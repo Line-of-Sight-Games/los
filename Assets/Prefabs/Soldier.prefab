@@ -1,0 +1,228 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4380717690802720389
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4380717690802720414}
+  - component: {fileID: 4380717690802720385}
+  - component: {fileID: 4380717690802720384}
+  - component: {fileID: 4380717690802720386}
+  - component: {fileID: 2230963200744647314}
+  - component: {fileID: 4658430169571143711}
+  - component: {fileID: 8291841830121597931}
+  - component: {fileID: 7218961582260931130}
+  - component: {fileID: 2309383051849836535}
+  m_Layer: 0
+  m_Name: Soldier
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4380717690802720414
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4380717690802720385
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &4380717690802720384
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: ea03d4cf1a86fb840a6a9f96f97551bb, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4380717690802720386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 110805a4a9cd9b145b2c67df48ed4586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  x: 0
+  y: 0
+  z: 0
+  id: 
+  soldierName: 
+  soldierTerrain: 
+  soldierSpeciality: 
+  soldierAbilities: []
+  soldierTeam: 0
+  soldierDisplayPriority: 0
+  soldierPortrait: {fileID: 0}
+  soldierPortraitText: 
+  fielded: 0
+  selected: 0
+  revealed: 0
+  usedAP: 0
+  hp: 6
+  ap: 0
+  mp: 0
+  tp: 0
+  xp: 0
+  terrainOn: 
+  rank: 
+  instantSpeed: 0
+  roundsFielded: 0
+  roundsFieldedConscious: 0
+  roundsWithoutFood: 0
+  loudActionRoundsVulnerable: 0
+  stunnedRoundsVulnerable: 0
+  suppressionValue: 0
+  healthRemovedFromStarve: 0
+  fighterHitCount: 0
+  plannerDonatedMove: 0
+  revealedByTeam: 
+  lastChosenStat: 
+  inventory:
+    itemPrefab: {fileID: 0}
+    linkedSoldier: {fileID: 0}
+  state: []
+  inventoryList: []
+  controlledBySoldiersList: []
+  controllingSoldiersList: []
+  revealedBySoldiersList: []
+  revealingSoldiersList: []
+  itemPrefab: {fileID: 4690525424084030571, guid: 9861933c9c6ad5c47a543593cd6719de, type: 3}
+  SRColliderMax: {fileID: 2230963200744647314}
+  SRColliderHalf: {fileID: 4658430169571143711}
+  SRColliderMin: {fileID: 8291841830121597931}
+  itemCollider: {fileID: 7218961582260931130}
+  bodyCollider: {fileID: 2309383051849836535}
+  selectedMaterial: {fileID: 2100000, guid: 11f5df4d1eaf47f468e4296dce19665b, type: 2}
+  deadMaterial: {fileID: 2100000, guid: df535cf857aaded49849689743f5a5f3, type: 2}
+  materials:
+  - {fileID: 2100000, guid: 2ce6e73b3cdeb1a419b3fa7d4e0705c7, type: 2}
+  - {fileID: 2100000, guid: 6e83e4994daf1bf4bbfa03d6931ddc9c, type: 2}
+  - {fileID: 2100000, guid: 5e797a46cd49e1c4a9c6935442ff413d, type: 2}
+  soldierUI: {fileID: 0}
+  soldierUIPrefab: {fileID: 5713749636568449379, guid: 0f3751c0026db9a4982c469260e5f172, type: 3}
+  game: {fileID: 0}
+  menu: {fileID: 0}
+--- !u!135 &2230963200744647314
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &4658430169571143711
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &8291841830121597931
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &7218961582260931130
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 4
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!65 &2309383051849836535
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4380717690802720389}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
