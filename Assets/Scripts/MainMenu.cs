@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEditor;
 using UnityEditor.TerrainTools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -31,6 +32,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         soldierPortraitPrefab, meleeAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
         overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen;
     public ItemIcon itemIconPrefab;
+    public LOSArrow LOSArrowPrefab;
     public List<Button> actionButtons;
     public List<Sprite> insignia;
     public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, additionalOptionsButton;
@@ -39,7 +41,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public string meleeChargeIndicator;
     public Soldier[] allSoldiers;
     public Soldier activeSoldier;
-    public bool overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, meleeResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag;
+    public bool overrideView, displayLOSArrows, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, meleeResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, fist;
 
@@ -155,6 +157,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 TurnTimerColour();
                 ChangeRoundIndicators();
 
+                //show LOS lines, detroy them if overridekey not held
+                DisplayLOSArrows(); 
+
                 if (activeSoldier != null)
                 {
                     DisplayActiveSoldier();
@@ -187,6 +192,40 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             return true;
         else
             return false;
+    }
+    public void DisplayLOSArrows()
+    {
+        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+        if (OverrideKey())
+        {
+            foreach (LOSArrow arrow in LOSArrows)
+                arrow.gameObject.SetActive(true);
+        }
+        else
+        {
+            foreach (LOSArrow arrow in LOSArrows)
+                arrow.gameObject.SetActive(false);
+        }
+            
+    }
+    public void DestroyLOSArrows()
+    {
+        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+        print("Destroying LOS arrows");
+        foreach (LOSArrow arrow in LOSArrows)
+            Destroy(arrow.gameObject);
+    }
+    public void GenerateLOSArrows()
+    {
+        foreach (Soldier s in allSoldiers)
+        {
+            foreach (string id in s.RevealingSoldiers)
+            {
+                LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s, soldierManager.FindSoldierById(id));
+                arrow.transform.SetAsLastSibling();
+                arrow.gameObject.SetActive(false);
+            }
+        }
     }
     public string PrintArray(System.Array array)
     {
@@ -324,7 +363,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ConfirmOverride()
     {
-        if (Input.GetKey(overrideKey))
+        if (OverrideKey())
         {
             //enter override
             FreezeTime();
@@ -1429,7 +1468,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenDetectionUI()
     {
-        if (Input.GetKey(overrideKey))
+        if (OverrideKey())
         {
             //actually open the alert log
             if (detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
@@ -1468,7 +1507,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         detectionAlert.transform.Find("Counter").Find("CounterSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + counter.stats.SR.Val + ")";
         detectionAlert.transform.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text = detectorLabel;
-        detectionAlert.transform.Find("Counter").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(detector);
+        detectionAlert.transform.Find("Counter").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(counter);
         detectionAlert.transform.Find("Counter").Find("CounterLocation").GetComponent<TextMeshProUGUI>().text = "X:" + counter.X + "\nY:" + counter.Y + "\nZ:" + counter.Z;
     }
     public void ConfirmDetections()
@@ -1610,12 +1649,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 }
             }
 
+            //destroy all LOS arrows
+            DestroyLOSArrows();
+
             //repopulate each soldier's revealing and revealedby lists with all reveals
             foreach (Soldier s in allSoldiers)
             {
                 s.RevealingSoldiers = allSoldiersRevealingFinal.GetValueOrDefault(s.id);
                 s.RevealedBySoldiers = allSoldiersRevealedBy.GetValueOrDefault(s.id);
             }
+
+            //generate all LOS arrows
+            GenerateLOSArrows();
 
             //destroy all detection alerts after done
             foreach (Transform child in detectionAlert)

@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Newtonsoft.Json.Linq;
 using System.Collections;
+using JetBrains.Annotations;
 
 public class Soldier : PhysicalObject, IDataPersistence
 {

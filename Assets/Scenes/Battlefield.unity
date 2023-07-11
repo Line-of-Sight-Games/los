@@ -84032,6 +84032,7 @@ MonoBehaviour:
   undoButton: {fileID: 1952558122}
   blockingScreen: {fileID: 66047217}
   itemIconPrefab: {fileID: 811143984741386969, guid: deef55176b5753942bdcc3aa474c508b, type: 3}
+  LOSArrowPrefab: {fileID: 7419626934468434370, guid: 5c299b9b47d05c64883c917299172067, type: 3}
   actionButtons:
   - {fileID: 1844398932}
   - {fileID: 1632509519}
