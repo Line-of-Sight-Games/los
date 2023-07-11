@@ -8,7 +8,7 @@ public class SoundManager : MonoBehaviour
 
     //audio stuff
     public AudioSource noisePlayer;
-    public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
+    public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade, counterattack;
     public bool banzaiPlayed;
 
     public void PlayBanzai()
@@ -62,5 +62,9 @@ public class SoundManager : MonoBehaviour
     public void PlayNewAbility()
     {
         noisePlayer.PlayOneShot(newAbilityUpgrade);
+    }
+    public void PlayCounterattack()
+    {
+        noisePlayer.PlayOneShot(counterattack);
     }
 }

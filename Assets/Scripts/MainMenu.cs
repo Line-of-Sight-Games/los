@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -31,6 +32,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen;
     public ItemIcon itemIconPrefab;
     public List<Button> actionButtons;
+    public List<Sprite> insignia;
     public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, additionalOptionsButton;
     private float playTimeTotal;
     public float turnTime;
@@ -915,9 +917,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         var soldierBanner = soldierOptionsUI.transform.Find("SoldierBanner");
 
-        soldierBanner.Find("SoldierPortrait").GetComponent<Image>().sprite = activeSoldier.soldierPortrait;
-        soldierBanner.Find("SoldierPortrait").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierName;
-        soldierBanner.Find("SoldierPortrait").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierTeam.ToString();
+        soldierBanner.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(activeSoldier);
         soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = "HP: " + activeSoldier.GetFullHP().ToString();
         soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = "AP: " + activeSoldier.ap.ToString();
         soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MP: " + activeSoldier.mp.ToString();
@@ -1460,17 +1460,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         detectionAlert.GetComponent<SoldierAlertDouble>().SetSoldiers(detector, counter);
         detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
+
         detectionAlert.transform.Find("Detector").Find("DetectorSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + detector.stats.SR.Val + ")";
         detectionAlert.transform.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text = counterLabel;
-        detectionAlert.transform.Find("Detector").Find("DetectorImage").GetComponent<Image>().sprite = detector.soldierPortrait;
-        detectionAlert.transform.Find("Detector").Find("DetectorImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = detector.soldierName;
-        detectionAlert.transform.Find("Detector").Find("DetectorImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = detector.soldierTeam.ToString();
+        detectionAlert.transform.Find("Detector").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(detector);
         detectionAlert.transform.Find("Detector").Find("DetectorLocation").GetComponent<TextMeshProUGUI>().text = "X:" + detector.X + "\nY:" + detector.Y + "\nZ:" + detector.Z;
-        detectionAlert.transform.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text = detectorLabel;
+
         detectionAlert.transform.Find("Counter").Find("CounterSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + counter.stats.SR.Val + ")";
-        detectionAlert.transform.Find("Counter").Find("CounterImage").GetComponent<Image>().sprite = counter.soldierPortrait;
-        detectionAlert.transform.Find("Counter").Find("CounterImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = counter.soldierName;
-        detectionAlert.transform.Find("Counter").Find("CounterImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = counter.soldierTeam.ToString();
+        detectionAlert.transform.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text = detectorLabel;
+        detectionAlert.transform.Find("Counter").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(detector);
         detectionAlert.transform.Find("Counter").Find("CounterLocation").GetComponent<TextMeshProUGUI>().text = "X:" + counter.X + "\nY:" + counter.Y + "\nZ:" + counter.Z;
     }
     public void ConfirmDetections()
@@ -1643,9 +1641,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         GameObject lostLosAlert = Instantiate(lostLosAlertPrefab, lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
         lostLosAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
-        lostLosAlert.transform.Find("SoldierImage").GetComponent<Image>().sprite = soldier.soldierPortrait;
-        lostLosAlert.transform.Find("SoldierImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = soldier.soldierName;
-        lostLosAlert.transform.Find("SoldierImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = soldier.soldierTeam.ToString();
+        lostLosAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         lostLosAlert.transform.Find("LostLosDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " is now hidden, remove him from the board.";
     }
     public IEnumerator OpenLostLOSList()
@@ -1704,9 +1700,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>DAMAGE RESISTED</color>";
 
         damageAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
-        damageAlert.transform.Find("SoldierImage").GetComponent<Image>().sprite = soldier.soldierPortrait;
-        damageAlert.transform.Find("SoldierImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = soldier.soldierName;
-        damageAlert.transform.Find("SoldierImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = soldier.soldierTeam.ToString();
+        damageAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         damageAlert.transform.Find("DamageDescription").GetComponent<TextMeshProUGUI>().text = description;
 
         //try and open damagealert
@@ -1797,9 +1791,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         inspirerAlert.transform.Find("InspirerTitle").GetComponent<TextMeshProUGUI>().text = inspirerTitle;
         inspirerAlert.transform.Find("InspirerDescription").GetComponent<TextMeshProUGUI>().text = reason;
-        inspirerAlert.transform.Find("SoldierImage").GetComponent<Image>().sprite = friendly.soldierPortrait;
-        inspirerAlert.transform.Find("SoldierImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = friendly.soldierName;
-        inspirerAlert.transform.Find("SoldierImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = friendly.soldierTeam.ToString();
+        inspirerAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(friendly);
     }
     public void CloseInspirerUI()
     {
@@ -1854,9 +1846,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         traumaAlert.transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = trauma.ToString();
         traumaAlert.transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = reason;
-        traumaAlert.transform.Find("SoldierImage").GetComponent<Image>().sprite = friendly.soldierPortrait;
-        traumaAlert.transform.Find("SoldierImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = friendly.soldierName;
-        traumaAlert.transform.Find("SoldierImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = friendly.soldierTeam.ToString();
+        traumaAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(friendly);
         traumaAlert.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = rolls.ToString();
         traumaAlert.transform.Find("XpOnResist").GetComponent<TextMeshProUGUI>().text = xpOnResist.ToString();
         traumaAlert.transform.Find("Distance").GetComponent<TextMeshProUGUI>().text = range;
@@ -2253,12 +2243,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         meleeAlert.GetComponent<SoldierAlertDouble>().SetSoldiers(attacker, defender);
         meleeAlert.transform.Find("Results").Find("DamageResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = damageResult;
         meleeAlert.transform.Find("Results").Find("ControlResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = controlResult;
-        meleeAlert.transform.Find("Attacker").Find("AttackerImage").GetComponent<Image>().sprite = attacker.soldierPortrait;
-        meleeAlert.transform.Find("Attacker").Find("AttackerImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = attacker.soldierName;
-        meleeAlert.transform.Find("Attacker").Find("AttackerImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = attacker.soldierTeam.ToString();
-        meleeAlert.transform.Find("Defender").Find("DefenderImage").GetComponent<Image>().sprite = defender.soldierPortrait;
-        meleeAlert.transform.Find("Defender").Find("DefenderImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = defender.soldierName;
-        meleeAlert.transform.Find("Defender").Find("DefenderImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = defender.soldierTeam.ToString();
+        meleeAlert.transform.Find("Attacker").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(attacker);
+        meleeAlert.transform.Find("Defender").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(defender);
     }
     public void OpenMeleeResultUI()
     {
@@ -2320,9 +2306,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (closestAlly != null)
         {
             GameObject closestAllyPortrait = Instantiate(soldierPortraitPrefab, closestAllyUI.transform.Find("ClosestAllyPanel"));
-            closestAllyPortrait.transform.GetComponent<Image>().sprite = closestAlly.soldierPortrait;
-            closestAllyPortrait.transform.Find("SoldierName").GetComponent<TextMeshProUGUI>().text = closestAlly.soldierName;
-            closestAllyPortrait.transform.Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = closestAlly.soldierTeam.ToString();
+            closestAllyPortrait.GetComponent<SoldierPortrait>().Init(closestAlly);
         }
     }
     public void ClearClosestAllyUI(GameObject closestAllyUI)
@@ -2839,9 +2823,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 GameObject xpAlert = Instantiate(xpAlertPrefab, xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
                 xpAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
-                xpAlert.transform.Find("SoldierImage").GetComponent<Image>().sprite = soldier.soldierPortrait;
-                xpAlert.transform.Find("SoldierImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = soldier.soldierName;
-                xpAlert.transform.Find("SoldierImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = soldier.soldierTeam.ToString();
+                xpAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
                 xpAlert.transform.Find("XpIndicator").GetComponent<TextMeshProUGUI>().text = xp.ToString();
                 xpAlert.transform.Find("XpDescription").GetComponent<TextMeshProUGUI>().text = xpDescription;
                 xpAlert.transform.Find("LearnerEnabled").GetComponent<Toggle>().isOn = learnerEnabled;
@@ -2976,9 +2958,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         GameObject promotionAlert = Instantiate(promotionAlertPrefab, promotionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
         promotionAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
-        promotionAlert.transform.Find("SoldierImage").GetComponent<Image>().sprite = soldier.soldierPortrait;
-        promotionAlert.transform.Find("SoldierImage").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = soldier.soldierName;
-        promotionAlert.transform.Find("SoldierImage").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = soldier.soldierTeam.ToString();
+        promotionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         promotionAlert.transform.Find("PromotionRank").GetComponent<TextMeshProUGUI>().text = soldier.NextRank();
 
         if (soldier.NextRank() == "Captain")

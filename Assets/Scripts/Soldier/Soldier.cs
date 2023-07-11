@@ -29,7 +29,6 @@ public class Soldier : PhysicalObject, IDataPersistence
     public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
     public BoxCollider bodyCollider;
 
-    private AllPortraits allPortraits;
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
 
@@ -327,12 +326,12 @@ public class Soldier : PhysicalObject, IDataPersistence
             "Sergeant" => "Corporal",
             "Corporal" => "Captain",
             "Captain" => "Major",
-            "Major" => "Lieutenant Colonel",
-            "Lieutenant Colonel" => "Colonel",
+            "Major" => "Lieutenant-Colonel",
+            "Lieutenant-Colonel" => "Colonel",
             "Colonel" => "Brigadier",
-            "Brigadier" => "Major General",
-            "Major General" => "Lieutenant General",
-            "Lieutenant General" => "General",
+            "Brigadier" => "Major-General",
+            "Major-General" => "Lieutenant-General",
+            "Lieutenant-General" => "General",
             "General" or _ => "",
         };
     }
@@ -348,11 +347,11 @@ public class Soldier : PhysicalObject, IDataPersistence
             "Corporal" => 16,
             "Captain" => 32,
             "Major" => 64,
-            "Lieutenant Colonel" => 128,
+            "Lieutenant-Colonel" => 128,
             "Colonel" => 256,
             "Brigadier" => 512,
-            "Major General" => 1024,
-            "Lieutenant General" => 2048,
+            "Major-General" => 1024,
+            "Lieutenant-General" => 2048,
             "General" => 4096,
             _ => 0,
         };
@@ -1332,21 +1331,11 @@ public class Soldier : PhysicalObject, IDataPersistence
     }
     public void DisplayStats()
     {
-        var portraitDisplay = soldierUI.transform.Find("SoldierPortrait").gameObject.GetComponent<Image>();
-        var soldierNameDisplay = soldierUI.transform.Find("SoldierPortrait").Find("SoldierName").GetComponent<TextMeshProUGUI>();
-        var teamDisplay = soldierUI.transform.Find("SoldierPortrait").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>();
-        var hpDisplay = soldierUI.transform.Find("HP").gameObject.GetComponent<TextMeshProUGUI>();
-        var apDisplay = soldierUI.transform.Find("AP").gameObject.GetComponent<TextMeshProUGUI>();
-        var mpDisplay = soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>();
-        var locDisplay = soldierUI.transform.Find("Location").gameObject.GetComponent<TextMeshProUGUI>();
-
-        portraitDisplay.sprite = soldierPortrait;
-        soldierNameDisplay.text = soldierName;
-        teamDisplay.text = soldierTeam.ToString();
-        hpDisplay.text = "HP:" + GetFullHP();
-        apDisplay.text = "AP:" + ap;
-        mpDisplay.text = "MP:" + mp;
-        locDisplay.text = "X:" + x +"   Y:" + y + "   Z:" + z;
+        soldierUI.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(this);
+        soldierUI.transform.Find("HP").gameObject.GetComponent<TextMeshProUGUI>().text = "HP:" + GetFullHP();
+        soldierUI.transform.Find("AP").gameObject.GetComponent<TextMeshProUGUI>().text = "AP:" + ap;
+        soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>().text = "MP:" + mp;
+        soldierUI.transform.Find("Location").gameObject.GetComponent<TextMeshProUGUI>().text = "X:" + x + "   Y:" + y + "   Z:" + z;
     }
     public void CheckRevealed()
     {
@@ -1492,42 +1481,62 @@ public class Soldier : PhysicalObject, IDataPersistence
 
     public Sprite LoadPortrait(string portraitName)
     {
-        allPortraits = FindObjectOfType<AllPortraits>();
+        TMP_Dropdown allPortraits = FindObjectOfType<AllPortraits>().allPortraitsDropdown;
         return portraitName switch
         {
-            "Alpine_Commander" => allPortraits.allPortraits.options[0].image,
-            "Alpine_Balaclava" => allPortraits.allPortraits.options[1].image,
-            "Alpine_BroadBrim" => allPortraits.allPortraits.options[2].image,
-            "Alpine_Cap" => allPortraits.allPortraits.options[3].image,
-            "Alpine_GasMask" => allPortraits.allPortraits.options[4].image,
-            "Alpine_Helmet" => allPortraits.allPortraits.options[5].image,
-            "Alpine_Visor" => allPortraits.allPortraits.options[6].image,
-            "Alpine_WWII" => allPortraits.allPortraits.options[7].image,
-            "Desert_Commander" => allPortraits.allPortraits.options[8].image,
-            "Desert_Balaclava" => allPortraits.allPortraits.options[9].image,
-            "Desert_BroadBrim" => allPortraits.allPortraits.options[10].image,
-            "Desert_DarkWWII" => allPortraits.allPortraits.options[11].image,
-            "Desert_GasMask" => allPortraits.allPortraits.options[12].image,
-            "Desert_Helmet" => allPortraits.allPortraits.options[13].image,
-            "Desert_LightWWII" => allPortraits.allPortraits.options[14].image,
-            "Desert_Shades" => allPortraits.allPortraits.options[15].image,
-            "Jungle_Commander" => allPortraits.allPortraits.options[16].image,
-            "Jungle_Balaclava" => allPortraits.allPortraits.options[17].image,
-            "Jungle_BeardWWII" => allPortraits.allPortraits.options[18].image,
-            "Jungle_Beret" => allPortraits.allPortraits.options[19].image,
-            "Jungle_DarkWWII" => allPortraits.allPortraits.options[20].image,
-            "Jungle_LightWWII" => allPortraits.allPortraits.options[21].image,
-            "Jungle_Rang" => allPortraits.allPortraits.options[22].image,
-            "Jungle_Shades" => allPortraits.allPortraits.options[23].image,
-            "Urban_Commander" => allPortraits.allPortraits.options[24].image,
-            "Urban_Anubis" => allPortraits.allPortraits.options[25].image,
-            "Urban_Beret" => allPortraits.allPortraits.options[26].image,
-            "Urban_BlackBalaclava" => allPortraits.allPortraits.options[27].image,
-            "Urban_BrownBalaclava" => allPortraits.allPortraits.options[28].image,
-            "Urban_Facepaint" => allPortraits.allPortraits.options[29].image,
-            "Urban_Shades" => allPortraits.allPortraits.options[30].image,
-            "Urban_WWII" => allPortraits.allPortraits.options[31].image,
-            _ => allPortraits.allPortraits.options[0].image,
+            "Alpine_Commander" => allPortraits.options[0].image,
+            "Alpine_Balaclava" => allPortraits.options[1].image,
+            "Alpine_BroadBrim" => allPortraits.options[2].image,
+            "Alpine_Cap" => allPortraits.options[3].image,
+            "Alpine_GasMask" => allPortraits.options[4].image,
+            "Alpine_Helmet" => allPortraits.options[5].image,
+            "Alpine_Visor" => allPortraits.options[6].image,
+            "Alpine_WWII" => allPortraits.options[7].image,
+            "Desert_Commander" => allPortraits.options[8].image,
+            "Desert_Balaclava" => allPortraits.options[9].image,
+            "Desert_BroadBrim" => allPortraits.options[10].image,
+            "Desert_DarkWWII" => allPortraits.options[11].image,
+            "Desert_GasMask" => allPortraits.options[12].image,
+            "Desert_Helmet" => allPortraits.options[13].image,
+            "Desert_LightWWII" => allPortraits.options[14].image,
+            "Desert_Shades" => allPortraits.options[15].image,
+            "Jungle_Commander" => allPortraits.options[16].image,
+            "Jungle_Balaclava" => allPortraits.options[17].image,
+            "Jungle_BeardWWII" => allPortraits.options[18].image,
+            "Jungle_Beret" => allPortraits.options[19].image,
+            "Jungle_DarkWWII" => allPortraits.options[20].image,
+            "Jungle_LightWWII" => allPortraits.options[21].image,
+            "Jungle_Rang" => allPortraits.options[22].image,
+            "Jungle_Shades" => allPortraits.options[23].image,
+            "Urban_Commander" => allPortraits.options[24].image,
+            "Urban_Anubis" => allPortraits.options[25].image,
+            "Urban_Beret" => allPortraits.options[26].image,
+            "Urban_BlackBalaclava" => allPortraits.options[27].image,
+            "Urban_BrownBalaclava" => allPortraits.options[28].image,
+            "Urban_Facepaint" => allPortraits.options[29].image,
+            "Urban_Shades" => allPortraits.options[30].image,
+            "Urban_WWII" => allPortraits.options[31].image,
+            _ => allPortraits.options[0].image,
+        };
+    }
+    public Sprite LoadInsignia(string rank)
+    {
+        TMP_Dropdown allInsignia = FindObjectOfType<AllInsignia>().allInsigniaDropdown;
+        return rank switch
+        {
+            "Private" => allInsignia.options[1].image,
+            "Lieutenant" => allInsignia.options[2].image,
+            "Sergeant" => allInsignia.options[3].image,
+            "Corporal" => allInsignia.options[4].image,
+            "Captain" => allInsignia.options[5].image,
+            "Major" => allInsignia.options[6].image,
+            "Lieutenant-Colonel" => allInsignia.options[7].image,
+            "Colonel" => allInsignia.options[8].image,
+            "Brigadier" => allInsignia.options[9].image,
+            "Major-General" => allInsignia.options[10].image,
+            "Lieutenant-General" => allInsignia.options[11].image,
+            "General" => allInsignia.options[12].image,
+            "Recruit" or _ => allInsignia.options[0].image,
         };
     }
     public string IncrementRandom(string choiceStat)

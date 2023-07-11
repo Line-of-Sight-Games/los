@@ -1149,9 +1149,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                         //add flanker to ui to visualise
                         GameObject flankerPortrait = Instantiate(menu.soldierPortraitPrefab, menu.flankersShotUI.transform.Find("FlankersPanel"));
-                        flankerPortrait.transform.GetComponent<Image>().sprite = s.soldierPortrait;
-                        flankerPortrait.transform.Find("SoldierName").GetComponent<TextMeshProUGUI>().text = s.soldierName;
-                        flankerPortrait.transform.Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = s.soldierTeam.ToString();
+                        flankerPortrait.GetComponent<SoldierPortrait>().Init(s);
                     }
                 }
             }
@@ -1599,9 +1597,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                 //add flanker to ui to visualise
                 GameObject flankerPortrait = Instantiate(menu.soldierPortraitPrefab, menu.flankersMeleeAttackerUI.transform.Find("FlankersPanel"));
-                flankerPortrait.transform.GetComponent<Image>().sprite = s.soldierPortrait;
-                flankerPortrait.transform.Find("SoldierName").GetComponent<TextMeshProUGUI>().text = s.soldierName;
-                flankerPortrait.transform.Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = s.soldierTeam.ToString();
+                flankerPortrait.GetComponent<SoldierPortrait>().Init(s);
             }
         }
 
@@ -1712,9 +1708,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     //add flanker to ui to visualise
                     GameObject flankerPortrait = Instantiate(menu.soldierPortraitPrefab, menu.flankersMeleeDefenderUI.transform.Find("FlankersPanel"));
-                    flankerPortrait.transform.GetComponent<Image>().sprite = s.soldierPortrait;
-                    flankerPortrait.transform.Find("SoldierName").GetComponent<TextMeshProUGUI>().text = s.soldierName;
-                    flankerPortrait.transform.Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = s.soldierTeam.ToString();
+                    flankerPortrait.GetComponent<SoldierPortrait>().Init(s);
                 }
             }
 
@@ -1983,6 +1977,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else if (meleeDamage < 0)
                         {
+                            //play counterattack sound
+                            soundManager.PlayCounterattack();
+
                             if (activeSoldier.inventory.IsWearingExoArmour() && !defender.inventory.IsWearingJuggernautArmour()) //exo counter kill on standard man
                             {
                                 damageMessage = "<color=green>INSTANT KILL\n(Exo Armour)</color>";

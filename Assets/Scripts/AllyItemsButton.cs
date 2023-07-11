@@ -17,9 +17,7 @@ public class AllyItemsButton : MonoBehaviour
     {
         linkedSoldier = soldier;
         linkedItemPanel = allyItemPanel;
-        transform.Find("SoldierPortrait").GetComponent<Image>().sprite = linkedSoldier.soldierPortrait;
-        transform.Find("SoldierPortrait").Find("SoldierName").GetComponent<TextMeshProUGUI>().text = linkedSoldier.soldierName;
-        transform.Find("SoldierPortrait").Find("TeamIndicator").Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = linkedSoldier.soldierTeam.ToString();
+        transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
 
         return this;
     }
