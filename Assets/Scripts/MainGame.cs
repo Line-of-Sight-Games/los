@@ -1306,9 +1306,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                                 //paying xp for hit
                                 if (hitChance >= 10)
-                                    menu.AddXpAlert(activeSoldier, 8, "Critical hit on " + target.soldierName + "!", false);
+                                    menu.AddXpAlert(activeSoldier, 8, "Critical shot on " + target.soldierName + "!", false);
                                 else
-                                    menu.AddXpAlert(activeSoldier, 10, "Critical hit with a " + hitChance + "% chance on " + target.soldierName + "!", false);
+                                    menu.AddXpAlert(activeSoldier, 10, "Critical shot with a " + hitChance + "% chance on " + target.soldierName + "!", false);
                             }
                             else
                             {
