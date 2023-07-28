@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEditor;
-using UnityEditor.TerrainTools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -157,7 +156,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 TurnTimerColour();
                 ChangeRoundIndicators();
 
-                //show LOS lines, detroy them if overridekey not held
+                //show LOS lines
                 DisplayLOSArrows(); 
 
                 if (activeSoldier != null)

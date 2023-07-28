@@ -1962,10 +1962,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             else
                             {
                                 if (activeSoldier.IsBloodRaged())
-                                {
                                     meleeDamage *= 2;
-                                    activeSoldier.UnsetBloodRage();
-                                }
 
                                 if (defender.inventory.IsWearingJuggernautArmour() && !activeSoldier.inventory.IsWearingExoArmour())
                                     damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
@@ -2001,6 +1998,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             defender.TakeDamage(activeSoldier, meleeDamage, true, new List<string>() { "Melee" });
                         }
                     }
+                    
+                    //reset blood rage even if non-successful attack
+                    activeSoldier.UnsetBloodRage();
                 }
 
                 //add xp for successful melee attack

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Terminal : PhysicalObject, IDataPersistence
+public class Terminal : POI, IDataPersistence
 {
     public Dictionary<string, object> details;
     public string terrain;
