@@ -273,8 +273,6 @@ public class Item : PhysicalObject, IDataPersistence
             gunMedCoverDamage = reader.allItems.items[itemIndex].Med_Cov_Damage;
             gunLongCoverDamage = reader.allItems.items[itemIndex].Long_Cov_Damage;
         }
-    
-    
 
         manager.RefreshItemList();
 

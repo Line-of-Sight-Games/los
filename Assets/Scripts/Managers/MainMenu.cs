@@ -26,7 +26,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, 
         configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
         traumaAlertUI, traumaUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
-        coverAlertUI, externalItemSourcesUI, allyItemButtonUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, allyItemPanelPrefab, detectionAlertPrefab, 
+        coverAlertUI, externalItemSourcesUI, allyItemButtonUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, allyInventoryPanelPrefab, detectionAlertPrefab, 
         lostLosAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyItemsButtonPrefab, 
         soldierPortraitPrefab, meleeAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
         overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen;
@@ -1665,7 +1665,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             foreach (Transform child in detectionAlert)
                 Destroy(child.gameObject);
 
-            CloseDetectionUI(); 
+            //only close the detectionUI if it's open
+            if (detectionUI.activeInHierarchy)
+                CloseDetectionUI(); 
         }
         else
             Debug.Log("Haven't scrolled all the way to the bottom");
@@ -2551,14 +2553,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (activeSoldier.IsSameTeamAs(s) && s.IsFielded() && (!s.IsMeleeControlled() || s.IsUnconscious()))
             {
                 if (activeSoldier.PhysicalObjectWithinItemRadius(s) && s.IsInteractable())
-                    Instantiate(allyItemsButtonPrefab.GetComponent<AllyItemsButton>().Init(s, Instantiate(allyItemPanelPrefab.GetComponent<AllyItemsPanel>().Init(s), externalItemSourcesUI.transform).GetComponent<AllyItemsPanel>()).gameObject, allyItemButtonUI.transform);
+                    Instantiate(allyItemsButtonPrefab.GetComponent<AllyItemsButton>().Init(s, Instantiate(allyInventoryPanelPrefab.GetComponent<AllyItemsPanel>().Init(s), externalItemSourcesUI.transform).GetComponent<AllyItemsPanel>()).gameObject, allyItemButtonUI.transform);
             }
         }
     }
     public void OpenConfigureUI()
     {
         Transform inventoryUI = configureUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("InventoryContent");
-        Transform groundItemsUI = configureUI.transform.Find("ItemDisplayPanel").Find("ExternalItemSources").Find("GroundItemsPanel").Find("Viewport").Find("GroundItemsContent");
+        Transform groundItemsUI = configureUI.transform.Find("ExternalItemSources").Find("GroundItemsPanel").Find("Viewport").Find("GroundItemsContent");
 
         //populate inventory icons
         foreach (Item i in activeSoldier.inventory.Items)
@@ -2577,26 +2579,26 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "0";
         
         //reset all pickup counters to 0 for all items menu
-        Transform allItemsUI = configureUI.transform.Find("ItemDisplayPanel").Find("ExternalItemSources").Find("AllItemsPanel").Find("Viewport").Find("AllItemsContent");
+        Transform allItemsUI = configureUI.transform.Find("ExternalItemSources").Find("AllItemsPanel").Find("Viewport").Find("AllItemsContent");
         
         foreach (Transform child in allItemsUI)
             child.GetComponent<ItemIcon>().pickupNumber = 0;
 
         //clear all display panels
         Transform inventoryItemsUI = configureUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("InventoryContent");
-        Transform groundItemsUI = configureUI.transform.Find("ItemDisplayPanel").Find("ExternalItemSources").Find("GroundItemsPanel").Find("Viewport").Find("GroundItemsContent");
-        Transform allyItemsButtonUI = configureUI.transform.Find("ItemDisplayPanel").Find("ExternalItemSources").Find("AllyItemsButtonUI").Find("Viewport").Find("AllyButtonContent");
-        List<AllyItemsPanel> allyItemsPanels = configureUI.transform.Find("ItemDisplayPanel").Find("ExternalItemSources").GetComponentsInChildren<AllyItemsPanel>().ToList();
+        Transform groundItemsUI = configureUI.transform.Find("ExternalItemSources").Find("GroundItemsPanel").Find("Viewport").Find("GroundItemsContent");
+        Transform allyButtonPanel = configureUI.transform.Find("ExternalItemSources").Find("AllyButtonPanel");
+        List<AllyItemsPanel> allyInventoryPanels = configureUI.transform.Find("ExternalItemSources").GetComponentsInChildren<AllyItemsPanel>().ToList();
 
         ClearItemPanel(inventoryItemsUI);
         ClearItemPanel(groundItemsUI);
-        ClearItemPanel(allyItemsButtonUI);
-        foreach (AllyItemsPanel allyPanel in allyItemsPanels)
+        ClearItemPanel(allyButtonPanel);
+        foreach (AllyItemsPanel allyPanel in allyInventoryPanels)
             Destroy(allyPanel.gameObject);
 
         //close all open display panels
-        GameObject allItemsPanelUI = configureUI.transform.Find("ItemDisplayPanel").Find("ExternalItemSources").Find("AllItemsPanel").gameObject;
-        GameObject groundItemsPanelUI = configureUI.transform.Find("ItemDisplayPanel").Find("ExternalItemSources").Find("GroundItemsPanel").gameObject;
+        GameObject allItemsPanelUI = configureUI.transform.Find("ExternalItemSources").Find("AllItemsPanel").gameObject;
+        GameObject groundItemsPanelUI = configureUI.transform.Find("ExternalItemSources").Find("GroundItemsPanel").gameObject;
 
         CloseItemPanel(allItemsPanelUI);
         CloseItemPanel(groundItemsPanelUI);

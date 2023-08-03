@@ -6,9 +6,11 @@ public class AllyItemsPanel : MonoBehaviour
 {
     public MainMenu menu;
     public Soldier linkedSoldier;
+    public SoundManager soundManager;
 
     public AllyItemsPanel Init(Soldier soldier)
     {
+        soundManager = FindObjectOfType<SoundManager>();
         menu = FindObjectOfType<MainMenu>();
         linkedSoldier = soldier;
 
@@ -18,5 +20,10 @@ public class AllyItemsPanel : MonoBehaviour
     public void CloseAllyItemPanel()
     {
         menu.CloseItemPanel(gameObject);
+    }
+
+    public void ButtonSoundTrigger()
+    {
+        soundManager.PlayButtonPress();
     }
 }
