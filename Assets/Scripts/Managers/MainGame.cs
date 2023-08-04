@@ -223,7 +223,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (s.suppressionValue != 0)
                     s.suppressionValue = 0;
             }
-            else //run things that trigger at the end of another player's turn
+            else //run things that trigger at the end of another team's turn
             {
                 
             }
@@ -241,7 +241,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     StartCoroutine(s.TakePoisonDamage());
 
             }
-            else //run things that trigger at the end of another player's turn
+            else //run things that trigger at the end of another team's turn
             {
 
             }
@@ -293,7 +293,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else
             {
-                //run things that trigger at the start of another player's turn
+                //run things that trigger at the start of another team's turn
             }
         }
 
@@ -525,9 +525,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 //get maxmove
                 float maxMove;
-                if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Full Move"))
+                if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Full"))
                     maxMove = activeSoldier.FullMove;
-                else if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Half Move"))
+                else if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Half"))
                     maxMove = activeSoldier.HalfMove;
                 else
                     maxMove = activeSoldier.TileMove;
@@ -809,9 +809,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         var traumaMod = activeSoldier.tp switch
         {
-            1 => 0.05f,
-            2 => 0.15f,
-            3 => 0.25f,
+            1 => 0.1f,
+            2 => 0.2f,
+            3 => 0.4f,
             _ => 0.0f,
         };
 
@@ -823,7 +823,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float sustenanceMod = 0;
 
         if (activeSoldier.roundsWithoutFood >= 20)
-            sustenanceMod = 0.25f;
+            sustenanceMod = 0.5f;
 
         Debug.Log("Sustenance Mod: " + sustenanceMod);
         return 1 - sustenanceMod;
@@ -1212,6 +1212,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 Vector3 coverPosition = new(x, y, z);
                 hitChance = Mathf.RoundToInt(((WeaponHitChanceCover(coverPosition, gun) + 10 * RelevantWeaponSkill(gun)) * VisMod() * RainModCover() * WindModCover(coverPosition) * ShooterHealthMod() * ShooterTerrainMod() * ElevationModCover(coverPosition)) - ShooterSuppressionMod(suppressionCheck));
+                if (hitChance < 0)
+                    hitChance = 0;
             }
             else
                 hitChance = 0;
@@ -1259,7 +1261,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (CheckAP(ap))
             {
                 //deduct ap for aiming
-                DeductAP(ap  - 1);
+                DeductAP(ap - 1);
 
                 Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
                 Soldier target = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
@@ -1268,12 +1270,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //check for ammo
                 if (gun.CheckAnyAmmo())
                 {
-                    //deduct ap for the shot
-                    DeductAP(1);
-
-                    //standard shot proceeds
-                    if (shotTypeDropdown.value == 0)
+                    if (shotTypeDropdown.value == 0) //standard shot
                     {
+                        //deduct ap for the shot
+                        DeductAP(1);
+
                         gun.SpendSingleAmmo();
                         
                         int randNum1 = RandomNumber(0, 100);
@@ -1297,12 +1298,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         //standard shot hits
                         if (randNum1 <= hitChance)
                         {
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+
                             //standard shot crit hits
                             if (randNum2 <= critChance)
                             {
                                 target.TakeDamage(activeSoldier, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
                                 menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL HIT </color>";
-                                menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                                 //paying xp for hit
                                 if (hitChance >= 10)
@@ -1314,7 +1316,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             {
                                 target.TakeDamage(activeSoldier, gun.gunDamage, false, new List<string>() { "Shot" });
                                 menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
-                                menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                                 //paying xp for hit
                                 if (hitChance >= 10)
@@ -1329,7 +1330,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         else
                         {
                             menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}. Resolve hits as damage event ({gun.gunDamage}), or cover hit {gun.DisplayGunCoverDamage()}.";
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                             //show los check button if shot misses
                             menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
@@ -1349,8 +1350,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.OpenShotResultUI();
                         menu.CloseShotUI();
                     }
-                    else if (shotTypeDropdown.value == 1)
+                    else if (shotTypeDropdown.value == 1) //supression shot
                     {
+                        //deduct ap for the shot
+                        DeductAP(1);
+
                         gun.SpendSpecificAmmo(gun.gunSuppressionDrain, true);
 
                         int suppressionValue = CalculateRangeBracket(CalculateRange(activeSoldier, target)) switch
@@ -1370,12 +1374,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.OpenShotResultUI();
                         menu.CloseShotUI();
                     }
-                    else
+                    else //cover shot
                     {
                         if (int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TMP_InputField>().text, out x) && int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TMP_InputField>().text, out y) && int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TMP_InputField>().text, out z))
                         {
                             if (x >= 1 && x <= maxX && y >= 1 && y <= maxY && z >= 0 && z <= maxZ)
                             {
+                                //deduct ap for the shot
+                                DeductAP(1);
+
                                 gun.SpendSingleAmmo();
 
                                 int randNum1 = RandomNumber(0, 100);
@@ -1410,6 +1417,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 //standard shot hits cover
                                 if (randNum1 <= hitChance)
                                 {
+                                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+
                                     //critical shot hits cover
                                     if (randNum2 <= critChance)
                                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
@@ -1420,7 +1429,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 else
                                 {
                                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}. Resolve any hits as damage event ({gun.gunDamage}), or cover hit {gun.DisplayGunCoverDamage()}.";
+                                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                                 }
 
                                 //trigger loud action
@@ -1529,9 +1538,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //check for inspirer
         attackerMeleeSkill += activeSoldier.InspirerBonusWeaponMelee();
 
-        //check for starve penalties
-        if (activeSoldier.roundsWithoutFood >= 20)
-            attackerMeleeSkill = Mathf.RoundToInt(attackerMeleeSkill * 0.75f);
+        //apply sustenance debuff
+        attackerMeleeSkill *= AttackerSustenanceMod();
 
         //correct negatives
         if (attackerMeleeSkill < 0)
@@ -1539,6 +1547,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         Debug.Log("Attacker M skill: " + attackerMeleeSkill);
         return attackerMeleeSkill;
+    }
+    public float AttackerSustenanceMod()
+    {
+        float sustenanceMod = 0;
+
+        if (activeSoldier.roundsWithoutFood >= 20)
+            sustenanceMod = 0.5f;
+
+        Debug.Log("Sustenance Mod: " + sustenanceMod);
+        return 1 - sustenanceMod;
     }
     public int AttackerWeaponDamage(Item weapon)
     {
@@ -2540,7 +2558,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //block confirm if all buttons haven't been clicked
             if (!unresolved)
             {
-                //destroy all detection alerts for given player after done
+                //destroy all detection alerts for given team after done
                 foreach (Transform child in traumaAlerts)
                     Destroy(child.gameObject);
 
@@ -2661,7 +2679,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             if (friendly.IsAbleToSee() && inspirer.IsSameTeamAs(friendly) && friendly.PhysicalObjectWithinMaxRadius(inspirer))
             {
-                menu.AddInspirerAlert(friendly, "An Inspirer (" + inspirer.soldierName + ") is within SR range of " + friendly.soldierName + ". Check for LOS?");
+                menu.AddInspirerAlert(friendly, "An Inspirer (" + inspirer.soldierName + ") is within SR range of " + friendly.soldierName + ". Is LOS present?");
                 openInspirerUI = true; 
             }
         }
@@ -2887,7 +2905,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         string movingSoldierActiveStat = "F";
         string detecteeActiveStat = "C";
-        int[] movingSoldierMultipliers = { 4, 2, 1 };
+        int[] movingSoldierMultipliers = { 3, 2, 1 };
         int[] detecteeMultipliers = { 4, 3, 2 };
 
         //if moving soldier is offturn, swap the default active stats and Perceptiveness multipliers

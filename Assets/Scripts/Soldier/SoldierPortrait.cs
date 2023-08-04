@@ -8,7 +8,10 @@ public class SoldierPortrait : MonoBehaviour
     {
         GetComponent<Image>().sprite = s.soldierPortrait;
         transform.Find("SoldierName").GetComponent<TextMeshProUGUI>().text = s.soldierName;
-        transform.Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = s.soldierTeam.ToString();
+        if (s.soldierTeam == 1)
+            transform.Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = $"<color=red>{s.soldierTeam}</color>";
+        else
+            transform.Find("TeamIndicator").GetComponent<TextMeshProUGUI>().text = $"<color=blue>{s.soldierTeam}</color>";
         transform.Find("RankIndicator").GetComponent<Image>().sprite = s.LoadInsignia(s.rank);
     }
 }

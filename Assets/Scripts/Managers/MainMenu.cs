@@ -665,10 +665,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
 
         if (p1DeadCount == allSoldiers.Length / 2)
-            game.GameOver("Player 2 Victory");
+            game.GameOver("<color=blue>Team 2</color> Victory");
 
         if (p2DeadCount == allSoldiers.Length / 2)
-            game.GameOver("Player 1 Victory");
+            game.GameOver("<color=red>Team 1</color> Victory");
     }
     public void DisplayItems()
     {
@@ -846,7 +846,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (activeSoldier.state.Contains("Last Stand"))
                 buttonStates.Add(moveButton, "Last Stand");
             else if (activeSoldier.mp == 0)
-                buttonStates.Add(moveButton, "No MP");
+                buttonStates.Add(moveButton, "No MA");
 
             //block cover button
             if (activeSoldier.inventory.IsWearingJuggernautArmour())
@@ -958,8 +958,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         soldierBanner.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(activeSoldier);
         soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = "HP: " + activeSoldier.GetFullHP().ToString();
         soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = "AP: " + activeSoldier.ap.ToString();
-        soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MP: " + activeSoldier.mp.ToString();
-        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Inst. Speed: " + activeSoldier.InstantSpeed.ToString();
+        soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MA: " + activeSoldier.mp.ToString();
+        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Speed: " + activeSoldier.InstantSpeed.ToString();
         soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = "XP: " + activeSoldier.xp.ToString();
         soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = "Status: " + GetStatus();
 
@@ -1483,6 +1483,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddDetectionAlert(Soldier detector, Soldier counter, string detectorLabel, string counterLabel, string arrowType)
     {
+        print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
         //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
             if ((child.GetComponent<SoldierAlertDouble>().s1 == detector && child.GetComponent<SoldierAlertDouble>().s2 == counter) || (child.GetComponent<SoldierAlertDouble>().s1 == counter && child.GetComponent<SoldierAlertDouble>().s2 == detector))
@@ -1661,13 +1662,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //generate all LOS arrows
             GenerateLOSArrows();
 
-            //destroy all detection alerts after done
-            foreach (Transform child in detectionAlert)
-                Destroy(child.gameObject);
-
             //only close the detectionUI if it's open
             if (detectionUI.activeInHierarchy)
-                CloseDetectionUI(); 
+            {
+                //destroy all detection alerts after done
+                foreach (Transform child in detectionAlert)
+                    Destroy(child.gameObject);
+
+                CloseDetectionUI();
+            }     
         }
         else
             Debug.Log("Haven't scrolled all the way to the bottom");
@@ -2856,7 +2859,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (soldier != null && xp > 0)
         {
-            //block duplicate xp alerts being created, made to obey the rule that xp for avoidance or detection can only be one per player per turn
+            //block duplicate xp alerts being created, made to obey the rule that xp for avoidance or detection can only be one per soldier per turn
             foreach (Transform child in xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
             {
                 //destroy duplicate avoidances/detections against same detecting/avoiding soldier
@@ -2935,7 +2938,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             CheckPromotion(xpAlertsList);
 
-            //destroy all xp alerts for given player after done
+            //destroy all xp alerts for given team after done
             foreach (Transform child in xpAlerts)
                 if (child.GetComponent<SoldierAlert>().soldier.IsOnturn())
                     Destroy(child.gameObject);
@@ -3028,7 +3031,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (confirm)
         {
-            //destroy all promotion alerts for given player after done
+            //destroy all promotion alerts for given team after done
             foreach (Transform child in promotionAlerts)
                 if (child.GetComponent<SoldierAlert>().soldier.IsOnturn())
                     Destroy(child.gameObject);

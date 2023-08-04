@@ -249,14 +249,14 @@ public class SoldierAlert : MonoBehaviour
                 {
                     soldier.TakeTrauma(trauma);
                     transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
-                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " failed to resist the trauma and took " + trauma + " trauma. " + /*(" + rolls + " Resilience check).*/ "He is in " + soldier.GetTraumaState() + " state.";
+                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " failed to resist the trauma and took " + trauma + " trauma. " + /*(" + rolls + " Resilience check).*/ "He is now " + soldier.GetTraumaState() + ".";
                 }
             }
             else
             {
                 soldier.TakeTrauma(trauma);
                 transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
-                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " took " + trauma + " trauma. " + /*(no Resilience check alllowed).*/ "He is in " + soldier.GetTraumaState() + " state.";
+                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " took " + trauma + " trauma. " + /*(no Resilience check alllowed).*/ "He is now " + soldier.GetTraumaState() + ".";
             }
             
         }
@@ -264,7 +264,7 @@ public class SoldierAlert : MonoBehaviour
         {
             transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=white>NO LOS</color>";
             transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = "";
-            transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = "No LOS, no trauma points accrued.";
+            transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = "No trauma points accrued.";
         }
 
         traumaButton.SetActive(false);

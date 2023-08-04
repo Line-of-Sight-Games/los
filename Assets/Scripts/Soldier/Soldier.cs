@@ -1100,7 +1100,7 @@ public class Soldier : PhysicalObject, IDataPersistence
             
 
             //add damage alert
-            menu.AddDamageAlert(this, soldierName + " took " + damage + " " + menu.PrintList(damageSource) + " damage. He is in " + CheckHealthState() + " state.", false);
+            menu.AddDamageAlert(this, soldierName + " took " + damage + " " + menu.PrintList(damageSource) + " damage. He is now " + CheckHealthState() + ".", false);
         }
         else
         {
@@ -1195,7 +1195,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         {
             instantSpeed = (int)((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove()) + stats.Str.Val;
 
-            //halve movement for player 1 on first turn
+            //halve movement for team 1 on first turn
             if (soldierTeam == 1 && game.currentRound == 1)
                 instantSpeed /= 2;
 
@@ -1335,7 +1335,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         soldierUI.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(this);
         soldierUI.transform.Find("HP").gameObject.GetComponent<TextMeshProUGUI>().text = "HP:" + GetFullHP();
         soldierUI.transform.Find("AP").gameObject.GetComponent<TextMeshProUGUI>().text = "AP:" + ap;
-        soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>().text = "MP:" + mp;
+        soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>().text = "MA:" + mp;
         soldierUI.transform.Find("Location").gameObject.GetComponent<TextMeshProUGUI>().text = "X:" + x + "   Y:" + y + "   Z:" + z;
     }
     public void CheckRevealed()
