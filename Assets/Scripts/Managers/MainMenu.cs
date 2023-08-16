@@ -13,6 +13,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 {
     //secret override key
     public KeyCode overrideKey = KeyCode.LeftShift;
+    public KeyCode secondOverrideKey = KeyCode.Space;
 
     public SoldierManager soldierManager;
     public ItemManager itemManager;
@@ -156,8 +157,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 TurnTimerColour();
                 ChangeRoundIndicators();
 
-                //show LOS lines
-                DisplayLOSArrows(); 
+                //show LOS gizmos
+                DisplayLOSGizmos(); 
 
                 if (activeSoldier != null)
                 {
@@ -192,21 +193,39 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
             return false;
     }
-    public void DisplayLOSArrows()
+    public bool SecondOverrideKey()
     {
-        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
-        if (OverrideKey())
+        if (Input.GetKey(secondOverrideKey))
+            return true;
+        else
+            return false;
+    }
+    public void DisplayLOSGizmos()
+    {
+        if (OverrideKey() && SecondOverrideKey())
         {
-            foreach (LOSArrow arrow in LOSArrows)
-                arrow.gameObject.SetActive(true);
+            DisplayLOSArrows();
         }
         else
         {
-            foreach (LOSArrow arrow in LOSArrows)
-                arrow.gameObject.SetActive(false);
+            HideLOSArrows();
         }
-            
     }
+    public void DisplayLOSArrows()
+    {
+        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+
+        foreach (LOSArrow arrow in LOSArrows)
+            arrow.gameObject.SetActive(true);
+    }
+    public void HideLOSArrows()
+    {
+        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+
+        foreach (LOSArrow arrow in LOSArrows)
+            arrow.gameObject.SetActive(false);
+    }
+
     public void DestroyLOSArrows()
     {
         var LOSArrows = FindObjectsOfType<LOSArrow>(true);
@@ -852,7 +871,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (activeSoldier.inventory.IsWearingJuggernautArmour())
                 buttonStates.Add(coverButton, "<color=green>Juggernaut</color>"); 
             else if (activeSoldier.IsInCover())
-                buttonStates.Add(coverButton, "<color=green>In Cover</color>");
+                buttonStates.Add(coverButton, "<color=green>Taking Cover</color>");
             
 
             //block shot and overwatch buttons
@@ -959,7 +978,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = "HP: " + activeSoldier.GetFullHP().ToString();
         soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = "AP: " + activeSoldier.ap.ToString();
         soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MA: " + activeSoldier.mp.ToString();
-        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Speed: " + activeSoldier.InstantSpeed.ToString();
+        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Max Move: " + activeSoldier.InstantSpeed.ToString();
         soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = "XP: " + activeSoldier.xp.ToString();
         soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = "Status: " + GetStatus();
 
@@ -1167,7 +1186,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public string GetCoverState()
     {
         if (activeSoldier.IsInCover())
-            return ", <color=green>In Cover</color>";
+            return ", <color=green>Taking Cover</color>";
         else
             return "";
     }
@@ -2408,6 +2427,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         GameObject backButton = moveUI.transform.Find("BackButton").gameObject;
 
         List<TMP_Dropdown.OptionData> moveTypeDetails;
+        moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         moveTypeDropdown.ClearOptions();
 
         //add suppression indicators if suppressed
@@ -2452,6 +2472,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (activeSoldier.inventory.IsWearingExoArmour())
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Exo Jump</color>"));
         moveTypeDropdown.AddOptions(moveTypeDetails);
+
+        //grey options according to AP
+        if (activeSoldier.ap < 3)
+        {
+            moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
+            moveTypeDropdown.value = 1;
+        }
+        if (activeSoldier.ap < 2)
+        {
+            moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");
+            moveTypeDropdown.value = 2;
+        }
 
         //block cover for JA
         if (activeSoldier.inventory.IsWearingJuggernautArmour())
@@ -2734,32 +2766,35 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //damage event functions - menu
     public void OpenDamageEventUI()
     {
-        TMP_Dropdown damageEventTypeDropdown = damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>();
-        damageEventTypeDropdown.ClearOptions();
+        if (OverrideKey())
+        {
+            TMP_Dropdown damageEventTypeDropdown = damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>();
+            damageEventTypeDropdown.ClearOptions();
 
-        //generate damage event type dropdown
-        List<TMP_Dropdown.OptionData> damageEventTypeDetails = new()
+            //generate damage event type dropdown
+            List<TMP_Dropdown.OptionData> damageEventTypeDetails = new()
         {
             new TMP_Dropdown.OptionData("Fall Damage"),
             new TMP_Dropdown.OptionData("Structural Collapse"),
             new TMP_Dropdown.OptionData("Other"),
         };
-        if (activeSoldier.IsBloodletter() && !activeSoldier.bloodLettedThisTurn)
-            damageEventTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Bloodletting</color>"));
-        damageEventTypeDropdown.AddOptions(damageEventTypeDetails);
+            if (activeSoldier.IsBloodletter() && !activeSoldier.bloodLettedThisTurn)
+                damageEventTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Bloodletting</color>"));
+            damageEventTypeDropdown.AddOptions(damageEventTypeDetails);
 
-        //prefill movement position inputs with current position
-        damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
-        damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
-        damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
+            //prefill movement position inputs with current position
+            damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
+            damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
+            damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
 
-        /*//block bloodletter if already bloodletted this turn
-        if (activeSoldier.IsBloodletter() && activeSoldier.bloodLettedThisTurn)
-            damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Bloodletting");
-        else
-            damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();*/
+            /*//block bloodletter if already bloodletted this turn
+            if (activeSoldier.IsBloodletter() && activeSoldier.bloodLettedThisTurn)
+                damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Bloodletting");
+            else
+                damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();*/
 
-        damageEventUI.SetActive(true);
+            damageEventUI.SetActive(true);
+        }
     }
     public void ClearDamageEventUI()
     {
@@ -2771,7 +2806,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text = "";
         damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text = "";
         damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        damageEventUI.transform.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value = 0;
+        damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value = 0;
         damageEventUI.transform.Find("DamageSource").Find("DamageSourceInput").GetComponent<TMP_InputField>().text = "";
         clearDamageEventFlag = false;
     }
@@ -2791,7 +2826,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageEventUI.transform.Find("Other").gameObject.SetActive(false);
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
             damageEventUI.transform.Find("Location").gameObject.SetActive(true);
-            damageEventUI.transform.Find("Terrain").gameObject.SetActive(true);
         }
         else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Collapse"))
         {
@@ -2800,7 +2834,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageEventUI.transform.Find("Other").gameObject.SetActive(false);
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
             damageEventUI.transform.Find("Location").gameObject.SetActive(true);
-            damageEventUI.transform.Find("Terrain").gameObject.SetActive(true);
         }
         else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Other"))
         {
@@ -2809,7 +2842,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageEventUI.transform.Find("Other").gameObject.SetActive(true);
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(true);
             damageEventUI.transform.Find("Location").gameObject.SetActive(false);
-            damageEventUI.transform.Find("Terrain").gameObject.SetActive(false);
         }
         else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Bloodletting"))
         {
@@ -2817,7 +2849,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageEventUI.transform.Find("Other").gameObject.SetActive(false);
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
             damageEventUI.transform.Find("Location").gameObject.SetActive(false);
-            damageEventUI.transform.Find("Terrain").gameObject.SetActive(false);
         }
     }
 
@@ -3008,6 +3039,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         promotionAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
         promotionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
+        promotionAlert.transform.Find("NextRankIndicator").GetComponent<Image>().sprite = soldier.LoadInsignia(soldier.NextRank());
         promotionAlert.transform.Find("PromotionRank").GetComponent<TextMeshProUGUI>().text = soldier.NextRank();
 
         if (soldier.NextRank() == "Captain")

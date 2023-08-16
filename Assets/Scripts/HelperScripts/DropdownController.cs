@@ -1,10 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System.Text.RegularExpressions;
-using UnityEngine.Networking.Types;
 
 public class DropdownController : MonoBehaviour
 {
@@ -22,10 +19,13 @@ public class DropdownController : MonoBehaviour
         {
             for (int i = 0; i < dropdown.options.Count; i++)
             {
-                if (optionsToGrey.Contains(dropdown.options[i].text))
+                foreach (string option in optionsToGrey)
                 {
-                    Debug.Log($"Item {i}: {dropdown.options[i].text}");
-                    dropdown.transform.Find("Dropdown List").Find("Viewport").Find("Content").Find($"Item {i}: {dropdown.options[i].text}").GetComponent<Toggle>().interactable = false;
+                    if (option == dropdown.options[i].text || int.Parse(option) == i)
+                    {
+                        Debug.Log($"Item {i}: {dropdown.options[i].text}");
+                        dropdown.transform.Find("Dropdown List").Find("Viewport").Find("Content").GetChild(i + 1).GetComponent<Toggle>().interactable = false;
+                    }
                 }
             }
         }

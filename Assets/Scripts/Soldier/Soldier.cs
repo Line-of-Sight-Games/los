@@ -1881,7 +1881,7 @@ public class Soldier : PhysicalObject, IDataPersistence
 
             //remove all instances of anyone else revealing them
             foreach (Soldier s in soldierManager.allSoldiers)
-                s.RevealingSoldiers.Remove(this.soldierName);
+                s.RevealingSoldiers.Remove(this.id);
 
             //remove all engagements
             if (IsMeleeEngaged())

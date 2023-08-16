@@ -191,7 +191,7 @@ public class SoldierAlert : MonoBehaviour
             transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Ability gained: " + abilityDropdown.options[abilityDropdown.value].text;
             promotionComplete = true;
 
-            soldier.game.soundManager.PlayPromotion();
+            //soldier.game.soundManager.PlayPromotion();
         }
 
     }

@@ -1367,6 +1367,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         };
                         target.SetSuppression(suppressionValue);
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Supressed (" + target.suppressionValue + ")</color>";
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Successful Suppression.";
+
+                        //don't show los check button if just suppression
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
 
                         //trigger loud action
                         activeSoldier.PerformLoudAction();
@@ -1448,6 +1452,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Gun is Empty";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "No shot fired.";
+                    
+                    //don't show los check if shot doesn't fire
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
 
                     menu.OpenShotResultUI();
                     menu.CloseShotUI();
@@ -2600,7 +2608,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
         {
             //check input formatting
-            if (int.TryParse(menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text, out x) && int.TryParse(menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text, out y) && int.TryParse(menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text, out z) && menu.damageEventUI.transform.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
+            if (int.TryParse(menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text, out x) && int.TryParse(menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text, out y) && int.TryParse(menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text, out z) && menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
             {
                 if (x >= 1 && x <= maxX && y >= 1 && y <= maxY && z >= 0 && z <= maxZ)
                 {
@@ -2609,7 +2617,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     activeSoldier.X = x;
                     activeSoldier.Y = y;
                     activeSoldier.Z = z;
-                    activeSoldier.TerrainOn = menu.damageEventUI.transform.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[menu.damageEventUI.transform.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text;
+                    activeSoldier.TerrainOn = menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text;
 
                     //break melee control
                     BreakAllMeleeEngagements(activeSoldier);
