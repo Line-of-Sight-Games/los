@@ -1,10 +1,9 @@
-using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -22,8 +21,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public DipelecGen dipelec;
     public SoundManager soundManager;
 
-    public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, playerTurnIndicator, weatherIndicator;
-    public GameObject menuUI, playerTurnOverUI, playerTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, 
+    public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, 
         shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, 
         configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
         traumaAlertUI, traumaUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
@@ -245,7 +244,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
         }
     }
-    public string PrintArray(System.Array array)
+    public string PrintArray(Array array)
     {
         string str = "[";
         foreach (object obj in array)
@@ -727,7 +726,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (!game.gameOver)
         {
             roundIndicator.text = "Round " + game.currentRound;
-            playerTurnIndicator.text = "Team " + game.currentTeam + " Turn";
+            if (game.currentTeam == 1)
+                teamTurnIndicator.text = "<color=red>";
+            else
+                teamTurnIndicator.text = "<color=blue>";
+            teamTurnIndicator.text += "Team " + game.currentTeam + "</color> Turn";
         }
     }
     public string FormatFloatTime(float time)
@@ -846,10 +849,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             else
                 GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), moveButton), "Broken");
         }
-        else if (activeSoldier.IsMeleeEngaged())
+        else if (activeSoldier.IsMeleeControlled())
         {
             //if has pistol/smg add shot button
-            bool canShoot = false;  
+            bool canShoot = false;
             foreach (Item i in activeSoldier.inventory.Items)
                 if (i.gunType == "SMG" || i.gunType == "Pistol")
                     canShoot = true;
@@ -866,19 +869,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(moveButton, "Last Stand");
             else if (activeSoldier.mp == 0)
                 buttonStates.Add(moveButton, "No MA");
+            else if (activeSoldier.IsMeleeControlling())
+                buttonStates.Add(moveButton, "Melee Controlling");
 
             //block cover button
             if (activeSoldier.inventory.IsWearingJuggernautArmour())
-                buttonStates.Add(coverButton, "<color=green>Juggernaut</color>"); 
+                buttonStates.Add(coverButton, "<color=green>Juggernaut</color>");
             else if (activeSoldier.IsInCover())
                 buttonStates.Add(coverButton, "<color=green>Taking Cover</color>");
-            
+
 
             //block shot and overwatch buttons
             bool hasGun = false;
             foreach (Item i in activeSoldier.inventory.Items)
                 if (i.gunType != null)
                     hasGun = true;
+            bool canShootInMelee = false;
+            foreach (Item i in activeSoldier.inventory.Items)
+                if (i.gunType == "SMG" || i.gunType == "Pistol")
+                    canShootInMelee = true;
             if (!hasGun)
             {
                 buttonStates.Add(shotButton, "No Gun");
@@ -888,6 +897,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 buttonStates.Add(shotButton, "Blind");
                 buttonStates.Add(overwatchButton, "Blind");
+            }
+            else if (activeSoldier.IsMeleeControlling())
+            {
+                if (!canShootInMelee)
+                    buttonStates.Add(shotButton, "Melee Controlling");
+                buttonStates.Add(overwatchButton, "Melee Controlling");
             }
 
             //block melee button
@@ -1955,14 +1970,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown gunDropdown = shotUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown aimDropdown = shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
-        //targetDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+        targetDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         List<TMP_Dropdown.OptionData> targetDetails = new(), gunDetails = new();
         List<string> noTargets = new() { "No Targets" };
 
         //generate guns list
         foreach (Item i in activeSoldier.inventory.Items)
         {
-            if (i.gunType != "")
+            if (i.gunType != null)
                 gunDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
         }
         if (gunDetails.Count > 0)
@@ -1992,8 +2007,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //block suppression option if gun does not have enough ammo
             if (!gun.CheckSpecificAmmo(gun.gunSuppressionDrain, true))
                 shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression Shot");
-            else
-                shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+
             shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
             CheckTargetInCover();
         }
@@ -2369,7 +2383,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         GameObject closestAllyUI = moveUI.transform.Find("ClosestAlly").gameObject;
         ClearClosestAllyUI(closestAllyUI);
 
-        Soldier closestAlly = game.FindClosestAlly();
+        Soldier closestAlly = game.FindClosestAlly(true);
 
         if (closestAlly != null)
         {
@@ -2429,6 +2443,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         List<TMP_Dropdown.OptionData> moveTypeDetails;
         moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         moveTypeDropdown.ClearOptions();
+        moveTypeDropdown.interactable = true;
+        coverToggle.interactable = true;
+        meleeToggle.interactable = true;
 
         //add suppression indicators if suppressed
         string fullMoveSuppressed = "", halfMoveSuppressed = "";
@@ -2460,14 +2477,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 new TMP_Dropdown.OptionData("Half: " + activeSoldier.HalfMove + halfMoveSuppressed),
                 new TMP_Dropdown.OptionData("Tile: " + activeSoldier.TileMove),
             };
-            moveTypeDropdown.interactable = true;
-            coverToggle.interactable = true;
-            meleeToggle.interactable = true;
             backButton.SetActive(true);
         }
         
         //add extra move options for planner/exo
-        if (activeSoldier.IsPlanner() && game.FindClosestAlly() != null && !activeSoldier.usedMP)
+        if (activeSoldier.IsPlanner() && game.FindClosestAlly(true) != null && !activeSoldier.usedMP)
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Planner Donate</color>"));
         if (activeSoldier.inventory.IsWearingExoArmour())
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Exo Jump</color>"));
@@ -2488,6 +2502,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //block cover for JA
         if (activeSoldier.inventory.IsWearingJuggernautArmour())
             coverToggle.interactable = false;
+
+        //block melee toggle if within engage distance of enemy
+        if (game.FindClosestEnemy(true) != null && activeSoldier.PhysicalObjectWithinMeleeRadius(game.FindClosestEnemy(true)) || suppressed)
+            meleeToggle.interactable = false;
 
         /*//block planner if already moved
         if (!activeSoldier.usedMP)
@@ -3110,22 +3128,34 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //end of turn functions
     public void OpenPlayerTurnOverUI()
     {
-        playerTurnOverUI.transform.Find("OptionPanel").Find("Title").Find("TitleText").GetComponent<TextMeshProUGUI>().text = "<color=blue>Team " + game.currentTeam + ": Leave Command Zone.</color>";
-        playerTurnOverUI.SetActive(true);
+        string displayText;
+        if (game.currentTeam == 1)
+            displayText = "<color=red>";
+        else
+            displayText = "<color=blue>";
+        displayText += "Team " + game.currentTeam + "</color>: Leave Command Zone.";
+        teamTurnOverUI.transform.Find("OptionPanel").Find("Title").Find("TitleText").GetComponent<TextMeshProUGUI>().text = displayText;
+        teamTurnOverUI.SetActive(true);
     }
     public void ClosePlayerTurnOverUI()
     {
         SetTeamTurnOverFlagTo(true);
-        playerTurnOverUI.SetActive(false);
+        teamTurnOverUI.SetActive(false);
     }
     public void OpenPlayerTurnStartUI()
     {
-        playerTurnStartUI.transform.Find("OptionPanel").Find("Title").Find("TitleText").GetComponent<TextMeshProUGUI>().text = "<color=blue>Team " + game.currentTeam + ": Enter Command Zone.</color>";
-        playerTurnStartUI.SetActive(true);
+        string displayText;
+        if (game.currentTeam == 1)
+            displayText = "<color=red>";
+        else
+            displayText = "<color=blue>";
+        displayText += "Team " + game.currentTeam + "</color>: Enter Command Zone.";
+        teamTurnStartUI.transform.Find("OptionPanel").Find("Title").Find("TitleText").GetComponent<TextMeshProUGUI>().text = displayText;
+        teamTurnStartUI.SetActive(true);
     }
     public void ClosePlayerTurnStartUI()
     {
         SetTeamTurnStartFlagTo(true);
-        playerTurnStartUI.SetActive(false);
+        teamTurnStartUI.SetActive(false);
     }
 }

@@ -19217,7 +19217,7 @@ GameObject:
   - component: {fileID: 314291172}
   - component: {fileID: 314291171}
   m_Layer: 5
-  m_Name: PlayerTurnOverUI
+  m_Name: TeamTurnOverUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27301,6 +27301,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1395414604}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: PlayButtonPress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1320017608}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: CloseAdditionalActionMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -36098,6 +36110,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1395414604}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: PlayButtonPress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1320017608}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: CloseAdditionalActionMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -51842,7 +51866,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294901760
-  m_fontColor: {r: 0, g: 0, b: 1, a: 1}
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -56582,7 +56606,7 @@ GameObject:
   - component: {fileID: 872033237}
   - component: {fileID: 872033236}
   m_Layer: 5
-  m_Name: PlayerTurnText
+  m_Name: TeamTurnText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83325,11 +83349,11 @@ MonoBehaviour:
   gameTimer: {fileID: 1667207241}
   turnTimer: {fileID: 1593265841}
   roundIndicator: {fileID: 1057155381}
-  playerTurnIndicator: {fileID: 872033236}
+  teamTurnIndicator: {fileID: 872033236}
   weatherIndicator: {fileID: 1137925794}
   menuUI: {fileID: 7832104535217442711}
-  playerTurnOverUI: {fileID: 314291169}
-  playerTurnStartUI: {fileID: 1343941492}
+  teamTurnOverUI: {fileID: 314291169}
+  teamTurnStartUI: {fileID: 1343941492}
   setupMenuUI: {fileID: 509688961}
   gameTimerUI: {fileID: 1667207240}
   gameMenuUI: {fileID: 1212361805}
@@ -85272,7 +85296,7 @@ GameObject:
   - component: {fileID: 1343941495}
   - component: {fileID: 1343941494}
   m_Layer: 5
-  m_Name: PlayerTurnStartUI
+  m_Name: TeamTurnStartUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -90813,11 +90837,11 @@ MonoBehaviour:
   m_Content: {fileID: 627280543}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 40
+  m_ScrollSensitivity: 100
   m_Viewport: {fileID: 818816689}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 0}
@@ -102319,7 +102343,7 @@ GameObject:
   - component: {fileID: 1621101086}
   - component: {fileID: 1621101085}
   m_Layer: 5
-  m_Name: PlayerTurn
+  m_Name: TeamTurn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -110978,11 +111002,11 @@ MonoBehaviour:
   m_Content: {fileID: 1024033980}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 40
+  m_ScrollSensitivity: 100
   m_Viewport: {fileID: 38941913}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 0}
@@ -131289,7 +131313,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294901760
-  m_fontColor: {r: 0, g: 0, b: 1, a: 1}
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

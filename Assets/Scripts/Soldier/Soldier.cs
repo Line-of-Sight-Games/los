@@ -59,8 +59,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         stats = new Statline(this);
         inventory = new Inventory(this);
         IncrementSpeciality();
-        IncrementRandom("");
-        IncrementRandom("");
+        IncrementDoubleRandom();
         hp = stats.H.BaseVal;
         GenerateAP();
         xp = 1;
@@ -220,7 +219,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     }
     public bool IsRevealed()
     {
-        if (IsAlive() && RevealedBySoldiers.Any())
+        if ((IsAlive() && RevealedBySoldiers.Any()) || IsDead() || IsPlayingDead())
             return true;
         else
             return false;
@@ -772,7 +771,7 @@ public class Soldier : PhysicalObject, IDataPersistence
 
     public void ApplyHealthStateMods()
     {
-        if (state.Contains("Unconscious"))
+        if (state.Contains("Unconscious") || state.Contains("Playdead"))
         {
             stats.SR.Val = 0;
             stats.E.Val = 0;
@@ -1552,6 +1551,27 @@ public class Soldier : PhysicalObject, IDataPersistence
         stats = stats.Where(e => e != soldierSpeciality && e != choiceStat).ToArray();
         return IncrementStat(stats[Random.Range(0, stats.Length)]);
     }
+    public void IncrementDoubleRandom()
+    {
+        int num1 = 0, num2 = 0;
+        string[] stats =
+        {
+            "Leadership", "Health", "Resilience", "Speed", "Evasion", "Stealth", "Perceptiveness", "Camouflage", "Sight Radius",
+            "Rifle", "Assault Rifle", "Light Machine Gun", "Sniper Rifle", "Sub-Machine Gun", "Shotgun", "Melee",
+            "Strength", "Diplomacy", "Electronics", "Healing"
+        };
+
+        stats = stats.Where(e => e != soldierSpeciality).ToArray();
+
+        while (num1 == num2)
+        {
+            num1 = Random.Range(0, stats.Length);
+            num2 = Random.Range(0, stats.Length);
+        }
+
+        IncrementStat(stats[num1]);
+        IncrementStat(stats[num2]);
+    }
     public string IncrementSpeciality()
     {
         return IncrementStat(soldierSpeciality);
@@ -1980,6 +2000,13 @@ public class Soldier : PhysicalObject, IDataPersistence
     public bool IsMeleeControlled()
     {
         if (controlledBySoldiersList.Count > 0)
+            return true;
+        else
+            return false;
+    }
+    public bool IsMeleeControlling()
+    {
+        if (controllingSoldiersList.Count > 0 && controlledBySoldiersList.Count == 0)
             return true;
         else
             return false;

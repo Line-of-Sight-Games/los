@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,7 +41,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public int RandomNumber(int min, int max)
     {
-        return Random.Range(min, max + 1);
+        return UnityEngine.Random.Range(min, max + 1);
     }
     public int DiceRoll()
     {
@@ -95,7 +96,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     
     public string RandomShotScatterDistance()
     {
-        return decimal.Round((decimal)Random.Range(0.5f, 5.0f), 1).ToString();
+        return decimal.Round((decimal)UnityEngine.Random.Range(0.5f, 5.0f), 1).ToString();
     }
     public string RandomShotScatterHorizontal()
     {
@@ -125,7 +126,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         menu.FreezeTime();
         menu.DisplaySoldiersGameOver();
         menu.roundIndicator.text = "Game Over";
-        menu.playerTurnIndicator.text = result;
+        menu.teamTurnIndicator.text = result;
         soundManager.PlayGameOverMusic();
     }
     public void EndTurnNonCoroutine()
@@ -416,16 +417,51 @@ public class MainGame : MonoBehaviour, IDataPersistence
             UpdateMoveDonated();
         }
     }
-    public Soldier FindClosestAlly()
+    public Soldier FindClosestAlly(bool canWalk)
     {
-        List<System.Tuple<float, Soldier>> soldierDistances = new();
+        List<Tuple<float, Soldier>> soldierDistances = new();
 
         foreach (Soldier s in AllSoldiers())
         {
-            if (s.IsAbleToWalk() && s.IsSameTeamAs(activeSoldier))
-                soldierDistances.Add(System.Tuple.Create(CalculateRange(activeSoldier, s), s));
+            if (s.IsSameTeamAs(activeSoldier))
+            {
+                if (canWalk)
+                {
+                    if (s.IsAbleToWalk())
+                        soldierDistances.Add(Tuple.Create(CalculateRange(activeSoldier, s), s));
+                }
+                else
+                    soldierDistances.Add(Tuple.Create(CalculateRange(activeSoldier, s), s));
+            }
+                
         }
-        soldierDistances.OrderBy(t => t.Item1);
+
+        soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
+
+        if (soldierDistances.Count > 0)
+            return soldierDistances[0].Item2;
+        else
+            return null;
+    }
+    public Soldier FindClosestEnemy(bool isVisible)
+    {
+        List<Tuple<float, Soldier>> soldierDistances = new();
+
+        foreach (Soldier s in AllSoldiers())
+        {
+            if (s.IsOppositeTeamAs(activeSoldier))
+            {
+                if (isVisible)
+                {
+                    if (s.IsRevealed())
+                        soldierDistances.Add(Tuple.Create(CalculateRange(activeSoldier, s), s));
+                }
+                else
+                    soldierDistances.Add(Tuple.Create(CalculateRange(activeSoldier, s), s));
+            }
+        }
+
+        soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
 
         if (soldierDistances.Count > 0)
             return soldierDistances[0].Item2;
@@ -539,7 +575,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (activeSoldier.X != x || activeSoldier.Y != y || activeSoldier.Z != z)
                     {
                         //skip supression check if it's already happened before, otherwise run it
-                        if (coverToggle.interactable || (activeSoldier.IsSuppressed() && activeSoldier.SuppressionCheck()))
+                        if (!activeSoldier.IsSuppressed() || (activeSoldier.IsSuppressed() && (moveTypeDropdown.interactable == false || activeSoldier.SuppressionCheck())))
                         {
                             float distance = CalculateMoveDistance(x, y, z);
                             if (force || distance <= maxMove)
@@ -1121,6 +1157,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float flankingMod;
         int flankersCount = 0;
         int flankingAngle = 80;
+        List<Tuple<float, Soldier>> allFlankingAngles = new();
+        List<Tuple<float, Soldier>> confirmedFlankingAngles = new();
 
         if (activeSoldier.IsTactician())
             flankingAngle = 20;
@@ -1132,25 +1170,44 @@ public class MainGame : MonoBehaviour, IDataPersistence
             shotLine.Normalize();
             Debug.Log("shotLine: " + shotLine);
 
-            Vector2 referenceLine = shotLine;
+            //find all soldiers who could be considered for flanking and their flanking angles
             foreach (Soldier s in AllSoldiers())
             {
-                Debug.Log("name: " + s.soldierName + "can see: " + s.IsAbleToSee() + "same team: " + s.IsSameTeamAs(activeSoldier) + "can see in own right: " + s.CanSeeInOwnRight(target));
                 if (s.IsAbleToSee() && s.IsSameTeamAs(activeSoldier) && s.CanSeeInOwnRight(target))
                 {
                     Vector2 flankLine = new(target.X - s.X, target.Y - s.Y);
                     flankLine.Normalize();
-                    Debug.Log("flankline: " + flankLine);
-                    if (Vector2.Angle(referenceLine, flankLine) > flankingAngle && Vector2.Angle(shotLine, flankLine) > flankingAngle && flankersCount < 3)
-                    {
-                        flankersCount++;
-                        referenceLine = flankLine;
-                        Debug.Log(s.soldierName + " is flanking at angle: " + Vector2.Angle(shotLine, flankLine));
+                    float flankAngle = Vector2.SignedAngle(shotLine, flankLine);
+                    if (flankAngle < 0)
+                        flankAngle += 360;
+                    allFlankingAngles.Add(Tuple.Create(flankAngle, s));
 
-                        //add flanker to ui to visualise
-                        GameObject flankerPortrait = Instantiate(menu.soldierPortraitPrefab, menu.flankersShotUI.transform.Find("FlankersPanel"));
-                        flankerPortrait.GetComponent<SoldierPortrait>().Init(s);
-                    }
+                    //print($"name: {s.soldierName} | flankline: {flankLine} | angle to shotline {flankAngle}");
+                }
+            }
+
+            //order smallest angle to largest angle
+            allFlankingAngles = allFlankingAngles.OrderBy(t => t.Item1).ToList();
+            confirmedFlankingAngles.Add(Tuple.Create(0f, null as Soldier));
+            while (allFlankingAngles.Count > 0)
+            {
+                print($"name: {allFlankingAngles[0].Item2.soldierName} | angle: {allFlankingAngles[0].Item1}");
+                if (allFlankingAngles[0].Item1 > flankingAngle && allFlankingAngles[0].Item1 - confirmedFlankingAngles[^1].Item1 > flankingAngle)
+                    confirmedFlankingAngles.Add(allFlankingAngles[0]);
+                
+                allFlankingAngles.RemoveAt(0);
+            }
+
+            confirmedFlankingAngles.RemoveAt(0);
+            foreach (Tuple<float, Soldier> confirmedFlankAngle in confirmedFlankingAngles)
+            {
+                if (flankersCount < 3)
+                {
+                    flankersCount++;
+
+                    //add flanker to ui to visualise
+                    GameObject flankerPortrait = Instantiate(menu.soldierPortraitPrefab, menu.flankersShotUI.transform.Find("FlankersPanel"));
+                    flankerPortrait.GetComponent<SoldierPortrait>().Init(confirmedFlankAngle.Item2);
                 }
             }
 
@@ -1795,10 +1852,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else
             meleeDamageFinal = 0;
-
-        float attackerBase = AttackerMeleeSkill() + AttackerWeaponDamage(attackerWeapon), attackerMods = AttackerHealthMod() * AttackerTerrainMod() * KdMod() * FlankingAgainstAttackerMod(defender), attackerStrengthMod = AttackerStrengthMod(), defenderBase = DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier(), defenderMods = DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender), defenderStrengthMod = DefenderStrengthMod(defender);
-        Debug.Log("Attacker Base(" + attackerBase + ") * AttackerMods(" + attackerMods + ") + AttackerStrengthMod(" + attackerStrengthMod + ")\nDefenderBase(" + defenderBase + ") * DefenderMods(" + defenderMods + ") + DefenderStrengthMod(" + defenderStrengthMod + ")");
-
 
         return meleeDamageFinal;
     }
