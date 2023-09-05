@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEditor.Build;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -23,7 +24,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
-    public TMP_InputField xPos, yPos, zPos, fallInput;
+    public TMP_InputField xPos, yPos, zPos, fallInput, overwatchXPos, overwatchYPos, overwatchRadius;
     public TMP_Dropdown moveTypeDropdown, terrainDropdown, shotTypeDropdown, gunTypeDropdown, aimTypeDropdown, coverLevelDropdown, targetDropdown, meleeTypeDropdown, attackerWeaponDropdown, meleeTargetDropdown, defenderWeaponDropdown, damageEventTypeDropdown;
     public TextMeshProUGUI moveAP;
     public Toggle coverToggle, meleeToggle;
@@ -226,7 +227,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else //run things that trigger at the end of another team's turn
             {
-                
+                //unset overwatch
+                if (s.IsOnOverwatch())
+                    s.UnsetOverwatch();
             }
         }
 
@@ -368,6 +371,25 @@ public class MainGame : MonoBehaviour, IDataPersistence
         activeSoldier.SetPlaydead();
         menu.ClosePlaydeadAlertUI();
     }
+
+    //overwatch functions
+    public void ConfirmOverwatch()
+    {
+        if (int.TryParse(overwatchXPos.text, out x) && int.TryParse(overwatchYPos.text, out y) && int.TryParse(overwatchRadius.text, out z))
+        {
+            if (x >= 1 && x <= maxX && y >= 1 && y <= maxY && z <= activeSoldier.SRColliderMax.radius)
+            {
+                if (CheckAP(2))
+                {
+                    DrainAP();
+                    activeSoldier.SetOverwatch(x, y, z);
+
+                    menu.CloseOverwatchUI();
+                }
+            }
+        }
+    }
+
 
     //move functions
     public void FleeSoldier()
@@ -517,6 +539,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 else
                                     activeSoldier.UnsetCover();
 
+                                //unset overwatch
+                                activeSoldier.UnsetOverwatch();
+
                                 //break melee control
                                 BreakAllMeleeEngagements(activeSoldier);
 
@@ -600,6 +625,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                     //break melee control
                                     BreakAllMeleeEngagements(activeSoldier);
 
+                                    //unset overwatch
+                                    activeSoldier.UnsetOverwatch();
+
                                     //break suppression
                                     if (activeSoldier.suppressionValue != 0)
                                         activeSoldier.suppressionValue = 0;
@@ -664,33 +692,33 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
     //shot functions
-    public void UpdateShotUI()
+    public void UpdateShotUI(Soldier shooter)
     {
         if (!menu.clearShotFlag)
         {
             if (shotTypeDropdown.value == 0)
             {
-                UpdateShotAP();
-                UpdateHitPercentage();
+                UpdateShotAP(shooter);
+                UpdateHitPercentage(shooter);
             }
             else if (shotTypeDropdown.value == 1)
             {
-                UpdateShotAP();
-                UpdateSuppressionValue();
+                UpdateShotAP(shooter);
+                UpdateSuppressionValue(shooter);
             }
             else
             {
-                UpdateShotAP();
-                UpdateHitPercentage();
+                UpdateShotAP(shooter);
+                UpdateHitPercentage(shooter);
             }
         } 
     }
-    public void UpdateShotAP()
+    public void UpdateShotAP(Soldier shooter)
     {
         int ap = 1;
         if (shotTypeDropdown.value == 1)
         {
-            ap = activeSoldier.ap;
+            ap = shooter.ap;
         }
         else
         {
@@ -708,15 +736,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
         }
+
+        //set ap to 0 for overwatch
+        if (shooter.soldierTeam != currentTeam)
+            ap = 0;
         
         menu.shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
     }
-    public void UpdateSuppressionValue()
+    public void UpdateSuppressionValue(Soldier shooter)
     {
         Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
         Soldier target = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
 
-        int suppressionValue = CalculateRangeBracket(CalculateRange(activeSoldier, target)) switch
+        int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target)) switch
         {
             "Melee" or "CQB" => gun.gunCQBSuppressionPenalty,
             "Short" => gun.gunShortSuppressionPenalty,
@@ -727,12 +759,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         menu.shotUI.transform.Find("SuppressionValue").Find("SuppressionValueDisplay").GetComponent<TextMeshProUGUI>().text = suppressionValue.ToString();
     }
-    public int WeaponHitChance(Soldier target, Item gun)
+    public int WeaponHitChance(Soldier shooter, Soldier target, Item gun)
     {
         int weaponHitChance;
 
         //get base hit chance
-        switch (CalculateRangeBracket(CalculateRange(activeSoldier, target)))
+        switch (CalculateRangeBracket(CalculateRange(shooter, target)))
         {
             case "Melee":
             case "CQB":
@@ -771,11 +803,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
 
         //apply sharpshooter buff
-        if (weaponHitChance > 0 && activeSoldier.IsSharpshooter())
+        if (weaponHitChance > 0 && shooter.IsSharpshooter())
             weaponHitChance += 5;
 
         //apply inspirer buff
-        weaponHitChance += activeSoldier.InspirerBonusWeapon(gun);
+        weaponHitChance += shooter.InspirerBonusWeapon(gun);
 
         //correct negatives
         if (weaponHitChance < 0)
@@ -784,12 +816,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Weapon Hit Chance: " + weaponHitChance);
         return weaponHitChance;
     }
-    public int WeaponHitChanceCover(Vector3 cover, Item gun)
+    public int WeaponHitChanceCover(Soldier shooter, Vector3 cover, Item gun)
     {
         int weaponHitChance;
 
         //get base hit chance
-        switch (CalculateRangeBracket(CalculateRangeCover(activeSoldier, cover)))
+        switch (CalculateRangeBracket(CalculateRangeCover(shooter, cover)))
         {
             case "Melee":
             case "CQB":
@@ -828,11 +860,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
 
         //apply sharpshooter buff
-        if (weaponHitChance > 0 && activeSoldier.IsSharpshooter())
+        if (weaponHitChance > 0 && shooter.IsSharpshooter())
             weaponHitChance += 5;
 
         //apply inspirer buff
-        weaponHitChance += activeSoldier.InspirerBonusWeapon(gun);
+        weaponHitChance += shooter.InspirerBonusWeapon(gun);
 
         //correct negatives
         if (weaponHitChance < 0)
@@ -841,9 +873,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Weapon Hit Chance: " + weaponHitChance);
         return weaponHitChance;
     }
-    public float ShooterTraumaMod()
+    public float ShooterTraumaMod(Soldier shooter)
     {
-        var traumaMod = activeSoldier.tp switch
+        var traumaMod = shooter.tp switch
         {
             1 => 0.1f,
             2 => 0.2f,
@@ -854,42 +886,42 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Trauma Mod: " + traumaMod);
         return 1 - traumaMod;
     }
-    public float ShooterSustenanceMod()
+    public float ShooterSustenanceMod(Soldier shooter)
     {
         float sustenanceMod = 0;
 
-        if (activeSoldier.roundsWithoutFood >= 20)
+        if (shooter.roundsWithoutFood >= 20)
             sustenanceMod = 0.5f;
 
         Debug.Log("Sustenance Mod: " + sustenanceMod);
         return 1 - sustenanceMod;
     }
-    public float RelevantWeaponSkill(Item gun)
+    public float RelevantWeaponSkill(Soldier shooter, Item gun)
     {
         float weaponSkill = gun.gunType switch
         {
-            "Assault Rifle" => activeSoldier.stats.AR.Val,
-            "LMG" => activeSoldier.stats.LMG.Val,
-            "Rifle" => activeSoldier.stats.Ri.Val,
-            "Shotgun" => activeSoldier.stats.Sh.Val,
-            "SMG" => activeSoldier.stats.SMG.Val,
-            "Sniper" => activeSoldier.stats.Sn.Val,
-            _ => activeSoldier.stats.GetHighestWeaponSkill(),
+            "Assault Rifle" => shooter.stats.AR.Val,
+            "LMG" => shooter.stats.LMG.Val,
+            "Rifle" => shooter.stats.Ri.Val,
+            "Shotgun" => shooter.stats.Sh.Val,
+            "SMG" => shooter.stats.SMG.Val,
+            "Sniper" => shooter.stats.Sn.Val,
+            _ => shooter.stats.GetHighestWeaponSkill(),
         };
 
         //apply juggernaut armour debuff
-        if (activeSoldier.inventory.IsWearingJuggernautArmour())
+        if (shooter.inventory.IsWearingJuggernautArmour())
             weaponSkill--;
 
         //apply stim armour buff
-        if (activeSoldier.inventory.IsWearingStimulantArmour())
+        if (shooter.inventory.IsWearingStimulantArmour())
             weaponSkill += 2;
 
         //apply trauma debuff
-        weaponSkill *= ShooterTraumaMod();
+        weaponSkill *= ShooterTraumaMod(shooter);
 
         //apply sustenance debuff
-        weaponSkill *= ShooterSustenanceMod();
+        weaponSkill *= ShooterSustenanceMod(shooter);
 
         //correct negatives
         if (weaponSkill < 0)
@@ -917,11 +949,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Cover Mod: " + coverMod);
         return 1 - coverMod;
     }
-    public float VisMod()
+    public float VisMod(Soldier shooter)
     {
         float visMod;
 
-        if (activeSoldier.IsCommander())
+        if (shooter.IsCommander())
             visMod = 0.0f;
         else
         {
@@ -939,11 +971,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Vis Mod: " + visMod);
         return 1 - visMod;
     }
-    public float RainMod(Soldier target)
+    public float RainMod(Soldier shooter, Soldier target)
     {
         string rainfall = weather.CurrentRain;
 
-        if (activeSoldier.IsCalculator())
+        if (shooter.IsCalculator())
             rainfall = weather.DecreasedRain(rainfall);
         if (target.IsCalculator())
             rainfall = weather.IncreasedRain(rainfall);
@@ -960,7 +992,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Rain Mod: " + rainMod);
         return 1 - rainMod;
     }
-    public float RainModCover()
+    public float RainModCover(Soldier shooter)
     {
         var rainModCover = weather.CurrentRain switch
         {
@@ -974,9 +1006,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Rain Mod Cover: " + rainModCover);
         return 1 - rainModCover;
     }
-    public float WindMod(Soldier target)
+    public float WindMod(Soldier shooter, Soldier target)
     {
-        Vector2 shotLine = new(target.X - activeSoldier.X, target.Y - activeSoldier.Y);
+        Vector2 shotLine = new(target.X - shooter.X, target.Y - shooter.Y);
         shotLine.Normalize();
         Vector2 windLine = weather.CurrentWindDirection;
         float shotAngleRelativeToWind = Vector2.Angle(shotLine, windLine);
@@ -985,7 +1017,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float windMod;
 
         string windSpeed = weather.CurrentWindSpeed;
-        if (activeSoldier.IsCalculator())
+        if (shooter.IsCalculator())
             windSpeed = weather.DecreasedWindspeed(windSpeed);
         if (target.IsCalculator())
             windSpeed = weather.IncreasedWindspeed(windSpeed);
@@ -1019,9 +1051,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Wind Mod: " + windMod);
         return 1 - windMod;
     }
-    public float WindModCover(Vector3 cover)
+    public float WindModCover(Soldier shooter, Vector3 cover)
     {
-        Vector2 shotLine = new(cover.x - activeSoldier.X, cover.y - activeSoldier.Y);
+        Vector2 shotLine = new(cover.x - shooter.X, cover.y - shooter.Y);
         shotLine.Normalize();
         Vector2 windLine = weather.CurrentWindDirection;
         float shotAngleRelativeToWind = Vector2.Angle(shotLine, windLine);
@@ -1056,14 +1088,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Wind Mod Cover: " + windModCover);
         return 1 - windModCover;
     }
-    public float ShooterHealthMod()
+    public float ShooterHealthMod(Soldier shooter)
     {
         float shooterHealthMod;
-        if (activeSoldier.state.Contains("Last Stand"))
+        if (shooter.state.Contains("Last Stand"))
             shooterHealthMod = 0.6f;
-        else if (activeSoldier.hp <= activeSoldier.stats.H.Val / 2)
+        else if (shooter.hp <= shooter.stats.H.Val / 2)
             shooterHealthMod = 0.16f;
-        else if (activeSoldier.hp < activeSoldier.stats.H.Val)
+        else if (shooter.hp < shooter.stats.H.Val)
             shooterHealthMod = 0.06f;
         else
             shooterHealthMod = 0f;
@@ -1086,12 +1118,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Target Health Mod: " + targetHealthMod);
         return 1 - targetHealthMod;
     }
-    public float ShooterTerrainMod()
+    public float ShooterTerrainMod(Soldier shooter)
     {
         float shooterTerrainMod;
-        if (activeSoldier.IsOnNativeTerrain())
+        if (shooter.IsOnNativeTerrain())
             shooterTerrainMod = -0.04f;
-        else if (activeSoldier.IsOnOppositeTerrain())
+        else if (shooter.IsOnOppositeTerrain())
             shooterTerrainMod = 0.12f;
         else
             shooterTerrainMod = 0.06f;
@@ -1112,24 +1144,24 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Target Terrain Mod: " + targetTerrainMod);
         return 1 - targetTerrainMod;
     }
-    public float ElevationMod(Soldier target)
+    public float ElevationMod(Soldier shooter, Soldier target)
     {
-        float elevationMod = (target.Z - activeSoldier.Z) * 0.01f;
+        float elevationMod = (target.Z - shooter.Z) * 0.01f;
 
         Debug.Log("Elevation Mod: " + elevationMod);
         return 1 - elevationMod;
     }
-    public float ElevationModCover(Vector3 cover)
+    public float ElevationModCover(Soldier shooter, Vector3 cover)
     {
-        float elevationModCover = (cover.z - activeSoldier.Z) * 0.01f;
+        float elevationModCover = (cover.z - shooter.Z) * 0.01f;
 
         Debug.Log("Elevation Mod Cover: " + elevationModCover);
         return 1 - elevationModCover;
     }
-    public float KdMod()
+    public float KdMod(Soldier shooter)
     {
         float kdMod;
-        int kd = activeSoldier.GetKd();
+        int kd = shooter.GetKd();
 
         if (kd != 0)
             kdMod = -(2 * kd * 0.01f);
@@ -1139,10 +1171,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("KD Mod: " + kdMod);
         return 1 - kdMod;
     }
-    public float OverwatchMod()
+    public float OverwatchMod(Soldier shooter)
     {
         float overwatchMod;
-        if (activeSoldier.IsOnOverwatch())
+        if (shooter.IsOnOverwatch())
             overwatchMod = 0.4f;
         else
             overwatchMod = 0;
@@ -1150,7 +1182,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Overwatch Mod: " + overwatchMod);
         return 1 - overwatchMod;
     }
-    public float FlankingMod(Soldier target)
+    public float FlankingMod(Soldier shooter, Soldier target)
     {
         //clear the flanker ui
         ClearFlankersUI(menu.flankersShotUI);
@@ -1160,20 +1192,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
         List<Tuple<float, Soldier>> allFlankingAngles = new();
         List<Tuple<float, Soldier>> confirmedFlankingAngles = new();
 
-        if (activeSoldier.IsTactician())
+        if (shooter.IsTactician())
             flankingAngle = 20;
 
         Debug.Log("Flanking Angle: " + flankingAngle);
         if (!target.IsTactician())
         {
-            Vector2 shotLine = new(target.X - activeSoldier.X, target.Y - activeSoldier.Y);
+            Vector2 shotLine = new(target.X - shooter.X, target.Y - shooter.Y);
             shotLine.Normalize();
             Debug.Log("shotLine: " + shotLine);
 
             //find all soldiers who could be considered for flanking and their flanking angles
             foreach (Soldier s in AllSoldiers())
             {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(activeSoldier) && s.CanSeeInOwnRight(target))
+                if (s.IsAbleToSee() && s.IsSameTeamAs(shooter) && s.CanSeeInOwnRight(target))
                 {
                     Vector2 flankLine = new(target.X - s.X, target.Y - s.Y);
                     flankLine.Normalize();
@@ -1229,10 +1261,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Flanking Mod: " + flankingMod);
         return 1 - flankingMod;
     }
-    public float StealthMod()
+    public float StealthMod(Soldier shooter)
     {
         float stealthMod;
-        if (!activeSoldier.IsRevealed())
+        if (!shooter.IsRevealed())
             stealthMod = -0.4f;
         else
             stealthMod = 0;
@@ -1240,17 +1272,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Debug.Log("Stealth Mod: " + stealthMod);
         return 1 - stealthMod;
     }
-    public float ShooterSuppressionMod(bool suppressionCheck)
+    public float ShooterSuppressionMod(Soldier shooter, bool suppressionCheck)
     {
         float suppressionMod = 0;
         
         if (!suppressionCheck)
-             suppressionMod = activeSoldier.suppressionValue;
+             suppressionMod = shooter.suppressionValue;
 
         Debug.Log("Suppression Mod: " + suppressionMod);
         return suppressionMod;
     }
-    public int CalculateHitPercentage(bool suppressionCheck)
+    public int CalculateHitPercentage(Soldier shooter, bool suppressionCheck)
     {
         int hitChance;
         Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
@@ -1259,7 +1291,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //if it's a normal shot
         if (shotTypeDropdown.value == 0)
         {
-            hitChance = Mathf.RoundToInt(((WeaponHitChance(target, gun) + 10 * RelevantWeaponSkill(gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod() * RainMod(target) * WindMod(target) * ShooterHealthMod() * TargetHealthMod(target) * ShooterTerrainMod() * TargetTerrainMod(target) * ElevationMod(target) * KdMod() * OverwatchMod() * FlankingMod(target) * StealthMod()) - ShooterSuppressionMod(suppressionCheck));
+            hitChance = Mathf.RoundToInt(((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * TargetHealthMod(target) * ShooterTerrainMod(shooter) * TargetTerrainMod(target) * ElevationMod(shooter, target) * KdMod(shooter) * OverwatchMod(shooter) * FlankingMod(shooter, target) * StealthMod(shooter)) - ShooterSuppressionMod(shooter, suppressionCheck));
             if (hitChance < 0)
                 hitChance = 0;
         }
@@ -1268,7 +1300,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TMP_InputField>().text, out x) && int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TMP_InputField>().text, out y) && int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TMP_InputField>().text, out z))
             {
                 Vector3 coverPosition = new(x, y, z);
-                hitChance = Mathf.RoundToInt(((WeaponHitChanceCover(coverPosition, gun) + 10 * RelevantWeaponSkill(gun)) * VisMod() * RainModCover() * WindModCover(coverPosition) * ShooterHealthMod() * ShooterTerrainMod() * ElevationModCover(coverPosition)) - ShooterSuppressionMod(suppressionCheck));
+                hitChance = Mathf.RoundToInt(((WeaponHitChanceCover(shooter, coverPosition, gun) + 10 * RelevantWeaponSkill(shooter, gun)) * VisMod(shooter) * RainModCover(shooter) * WindModCover(shooter, coverPosition) * ShooterHealthMod(shooter) * ShooterTerrainMod(shooter) * ElevationModCover(shooter, coverPosition)) - ShooterSuppressionMod(shooter, suppressionCheck));
                 if (hitChance < 0)
                     hitChance = 0;
             }
@@ -1279,7 +1311,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         return hitChance;
     }
-    public int CalculateCritPercentage(int hitChance)
+    public int CalculateCritPercentage(Soldier shooter, int hitChance)
     {
         int critChance;
         Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
@@ -1287,25 +1319,25 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (shotTypeDropdown.value == 0)
         {
-            critChance = Mathf.RoundToInt((Mathf.Pow(RelevantWeaponSkill(gun), 2) * (hitChance / 100.0f)) - TargetEvasion(target));
+            critChance = Mathf.RoundToInt((Mathf.Pow(RelevantWeaponSkill(shooter, gun), 2) * (hitChance / 100.0f)) - TargetEvasion(target));
             if (critChance < 0)
                 critChance = 0;
         }
         else
         {
             if (int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TMP_InputField>().text, out x) && int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TMP_InputField>().text, out y) && int.TryParse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TMP_InputField>().text, out z))
-                critChance = Mathf.RoundToInt(Mathf.Pow(RelevantWeaponSkill(gun), 2) * (hitChance / 100.0f));
+                critChance = Mathf.RoundToInt(Mathf.Pow(RelevantWeaponSkill(shooter, gun), 2) * (hitChance / 100.0f));
             else
                 critChance = 0;
         }
 
         return critChance;
     }
-    public void UpdateHitPercentage()
+    public void UpdateHitPercentage(Soldier shooter)
     {
-        int suppressedHitChance = CalculateHitPercentage(false);
-        int hitChance = CalculateHitPercentage(true);
-        int critChance = CalculateCritPercentage(hitChance);
+        int suppressedHitChance = CalculateHitPercentage(shooter, false);
+        int hitChance = CalculateHitPercentage(shooter, true);
+        int critChance = CalculateCritPercentage(shooter, hitChance);
 
         menu.shotUI.transform.Find("TargetPanel").Find("SuppressedHitChance").Find("SuppressedHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = suppressedHitChance.ToString() + "%";
         menu.shotUI.transform.Find("TargetPanel").Find("HitChance").Find("HitChanceDisplay").GetComponent<TextMeshProUGUI>().text = hitChance.ToString() + "%";
@@ -1313,34 +1345,32 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmShot()
     {
+        Soldier shooter = soldierManager.FindSoldierById(menu.shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
         if (int.TryParse(menu.shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap))
         {
             if (CheckAP(ap))
             {
-                //deduct ap for aiming
-                DeductAP(ap - 1);
-
                 Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
                 Soldier target = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
-                bool resistSuppression = activeSoldier.SuppressionCheck();
+                bool resistSuppression = shooter.SuppressionCheck();
 
                 //check for ammo
                 if (gun.CheckAnyAmmo())
                 {
                     if (shotTypeDropdown.value == 0) //standard shot
                     {
-                        //deduct ap for the shot
-                        DeductAP(1);
+                        //deduct ap for aim and shot
+                        DeductAP(ap);
 
                         gun.SpendSingleAmmo();
                         
                         int randNum1 = RandomNumber(0, 100);
                         int randNum2 = RandomNumber(0, 100);
-                        int hitChance = CalculateHitPercentage(resistSuppression);
-                        int critChance = CalculateCritPercentage(hitChance);
+                        int hitChance = CalculateHitPercentage(shooter, resistSuppression);
+                        int critChance = CalculateCritPercentage(shooter, hitChance);
 
                         //display suppression indicator
-                        if (activeSoldier.IsSuppressed())
+                        if (shooter.IsSuppressed())
                         {
                             menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
 
@@ -1360,25 +1390,25 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             //standard shot crit hits
                             if (randNum2 <= critChance)
                             {
-                                target.TakeDamage(activeSoldier, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
+                                target.TakeDamage(shooter, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
                                 menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL HIT </color>";
 
                                 //paying xp for hit
                                 if (hitChance >= 10)
-                                    menu.AddXpAlert(activeSoldier, 8, "Critical shot on " + target.soldierName + "!", false);
+                                    menu.AddXpAlert(shooter, 8, "Critical shot on " + target.soldierName + "!", false);
                                 else
-                                    menu.AddXpAlert(activeSoldier, 10, "Critical shot with a " + hitChance + "% chance on " + target.soldierName + "!", false);
+                                    menu.AddXpAlert(shooter, 10, "Critical shot with a " + hitChance + "% chance on " + target.soldierName + "!", false);
                             }
                             else
                             {
-                                target.TakeDamage(activeSoldier, gun.gunDamage, false, new List<string>() { "Shot" });
+                                target.TakeDamage(shooter, gun.gunDamage, false, new List<string>() { "Shot" });
                                 menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                                 //paying xp for hit
                                 if (hitChance >= 10)
-                                    menu.AddXpAlert(activeSoldier, 2, "Shot hit on " + target.soldierName + ".", false);
+                                    menu.AddXpAlert(shooter, 2, "Shot hit on " + target.soldierName + ".", false);
                                 else
-                                    menu.AddXpAlert(activeSoldier, 10, "Shot hit with a " + hitChance + "% chance on " + target.soldierName + "!", false);
+                                    menu.AddXpAlert(shooter, 10, "Shot hit with a " + hitChance + "% chance on " + target.soldierName + "!", false);
                             }
 
                             //don't show los check button if shot hits
@@ -1393,28 +1423,28 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                             //paying xp for dodge
                             if (hitChance <= 90)
-                                menu.AddXpAlert(target, 1, "Dodged shot from " + activeSoldier.soldierName + ".", false);
+                                menu.AddXpAlert(target, 1, "Dodged shot from " + shooter.soldierName + ".", false);
                             else
-                                menu.AddXpAlert(target, 10, "Dodged shot with a " + hitChance + "% chance from " + activeSoldier.soldierName + "!", false);
+                                menu.AddXpAlert(target, 10, "Dodged shot with a " + hitChance + "% chance from " + shooter.soldierName + "!", false);
 
                             //push the no damage attack through for witness trigger
-                            target.TakeDamage(activeSoldier, 0, true, new List<string>() { "Shot" });
+                            target.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
                         }
 
                         //trigger loud action
-                        activeSoldier.PerformLoudAction();
+                        shooter.PerformLoudAction();
 
                         menu.OpenShotResultUI();
                         menu.CloseShotUI();
                     }
                     else if (shotTypeDropdown.value == 1) //supression shot
                     {
-                        //deduct ap for the shot
-                        DeductAP(1);
+                        //deduct ap for aim and shot
+                        DeductAP(ap);
 
                         gun.SpendSpecificAmmo(gun.gunSuppressionDrain, true);
 
-                        int suppressionValue = CalculateRangeBracket(CalculateRange(activeSoldier, target)) switch
+                        int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target)) switch
                         {
                             "Melee" or "CQB" => gun.gunCQBSuppressionPenalty,
                             "Short" => gun.gunShortSuppressionPenalty,
@@ -1430,7 +1460,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
 
                         //trigger loud action
-                        activeSoldier.PerformLoudAction();
+                        shooter.PerformLoudAction();
 
                         menu.OpenShotResultUI();
                         menu.CloseShotUI();
@@ -1441,69 +1471,74 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         {
                             if (x >= 1 && x <= maxX && y >= 1 && y <= maxY && z >= 0 && z <= maxZ)
                             {
-                                //deduct ap for the shot
-                                DeductAP(1);
-
-                                gun.SpendSingleAmmo();
-
-                                int randNum1 = RandomNumber(0, 100);
-                                int randNum2 = RandomNumber(0, 100);
-                                int hitChance = CalculateHitPercentage(resistSuppression);
-                                int critChance = CalculateCritPercentage(hitChance);
-                                int coverDamage = CalculateRangeBracket(CalculateRangeCover(activeSoldier, new Vector3(x, y, z))) switch
+                                if (PointIsRevealed(new Vector3(x, y, z)))
                                 {
-                                    "Melee" or "CQB" => gun.gunCQBCoverDamage,
-                                    "Short" => gun.gunShortCoverDamage,
-                                    "Medium" => gun.gunMedCoverDamage,
-                                    "Long" or "Coriolis" => gun.gunLongCoverDamage,
-                                    _ => 0,
-                                };
+                                    //deduct ap for aim and shot
+                                    DeductAP(ap);
 
-                                //display suppression indicator
-                                if (activeSoldier.IsSuppressed())
-                                {
-                                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+                                    gun.SpendSingleAmmo();
 
-                                    if (resistSuppression)
-                                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                                    int randNum1 = RandomNumber(0, 100);
+                                    int randNum2 = RandomNumber(0, 100);
+                                    int hitChance = CalculateHitPercentage(shooter, resistSuppression);
+                                    int critChance = CalculateCritPercentage(shooter, hitChance);
+                                    int coverDamage = CalculateRangeBracket(CalculateRangeCover(shooter, new Vector3(x, y, z))) switch
+                                    {
+                                        "Melee" or "CQB" => gun.gunCQBCoverDamage,
+                                        "Short" => gun.gunShortCoverDamage,
+                                        "Medium" => gun.gunMedCoverDamage,
+                                        "Long" or "Coriolis" => gun.gunLongCoverDamage,
+                                        _ => 0,
+                                    };
+
+                                    //display suppression indicator
+                                    if (shooter.IsSuppressed())
+                                    {
+                                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+
+                                        if (resistSuppression)
+                                            menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                                        else
+                                            menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
+                                    }
                                     else
-                                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
+                                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
+
+                                    //show los check button
+                                    menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+
+                                    //standard shot hits cover
+                                    if (randNum1 <= hitChance)
+                                    {
+                                        menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+
+                                        //critical shot hits cover
+                                        if (randNum2 <= critChance)
+                                            menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
+                                        else
+                                            menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
+
+                                    }
+                                    else
+                                    {
+                                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                                        menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                                    }
+
+                                    //trigger loud action
+                                    shooter.PerformLoudAction();
+
+                                    menu.OpenShotResultUI();
+                                    menu.CloseShotUI();
                                 }
                                 else
-                                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
-
-                                //show los check button
-                                menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
-
-                                //standard shot hits cover
-                                if (randNum1 <= hitChance)
-                                {
-                                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
-
-                                    //critical shot hits cover
-                                    if (randNum2 <= critChance)
-                                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
-                                    else
-                                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
-
-                                }
-                                else
-                                {
-                                    menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
-                                }
-
-                                //trigger loud action
-                                activeSoldier.PerformLoudAction();
-
-                                menu.OpenShotResultUI();
-                                menu.CloseShotUI();
+                                    print("Point not revealed.");
                             }
                             else
-                                Debug.Log("x, y, z values must not be out of bounds.");
+                                print("x, y, z values must not be out of bounds.");
                         }
                         else
-                            Debug.Log("Formatting was wrong, try again.");
+                            print("Formatting was wrong, try again.");
                     }
                 }
                 else
@@ -1517,8 +1552,31 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     menu.OpenShotResultUI();
                     menu.CloseShotUI();
                 }
+
+                //unset overwatch after any shot
+                shooter.UnsetOverwatch();
             }
         }  
+    }
+
+    public bool PointIsRevealed(Vector3 point)
+    {
+        bool pointIsRevealed = false;
+
+        foreach (Soldier s in AllSoldiers())
+        {
+            if (s.IsAbleToSee() && activeSoldier.IsSameTeamAsIncludingSelf(s))
+            {
+                if (CalculateRangeCover(s, point) <= s.SRColliderMax.radius)
+                {
+                    pointIsRevealed = true;
+                    print($"{s.soldierName} | {point.x}, {point.y}, {point.z} | {s.SRColliderMax.radius} | {pointIsRevealed}");
+                }
+            }
+        }   
+                    
+
+        return pointIsRevealed;
     }
 
 
@@ -1840,7 +1898,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //if it's a normal attack
         if (meleeTypeDropdown.value == 0)
         {
-            meleeDamage = ((AttackerMeleeSkill() + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod() * AttackerTerrainMod() * KdMod() * FlankingAgainstAttackerMod(defender) * SuppressionMod(defender) + AttackerStrengthMod()) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * SuppressionMod(defender) + DefenderStrengthMod(defender));
+            meleeDamage = ((AttackerMeleeSkill() + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod() * AttackerTerrainMod() * KdMod(activeSoldier) * FlankingAgainstAttackerMod(defender) * SuppressionMod(defender) + AttackerStrengthMod()) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * SuppressionMod(defender) + DefenderStrengthMod(defender));
             Debug.Log("Raw Melee Damage: " + meleeDamage);
             //rounding based on R
             if (activeSoldier.stats.R.Val > defender.stats.R.Val)
@@ -2160,8 +2218,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     totalSwap++;
 
         foreach (Transform child in allItemsContentUI)
-            if (child.GetComponent<ItemIcon>().pickupNumber > 0)
-                totalPickup += child.GetComponent<ItemIcon>().pickupNumber;
+            if (child.GetComponent<ItemIcon>() != null)
+                if (child.GetComponent<ItemIcon>().pickupNumber > 0)
+                    totalPickup += child.GetComponent<ItemIcon>().pickupNumber;
 
         foreach (Transform child in inventoryItemsContentUI)
             if (child.GetComponent<ItemIcon>().pickupNumber == 0)
@@ -2188,6 +2247,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (activeSoldier.IsAdept() && ap > 1)
             ap -= 1;
 
+        //configure free on first soldier turn is they haven't used ap
+        if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
+            ap = 0;
+
         menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
     }
     public List<Item> FindNearbyItems()
@@ -2205,15 +2268,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         int.TryParse(menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
 
-        if (ap > 0 && CheckAP(ap))
+        if (CheckAP(ap))
         {
             DeductAP(ap);
             foreach (Transform child in allItemsContentUI)
             {
-                ItemIcon itemDetails = child.GetComponent<ItemIcon>();
+                if (child.GetComponent<ItemIcon>() != null)
+                {
+                    ItemIcon itemDetails = child.GetComponent<ItemIcon>();
 
-                for (int i = 0; i < itemDetails.pickupNumber; i++)
-                    activeSoldier.PickUpItem(itemManager.SpawnItem(child.gameObject.name));
+                    for (int i = 0; i < itemDetails.pickupNumber; i++)
+                        activeSoldier.PickUpItem(itemManager.SpawnItem(child.gameObject.name));
+                }
             }
 
             foreach (Transform child in inventoryItemsContentUI)
@@ -2505,11 +2571,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 foreach (Soldier friendly in AllSoldiers())
                 {
-                    Debug.Log(friendly.soldierName + " trauma check attempting to run");
+                    //Debug.Log(friendly.soldierName + " trauma check attempting to run");
 
                     if (friendly.IsSameTeamAs(deadSoldier))
                     {
-                        Debug.Log(friendly.soldierName + " trauma check actually running");
+                        //Debug.Log(friendly.soldierName + " trauma check actually running");
                         //desensitised
                         if (friendly.tp >= 5)
                             menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
@@ -2979,16 +3045,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //imperceptible delay to allow colliders to be recalculated at new destination
         yield return new WaitForSeconds(0.05f);
 
-        if (movingSoldier.IsAlive() && !movingSoldier.IsPlayingDead())
+        if (movingSoldier.IsAlive() /*&& !movingSoldier.IsPlayingDead()*/)
         {
             bool showDetectionUI = false;
             foreach (Soldier detectee in AllSoldiers())
             {
-                bool detectedLeft = false, detectedRight = false, avoidanceLeft = false, avoidanceRight = false, noDetectRight = false, noDetectLeft = false;
+                bool detectedLeft = false, detectedRight = false, avoidanceLeft = false, avoidanceRight = false, noDetectRight = false, noDetectLeft = false, overwatchRight = false, overwatchLeft = false;
                 string arrowType = "";
                 string detectorLabel = "", counterLabel = "";
 
-                if (detectee.IsAlive() && !detectee.IsPlayingDead() && movingSoldier.IsOppositeTeamAs(detectee))
+                if (detectee.IsAlive() && /*!detectee.IsPlayingDead() &&*/ movingSoldier.IsOppositeTeamAs(detectee))
                 {
                     bool addDetection = false;
 
@@ -3007,7 +3073,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             else
                             {
                                 detectorLabel += CreateDetectionMessage("detection", "3cm", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
-                                detectedRight = true;
+                                if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
+                                    overwatchRight = true;
+                                else
+                                    detectedRight = true;
                             }
                         }
                         else if (movingSoldier.PhysicalObjectWithinHalfRadius(detectee))
@@ -3022,7 +3091,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             else
                             {
                                 detectorLabel += CreateDetectionMessage("detection", "half SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
-                                detectedRight = true;
+                                if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
+                                    overwatchRight = true;
+                                else
+                                    detectedRight = true;
                             }
                         }
                         else if (movingSoldier.PhysicalObjectWithinMaxRadius(detectee))
@@ -3037,7 +3109,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             else
                             {
                                 detectorLabel += CreateDetectionMessage("detection", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
-                                detectedRight = true;
+                                if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
+                                    overwatchRight = true;
+                                else
+                                    detectedRight = true;
                             }
                         }
                         else if (movingSoldierOldPosition != Vector3.zero && GlimpseDetectionMovingSeesDetectee(movingSoldier, detectee, movingSoldierOldPosition))
@@ -3060,7 +3135,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 else
                                     detectorLabel += CreateDetectionMessage("glimpsedetection", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne);
 
-                                detectedRight = true;
+                                if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
+                                    overwatchRight = true;
+                                else
+                                    detectedRight = true;
                             }
                         }
                         else
@@ -3092,7 +3170,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             else
                             {
                                 counterLabel += CreateDetectionMessage("detection", "3cm", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[0], detectee.stats.P.Val);
-                                detectedLeft = true;
+                                if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
+                                    overwatchLeft = true;
+                                else
+                                    detectedLeft = true;
                             }
                         }
                         else if (detectee.PhysicalObjectWithinHalfRadius(movingSoldier))
@@ -3107,7 +3188,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             else
                             {
                                 counterLabel += CreateDetectionMessage("detection", "half SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[1], detectee.stats.P.Val);
-                                detectedLeft = true;
+                                if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
+                                    overwatchLeft = true;
+                                else
+                                    detectedLeft = true;
                             }
                         }
                         else if (detectee.PhysicalObjectWithinMaxRadius(movingSoldier))
@@ -3122,7 +3206,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             else
                             {
                                 counterLabel += CreateDetectionMessage("detection", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val);
-                                detectedLeft = true;
+                                if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
+                                    overwatchLeft = true;
+                                else
+                                    detectedLeft = true;
                             }
                         }
                         else if (movingSoldierOldPosition != Vector3.zero && GlimpseDetectionDetecteeSeesMoving(movingSoldier, detectee, movingSoldierOldPosition))
@@ -3145,7 +3232,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 else
                                     counterLabel += CreateDetectionMessage("glimpsedetection", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
 
-                                detectedLeft = true;
+                                if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
+                                    overwatchLeft = true;
+                                else
+                                    detectedLeft = true;
                             }
                         }
                         else
@@ -3171,6 +3261,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             arrowType = "detection2Way";
                         else if (noDetectLeft)
                             arrowType = "detection1WayRight";
+                        else if (overwatchLeft)
+                            arrowType = "detectionOverwatch2WayLeft";
                     }
                     else if (avoidanceRight)
                     {
@@ -3180,6 +3272,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             arrowType = "avoidance2WayRight";
                         else if (noDetectLeft)
                             arrowType = "avoidance1WayRight";
+                        else if (overwatchLeft)
+                            arrowType = "avoidanceOverwatch2WayLeft";
                     }
                     else if (noDetectRight)
                     {
@@ -3187,6 +3281,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             arrowType = "avoidance1WayLeft";
                         else if (detectedLeft)
                             arrowType = "detection1WayLeft";
+                        else if (overwatchLeft)
+                            arrowType = "overwatch1WayLeft";
+                    }
+                    else if (overwatchRight)
+                    {
+                        if (avoidanceLeft)
+                            arrowType = "avoidanceOverwatch2WayRight";
+                        else if (detectedLeft)
+                            arrowType = "detectionOverwatch2WayRight";
+                        else if (noDetectLeft)
+                            arrowType = "overwatch1WayRight";
                     }
 
                     //suppress detection alerts that evaluate the same as prior state on stat changes which can not affect LOS
@@ -3208,7 +3313,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             Debug.Log(arrowType + ": offturn can see onturn (1 way)");
                         }
                     }
-                    
 
                     if (addDetection)
                     {

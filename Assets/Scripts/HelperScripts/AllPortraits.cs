@@ -6,4 +6,5 @@ using TMPro;
 public class AllPortraits : MonoBehaviour
 {
     public TMP_Dropdown allPortraitsDropdown;
+    public TMP_Dropdown allPortraitsTeamsightDropdown;
 }

@@ -6,7 +6,8 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Newtonsoft.Json.Linq;
 using System.Collections;
-using JetBrains.Annotations;
+using System;
+using static UnityEngine.GraphicsBuffer;
 
 public class Soldier : PhysicalObject, IDataPersistence
 {
@@ -20,7 +21,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     public bool fielded, selected, revealed, usedAP, usedMP, bloodLettedThisTurn;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, timesBloodlet;
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius;
     public string revealedByTeam, lastChosenStat, poisonedBy;
     public Statline stats;
     public Inventory inventory;
@@ -168,19 +169,33 @@ public class Soldier : PhysicalObject, IDataPersistence
         else
             return false;
     }
+    public bool IsSelf(Soldier s)
+    {
+        if (this == s)
+            return true;
+
+        return false;
+    }
     public bool IsNotSelf(Soldier s)
     {
         if (this != s)
             return true;
-        else
-            return false;
+        
+        return false;
     }
     public bool IsSameTeamAs(Soldier s)
     {
         if (IsAlive() && soldierTeam == s.soldierTeam && IsNotSelf(s))
             return true;
-        else
-            return false;
+        
+        return false;
+    }
+    public bool IsSameTeamAsIncludingSelf(Soldier s)
+    {
+        if (IsSameTeamAs(s) || IsSelf(s))
+            return true;
+
+        return false;
     }
     public bool IsOppositeTeamAs(Soldier s)
     {
@@ -219,7 +234,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     }
     public bool IsRevealed()
     {
-        if ((IsAlive() && RevealedBySoldiers.Any()) || IsDead() || IsPlayingDead())
+        if ((IsAlive() && RevealedBySoldiers.Any()) || IsDead())
             return true;
         else
             return false;
@@ -466,6 +481,9 @@ public class Soldier : PhysicalObject, IDataPersistence
         details.Add("bloodLettedThisTurn", bloodLettedThisTurn);
         details.Add("witnessActiveAbilities", witnessActiveAbilities);
         details.Add("witnessStoredAbilities", witnessStoredAbilities);
+        details.Add("overwatchXPoint", overwatchXPoint);
+        details.Add("overwatchYPoint", overwatchYPoint);
+        details.Add("overwatchConeRadius", overwatchConeRadius);
 
         //add the soldier in
         if (data.allSoldiersDetails.ContainsKey(id))
@@ -479,7 +497,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         data.allSoldiersDetails.TryGetValue(id, out details);
         //Debug.Log(id);
         soldierName = (string)details["soldierName"];
-        soldierTeam = System.Convert.ToInt32(details["team"]);
+        soldierTeam = Convert.ToInt32(details["team"]);
         soldierTerrain = (string)details["terrain"];
         //load portrait
         soldierPortrait = LoadPortrait((string)details["portrait"]);
@@ -491,13 +509,13 @@ public class Soldier : PhysicalObject, IDataPersistence
         foreach (string ability in soldierAbilitiesJArray)
             soldierAbilities.Add(ability);
 
-        soldierDisplayPriority = System.Convert.ToInt32(details["displayPriority"]);
+        soldierDisplayPriority = Convert.ToInt32(details["displayPriority"]);
         fielded = (bool)details["fielded"];
-        hp = System.Convert.ToInt32(details["hp"]);
-        ap = System.Convert.ToInt32(details["ap"]);
-        mp = System.Convert.ToInt32(details["mp"]);
-        tp = System.Convert.ToInt32(details["tp"]);
-        xp = System.Convert.ToInt32(details["xp"]);
+        hp = Convert.ToInt32(details["hp"]);
+        ap = Convert.ToInt32(details["ap"]);
+        mp = Convert.ToInt32(details["mp"]);
+        tp = Convert.ToInt32(details["tp"]);
+        xp = Convert.ToInt32(details["xp"]);
         rank = (string)details["rank"];
 
         //load state
@@ -507,9 +525,9 @@ public class Soldier : PhysicalObject, IDataPersistence
             state.Add(stateString);
 
         //load position
-        x = System.Convert.ToInt32(details["x"]);
-        y = System.Convert.ToInt32(details["y"]);
-        z = System.Convert.ToInt32(details["z"]);
+        x = Convert.ToInt32(details["x"]);
+        y = Convert.ToInt32(details["y"]);
+        z = Convert.ToInt32(details["z"]);
         terrainOn = (string)details["terrainOn"];
         MapPhysicalPosition(x, y, z);
 
@@ -558,20 +576,20 @@ public class Soldier : PhysicalObject, IDataPersistence
         }
 
         //load other details
-        roundsFielded = System.Convert.ToInt32(details["roundsFielded"]);
-        roundsFieldedConscious = System.Convert.ToInt32(details["roundsFieldedConscious"]);
-        roundsWithoutFood = System.Convert.ToInt32(details["roundsWithoutFood"]);
+        roundsFielded = Convert.ToInt32(details["roundsFielded"]);
+        roundsFieldedConscious = Convert.ToInt32(details["roundsFieldedConscious"]);
+        roundsWithoutFood = Convert.ToInt32(details["roundsWithoutFood"]);
         revealed = (bool)details["revealed"];
         usedAP = (bool)details["usedAP"];
         usedMP = (bool)details["usedMP"];
-        loudActionRoundsVulnerable = System.Convert.ToInt32(details["loudActionRoundsVulnerable"]);
-        stunnedRoundsVulnerable = System.Convert.ToInt32(details["stunnedRoundsVulnerable"]);
+        loudActionRoundsVulnerable = Convert.ToInt32(details["loudActionRoundsVulnerable"]);
+        stunnedRoundsVulnerable = Convert.ToInt32(details["stunnedRoundsVulnerable"]);
         revealedByTeam = (string)details["revealedByTeam"];
         lastChosenStat = (string)details["lastChosenStat"];
-        suppressionValue = System.Convert.ToInt32(details["suppressionValue"]);
-        healthRemovedFromStarve = System.Convert.ToInt32(details["healthRemovedFromStarve"]);
-        fighterHitCount = System.Convert.ToInt32(details["fighterHitCount"]);
-        plannerDonatedMove = System.Convert.ToInt32(details["plannerDonatedMove"]);
+        suppressionValue = Convert.ToInt32(details["suppressionValue"]);
+        healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
+        fighterHitCount = Convert.ToInt32(details["fighterHitCount"]);
+        plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
         poisonedBy = (string)details["poisonedBy"];
         bloodLettedThisTurn = (bool)details["bloodLettedThisTurn"];
         //load witness stored active abilities
@@ -584,6 +602,9 @@ public class Soldier : PhysicalObject, IDataPersistence
         witnessStoredAbilitiesJArray = (JArray)details["witnessStoredAbilities"];
         foreach (string ability in witnessStoredAbilitiesJArray)
             witnessStoredAbilities.Add(ability);
+        overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
+        overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
+        overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
 
         //link to maingame object
         game = FindObjectOfType<MainGame>();
@@ -1417,10 +1438,10 @@ public class Soldier : PhysicalObject, IDataPersistence
 
         while (runLoop)
         {
-            if (Random.Range(1, 7) <= leadership)
+            if (UnityEngine.Random.Range(1, 7) <= leadership)
             {
                 localMp++;
-                if (Random.Range(1, 7) <= 3)
+                if (UnityEngine.Random.Range(1, 7) <= 3)
                     localAp++;
                 else
                     localAp += 2;
@@ -1503,7 +1524,47 @@ public class Soldier : PhysicalObject, IDataPersistence
             "Jungle_Commander" => allPortraits.options[16].image,
             "Jungle_Balaclava" => allPortraits.options[17].image,
             "Jungle_BeardWWII" => allPortraits.options[18].image,
-            "Jungle_Beret" => allPortraits.options[19].image,
+            "Jungle_Mewham" => allPortraits.options[19].image,
+            "Jungle_DarkWWII" => allPortraits.options[20].image,
+            "Jungle_LightWWII" => allPortraits.options[21].image,
+            "Jungle_Rang" => allPortraits.options[22].image,
+            "Jungle_Shades" => allPortraits.options[23].image,
+            "Urban_Commander" => allPortraits.options[24].image,
+            "Urban_Anubis" => allPortraits.options[25].image,
+            "Urban_Beret" => allPortraits.options[26].image,
+            "Urban_BlackBalaclava" => allPortraits.options[27].image,
+            "Urban_BrownBalaclava" => allPortraits.options[28].image,
+            "Urban_Facepaint" => allPortraits.options[29].image,
+            "Urban_Shades" => allPortraits.options[30].image,
+            "Urban_WWII" => allPortraits.options[31].image,
+            _ => allPortraits.options[0].image,
+        };
+    }
+    public Sprite LoadPortraitTeamsight(string portraitName)
+    {
+        TMP_Dropdown allPortraits = FindObjectOfType<AllPortraits>().allPortraitsTeamsightDropdown;
+        return portraitName switch
+        {
+            "Alpine_Commander" => allPortraits.options[0].image,
+            "Alpine_Balaclava" => allPortraits.options[1].image,
+            "Alpine_BroadBrim" => allPortraits.options[2].image,
+            "Alpine_Cap" => allPortraits.options[3].image,
+            "Alpine_GasMask" => allPortraits.options[4].image,
+            "Alpine_Helmet" => allPortraits.options[5].image,
+            "Alpine_Visor" => allPortraits.options[6].image,
+            "Alpine_WWII" => allPortraits.options[7].image,
+            "Desert_Commander" => allPortraits.options[8].image,
+            "Desert_Balaclava" => allPortraits.options[9].image,
+            "Desert_BroadBrim" => allPortraits.options[10].image,
+            "Desert_DarkWWII" => allPortraits.options[11].image,
+            "Desert_GasMask" => allPortraits.options[12].image,
+            "Desert_Helmet" => allPortraits.options[13].image,
+            "Desert_LightWWII" => allPortraits.options[14].image,
+            "Desert_Shades" => allPortraits.options[15].image,
+            "Jungle_Commander" => allPortraits.options[16].image,
+            "Jungle_Balaclava" => allPortraits.options[17].image,
+            "Jungle_BeardWWII" => allPortraits.options[18].image,
+            "Jungle_Mewham" => allPortraits.options[19].image,
             "Jungle_DarkWWII" => allPortraits.options[20].image,
             "Jungle_LightWWII" => allPortraits.options[21].image,
             "Jungle_Rang" => allPortraits.options[22].image,
@@ -1549,11 +1610,11 @@ public class Soldier : PhysicalObject, IDataPersistence
         };
 
         stats = stats.Where(e => e != soldierSpeciality && e != choiceStat).ToArray();
-        return IncrementStat(stats[Random.Range(0, stats.Length)]);
+        return IncrementStat(stats[UnityEngine.Random.Range(0, stats.Length)]);
     }
     public void IncrementDoubleRandom()
     {
-        int num1 = 0, num2 = 0;
+        int num1 = -1, num2 = -1, num3 = -1;
         string[] stats =
         {
             "Leadership", "Health", "Resilience", "Speed", "Evasion", "Stealth", "Perceptiveness", "Camouflage", "Sight Radius",
@@ -1563,14 +1624,24 @@ public class Soldier : PhysicalObject, IDataPersistence
 
         stats = stats.Where(e => e != soldierSpeciality).ToArray();
 
-        while (num1 == num2)
+        num1 = UnityEngine.Random.Range(0, stats.Length);
+        num2 = UnityEngine.Random.Range(0, stats.Length);
+
+        if (num1 == num2)
         {
-            num1 = Random.Range(0, stats.Length);
-            num2 = Random.Range(0, stats.Length);
+            num3 = UnityEngine.Random.Range(0, stats.Length);
+            while (num1 == num2 || num1 == num3 || num2 == num3)
+            {
+                num1 = UnityEngine.Random.Range(0, stats.Length);
+                num2 = UnityEngine.Random.Range(0, stats.Length);
+                num3 = UnityEngine.Random.Range(0, stats.Length);
+            }
         }
 
         IncrementStat(stats[num1]);
         IncrementStat(stats[num2]);
+        if (num3 > -1)
+            IncrementStat(stats[num3]);
     }
     public string IncrementSpeciality()
     {
@@ -1746,13 +1817,19 @@ public class Soldier : PhysicalObject, IDataPersistence
         else
             return false;
     }
-    public void SetOverwatch()
+    public void SetOverwatch(int x, int y, int r)
     {
+        overwatchXPoint = x;
+        overwatchYPoint = y;
+        overwatchConeRadius = r;
         state.Add("Overwatch");
         Debug.Log(soldierName + " is on Overwatch.");
     }
     public void UnsetOverwatch()
     {
+        overwatchXPoint = 0;
+        overwatchYPoint = 0;
+        overwatchConeRadius = 0;
         state.Remove("Overwatch");
     }
     public bool IsBloodRaged()
@@ -1948,7 +2025,10 @@ public class Soldier : PhysicalObject, IDataPersistence
         if (suppressionValue > 0)
         {
             if (ResilienceCheck())
+            {
+                menu.AddXpAlert(this, 2, "Resisted Suppression.", true);
                 return true;
+            }
             else
                 return false;
         }
@@ -2395,6 +2475,24 @@ public class Soldier : PhysicalObject, IDataPersistence
     {
         RoundsWithoutFood = 0;
     }
+    public bool PhysicalObjectWithinOverwatchCone(PhysicalObject obj)
+    {
+        if (IsOnOverwatch())
+        {
+            if (overwatchXPoint != 0 && overwatchYPoint != 0 && PhysicalObjectWithinRadius(obj, overwatchConeRadius))
+            {
+                Vector2 centreLine = new(overwatchXPoint - this.X, overwatchYPoint - this.Y);
+                Vector2 targetLine = new(obj.X - this.X, obj.Y - this.Y);
+                centreLine.Normalize();
+                targetLine.Normalize();
+
+                if (Vector2.Angle(centreLine, targetLine) <= 45)
+                    return true;
+            }
+        }
+
+        return false;
+    }
     public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
     {
         if (game.CalculateRange(this, obj) <= radius)
@@ -2448,7 +2546,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         set
         {
             //Debug.Log("Setting RevealedBySoldiers");
-            if (revealedBySoldiersList.Any() && !value.Any() && IsAlive())
+            if (revealedBySoldiersList.Any() && !value.Any() && IsAlive() && !IsPlayingDead())
             {
                 revealedBySoldiersList = value;
                 menu.AddLostLosAlert(this);

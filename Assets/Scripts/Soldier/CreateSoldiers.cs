@@ -18,7 +18,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	public List<Soldier> soldiers = new();
 	public TextMeshProUGUI soldierIdentifier, playerIdentifier;
 	public TMP_InputField soldierName;
-	public GameObject createCompletedUI;
+	public GameObject createCompletedUI, randomAlertUI;
 	private List<string> allSoldierIds = new();
 	public int currentTeam = 1, maxSoldiersPerTeam, primaries, weapons, supports, soldierIndex = 1;
 	public List<string> bannedNames = new()
@@ -136,7 +136,15 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		data.maxTeams = setTeamParameters.maxTeams;
 	}
 
-	public void RandomTeam()
+	public void OpenRandomAlertUI()
+	{
+		randomAlertUI.SetActive(true);
+	}
+    public void CloseRandomAlertUI()
+    {
+        randomAlertUI.SetActive(false);
+    }
+    public void RandomTeam()
     {
 		for (int i = soldierIndex; i <= maxSoldiersPerTeam; i++)
         {
