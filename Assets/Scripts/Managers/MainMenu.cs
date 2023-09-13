@@ -33,6 +33,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen;
     public ItemIcon itemIconPrefab;
     public LOSArrow LOSArrowPrefab;
+    public OverwatchArc overwatchArcPrefab;
+    public SightRadiusCircle sightRadiusCirclePrefab;
     public List<Button> actionButtons;
     public List<Sprite> insignia;
     public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, additionalOptionsButton;
@@ -159,7 +161,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 ChangeRoundIndicators();
 
                 //show LOS gizmos
-                DisplayLOSGizmos(); 
+                DisplayLOSGizmos();
 
                 if (activeSoldier != null)
                 {
@@ -201,40 +203,69 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
             return false;
     }
+    public bool SecondOverrideKeyDown()
+    {
+        if (Input.GetKeyDown(secondOverrideKey))
+            return true;
+        else
+            return false;
+    }
+    public bool SecondOverrideKeyUp()
+    {
+        if (Input.GetKeyUp(secondOverrideKey))
+            return true;
+        else
+            return false;
+    }
     public void DisplayLOSGizmos()
     {
-        if (OverrideKey() && SecondOverrideKey())
+        if (OverrideKey())
         {
-            DisplayLOSArrows();
+            //create gizmos upon key press
+            if (SecondOverrideKeyDown())
+            {
+                CreateLOSArrows();
+                if (activeSoldier != null)
+                {
+                    CreateSightRadiusCircle();
+                    CreateOverwatchArc();
+                }
+            }
+
+            //reveal GM objects while held
+            if (SecondOverrideKey())
+            {
+                DisplayGMObjects();
+            }
+            else
+            {
+                HideGMObjects();
+            }
+
+            //destroy gizmos upon key release
+            if (SecondOverrideKeyUp())
+            {
+                DestroySightRadiusCircle();
+                DestroyLOSArrows();
+                DestroyOverwatchArc();
+            }
         }
-        else
-        {
-            HideLOSArrows();
-        }
     }
-    public void DisplayLOSArrows()
+    public void DisplayGMObjects()
     {
-        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+        var GMObjects = FindObjectsOfType<GMObject>(true);
 
-        foreach (LOSArrow arrow in LOSArrows)
-            arrow.gameObject.SetActive(true);
+        foreach (GMObject obj in GMObjects)
+            obj.gameObject.SetActive(true);
     }
-    public void HideLOSArrows()
+    public void HideGMObjects()
     {
-        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+        var GMObjects = FindObjectsOfType<GMObject>(true);
 
-        foreach (LOSArrow arrow in LOSArrows)
-            arrow.gameObject.SetActive(false);
+        foreach (GMObject obj in GMObjects)
+            obj.gameObject.SetActive(false);
     }
-
-    public void DestroyLOSArrows()
-    {
-        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
-        print("Destroying LOS arrows");
-        foreach (LOSArrow arrow in LOSArrows)
-            Destroy(arrow.gameObject);
-    }
-    public void GenerateLOSArrows()
+    public void CreateLOSArrows()
     {
         foreach (Soldier s in allSoldiers)
         {
@@ -242,9 +273,40 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s, soldierManager.FindSoldierById(id));
                 arrow.transform.SetAsLastSibling();
-                arrow.gameObject.SetActive(false);
             }
         }
+    }
+    public void DestroyLOSArrows()
+    {
+        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+        foreach (LOSArrow arrow in LOSArrows)
+            Destroy(arrow.gameObject);
+    }
+    public void CreateOverwatchArc()
+    {
+        if (activeSoldier.IsOnOverwatch())
+        {
+            print("Overwatch registered");
+            OverwatchArc overwatchArc = Instantiate(overwatchArcPrefab).Init(activeSoldier);
+            overwatchArc.transform.SetAsLastSibling();
+        }
+    }
+    public void DestroyOverwatchArc()
+    {
+        var overwatchArcs = FindObjectsOfType<OverwatchArc>(true);
+        foreach (OverwatchArc overwatchArc in overwatchArcs)
+            Destroy(overwatchArc.gameObject);
+    }
+    public void CreateSightRadiusCircle()
+    {
+        SightRadiusCircle sightRadiusCircle = Instantiate(sightRadiusCirclePrefab).Init(activeSoldier);
+        sightRadiusCircle.transform.SetAsLastSibling();
+    }
+    public void DestroySightRadiusCircle()
+    {
+        var sightRadiusCircles = FindObjectsOfType<SightRadiusCircle>(true);
+        foreach (SightRadiusCircle sightRadiusCircle in sightRadiusCircles)
+            Destroy(sightRadiusCircle.gameObject);
     }
     public string PrintArray(Array array)
     {
@@ -1075,6 +1137,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("Name").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierName;
             soldierStatsUI.Find("General").Find("Rank").GetComponent<TextMeshProUGUI>().text = activeSoldier.rank;
             soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierTerrain;
+            soldierStatsUI.Find("General").Find("Specialty").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierSpeciality;
             soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = PrintList(activeSoldier.soldierAbilities);
             soldierStatsUI.Find("General").Find("Location").Find("LocationX").GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationY").GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
@@ -1766,18 +1829,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 }
             }
 
-            //destroy all LOS arrows
-            DestroyLOSArrows();
-
             //repopulate each soldier's revealing and revealedby lists with all reveals
             foreach (Soldier s in allSoldiers)
             {
                 s.RevealingSoldiers = allSoldiersRevealingFinal.GetValueOrDefault(s.id);
                 s.RevealedBySoldiers = allSoldiersRevealedBy.GetValueOrDefault(s.id);
             }
-
-            //generate all LOS arrows
-            GenerateLOSArrows();
 
             //only close the detectionUI if it's open
             if (detectionUI.activeInHierarchy)
@@ -2057,6 +2114,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown gunDropdown = shotUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown aimDropdown = shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown coverDropdown = shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
         targetDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         List<TMP_Dropdown.OptionData> targetDetails = new(), gunDetails = new();
         List<string> noTargets = new() { "No Targets" };
@@ -2132,10 +2190,30 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             aimDropdown.interactable = true;
         }
 
-        CheckShotType();
+        BlockShotOptions(false);
+
         game.UpdateShotUI(shooter);
 
         shotUI.SetActive(true);
+    }
+    public void BlockShotOptions(bool overwatch)
+    {
+        if (overwatch)
+        {
+            shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = false;
+            shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+            shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+            shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+            shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+        }
+        else
+        {
+            shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = true;
+            shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = true;
+            shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().interactable = true;
+            shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().interactable = true;
+            shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = true;
+        }
     }
     public IEnumerator OpenOverwatchShotUI(Soldier shooter, Soldier target)
     {
@@ -2143,9 +2221,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         //set shooter
         shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
-
-        //block back button
-        shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = false;
 
         TMP_Dropdown shotTypeDropdown = shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown gunDropdown = shotUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
@@ -2157,17 +2232,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         //set as regular shot
         shotTypeDropdown.value = 0;
-        shotTypeDropdown.interactable = false;
-
+        
         //set as aimed shot
         aimDropdown.value = 0;
-        aimDropdown.interactable = false;
 
         //set no cover
         coverDropdown.value = 0;
-        coverDropdown.interactable = false;
 
         //generate guns list
+        gunDropdown.ClearOptions();
         foreach (Item i in shooter.inventory.Items)
         {
             if (i.gunType != null)
@@ -2180,58 +2253,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait);
         targetDetails.Add(option);
         targetDropdown.AddOptions(targetDetails);
-        targetDropdown.interactable = false;
         CheckTargetInCover();
-        CheckShotType();
+
+        BlockShotOptions(true);
+        
         game.UpdateShotUI(shooter);
 
         shotUI.SetActive(true);
     }
-    public void CheckShotType()
-    {
-        TMP_Dropdown shotTypeDropdown = shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
 
-        if (shotTypeDropdown.value == 0)
-        {
-            shotUI.transform.Find("Aim").gameObject.SetActive(true);
-            shotUI.transform.Find("SuppressionValue").gameObject.SetActive(false);
-            shotUI.transform.Find("TargetPanel").Find("Target").gameObject.SetActive(true);
-            shotUI.transform.Find("TargetPanel").Find("CoverLocation").gameObject.SetActive(false);
-            shotUI.transform.Find("TargetPanel").Find("HitChance").gameObject.SetActive(true);
-            shotUI.transform.Find("TargetPanel").Find("CritHitChance").gameObject.SetActive(true);
-
-            if (activeSoldier.IsSuppressed())
-                shotUI.transform.Find("TargetPanel").Find("SuppressedHitChance").gameObject.SetActive(true);
-            else
-                shotUI.transform.Find("TargetPanel").Find("SuppressedHitChance").gameObject.SetActive(false);
-
-        }
-        else if (shotTypeDropdown.value == 1)
-        {
-            shotUI.transform.Find("Aim").gameObject.SetActive(false);
-            shotUI.transform.Find("SuppressionValue").gameObject.SetActive(true);
-            shotUI.transform.Find("TargetPanel").Find("Target").gameObject.SetActive(true);
-            shotUI.transform.Find("TargetPanel").Find("CoverLocation").gameObject.SetActive(false);
-            shotUI.transform.Find("TargetPanel").Find("HitChance").gameObject.SetActive(false);
-            shotUI.transform.Find("TargetPanel").Find("CritHitChance").gameObject.SetActive(false);
-
-            shotUI.transform.Find("TargetPanel").Find("SuppressedHitChance").gameObject.SetActive(false);
-        }
-        else
-        {
-            shotUI.transform.Find("Aim").gameObject.SetActive(true);
-            shotUI.transform.Find("SuppressionValue").gameObject.SetActive(false);
-            shotUI.transform.Find("TargetPanel").Find("Target").gameObject.SetActive(false);
-            shotUI.transform.Find("TargetPanel").Find("CoverLocation").gameObject.SetActive(true);
-            shotUI.transform.Find("TargetPanel").Find("HitChance").gameObject.SetActive(true);
-            shotUI.transform.Find("TargetPanel").Find("CritHitChance").gameObject.SetActive(true);
-
-            if (activeSoldier.IsSuppressed())
-                shotUI.transform.Find("TargetPanel").Find("SuppressedHitChance").gameObject.SetActive(true);
-            else
-                shotUI.transform.Find("TargetPanel").Find("SuppressedHitChance").gameObject.SetActive(false);
-        }
-    }
     public void CheckTargetInCover()
     {
         TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
@@ -2927,6 +2957,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         overwatchUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text = "";
         overwatchUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Radius").GetComponent<TMP_InputField>().text = "";
     }
     public void CloseOverwatchUI()
     {

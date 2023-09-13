@@ -1,21 +1,16 @@
 using UnityEngine;
 
-public class LOSArrow : MonoBehaviour
+public class LOSArrow : LOSGizmo
 {
-    public Soldier from;
     public Soldier to;
-    public LineRenderer lineRenderer;
-
-    void Awake()
-    {
-        lineRenderer = GetComponent<LineRenderer>();
-    }
 
     public LOSArrow Init(Soldier from, Soldier to)
     {
         this.to = to;
         this.from = from;
         transform.position = new Vector3((from.transform.position.x + to.transform.position.x) / 2.0f, (from.transform.position.y + to.transform.position.y) / 2.0f, (from.transform.position.z + to.transform.position.z) / 2.0f);
+
+        LineRenderer lineRenderer = Instantiate(lineRendererPrefab, transform);
 
         lineRenderer.SetPosition(0, new Vector3(from.transform.position.x, from.transform.position.y, from.transform.position.z));
         lineRenderer.SetPosition(1, new Vector3(to.transform.position.x, to.transform.position.y, to.transform.position.z));

@@ -101,10 +101,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 110805a4a9cd9b145b2c67df48ed4586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
+  terrainOn: 
   x: 0
   y: 0
   z: 0
-  id: 
   soldierName: 
   soldierTerrain: 
   soldierSpeciality: 
@@ -117,12 +118,13 @@ MonoBehaviour:
   selected: 0
   revealed: 0
   usedAP: 0
+  usedMP: 0
+  bloodLettedThisTurn: 0
   hp: 6
   ap: 0
   mp: 0
   tp: 0
   xp: 0
-  terrainOn: 
   rank: 
   instantSpeed: 0
   roundsFielded: 0
@@ -134,8 +136,13 @@ MonoBehaviour:
   healthRemovedFromStarve: 0
   fighterHitCount: 0
   plannerDonatedMove: 0
+  timesBloodlet: 0
+  overwatchXPoint: 0
+  overwatchYPoint: 0
+  overwatchConeRadius: 0
   revealedByTeam: 
   lastChosenStat: 
+  poisonedBy: 
   inventory:
     itemPrefab: {fileID: 0}
     linkedSoldier: {fileID: 0}
@@ -145,6 +152,8 @@ MonoBehaviour:
   controllingSoldiersList: []
   revealedBySoldiersList: []
   revealingSoldiersList: []
+  witnessStoredAbilities: []
+  witnessActiveAbilities: []
   itemPrefab: {fileID: 4690525424084030571, guid: 9861933c9c6ad5c47a543593cd6719de, type: 3}
   SRColliderMax: {fileID: 2230963200744647314}
   SRColliderHalf: {fileID: 4658430169571143711}
@@ -161,6 +170,7 @@ MonoBehaviour:
   soldierUIPrefab: {fileID: 5713749636568449379, guid: 0f3751c0026db9a4982c469260e5f172, type: 3}
   game: {fileID: 0}
   menu: {fileID: 0}
+  soldierManager: {fileID: 0}
 --- !u!135 &2230963200744647314
 SphereCollider:
   m_ObjectHideFlags: 0

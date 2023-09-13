@@ -618,6 +618,7 @@ public class Soldier : PhysicalObject, IDataPersistence
                 CalculateActiveStats();
                 DisplayStats();
                 CheckRevealed();
+                CheckSightRadius();
             }
         }
     }
@@ -664,6 +665,13 @@ public class Soldier : PhysicalObject, IDataPersistence
                 //get actual speed including enviro effects
                 CalculateInstantSpeed();
             }
+        }
+    }
+    public void CheckSightRadius()
+    {
+        if (stats.SR.Val == 0)
+        {
+            game.BreakAllMeleeEngagements(this);
         }
     }
     public void ApplyVisMods()

@@ -793,6 +793,7 @@ GameObject:
   - component: {fileID: 464832138875738099}
   - component: {fileID: 1534143711874041336}
   - component: {fileID: 8726395704103338615}
+  - component: {fileID: 5282010144223447932}
   m_Layer: 5
   m_Name: YInput
   m_TagString: Untagged
@@ -957,6 +958,21 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+--- !u!114 &5282010144223447932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2272814330098371105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b590a15c67174042b33acf6d142b8fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textInput: {fileID: 0}
+  initialiser: 0
+  game: {fileID: 0}
 --- !u!1 &2687862115611920848
 GameObject:
   m_ObjectHideFlags: 0
@@ -4512,6 +4528,7 @@ GameObject:
   - component: {fileID: 5607546131317137144}
   - component: {fileID: 5756742459205183403}
   - component: {fileID: 9066101361262896059}
+  - component: {fileID: 1986256231454738746}
   m_Layer: 5
   m_Name: ZInput
   m_TagString: Untagged
@@ -4676,6 +4693,21 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+--- !u!114 &1986256231454738746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7683929296911748592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b590a15c67174042b33acf6d142b8fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textInput: {fileID: 0}
+  initialiser: 0
+  game: {fileID: 0}
 --- !u!1 &7772743642484609598
 GameObject:
   m_ObjectHideFlags: 0
@@ -5002,6 +5034,7 @@ GameObject:
   - component: {fileID: 7018707565117540037}
   - component: {fileID: 7738577293205916926}
   - component: {fileID: 9108020749738744378}
+  - component: {fileID: 105276735773026500}
   m_Layer: 5
   m_Name: XInput
   m_TagString: Untagged
@@ -5166,6 +5199,21 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+--- !u!114 &105276735773026500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8540609447297672692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b590a15c67174042b33acf6d142b8fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textInput: {fileID: 0}
+  initialiser: 0
+  game: {fileID: 0}
 --- !u!1001 &6764351343910189243
 PrefabInstance:
   m_ObjectHideFlags: 0

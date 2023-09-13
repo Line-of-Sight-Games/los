@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System;
 
 public class CreateSoldiers : MonoBehaviour, IDataPersistence
 {
@@ -167,7 +169,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	}
 	public void RandomName()
     {
-		soldierName.text = randomNames[Random.Range(0, randomNames.Length)];
+		soldierName.text = randomNames[UnityEngine.Random.Range(0, randomNames.Length)];
     }
 	public int[] CreateRandomIntArray(int length)
 	{
@@ -175,7 +177,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		for (int i = 0; i < arr.Length; i++)
 			arr[i] = i;
 
-		arr = arr.OrderBy(x => Random.Range(0, activePortraitDropdown.options.Count)).ToArray();
+		arr = arr.OrderBy(x => UnityEngine.Random.Range(0, activePortraitDropdown.options.Count)).ToArray();
 
 		return arr;
 	}
@@ -188,13 +190,13 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 			while (checkingValid)
 			{
-				terrainDropdown.value = Random.Range(1, terrainDropdown.options.Count);
+				terrainDropdown.value = UnityEngine.Random.Range(1, terrainDropdown.options.Count);
 				if (!selectedCommanderTerrains.Contains(terrainDropdown.options[terrainDropdown.value].text))
 					checkingValid = false;
 			}
 		}
 		else
-			terrainDropdown.value = Random.Range(1, terrainDropdown.options.Count);
+			terrainDropdown.value = UnityEngine.Random.Range(1, terrainDropdown.options.Count);
     }
 	public void RandomPortrait()
 	{
@@ -228,7 +230,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 		while (checkingValid)
         {
-			activeSpecialityDropdown.value = Random.Range(1, activeSpecialityDropdown.options.Count);
+			activeSpecialityDropdown.value = UnityEngine.Random.Range(1, activeSpecialityDropdown.options.Count);
 			if (!selectedSkills.Contains(activeSpecialityDropdown.options[activeSpecialityDropdown.value].text))
 				checkingValid = false;
 		}
@@ -238,7 +240,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		var checkingValid = true;
 		while (checkingValid)
         {
-			abilityDropdown.value = Random.Range(1, abilityDropdown.options.Count);
+			abilityDropdown.value = UnityEngine.Random.Range(1, abilityDropdown.options.Count);
 			if (!selectedAbilities.Contains(abilityDropdown.options[abilityDropdown.value].text))
 				checkingValid = false;
 		}
@@ -379,10 +381,10 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	}
 	public void CheckSoldierName()
 	{
-		if (bannedNames.Contains(soldierName.text))
-			soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color = Color.red;
-		else
-			soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(0.196f, 0.196f, 0.196f);
+		if (!bannedNames.Contains(soldierName.text, StringComparer.OrdinalIgnoreCase) && Regex.Match(soldierName.text, @"^[a-zA-Z'-]+$", RegexOptions.IgnoreCase).Success)
+            soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(0.196f, 0.196f, 0.196f);
+        else
+            soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color = Color.red;
 	}
 	public void CheckPlayerIdentifier()
 	{
