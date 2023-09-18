@@ -9,7 +9,7 @@ public class OverwatchArc : LOSGizmo
         transform.position = from.transform.position;
         Vector3 direction = (new Vector3(from.overwatchXPoint, 0, from.overwatchYPoint) - from.transform.position).normalized;
 
-        float angleStep = 45f / numberOfLines;
+        float angleStep = (from.overwatchConeArc/2f) / numberOfLines;
 
         for (int i = - numberOfLines; i < numberOfLines; i++)
         {

@@ -26146,6 +26146,7 @@ MonoBehaviour:
   endSoldierTurnAlertUI: {fileID: 0}
   playdeadAlertUI: {fileID: 0}
   coverAlertUI: {fileID: 0}
+  overwatchUI: {fileID: 0}
   externalItemSourcesUI: {fileID: 0}
   allyItemButtonUI: {fileID: 0}
   flankersMeleeAttackerUI: {fileID: 0}
@@ -26172,6 +26173,8 @@ MonoBehaviour:
   blockingScreen: {fileID: 0}
   itemIconPrefab: {fileID: 0}
   LOSArrowPrefab: {fileID: 0}
+  overwatchArcPrefab: {fileID: 0}
+  sightRadiusCirclePrefab: {fileID: 0}
   actionButtons: []
   insignia: []
   shotButton: {fileID: 0}
@@ -26228,6 +26231,12 @@ MonoBehaviour:
   avoidance2Way: {fileID: 0}
   avoidance2WayLeft: {fileID: 0}
   avoidance2WayRight: {fileID: 0}
+  detectionOverwatch2WayLeft: {fileID: 0}
+  detectionOverwatch2WayRight: {fileID: 0}
+  avoidanceOverwatch2WayLeft: {fileID: 0}
+  avoidanceOverwatch2WayRight: {fileID: 0}
+  overwatch1WayLeft: {fileID: 0}
+  overwatch1WayRight: {fileID: 0}
   fist: {fileID: 0}
   terrainList:
   - Urban
@@ -28429,7 +28438,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This will randomise whole team?
+  m_text: This will randomise everything remaining in this team.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

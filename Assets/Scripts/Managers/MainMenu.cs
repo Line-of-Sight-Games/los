@@ -23,8 +23,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public SoundManager soundManager;
 
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, 
-        shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, 
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI,
+        shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,
         configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
         traumaAlertUI, traumaUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
         coverAlertUI, overwatchUI, externalItemSourcesUI, allyItemButtonUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, allyInventoryPanelPrefab, detectionAlertPrefab, 
@@ -1301,8 +1301,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public string GetSuppressionState()
     {
-        if (activeSoldier.suppressionValue > 0)
-            return ", <color=orange>Suppressed (" + activeSoldier.suppressionValue + ")</color>";
+        if (activeSoldier.GetSuppression() > 0)
+            return ", <color=orange>Suppressed (" + activeSoldier.GetSuppression() + ")</color>";
         else
             return "";
     }
@@ -1617,10 +1617,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         GameObject detectionAlert = Instantiate(detectionAlertPrefab, detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
-        if (detectorLabel.Contains("blind") || detectorLabel.Contains("out of SR"))
+        if (detectorLabel.Contains("Not detected"))
             detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
 
-        if (counterLabel.Contains("blind") || counterLabel.Contains("out of SR"))
+        if (counterLabel.Contains("Not detected"))
             detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
 
         detectionAlert.GetComponent<SoldierAlertDouble>().SetSoldiers(detector, counter);
@@ -2111,11 +2111,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
 
         TMP_Dropdown shotTypeDropdown = shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
+        shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         TMP_Dropdown gunDropdown = shotUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown aimDropdown = shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown coverDropdown = shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
-        targetDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         List<TMP_Dropdown.OptionData> targetDetails = new(), gunDetails = new();
         List<string> noTargets = new() { "No Targets" };
 
@@ -2176,19 +2176,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             shotTypeDropdown.value = 2;
         }
 
-        //if soldier engaged in melee block everything except standard unaimed shot
+        //if soldier engaged in melee block force unaimed shot
         if (activeSoldier.IsMeleeEngaged())
-        {
-            shotTypeDropdown.interactable = false;
             aimDropdown.value = 1;
-            aimDropdown.interactable = false;
-        }
         else
-        {
-            shotTypeDropdown.interactable = true;
             aimDropdown.value = 0;
-            aimDropdown.interactable = true;
-        }
 
         BlockShotOptions(false);
 
@@ -2204,6 +2196,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = false;
             shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().interactable = false;
             shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+            shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+        }
+        else if (activeSoldier.IsMeleeEngaged())
+        {
+            shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = true;
+            shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+            shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+            shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().interactable = true;
             shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = false;
         }
         else
@@ -2223,11 +2223,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
 
         TMP_Dropdown shotTypeDropdown = shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
+        shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         TMP_Dropdown gunDropdown = shotUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown aimDropdown = shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown coverDropdown = shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
-        targetDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         List<TMP_Dropdown.OptionData> targetDetails = new(), gunDetails = new();
 
         //set as regular shot
@@ -2303,8 +2303,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TMP_InputField>().text = "";
         shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TMP_InputField>().text = "";
         shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        shotUI.transform.Find("TargetPanel").Find("HitChance").Find("HitChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
-        shotUI.transform.Find("TargetPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
         game.ClearFlankersUI(flankersShotUI);
         clearShotFlag = false;
     }
@@ -2312,10 +2310,92 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CloseShotUI()
     {
         ClearShotUI();
+        ClearShotConfirmUI();
         shotUI.SetActive(false);
+        shotConfirmUI.SetActive(false);
     }
+    public void OpenShotConfirmUI()
+    {
+        if (int.TryParse(shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap))
+        {
+            if (game.CheckAP(ap))
+            {
+                //find shooter
+                Soldier shooter = soldierManager.FindSoldierById(shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
+                Soldier target = soldierManager.FindSoldierByName(game.targetDropdown.options[game.targetDropdown.value].text);
+                Tuple<int, int, int> chances;
 
+                //if suppression shot hit chance is always 100
+                if (game.shotTypeDropdown.value == 1)
+                    chances = Tuple.Create(100, 0, 100);
+                else
+                    chances = game.CalculateHitPercentage(shooter, target);
 
+                //only shot suppression hit chance if suppressed
+                if (shooter.IsSuppressed() && game.shotTypeDropdown.value != 1)
+                    shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(true);
+                else
+                    shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(false);
+
+                shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").Find("SuppressedHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item3.ToString() + "%";
+                shotConfirmUI.transform.Find("OptionPanel").Find("HitChance").Find("HitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item1.ToString() + "%";
+                shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
+
+                //enable back button only if shot is aimed and under 25%
+                if (chances.Item1 <= 25 && game.aimTypeDropdown.value == 0 && !shooter.IsOnOverwatch())
+                    shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = true;
+                else
+                    shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
+
+                //add parameter to equation view
+                shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text =
+                    $"{game.shotParameters.Find(tuple => tuple.Item1 == "accuracy")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "sharpshooter")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "inspired")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "WS")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "juggernaut")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "stim")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "trauma")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "sustenance")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tE")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "cover")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "vis")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "rain")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "wind")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "HP")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tHP")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "Ter")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tTer")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "elevation")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "kd")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "overwatch")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "flank")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "stealth")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "suppression")}";
+
+                shotConfirmUI.SetActive(true);
+            }
+        }
+    }
+    public void ExitShotConfirmUI()
+    {
+        int.TryParse(shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
+        //deduct ap for aiming if leaving shot
+        game.DeductAP(ap - 1);
+
+        CloseShotUI();
+    }
+    public void ClearShotConfirmUI()
+    {
+        //if (shotConfirmUI.activeInHierarchy)
+        {
+            clearShotFlag = true;
+            shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").Find("SuppressedHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
+            shotConfirmUI.transform.Find("OptionPanel").Find("HitChance").Find("HitChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
+            shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
+            clearShotFlag = false;
+        }       
+    }
 
 
 
@@ -2346,6 +2426,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public IEnumerator OpenMeleeUI(string meleeCharge)
     {
         yield return new WaitForSeconds(0.05f);
+        
+        //set attacker
+        Soldier attacker = activeSoldier;
+        meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text = attacker.id;
+
         meleeChargeIndicator = meleeCharge;
         TMP_Dropdown meleeTypeDropdown = meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>();
         meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
@@ -2363,12 +2448,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         meleeTypeDropdown.AddOptions(meleeTypeDetails);
 
         //block engagement only if melee controlled
-        if (activeSoldier.IsMeleeEngaged())
+        if (attacker.IsMeleeEngaged())
             meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Engagement Only");
 
         //generate attacker weapon list
         attackerWeaponDetails.Add(new TMP_Dropdown.OptionData("Fist", fist));
-        foreach (Item i in activeSoldier.inventory.Items)
+        foreach (Item i in attacker.inventory.Items)
         {
             if (i.equippableSlots.Contains("Hand_Slot"))
                 attackerWeaponDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
@@ -2379,9 +2464,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Soldier s in allSoldiers)
         {
             TMP_Dropdown.OptionData target = null;
-            if (s.IsAlive() && activeSoldier.IsOppositeTeamAs(s) && s.IsRevealed() && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
+            if (s.IsAlive() && attacker.IsOppositeTeamAs(s) && s.IsRevealed() && attacker.PhysicalObjectWithinMeleeRadius(s))
             {
-                if (activeSoldier.CanSeeInOwnRight(s))
+                if (attacker.CanSeeInOwnRight(s))
                     target = new(s.soldierName, s.soldierPortrait);
                 else
                     target = new(s.soldierName, s.LoadPortraitTeamsight(s.soldierPortraitText));
@@ -2392,7 +2477,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (target != null)
             {
                 //remove option if soldier is engaged and this soldier is not on the engagement list
-                if (activeSoldier.IsMeleeEngaged() && !activeSoldier.IsMeleeEngagedWith(s))
+                if (attacker.IsMeleeEngaged() && !attacker.IsMeleeEngagedWith(s))
                     targetDetails.Remove(target);
             }
         }
@@ -2432,14 +2517,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown defenderWeaponDropdown = meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").Find("WeaponDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown targetDropdown = meleeUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
-        Soldier target = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
+        Soldier defender = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
         List<TMP_Dropdown.OptionData> defenderWeaponDetails = new();
 
         //generate defender weapon list
         defenderWeaponDropdown.ClearOptions();
         defenderWeaponDropdown.value = 0;
         defenderWeaponDetails.Add(new TMP_Dropdown.OptionData("Fist", fist));
-        foreach (Item i in target.inventory.Items)
+        foreach (Item i in defender.inventory.Items)
         {
             if (i.equippableSlots.Contains("Hand_Slot"))
                 defenderWeaponDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
@@ -2454,13 +2539,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             meleeUI.transform.Find("AttackerWeapon").gameObject.SetActive(true);
             meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").gameObject.SetActive(true);
-            meleeUI.transform.Find("TargetPanel").Find("MeleeDamage").gameObject.SetActive(true);
         }
         else
         {
             meleeUI.transform.Find("AttackerWeapon").gameObject.SetActive(false);
             meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").gameObject.SetActive(false);
-            meleeUI.transform.Find("TargetPanel").Find("MeleeDamage").gameObject.SetActive(false);
         }
 
         if (meleeTypeDropdown.options[meleeTypeDropdown.value].text.Contains("Request"))
@@ -2479,13 +2562,69 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         meleeUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value = 0;
         game.ClearFlankersUI(flankersMeleeAttackerUI);
         game.ClearFlankersUI(flankersMeleeDefenderUI);
-        meleeUI.transform.Find("TargetPanel").Find("MeleeDamage").Find("MeleeDamageDisplay").GetComponent<TextMeshProUGUI>().text = "";
         clearMeleeFlag = false;
     }
     public void CloseMeleeUI()
     {
         ClearMeleeUI();
+        ClearMeleeConfirmUI();
         meleeUI.SetActive(false);
+        meleeConfirmUI.SetActive(false);
+    }
+    public void OpenMeleeConfirmUI()
+    {
+        if (int.TryParse(meleeUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap))
+        {
+            if (game.CheckAP(ap))
+            {
+                //find attacker and defender
+                Soldier attacker = soldierManager.FindSoldierById(meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text);
+                Soldier defender = soldierManager.FindSoldierByName(game.meleeTargetDropdown.options[game.meleeTargetDropdown.value].text);
+
+                int meleeDamage = game.CalculateMeleeResult(attacker, defender);
+
+                meleeConfirmUI.transform.Find("OptionPanel").Find("Damage").Find("DamageDisplay").GetComponent<TextMeshProUGUI>().text = meleeDamage.ToString();
+
+                //add parameters to equation view
+                meleeConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text =
+                    $"{game.meleeParameters.Find(tuple => tuple.Item1 == "aM")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aJuggernaut")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aInspirer")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aSustenance")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aWep")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aHP")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aTer")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aFlank")} " +
+                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "kd")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "suppression")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aStr")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dM")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dJuggernaut")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dInspirer")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dSustenance")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dWep")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "charge")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dHP")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dTer")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dFlank")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "suppression")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dStr")}";
+
+                //add rounding to equation view
+                meleeConfirmUI.transform.Find("EquationPanel").Find("Rounding").GetComponent<TextMeshProUGUI>().text = $"Rounding: {game.meleeParameters.Find(tuple => tuple.Item1 == "rounding").Item2}";
+
+                meleeConfirmUI.SetActive(true);
+            }
+        }
+    }
+    public void ClearMeleeConfirmUI()
+    {
+        //if (shotConfirmUI.activeInHierarchy)
+        {
+            clearMeleeFlag = true;
+            meleeConfirmUI.transform.Find("OptionPanel").Find("Damage").Find("DamageDisplay").GetComponent<TextMeshProUGUI>().text = "";
+            clearMeleeFlag = false;
+        }
     }
     public void OpenNoMeleeTargetsUI()
     {
@@ -2951,6 +3090,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenOverwatchUI()
     {
         overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Radius").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"Max {activeSoldier.SRColliderMax.radius}";
+        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Radius").GetComponent<InputController>().max = Mathf.RoundToInt(activeSoldier.SRColliderMax.radius);
         overwatchUI.SetActive(true);
     }
     public void ClearOverwatchUI()
@@ -2958,6 +3098,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         overwatchUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text = "";
         overwatchUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>().text = "";
         overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Radius").GetComponent<TMP_InputField>().text = "";
+        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Angle").GetComponent<TMP_InputField>().text = "";
     }
     public void CloseOverwatchUI()
     {

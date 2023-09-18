@@ -21,7 +21,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     public bool fielded, selected, revealed, usedAP, usedMP, bloodLettedThisTurn;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius;
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc;
     public string revealedByTeam, lastChosenStat, poisonedBy;
     public Statline stats;
     public Inventory inventory;
@@ -484,6 +484,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         details.Add("overwatchXPoint", overwatchXPoint);
         details.Add("overwatchYPoint", overwatchYPoint);
         details.Add("overwatchConeRadius", overwatchConeRadius);
+        details.Add("overwatchConeArc", overwatchConeArc);
 
         //add the soldier in
         if (data.allSoldiersDetails.ContainsKey(id))
@@ -605,6 +606,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
         overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
         overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
+        overwatchConeArc = Convert.ToInt32(details["overwatchConeArc"]);
 
         //link to maingame object
         game = FindObjectOfType<MainGame>();
@@ -1773,17 +1775,35 @@ public class Soldier : PhysicalObject, IDataPersistence
 
     public bool IsSuppressed()
     {
-        if (suppressionValue > 0)
+        if (GetSuppression() > 0)
             return true;
         else
             return false;
     }
+    public int GetSuppression()
+    {
+        float suppressionValueFinal = 1 - (suppressionValue/100f);
+        List<float> suppressionValues = new();
+
+        //get all engaged soldiers' suppression values
+        foreach (string id in controlledBySoldiersList)
+            suppressionValues.Add(1 - (soldierManager.FindSoldierById(id).suppressionValue/100f));
+        foreach (string id in controllingSoldiersList)
+            suppressionValues.Add(1 - (soldierManager.FindSoldierById(id).suppressionValue/100f));
+
+        //multiply all inverses
+        foreach (float val in suppressionValues)
+            suppressionValueFinal *= val;
+
+        return Mathf.RoundToInt((1 - suppressionValueFinal)*100);
+    }
     public void SetSuppression(int suppression)
     {
-        Debug.Log(suppression);
-        Debug.Log(suppressionValue);
         suppressionValue = Mathf.RoundToInt((1 - ((100 - suppressionValue)/100f)*((100 - suppression)/100f))*100);
-        Debug.Log(soldierName + " is supressed (" + suppressionValue + ").");
+    }
+    public void UnsetSuppression()
+    {
+        suppressionValue = 0;
     }
 
     public bool IsStunned()
@@ -1825,11 +1845,12 @@ public class Soldier : PhysicalObject, IDataPersistence
         else
             return false;
     }
-    public void SetOverwatch(int x, int y, int r)
+    public void SetOverwatch(int x, int y, int r, int a)
     {
         overwatchXPoint = x;
         overwatchYPoint = y;
         overwatchConeRadius = r;
+        overwatchConeArc = a;
         state.Add("Overwatch");
         Debug.Log(soldierName + " is on Overwatch.");
     }
@@ -1838,6 +1859,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         overwatchXPoint = 0;
         overwatchYPoint = 0;
         overwatchConeRadius = 0;
+        overwatchConeArc = 0;
         state.Remove("Overwatch");
     }
     public bool IsBloodRaged()
@@ -1899,7 +1921,15 @@ public class Soldier : PhysicalObject, IDataPersistence
     public void MakeStunned(int stunRounds)
     {
         if (stunRounds > stunnedRoundsVulnerable)
+        {
             SetStunned(stunRounds);
+
+            //remove all engagements
+            if (IsMeleeEngaged())
+                StartCoroutine(game.DetermineMeleeControllerMultiple(this));
+            
+            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
+        }
     }
     public string CheckHealthState()
     {
@@ -2494,7 +2524,7 @@ public class Soldier : PhysicalObject, IDataPersistence
                 centreLine.Normalize();
                 targetLine.Normalize();
 
-                if (Vector2.Angle(centreLine, targetLine) <= 45)
+                if (Vector2.Angle(centreLine, targetLine) <= overwatchConeArc/2.0f)
                     return true;
             }
         }
