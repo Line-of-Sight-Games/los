@@ -16,7 +16,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand"
     },
     {
       "Name": "Ammo_LMG",
@@ -34,7 +34,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand"
     },
     {
       "Name": "Ammo_Pi",
@@ -52,7 +52,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand"
     },
     {
       "Name": "Ammo_Ri",
@@ -70,7 +70,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand"
     },
     {
       "Name": "Ammo_Sh",
@@ -88,7 +88,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand"
     },
     {
       "Name": "Ammo_SMG",
@@ -106,7 +106,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand"
     },
     {
       "Name": "Ammo_Sn",
@@ -124,7 +124,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand"
     },
     {
       "Name": "AR_ACOG_FAL",
@@ -165,7 +165,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "AR_AK_47",
@@ -206,7 +206,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "AR_M_16",
@@ -247,7 +247,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Armour_Body",
@@ -265,7 +265,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Shoulder_Slot"
+      "EquippableSlots": "Chest"
     },
     {
       "Name": "Armour_Exo",
@@ -282,8 +282,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": false,
-      "EquippableSlots": "Fullbody_Slot",
-      "BlockedByFullbody": "Back_HoleLeft_Brace_SlotRight_Brace_SlotLateral_SlotPosterior_Slot"
+      "EquippableSlots": "Chest",
+      "BlockedByChest": "BackLeft_BraceRight_BraceLateralPosterior"
     },
     {
       "Name": "Armour_Ghillie",
@@ -300,8 +300,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Fullbody_Slot",
-      "BlockedByFullbody": "Left_Leg_SlotRight_Leg_SlotShoulder_SlotPosterior_Slot"
+      "EquippableSlots": "Chest",
+      "BlockedByFullbody": "Left_LegRight_LegShoulderPosterior"
     },
     {
       "Name": "Armour_Juggernaut",
@@ -319,8 +319,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": false,
-      "EquippableSlots": "Fullbody_Slot",
-      "BlockedByFullbody": "Shoulder_SlotPosterior_Slot"
+      "EquippableSlots": "Chest",
+      "BlockedByFullbody": "ShoulderPosterior"
     },
     {
       "Name": "Armour_Stimulant",
@@ -337,8 +337,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": false,
-      "EquippableSlots": "Fullbody_Slot",
-      "BlockedByFullbody": "Shoulder_Slot"
+      "EquippableSlots": "Chest",
+      "BlockedByFullbody": "Shoulder"
     },
     {
       "Name": "Backpack",
@@ -355,7 +355,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Back_Hole"
+      "EquippableSlots": "Back"
     },
     {
       "Name": "Bag",
@@ -372,7 +372,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Posterior_Slot"
+      "EquippableSlots": "Posterior"
     },
     {
       "Name": "Binoculars",
@@ -389,8 +389,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Brace",
@@ -407,7 +407,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Left_Leg_SlotRight_Leg_Slot"
+      "EquippableSlots": "Left_LegRight_Leg"
     },
     {
       "Name": "Claymore",
@@ -424,8 +424,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Deployment_Beacon",
@@ -442,7 +442,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateral"
     },
     {
       "Name": "E_Tool",
@@ -459,8 +459,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Food_Pack",
@@ -477,8 +477,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHandHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Grenade_Flashbang",
@@ -495,8 +495,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Grenade_Frag",
@@ -513,8 +513,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Grenade_Smoke",
@@ -531,8 +531,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Grenade_Tabun",
@@ -549,8 +549,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Knife",
@@ -567,9 +567,9 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotLateral_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole",
-      "BlockedByLateral": "Left_Brace_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourLateralHand",
+      "BlockedByPosterior": "Back",
+      "BlockedByLateral": "Left_Brace"
     },
     {
       "Name": "Medkit_Large",
@@ -587,7 +587,7 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Hand_Slot"
+      "EquippableSlots": "Hand"
     },
     {
       "Name": "Medkit_Medium",
@@ -664,7 +664,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "LMG_M_60",
@@ -705,7 +705,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "LMG_SAW",
@@ -746,7 +746,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Logistics_Belt",
@@ -763,7 +763,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Posterior_Slot"
+      "EquippableSlots": "Posterior"
     },
     {
       "Name": "Pi_Glock",
@@ -804,7 +804,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Lateral_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotBackpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "LateralPosteriorLeft_BraceRight_BraceBackpackArmourHand"
     },
     {
       "Name": "Pi_Sidearm",
@@ -845,7 +845,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Lateral_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotBackpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "LateralPosteriorLeft_BraceRight_BraceBackpackArmourHand"
     },
     {
       "Name": "Pi_357",
@@ -886,7 +886,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Lateral_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotBackpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "LateralPosteriorLeft_BraceRight_BraceBackpackArmourHand"
     },
     {
       "Name": "Poison_Satchel",
@@ -903,8 +903,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Ri_Arisaka",
@@ -945,7 +945,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Ri_Carbine",
@@ -986,7 +986,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Ri_M1_Garand",
@@ -1027,7 +1027,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Riot_Shield",
@@ -1044,7 +1044,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Hand_Slot"
+      "EquippableSlots": "Hand"
     },
     {
       "Name": "Sh_Ithaca",
@@ -1085,7 +1085,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Sh_Olympus",
@@ -1126,7 +1126,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Sh_SPAS_12",
@@ -1167,7 +1167,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "SMG_P_90",
@@ -1208,7 +1208,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "SMG_Thompson",
@@ -1249,7 +1249,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "SMG_UMP_40",
@@ -1290,7 +1290,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Sn_Barrett",
@@ -1331,7 +1331,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Sn_Dragunov",
@@ -1372,7 +1372,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Sn_Intervention",
@@ -1413,7 +1413,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotArmour_SlotHand_Slot"
+      "EquippableSlots": "BackpackArmourHand"
     },
     {
       "Name": "Suppressor",
@@ -1430,7 +1430,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Barrel_End_Slot"
+      "EquippableSlots": "Barrel_End"
     },
     {
       "Name": "Syringe_Amphetamine",
@@ -1447,8 +1447,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Androstenedione",
@@ -1465,8 +1465,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Cannabinoid",
@@ -1483,8 +1483,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Danazol",
@@ -1501,8 +1501,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Glucocorticoid",
@@ -1519,8 +1519,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Modafinil",
@@ -1537,8 +1537,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Shard",
@@ -1555,8 +1555,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Trenbolone",
@@ -1573,8 +1573,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Syringe_Unlabelled",
@@ -1591,8 +1591,8 @@
       "PoisonedBy": "",
       "Shareable": true,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByPosterior": "Back_Hole"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByPosterior": "Back"
     },
     {
       "Name": "Thermal Camera",
@@ -1609,9 +1609,9 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_SlotLateral_Slot",
-      "BlockedByLateral": "Left_Brace_Slot",
-      "BlockedByLeftBrace": "Lateral_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHandLateral",
+      "BlockedByLateral": "Left_Brace",
+      "BlockedByLeftBrace": "Lateral"
     },
     {
       "Name": "UHF Radio",
@@ -1628,8 +1628,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_Slot",
-      "BlockedByLeftBrace": "Lateral_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHand",
+      "BlockedByLeftBrace": "Lateral"
     },
     {
       "Name": "ULF Radio",
@@ -1646,7 +1646,7 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Back_Hole"
+      "EquippableSlots": "Back"
     },
     {
       "Name": "Water Canteen",
@@ -1663,8 +1663,8 @@
       "PoisonedBy": "",
       "Shareable": false,
       "Tradeable": true,
-      "EquippableSlots": "Backpack_SlotPosterior_SlotLeft_Brace_SlotRight_Brace_SlotArmour_SlotHand_SlotLateral_Slot",
-      "BlockedByLeftBrace": "Lateral_Slot"
+      "EquippableSlots": "BackpackPosteriorLeft_BraceRight_BraceArmourHandLateral",
+      "BlockedByLeftBrace": "Lateral"
     }
   ]
 }

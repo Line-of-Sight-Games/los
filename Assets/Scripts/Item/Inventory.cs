@@ -1,23 +1,40 @@
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
 public class Inventory
 {
+    [JsonIgnore] public Item itemPrefab;
+    [JsonIgnore] public Soldier linkedSoldier;
     private List<Item> itemList;
-    public Item itemPrefab;
-    public Soldier linkedSoldier;
+    private List<string> itemIds;
 
     public Inventory(Soldier soldier)
     {
         itemList = new List<Item>();
+        itemIds = new List<string>();
         linkedSoldier = soldier;
+    }
+
+    public void AddItemToSlot(Item item, string slotName)
+    {
+        //save the item id in the appropriate slot
+        linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = item.id;
+
+        itemList.Add(item);
+        itemIds.Add(item.id);
+        item.transform.SetParent(linkedSoldier.gameObject.transform, true);
+        item.transform.localPosition = new Vector3(0, 0, 0);
+        item.owner = linkedSoldier;
     }
 
     public void AddItem(Item item)
     {
-        //Debug.Log("ran add item");
         itemList.Add(item);
+        itemIds.Add(item.id);
         item.transform.SetParent(linkedSoldier.gameObject.transform, true);
         item.transform.localPosition = new Vector3(0, 0, 0);
         item.owner = linkedSoldier;
@@ -52,86 +69,25 @@ public class Inventory
         return null;
     }
 
-    public List<Item> Items 
+    [JsonIgnore]
+    public List<Item> AllItems 
     {
         get { return itemList; }
+    }
+
+    public List<string> AllItemIds
+    {
+        get { return itemIds; }
     }
 
     public string ListItems()
     {
         string items = "";
-        foreach(Item i in Items)
+        foreach(Item i in AllItems)
         {
             items += i.itemName + "\n";
         }
 
         return items;
-    }
-
-    public List<string> ListItemIds()
-    {
-        List<string> itemIds = new();
-        foreach (Item i in Items)
-        {
-            itemIds.Add(i.id);
-        }
-
-        return itemIds;
-    }
-    public bool HasArmourIntegrity()
-    {
-        if ((FindItem("Armour_Juggernaut") && GetItem("Armour_Juggernaut").ablativeHealth > 0) || (FindItem("Armour_Body") && GetItem("Armour_Body").ablativeHealth > 0))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingBodyArmour()
-    {
-        if (FindItem("Armour_Body"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingJuggernautArmour()
-    {
-        if (FindItem("Armour_Juggernaut"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingExoArmour()
-    {
-        if (FindItem("Armour_Exo"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingGhillieArmour()
-    {
-        if (FindItem("Armour_Ghillie"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingStimulantArmour()
-    {
-        if (FindItem("Armour_Stimulant"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsCarryingRiotShield()
-    {
-        if (FindItem("Riot_Shield"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingLogisticsBelt()
-    {
-        if (FindItem("Logistics_Belt"))
-            return true;
-        else
-            return false;
     }
 }

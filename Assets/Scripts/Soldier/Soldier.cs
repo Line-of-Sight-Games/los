@@ -7,9 +7,9 @@ using UnityEngine.SceneManagement;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
-using static UnityEngine.GraphicsBuffer;
+using Newtonsoft.Json;
 
-public class Soldier : PhysicalObject, IDataPersistence
+public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 {
     public Dictionary<string, object> details;
     public string soldierName, soldierTerrain, soldierSpeciality;
@@ -30,7 +30,11 @@ public class Soldier : PhysicalObject, IDataPersistence
     private JArray stateJArray, statsJArray, soldierAbilitiesJArray, itemsJArray, controllingSoldiersJArray, controlledBySoldiersJArray, revealedBySoldiersJArray, revealingSoldiersJArray, witnessStoredAbilitiesJArray, witnessActiveAbilitiesJArray;
     public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
     public BoxCollider bodyCollider;
-
+    public Dictionary<string, string> inventorySlots = new()
+    {
+        { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "Left_Leg", "" }, { "Right_Leg", "" }, { "Left_Hand", "" }, { "Right_Hand", "" }, { "Left_Brace", "" },
+        { "Right_Brace", "" }, { "Backpack1", "" }, { "Backpack2", "" }, { "Backpack3", "" }, { "Armour1", "" }, { "Armour2", "" }, { "Armour3", "" }, { "Armour4", "" }, { "Misc", "" }
+    };
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
 
@@ -38,12 +42,14 @@ public class Soldier : PhysicalObject, IDataPersistence
     public MainGame game;
     public MainMenu menu;
     public SoldierManager soldierManager;
+    public ItemManager itemManager;
 
     private void Awake()
     {
         game = FindObjectOfType<MainGame>();
         menu = FindObjectOfType<MainMenu>();
         soldierManager = FindObjectOfType<SoldierManager>();
+        itemManager = FindObjectOfType<ItemManager>();
     }
 
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability)
@@ -239,16 +245,16 @@ public class Soldier : PhysicalObject, IDataPersistence
         else
             return false;
     }
-    public bool IsRevealing(string name)
+    public bool IsRevealing(string id)
     {
-        if (IsAbleToSee() && RevealingSoldiers.Contains(name))
+        if (IsAbleToSee() && RevealingSoldiers.Contains(id))
             return true;
         else
             return false;
     }
-    public bool IsBeingRevealedBy(string name)
+    public bool IsBeingRevealedBy(string id)
     {
-        if (IsAlive() && RevealedBySoldiers.Contains(name))
+        if (IsAlive() && RevealedBySoldiers.Contains(id))
             return true;
         else
             return false;
@@ -267,15 +273,15 @@ public class Soldier : PhysicalObject, IDataPersistence
         else
             return false;
     }
-    public void PickUpItem(Item item)
+    public void PickUpItemToSlot(Item item, string slotName)
     {
-        inventory.AddItem(item);
+        inventory.AddItemToSlot(item, slotName);
         item.RunPickupEffect();
     }
     public void BrokenDropAllItems()
     {
         List<Item> itemList = new();
-        foreach (Item item in inventory.Items)
+        foreach (Item item in inventory.AllItems)
             itemList.Add(item);
 
         foreach (Item item in itemList)
@@ -285,7 +291,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     public void DestroyAllItems()
     {
         List<Item> itemList = new();
-        foreach (Item item in inventory.Items)
+        foreach (Item item in inventory.AllItems)
             itemList.Add(item);
 
         foreach (Item item in itemList)
@@ -305,7 +311,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     {
         int ahp = 0;
 
-        foreach (Item item in inventory.Items)
+        foreach (Item item in inventory.AllItems)
             ahp += item.ablativeHealth;
 
         return ahp;
@@ -380,8 +386,8 @@ public class Soldier : PhysicalObject, IDataPersistence
     }
     public int RankDifferenceTo(Soldier s)
     {
-        Debug.Log((int)(Mathf.Log(System.Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(System.Convert.ToSingle(s.MinXPForRank()), 2.0f)));
-        return (int)(Mathf.Log(System.Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(System.Convert.ToSingle(s.MinXPForRank()), 2.0f));
+        Debug.Log((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
+        return (int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f));
     }
     public string GetTraumaState()
     {
@@ -441,12 +447,8 @@ public class Soldier : PhysicalObject, IDataPersistence
         details.Add("instantSpeed", instantSpeed);
 
         //save inventory
-        inventoryList = new List<string>();
-        foreach (Item item in inventory.Items)
-        {
-            inventoryList.Add(item.id);
-        }
-        details.Add("inventory", inventoryList);
+        details.Add("inventory", inventory.AllItemIds);
+        details.Add("inventorySlots", inventorySlots);
 
         //save list of revealing soldiers
         details.Add("revealingSoldiers", revealingSoldiersList);
@@ -539,16 +541,15 @@ public class Soldier : PhysicalObject, IDataPersistence
         {
             stats.SetStat(stat.GetValue("Name").ToString(), (int)stat.GetValue("BaseVal"));
         }
-        instantSpeed = System.Convert.ToInt32(details["instantSpeed"]);
+        instantSpeed = Convert.ToInt32(details["instantSpeed"]);
 
         //load items
         inventory = new Inventory(this);
-        inventoryList = new List<string>();
         itemsJArray = (JArray)details["inventory"];
-        foreach(string itemId in itemsJArray)
-        {
+        foreach (string itemId in itemsJArray)
             inventoryList.Add(itemId);
-        }
+
+        inventorySlots = JsonConvert.DeserializeObject<Dictionary<string, string>>(details["inventorySlots"].ToString());
 
         //load list of revealing soldiers
         revealingSoldiersList = new();
@@ -624,7 +625,11 @@ public class Soldier : PhysicalObject, IDataPersistence
             }
         }
     }
-
+    public void AssignItemsToSlots()
+    {
+        foreach (KeyValuePair<string, string> kvp in inventorySlots)
+            PickUpItemToSlot(itemManager.FindItemById(kvp.Value), kvp.Key);
+    }
     public void CalculateActiveStats()
     {
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
@@ -838,32 +843,32 @@ public class Soldier : PhysicalObject, IDataPersistence
 
     public void ApplyItemMods()
     {
-        if (inventory.IsWearingBodyArmour())
+        if (IsWearingBodyArmour())
         {
             stats.C.Val--;
             stats.F.Val--;
         }
 
-        if (inventory.IsWearingGhillieArmour())
+        if (IsWearingGhillieArmour())
         {
             stats.C.Val += 4;
             stats.F.Val += 4;
         }
 
-        if (inventory.IsWearingExoArmour())
+        if (IsWearingExoArmour())
         {
             stats.F.Val = 0;
             stats.Str.Val *= 3;
         }
 
-        if (inventory.IsWearingJuggernautArmour())
+        if (IsWearingJuggernautArmour())
         {
             stats.C.Val = 0;
             stats.F.Val = 0;
             stats.P.Val -= 2;
         }
 
-        if (inventory.IsCarryingRiotShield())
+        if (IsCarryingRiotShield())
         {
             stats.C.Val = 0;
             stats.F.Val = 0;
@@ -955,9 +960,9 @@ public class Soldier : PhysicalObject, IDataPersistence
         //apply mods that apply to shot damage
         if (damageSource.Contains("Shot"))
         {
-            if (inventory.IsWearingExoArmour() && game.CoinFlip())
+            if (IsWearingExoArmour() && game.CoinFlip())
             {
-                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Exo Armour.", true);
+                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Exo Armour.", true, false);
                 damage = 0;
             }
         }
@@ -965,9 +970,9 @@ public class Soldier : PhysicalObject, IDataPersistence
         //apply mods that apply to melee damage
         if (damageSource.Contains("Melee"))
         {
-            if (inventory.IsWearingJuggernautArmour() && !damagedBy.inventory.IsWearingExoArmour())
+            if (IsWearingJuggernautArmour() && !damagedBy.IsWearingExoArmour())
             {
-                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true);
+                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true, false);
                 damage = 0;
             }
         }
@@ -975,9 +980,9 @@ public class Soldier : PhysicalObject, IDataPersistence
         //apply mods that apply to explosive damage
         if (damageSource.Contains("Explosive"))
         {
-            if (inventory.IsWearingJuggernautArmour())
+            if (IsWearingJuggernautArmour())
             {
-                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true);
+                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true, false);
                 damage = 0;
             }
         }
@@ -988,19 +993,19 @@ public class Soldier : PhysicalObject, IDataPersistence
             int remainingDamage = damage;
 
             //tank the damage on the armour if wearing BA or JA
-            if (inventory.IsWearingJuggernautArmour())
+            if (IsWearingJuggernautArmour())
             {
                 remainingDamage = inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damage);
 
                 if (remainingDamage < damage)
-                    menu.AddDamageAlert(this, soldierName + " absorbed " + (damage - remainingDamage) + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true);
+                    menu.AddDamageAlert(this, soldierName + " absorbed " + (damage - remainingDamage) + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true, false);
             }
-            else if (inventory.IsWearingBodyArmour())
+            else if (IsWearingBodyArmour())
             {
                 remainingDamage = inventory.GetItem("Armour_Body").TakeAblativeDamage(damage);
 
                 if (remainingDamage < damage)
-                    menu.AddDamageAlert(this, soldierName + " absorbed " + (damage - remainingDamage) + " " + menu.PrintList(damageSource) + " damage with Body Armour.", true);
+                    menu.AddDamageAlert(this, soldierName + " absorbed " + (damage - remainingDamage) + " " + menu.PrintList(damageSource) + " damage with Body Armour.", true, false);
             }
 
             damage = remainingDamage;
@@ -1009,22 +1014,22 @@ public class Soldier : PhysicalObject, IDataPersistence
         //apply insulator damage halving
         if (IsInsulator() && ResilienceCheck())
         {
-            menu.AddDamageAlert(this, soldierName + " <color=green>Insulated</color> " + (damage - damage/2) + " " + menu.PrintList(damageSource) + " damage.", true);
+            menu.AddDamageAlert(this, soldierName + " <color=green>Insulated</color> " + (damage - damage/2) + " " + menu.PrintList(damageSource) + " damage.", true, false);
             damage /= 2;
         }
             
 
         //apply stim armour damage reduction
-        if (inventory.IsWearingStimulantArmour())
+        if (IsWearingStimulantArmour())
         {
-            menu.AddDamageAlert(this, soldierName + " resisted 2 " + menu.PrintList(damageSource) + " damage with Stim Armour.", true);
+            menu.AddDamageAlert(this, soldierName + " resisted 2 " + menu.PrintList(damageSource) + " damage with Stim Armour.", true, false);
             damage -= 2;
         }
 
         //block damage if it's first turn and soldier has not used ap
         if (roundsFielded == 0 && !usedAP)
         {
-            menu.AddDamageAlert(this, soldierName + " can't be damaged before using AP. " + damage + " " + menu.PrintList(damageSource) + " damage resisted.", true);
+            menu.AddDamageAlert(this, soldierName + " can't be damaged before using AP. " + damage + " " + menu.PrintList(damageSource) + " damage resisted.", true, false);
             damage = 0;
         }
 
@@ -1041,7 +1046,6 @@ public class Soldier : PhysicalObject, IDataPersistence
 
     public void TakeDamage(Soldier damagedBy, int damage, bool skipDamageMods, List<string> damageSource)
     {
-        print("take damage");
         //apply damage mods
         if (!skipDamageMods)
             damage = ApplyDamageMods(damagedBy, damage, damageSource);
@@ -1119,18 +1123,17 @@ public class Soldier : PhysicalObject, IDataPersistence
                 game.BreakAllMeleeEngagements(this);
             }
 
+            //add damage alert
+            menu.AddDamageAlert(this, $"{soldierName} took {damage} {menu.PrintList(damageSource)} damage. He is now {CheckHealthState()}.", false, false);
+            print(damagedBy.soldierName);
+            print(menu.PrintList(damageSource));
             //make sure damage came from another soldier
             if (damagedBy != null)
             {
                 //apply stun affect from tranquiliser
                 if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")))
-                    if (!ResilienceCheck())
-                        MakeStunned(1);
+                    TranquiliserMakeStunned(1);
             }
-            
-
-            //add damage alert
-            menu.AddDamageAlert(this, soldierName + " took " + damage + " " + menu.PrintList(damageSource) + " damage. He is now " + CheckHealthState() + ".", false);
         }
         else
         {
@@ -1247,7 +1250,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     {
         int carryWeight = 0;
 
-        foreach (Item i in inventory.Items)
+        foreach (Item i in inventory.AllItems)
         {
             if (IsBull() && (i.gunType != null || i.itemName.Contains("Ammo")))
                 carryWeight += 1;
@@ -1468,7 +1471,7 @@ public class Soldier : PhysicalObject, IDataPersistence
         }
 
         //check for wearing logistics belt
-        if (inventory.IsWearingLogisticsBelt())
+        if (IsWearingLogisticsBelt())
             localAp++;
 
         //add inspirer ap bonus to support specialities
@@ -1931,6 +1934,16 @@ public class Soldier : PhysicalObject, IDataPersistence
             StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
         }
     }
+    public void TranquiliserMakeStunned(int stunRounds)
+    {
+        if (ResilienceCheck())
+            menu.AddDamageAlert(this, $"Resisted a {stunRounds} round stun.", true, true);
+        else
+        {
+            menu.AddDamageAlert(this, $"Suffered a {stunRounds} round stun.", false, true);
+            MakeStunned(stunRounds);
+        }
+    }
     public string CheckHealthState()
     {
         if (IsDead())
@@ -1958,7 +1971,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     }
     public void MakeLastStand()
     {
-        if (inventory.IsWearingJuggernautArmour())
+        if (IsWearingJuggernautArmour())
         {
             Debug.Log("Resisted last stand with JA");
         }
@@ -1994,7 +2007,7 @@ public class Soldier : PhysicalObject, IDataPersistence
     {
         if (this.IsAlive())
         {
-            menu.AddDamageAlert(this, soldierName + " was killed instantly by " + menu.PrintList(damageSource) + ".", false);
+            menu.AddDamageAlert(this, soldierName + " was killed instantly by " + menu.PrintList(damageSource) + ".", false, false);
             Kill(killedBy, damageSource);
         }
     }
@@ -2079,9 +2092,9 @@ public class Soldier : PhysicalObject, IDataPersistence
         int survivalPassesAchieved = 0;
         int survivalAttempts = 1;
 
-        if (inventory.IsWearingJuggernautArmour() && inventory.HasArmourIntegrity())
+        if (IsWearingJuggernautArmour() && HasArmourIntegrity())
             survivalAttempts += 2;
-        else if (inventory.IsWearingBodyArmour() && inventory.HasArmourIntegrity())
+        else if (IsWearingBodyArmour() && HasArmourIntegrity())
             survivalAttempts++;
 
         for (int i = 0; i < survivalPassesNeeded; i++)
@@ -2463,6 +2476,30 @@ public class Soldier : PhysicalObject, IDataPersistence
 
         return false;
     }
+    public bool HasGunEquipped()
+    {
+        if (EquippedGuns.Count > 0)
+            return true;
+
+        return false;
+    }
+    public bool HasSMGOrPistolEquipped()
+    {
+        foreach (Item item in EquippedGuns)
+            if (item.gunType == "Pistol" || item.gunType == "SMG")
+                return true;
+
+        return false;
+    }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2504,9 +2541,65 @@ public class Soldier : PhysicalObject, IDataPersistence
             return instantSpeed; 
         }
     }
+    public bool HasArmourIntegrity()
+    {
+        if ((inventory.FindItem("Armour_Juggernaut") && inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0) || (inventory.FindItem("Armour_Body") && inventory.GetItem("Armour_Body").ablativeHealth > 0))
+            return true;
+        else
+            return false;
+    }
+    public bool IsWearingBodyArmour()
+    {
+        if (inventory.FindItem("Armour_Body"))
+            return true;
+        else
+            return false;
+    }
+    public bool IsWearingJuggernautArmour()
+    {
+        if (inventory.FindItem("Armour_Juggernaut"))
+            return true;
+        else
+            return false;
+    }
+    public bool IsWearingExoArmour()
+    {
+        if (inventory.FindItem("Armour_Exo"))
+            return true;
+        else
+            return false;
+    }
+    public bool IsWearingGhillieArmour()
+    {
+        if (inventory.FindItem("Armour_Ghillie"))
+            return true;
+        else
+            return false;
+    }
+    public bool IsWearingStimulantArmour()
+    {
+        if (inventory.FindItem("Armour_Stimulant"))
+            return true;
+        else
+            return false;
+    }
+    public bool IsCarryingRiotShield()
+    {
+        if (inventory.FindItem("Riot_Shield"))
+            return true;
+        else
+            return false;
+    }
+    public bool IsWearingLogisticsBelt()
+    {
+        if (inventory.FindItem("Logistics_Belt"))
+            return true;
+        else
+            return false;
+    }
     public void IncreaseRoundsWithoutFood()
     {
-        if (!inventory.IsWearingStimulantArmour())
+        if (!IsWearingStimulantArmour())
             RoundsWithoutFood++;
     }
     public void ResetRoundsWithoutFood()
@@ -2519,8 +2612,8 @@ public class Soldier : PhysicalObject, IDataPersistence
         {
             if (overwatchXPoint != 0 && overwatchYPoint != 0 && PhysicalObjectWithinRadius(obj, overwatchConeRadius))
             {
-                Vector2 centreLine = new(overwatchXPoint - this.X, overwatchYPoint - this.Y);
-                Vector2 targetLine = new(obj.X - this.X, obj.Y - this.Y);
+                Vector2 centreLine = new(overwatchXPoint - X, overwatchYPoint - Y);
+                Vector2 targetLine = new(obj.X - X, obj.Y - Y);
                 centreLine.Normalize();
                 targetLine.Normalize();
 
@@ -2606,5 +2699,61 @@ public class Soldier : PhysicalObject, IDataPersistence
                 foreach (string id in revealingSoldiersList)
                     soldierManager.FindSoldierById(id).SetDissuaded();
         }
+    }
+    public Item LeftHandItem
+    {
+        get 
+        {
+            inventorySlots.TryGetValue("Left_Hand", out string leftHand);
+            return itemManager.FindItemById(leftHand);
+        }
+    }
+    public Item RightHandItem
+    {
+        get
+        {
+            inventorySlots.TryGetValue("Right_and", out string rightHand);
+            return itemManager.FindItemById(rightHand);
+        }
+    }
+    public Item BestMeleeWeapon
+    {
+        get
+        {
+            int leftMelee, rightMelee;
+            if (LeftHandItem == null)
+                leftMelee = 1;
+            else
+                leftMelee = LeftHandItem.meleeDamage;
+
+            if (RightHandItem == null)
+                rightMelee = 1;
+            else
+                rightMelee = RightHandItem.meleeDamage;
+
+            if (rightMelee > leftMelee)
+                return RightHandItem;
+            else
+                return LeftHandItem;
+        }
+    }
+    public List<Item> EquippedGuns
+    {
+        get
+        {
+            List<Item> gunsEquipped = new();
+            if (LeftHandItem != null)
+                if (LeftHandItem.gunType != null)
+                    gunsEquipped.Add(LeftHandItem);
+            if (RightHandItem != null)
+                if (RightHandItem.gunType != null)
+                    gunsEquipped.Add(RightHandItem);
+
+            return gunsEquipped;
+        }
+    }
+    public Inventory Inventory
+    {
+        get { return inventory; }
     }
 }

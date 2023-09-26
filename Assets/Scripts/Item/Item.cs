@@ -576,10 +576,6 @@ public class Item : PhysicalObject, IDataPersistence
 
     public void RunPickupEffect()
     {
-        //add body armour health
-        //if (itemName == "Armour_Body")
-        //    owner.hp += ablativeHealth;
-
         //unset cover for JA wearers
         if (itemName == "Armour_Juggernaut")
             owner.UnsetCover();
@@ -594,17 +590,17 @@ public class Item : PhysicalObject, IDataPersistence
 
         //spawn small medkit inside brace
         if (itemName == "Brace")
-            owner.PickUpItem(owner.game.itemManager.SpawnItem("Medkit_Small"));
+            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Small"), "Misc");
 
         //spawn med medkit in bag
         if (itemName == "Bag")
-            owner.PickUpItem(owner.game.itemManager.SpawnItem("Medkit_Medium"));
+            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Medium"), "Misc");
 
         //spawn small & med medkit in backpack
         if (itemName == "Backpack")
         {
-            owner.PickUpItem(owner.game.itemManager.SpawnItem("Medkit_Small"));
-            owner.PickUpItem(owner.game.itemManager.SpawnItem("Medkit_Medium"));
+            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Small"), "Misc");
+            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Medium"), "Misc");
         }
 
         //perform ability effects

@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -23,13 +24,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public SoundManager soundManager;
 
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI,
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, overwatchShotUI,
         shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,
         configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
         traumaAlertUI, traumaUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
         coverAlertUI, overwatchUI, externalItemSourcesUI, allyItemButtonUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, allyInventoryPanelPrefab, detectionAlertPrefab, 
         lostLosAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyItemsButtonPrefab, 
-        soldierPortraitPrefab, meleeAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
+        soldierPortraitPrefab, meleeAlertPrefab, overwatchShotUIPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
         overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen;
     public ItemIcon itemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -46,7 +47,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public bool overrideView, displayLOSArrows, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, meleeResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
-        detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, fist;
+        detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist;
 
     private readonly string[][] allStats =
     {
@@ -286,7 +287,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (activeSoldier.IsOnOverwatch())
         {
-            print("Overwatch registered");
             OverwatchArc overwatchArc = Instantiate(overwatchArcPrefab).Init(activeSoldier);
             overwatchArc.transform.SetAsLastSibling();
         }
@@ -643,7 +643,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 else
                     activeSoldier.Z = newlocationInput;
 
-                StartCoroutine(game.DetectionAlertSingle(activeSoldier, "losChange", Vector3.zero, string.Empty));
+                StartCoroutine(game.DetectionAlertSingle(activeSoldier, "moveChange", Vector3.zero, string.Empty));
             }
         }
 
@@ -837,19 +837,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenSoldierStatsUI()
     {
-        Transform inventoryUI = soldierStatsUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("DisplayInventoryContent");
+        /*Transform inventoryUI = soldierStatsUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("DisplayInventoryContent");
 
-        foreach (Item i in activeSoldier.inventory.Items)
-            Instantiate(itemIconPrefab, inventoryUI).Init(i.itemName, 1, i);
+        foreach (Item i in activeSoldier.inventory.AllItems)
+            Instantiate(itemIconPrefab, inventoryUI).Init(i.itemName, 1, i);*/
 
         soldierStatsUI.SetActive(true);
     }
     public void CloseSoldierStatsUI()
     {
-        Transform inventoryUI = soldierStatsUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("DisplayInventoryContent");
+        /*Transform inventoryUI = soldierStatsUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("DisplayInventoryContent");
 
         foreach (Transform child in inventoryUI)
-            Destroy(child.gameObject);
+            Destroy(child.gameObject);*/
 
         soldierStatsUI.SetActive(false);
     }
@@ -915,13 +915,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
         else if (activeSoldier.IsMeleeControlled())
         {
-            //if has pistol/smg add shot button
-            bool canShoot = false;
-            foreach (Item i in activeSoldier.inventory.Items)
-                if (i.gunType == "SMG" || i.gunType == "Pistol")
-                    canShoot = true;
-
-            if (canShoot)
+            if (activeSoldier.HasSMGOrPistolEquipped())
                 GreyOutButtons(ExceptButton(ExceptButton(AddAllButtons(buttonStates), meleeButton), shotButton), "<color=red>Melee Controlled</color>");
             else
                 GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), meleeButton), "<color=red>Melee Controlled</color>");
@@ -937,22 +931,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(moveButton, "Melee Controlling");
 
             //block cover button
-            if (activeSoldier.inventory.IsWearingJuggernautArmour())
+            if (activeSoldier.IsWearingJuggernautArmour())
                 buttonStates.Add(coverButton, "<color=green>Juggernaut</color>");
             else if (activeSoldier.IsInCover())
                 buttonStates.Add(coverButton, "<color=green>Taking Cover</color>");
 
 
             //block shot and overwatch buttons
-            bool hasGun = false;
-            foreach (Item i in activeSoldier.inventory.Items)
-                if (i.gunType != null)
-                    hasGun = true;
-            bool canShootInMelee = false;
-            foreach (Item i in activeSoldier.inventory.Items)
-                if (i.gunType == "SMG" || i.gunType == "Pistol")
-                    canShootInMelee = true;
-            if (!hasGun)
+            if (!activeSoldier.HasGunEquipped())
             {
                 buttonStates.Add(shotButton, "No Gun");
                 buttonStates.Add(overwatchButton, "No Gun");
@@ -964,7 +950,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
             else if (activeSoldier.IsMeleeControlling())
             {
-                if (!canShootInMelee)
+                if (!activeSoldier.HasSMGOrPistolEquipped())
                     buttonStates.Add(shotButton, "Melee Controlling");
                 buttonStates.Add(overwatchButton, "Melee Controlling");
             }
@@ -1672,12 +1658,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ConfirmDetections()
     {
-        //Debug.Log("ConfirmDetections()");
         ScrollRect detectionScroller = detectionUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
         if (detectionScroller.verticalNormalizedPosition <= 0.05f)
         {
-            //Debug.Log("ConfirmDetections() passed into the detectionscroller block");
-
             //create list of soldiers and who they're revealing
             Dictionary<string, List<string>> allSoldiersRevealing = new();
             Dictionary<string, List<string>> allSoldiersRevealedBy = new();
@@ -1727,13 +1710,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         }
 
                         //check for overwatch shot
-                        print(child.Find("DetectionArrow").GetComponent<Image>().sprite.name);
                         if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch"))
                         {
                             if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
-                                StartCoroutine(OpenOverwatchShotUI(counter, detector));
+                                StartCoroutine(CreateOverwatchShotUI(counter, detector));
                             else if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Right"))
-                                StartCoroutine(OpenOverwatchShotUI(detector, counter));
+                                StartCoroutine(CreateOverwatchShotUI(detector, counter));
+                            StartCoroutine(OpenOverwatchShotUI());
                         }
                     }
                     else
@@ -1770,13 +1753,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         }
 
                         //check for overwatch shot
-                        print(child.Find("DetectionArrow").GetComponent<Image>().sprite.name);
                         if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch"))
                         {
                             if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
-                                StartCoroutine(OpenOverwatchShotUI(counter, detector));
+                                StartCoroutine(CreateOverwatchShotUI(counter, detector));
                             else if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Right"))
-                                StartCoroutine(OpenOverwatchShotUI(detector, counter));
+                                StartCoroutine(CreateOverwatchShotUI(detector, counter));
+                            StartCoroutine(OpenOverwatchShotUI());
                         }
                     }
                     else
@@ -1915,12 +1898,24 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //damage ui functions
-    public void AddDamageAlert(Soldier soldier, string description, bool resisted)
+    public void AddDamageAlert(Soldier soldier, string description, bool resisted, bool nonDamage)
     {
         GameObject damageAlert = Instantiate(damageAlertPrefab, damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
         if (resisted)
-            damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>DAMAGE RESISTED</color>";
+        {
+            if (nonDamage)
+                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>EFFECT RESISTED</color>";
+            else
+                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>DAMAGE RESISTED</color>";
+        }
+        else
+        {
+            if (nonDamage)
+                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=red>EFFECT SUFFERED</color>";
+            else
+                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=red>DAMAGE SUFFERED</color>";
+        }
 
         damageAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
         damageAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
@@ -2115,18 +2110,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown gunDropdown = shotUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown aimDropdown = shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
-        TMP_Dropdown coverDropdown = shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
         List<TMP_Dropdown.OptionData> targetDetails = new(), gunDetails = new();
         List<string> noTargets = new() { "No Targets" };
 
         //generate guns list
-        foreach (Item i in activeSoldier.inventory.Items)
-        {
-            if (i.gunType != null)
-                gunDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
-        }
-        if (gunDetails.Count > 0)
-            gunDropdown.AddOptions(gunDetails);
+        foreach (Item i in shooter.EquippedGuns)
+            gunDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
+        gunDropdown.AddOptions(gunDetails);
+
+        //grey out dropdown if only one gun
+        if (gunDetails.Count == 1)
+            gunDropdown.interactable = false;
+            
+        Item gun = game.itemManager.FindItemById(game.gunTypeDropdown.options[game.gunTypeDropdown.value].text);
 
         //generate target list
         foreach (Soldier s in allSoldiers)
@@ -2157,7 +2153,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //check target list
         if (targetDetails.Count > 0)
         {
-            Item gun = game.itemManager.FindItemById(game.gunTypeDropdown.options[game.gunTypeDropdown.value].text);
             targetDropdown.AddOptions(targetDetails);
             targetDropdown.interactable = true;
             //block suppression option if gun does not have enough ammo
@@ -2165,7 +2160,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression Shot");
 
             shotTypeDropdown.value = 0;
-            CheckTargetInCover();
         }
         else
         {
@@ -2182,23 +2176,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
             aimDropdown.value = 0;
 
-        BlockShotOptions(false);
+        BlockShotOptions();
 
         game.UpdateShotUI(shooter);
 
         shotUI.SetActive(true);
     }
-    public void BlockShotOptions(bool overwatch)
+    public void BlockShotOptions()
     {
-        if (overwatch)
-        {
-            shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = false;
-            shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = false;
-            shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().interactable = false;
-            shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().interactable = false;
-            shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = false;
-        }
-        else if (activeSoldier.IsMeleeEngaged())
+        if (activeSoldier.IsMeleeEngaged())
         {
             shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = true;
             shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = false;
@@ -2215,69 +2201,83 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = true;
         }
     }
-    public IEnumerator OpenOverwatchShotUI(Soldier shooter, Soldier target)
+    public IEnumerator OpenOverwatchShotUI()
     {
         yield return new WaitForSeconds(0.05f);
-
-        //set shooter
-        shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
-
-        TMP_Dropdown shotTypeDropdown = shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
-        shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
-        TMP_Dropdown gunDropdown = shotUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
-        TMP_Dropdown aimDropdown = shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
-        TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
-        TMP_Dropdown coverDropdown = shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
-        List<TMP_Dropdown.OptionData> targetDetails = new(), gunDetails = new();
-
-        //set as regular shot
-        shotTypeDropdown.value = 0;
-        
-        //set as aimed shot
-        aimDropdown.value = 0;
-
-        //set no cover
-        coverDropdown.value = 0;
-
-        //generate guns list
-        gunDropdown.ClearOptions();
-        foreach (Item i in shooter.inventory.Items)
-        {
-            if (i.gunType != null)
-                gunDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
-        }
-        if (gunDetails.Count > 0)
-            gunDropdown.AddOptions(gunDetails);
-
-        //set target
-        TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait);
-        targetDetails.Add(option);
-        targetDropdown.AddOptions(targetDetails);
-        CheckTargetInCover();
-
-        BlockShotOptions(true);
-        
-        game.UpdateShotUI(shooter);
-
-        shotUI.SetActive(true);
+        overwatchShotUI.SetActive(true);
     }
 
-    public void CheckTargetInCover()
+    public IEnumerator CreateOverwatchShotUI(Soldier shooter, Soldier target)
     {
-        TMP_Dropdown targetDropdown = shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
-        TMP_Dropdown coverDropdown = shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
-        Soldier targetSoldier = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
+        yield return new WaitForSeconds(0.05f);
+        bool shotAlready = false;
 
-        //reset selection to no cover
-        coverDropdown.value = 0;
+        //check if the overwatch has not been taken already
+        foreach (Transform child in overwatchShotUI.transform)
+            if (child.Find("Shooter").GetComponent<TextMeshProUGUI>().text == shooter.id)
+                shotAlready = true;
 
-        //show the cover level only if man is in cover
-        if (targetSoldier != null)
+        //only proceed if it doesn't exist already
+        if (!shotAlready)
         {
-            if (targetSoldier.IsInCover())
-                shotUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(true);
+            GameObject overwatchUI = Instantiate(overwatchShotUIPrefab, overwatchShotUI.transform);
+
+            //set shooter
+            overwatchUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
+
+            TMP_Dropdown shotTypeDropdown = overwatchUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
+            shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+            TMP_Dropdown gunDropdown = overwatchUI.transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>();
+            TMP_Dropdown aimDropdown = overwatchUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
+            TMP_Dropdown targetDropdown = overwatchUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
+            TMP_Dropdown coverDropdown = overwatchUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
+            List<TMP_Dropdown.OptionData> targetDetails = new(), gunDetails = new();
+
+            //display shooter
+            if (shooter.IsBeingRevealedBy(target.id))
+            {
+                overwatchUI.transform.Find("ShooterPortrait").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(shooter);
+                overwatchUI.transform.Find("ShooterPortrait").gameObject.SetActive(true);
+            }
             else
-                shotUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(false);
+                overwatchUI.transform.Find("ShooterPortrait").gameObject.SetActive(false);
+
+            //set as regular shot
+            shotTypeDropdown.value = 0;
+            shotTypeDropdown.interactable = false;
+
+            //set as aimed shot
+            aimDropdown.value = 0;
+            aimDropdown.interactable = false;
+
+            //determine if in cover
+            if (target.IsInCover())
+                overwatchUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(true);
+            else
+                overwatchUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(false);
+            coverDropdown.value = 0;
+
+            //generate guns list
+            foreach(Item i in shooter.EquippedGuns)
+                gunDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
+            gunDropdown.AddOptions(gunDetails);
+
+            //grey out dropdown if only one gun
+            if (gunDetails.Count == 1)
+                gunDropdown.interactable = false;
+
+            //set target
+            TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait);
+            targetDetails.Add(option);
+            targetDropdown.AddOptions(targetDetails);
+            targetDropdown.interactable = false;
+
+            overwatchUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "0";
+
+            //prefill with target's current position
+            overwatchUI.transform.Find("TargetPanel").Find("OverwatchLocation").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = target.X.ToString();
+            overwatchUI.transform.Find("TargetPanel").Find("OverwatchLocation").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = target.Y.ToString();
+            overwatchUI.transform.Find("TargetPanel").Find("OverwatchLocation").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = target.Z.ToString();
         }
     }
     public void OpenShotResultUI()
@@ -2323,13 +2323,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 //find shooter
                 Soldier shooter = soldierManager.FindSoldierById(shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
                 Soldier target = soldierManager.FindSoldierByName(game.targetDropdown.options[game.targetDropdown.value].text);
+                Item gun = itemManager.FindItemById(game.gunTypeDropdown.options[game.gunTypeDropdown.value].text);
                 Tuple<int, int, int> chances;
 
                 //if suppression shot hit chance is always 100
                 if (game.shotTypeDropdown.value == 1)
                     chances = Tuple.Create(100, 0, 100);
                 else
-                    chances = game.CalculateHitPercentage(shooter, target);
+                    chances = game.CalculateHitPercentage(shooter, target, gun);
 
                 //only shot suppression hit chance if suppressed
                 if (shooter.IsSuppressed() && game.shotTypeDropdown.value != 1)
@@ -2342,7 +2343,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
 
                 //enable back button only if shot is aimed and under 25%
-                if (chances.Item1 <= 25 && game.aimTypeDropdown.value == 0 && !shooter.IsOnOverwatch())
+                if (chances.Item1 <= 25 && game.aimTypeDropdown.value == 0)
                     shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = true;
                 else
                     shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
@@ -2453,9 +2454,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         //generate attacker weapon list
         attackerWeaponDetails.Add(new TMP_Dropdown.OptionData("Fist", fist));
-        foreach (Item i in attacker.inventory.Items)
+        foreach (Item i in attacker.inventory.AllItems)
         {
-            if (i.equippableSlots.Contains("Hand_Slot"))
+            if (i.equippableSlots.Contains("Hand"))
                 attackerWeaponDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
         }
         attackerWeaponDropdown.AddOptions(attackerWeaponDetails);
@@ -2495,9 +2496,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             //generate defender weapon list
             defenderWeaponDetails.Add(new TMP_Dropdown.OptionData("Fist", fist));
-            foreach (Item i in target.inventory.Items)
+            foreach (Item i in target.inventory.AllItems)
             {
-                if (i.equippableSlots.Contains("Hand_Slot"))
+                if (i.equippableSlots.Contains("Hand"))
                     defenderWeaponDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
             }
             defenderWeaponDropdown.AddOptions(defenderWeaponDetails);
@@ -2524,9 +2525,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         defenderWeaponDropdown.ClearOptions();
         defenderWeaponDropdown.value = 0;
         defenderWeaponDetails.Add(new TMP_Dropdown.OptionData("Fist", fist));
-        foreach (Item i in defender.inventory.Items)
+        foreach (Item i in defender.inventory.AllItems)
         {
-            if (i.equippableSlots.Contains("Hand_Slot"))
+            if (i.equippableSlots.Contains("Hand"))
                 defenderWeaponDetails.Add(new TMP_Dropdown.OptionData(i.id, i.itemImage));
         }
         defenderWeaponDropdown.AddOptions(defenderWeaponDetails);
@@ -2804,7 +2805,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //add extra move options for planner/exo
         if (activeSoldier.IsPlanner() && game.FindClosestAlly(true) != null && !activeSoldier.usedMP)
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Planner Donate</color>"));
-        if (activeSoldier.inventory.IsWearingExoArmour())
+        if (activeSoldier.IsWearingExoArmour())
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Exo Jump</color>"));
         moveTypeDropdown.AddOptions(moveTypeDetails);
 
@@ -2821,7 +2822,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
 
         //block cover for JA
-        if (activeSoldier.inventory.IsWearingJuggernautArmour())
+        if (activeSoldier.IsWearingJuggernautArmour())
             coverToggle.interactable = false;
 
         //block melee toggle if within engage distance of enemy
@@ -2937,7 +2938,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         Transform groundItemsUI = configureUI.transform.Find("ExternalItemSources").Find("GroundItemsPanel").Find("Viewport").Find("GroundItemsContent");
 
         //populate inventory icons
-        foreach (Item i in activeSoldier.inventory.Items)
+        foreach (Item i in activeSoldier.inventory.AllItems)
             Instantiate(itemIconPrefab, inventoryUI).Init(i.itemName, 1, i);
 
         //populate ground item icons
@@ -2993,7 +2994,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (itemPanel.transform.Find("Viewport").Find("AllyInventoryContent").childCount == 0)
         {
-            foreach (Item i in ally.inventory.Items)
+            foreach (Item i in ally.inventory.AllItems)
                 Instantiate(itemIconPrefab, itemPanel.transform.Find("Viewport").Find("AllyInventoryContent")).Init(i.itemName, 1, i);
         }       
 

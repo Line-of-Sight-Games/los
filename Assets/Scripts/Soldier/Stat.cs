@@ -5,8 +5,8 @@ using Newtonsoft.Json;
 
 public class Stat
 {
-    [JsonIgnore]
-    public Statline statlineBelongsTo;
+
+    [JsonIgnore] public Statline statlineBelongsTo;
     private string name;
     private string longname;
     private string description;
@@ -28,22 +28,26 @@ public class Stat
     {
         get { return name; }
     }
+
     [JsonIgnore]
     public string Longname
     {
         get { return longname; }
     }
+
     [JsonIgnore]
     public int ReadIncrement
     {
         get { return increment; }
     }
+
     [JsonIgnore]
     public int Val
     {
         get { return activeValue; }
         set { activeValue = value; }
     }
+
     public int BaseVal
     {
         get { return baseValue; }

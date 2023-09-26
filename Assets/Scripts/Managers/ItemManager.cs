@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -43,22 +45,6 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         data.allItemIds = allItemIds;
     }
 
-    public Item SpawnItem(string itemName)
-    {
-        var item = Instantiate(itemPrefab).Init(itemName);
-        RefreshItemList();
-
-        return item;
-    }
-    public void DestroyItem(Item item)
-    {
-        Destroy(item);
-        RefreshItemList();
-    }
-    public void RefreshItemList()
-    {
-        allItems = FindObjectsOfType<Item>().ToList();
-    }
     public void AssignItemsToOwners()
     {
         IEnumerable<Item> allItems = FindObjectsOfType<Item>();
@@ -75,11 +61,28 @@ public class ItemManager : MonoBehaviour, IDataPersistence
                     //Debug.Log("item id " + item.id);
                     if (item.id == itemId)
                     {
-                        soldier.inventory.AddItem(item);
+                        soldier.Inventory.AddItem(item);
                     }
                 }
             }
         }
+    }
+
+    public Item SpawnItem(string itemName)
+    {
+        var item = Instantiate(itemPrefab).Init(itemName);
+        RefreshItemList();
+
+        return item;
+    }
+    public void DestroyItem(Item item)
+    {
+        Destroy(item);
+        RefreshItemList();
+    }
+    public void RefreshItemList()
+    {
+        allItems = FindObjectsOfType<Item>().ToList();
     }
     public Item FindItemById(string searchId)
     {

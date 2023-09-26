@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoodyBox : POI, IDataPersistence
+public class GoodyBox : POI, IDataPersistence, IHaveInventory
 {
     public Dictionary<string, object> details;
     public string terrain;
@@ -12,6 +12,7 @@ public class GoodyBox : POI, IDataPersistence
 
     public MainGame game;
     public MainMenu menu;
+
 
     private void Start()
     {
@@ -51,10 +52,15 @@ public class GoodyBox : POI, IDataPersistence
 
         //save inventory
         inventoryList = new List<string>();
-        foreach (Item item in inventory.Items)
+        foreach (Item item in inventory.AllItems)
         {
             inventoryList.Add(item.id);
         }
         details.Add("inventory", inventoryList);
     }
+
+    public Inventory Inventory
+    {
+        get { return inventory; }
+    } 
 }

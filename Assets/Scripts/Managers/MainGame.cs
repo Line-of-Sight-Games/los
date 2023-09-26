@@ -384,6 +384,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     DrainAP();
                     activeSoldier.SetOverwatch(x, y, r, a);
 
+                    StartCoroutine(DetectionAlertSingle(activeSoldier, "losChange", Vector3.zero, string.Empty));
                     menu.CloseOverwatchUI();
                 }
             }
@@ -562,7 +563,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                         launchMelee = "3cm Charge Attack";
                                 }
 
-                                StartCoroutine(DetectionAlertSingle(activeSoldier, "losChange", oldPos, launchMelee));
+                                StartCoroutine(DetectionAlertSingle(activeSoldier, "moveChange", oldPos, launchMelee));
                             }
                             menu.CloseMoveUI();
                         }
@@ -655,7 +656,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                             launchMelee = "3cm Charge Attack";
                                     }
 
-                                    StartCoroutine(DetectionAlertSingle(activeSoldier, "losChange", oldPos, launchMelee));
+                                    StartCoroutine(DetectionAlertSingle(activeSoldier, "moveChange", oldPos, launchMelee));
                                 }
                                 menu.CloseMoveUI();
 
@@ -698,14 +699,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (!menu.clearShotFlag)
         {
-            UpdateShotType(shooter);
+            UpdateShotType();
             UpdateShotAP(shooter);
 
             if (shotTypeDropdown.value == 1)
                 UpdateSuppressionValue(shooter);
+
+            UpdateTargetCover();
         } 
     }
-    public void UpdateShotType(Soldier shooter)
+    public void UpdateShotType()
     {
         TMP_Dropdown shotTypeDropdown = menu.shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
 
@@ -776,6 +779,24 @@ public class MainGame : MonoBehaviour, IDataPersistence
         };
 
         menu.shotUI.transform.Find("SuppressionValue").Find("SuppressionValueDisplay").GetComponent<TextMeshProUGUI>().text = suppressionValue.ToString();
+    }
+    public void UpdateTargetCover()
+    {
+        TMP_Dropdown targetDropdown = menu.shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown coverDropdown = menu.shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>();
+        Soldier targetSoldier = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
+
+        //reset selection to no cover
+        coverDropdown.value = 0;
+
+        //show the cover level only if man is in cover
+        if (targetSoldier != null)
+        {
+            if (targetSoldier.IsInCover())
+                menu.shotUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(true);
+            else
+                menu.shotUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(false);
+        }
     }
     public int WeaponHitChance(Soldier shooter, Soldier target, Item gun)
     {
@@ -948,12 +969,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
         };
 
         //apply juggernaut armour debuff
-        if (shooter.inventory.IsWearingJuggernautArmour())
+        if (shooter.IsWearingJuggernautArmour())
             juggernautBonus = -1;
         weaponSkill += juggernautBonus;
 
         //apply stim armour buff
-        if (shooter.inventory.IsWearingStimulantArmour())
+        if (shooter.IsWearingStimulantArmour())
             stimBonus = 2;
         weaponSkill += stimBonus;
 
@@ -1370,13 +1391,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         return suppressionMod;
     }
-    public Tuple<int, int, int> CalculateHitPercentage(Soldier shooter, Soldier target)
+    public Tuple<int, int, int> CalculateHitPercentage(Soldier shooter, Soldier target, Item gun)
     {
         //destroy old shot parameters
         shotParameters.Clear();
         Tuple<int, int, int> chances;
         int suppressedHitChance, hitChance, critChance;
-        Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
 
         //calculate normal hit chance
         if (shotTypeDropdown.value == 0) //normal shot
@@ -1419,10 +1439,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmShot()
     {
         Soldier shooter = soldierManager.FindSoldierById(menu.shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
+        Soldier target = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
+        Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
         int.TryParse(menu.shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
         int actingHitChance;
-        Item gun = itemManager.FindItemById(gunTypeDropdown.options[gunTypeDropdown.value].text);
-        Soldier target = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
         bool resistSuppression = shooter.SuppressionCheck();
 
         //check for ammo
@@ -1437,7 +1457,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         
                 int randNum1 = RandomNumber(0, 100);
                 int randNum2 = RandomNumber(0, 100);
-                Tuple<int, int, int> chances = CalculateHitPercentage(shooter, target);
+                Tuple<int, int, int> chances = CalculateHitPercentage(shooter, target, gun);
 
                 //display suppression indicator
                 if (shooter.IsSuppressed())
@@ -1559,7 +1579,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                             int randNum1 = RandomNumber(0, 100);
                             int randNum2 = RandomNumber(0, 100);
-                            Tuple<int, int, int> chances = CalculateHitPercentage(shooter, target);
+                            Tuple<int, int, int> chances = CalculateHitPercentage(shooter, target, gun);
                             int coverDamage = CalculateRangeBracket(CalculateRange(shooter, new Vector3(x, y, z))) switch
                             {
                                 "Melee" or "CQB" => gun.gunCQBCoverDamage,
@@ -1639,11 +1659,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             menu.OpenShotResultUI();
             menu.CloseShotUI();
         }
-
-        //unset overwatch after any shot
-        shooter.UnsetOverwatch();
     }
-
     public bool PointIsRevealed(Soldier shooter, Vector3 point)
     {
         bool pointIsRevealed = false;
@@ -1737,7 +1753,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float inspirerBonus, attackerMeleeSkill = attacker.stats.M.Val;
 
         //apply JA debuff
-        if (attacker.inventory.IsWearingJuggernautArmour())
+        if (attacker.IsWearingJuggernautArmour())
             juggernautBonus = -1;
         attackerMeleeSkill += juggernautBonus;
 
@@ -1857,7 +1873,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float inspirerBonus, defenderMeleeSkill = defender.stats.M.Val;
 
         //apply JA debuff
-        if (defender.inventory.IsWearingJuggernautArmour())
+        if (defender.IsWearingJuggernautArmour())
             juggernautBonus = -1;
         defenderMeleeSkill += juggernautBonus;
 
@@ -2004,8 +2020,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         float meleeDamage;
         int meleeDamageFinal;
-        Item attackerWeapon = itemManager.FindItemById(attackerWeaponDropdown.options[attackerWeaponDropdown.value].text);
-        Item defenderWeapon = itemManager.FindItemById(defenderWeaponDropdown.options[defenderWeaponDropdown.value].text);
+        Item attackerWeapon = attacker.BestMeleeWeapon;
+        Item defenderWeapon = defender.BestMeleeWeapon;
 
         //if it's a normal attack
         if (meleeTypeDropdown.value == 0)
@@ -2214,7 +2230,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         //melee attack proceeds
                         if (meleeDamage > 0)
                         {
-                            if (attacker.inventory.IsWearingExoArmour() && !defender.inventory.IsWearingJuggernautArmour()) //exo kill on standard man
+                            if (attacker.IsWearingExoArmour() && !defender.IsWearingJuggernautArmour()) //exo kill on standard man
                             {
                                 damageMessage = "<color=green>INSTANT KILL\n(Exo Armour)</color>";
                                 instantKill = true;
@@ -2224,7 +2240,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 if (attacker.IsBloodRaged())
                                     meleeDamage *= 2;
 
-                                if (defender.inventory.IsWearingJuggernautArmour() && !attacker.inventory.IsWearingExoArmour())
+                                if (defender.IsWearingJuggernautArmour() && !attacker.IsWearingExoArmour())
                                     damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
                                 else
                                     damageMessage = "<color=green>Successful Attack\n(" + meleeDamage + " Damage)</color>";
@@ -2237,7 +2253,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             //play counterattack sound
                             soundManager.PlayCounterattack();
 
-                            if (!defender.inventory.IsWearingExoArmour() && attacker.inventory.IsWearingJuggernautArmour()) //no damage counter against jugs
+                            if (!defender.IsWearingExoArmour() && attacker.IsWearingJuggernautArmour()) //no damage counter against jugs
                                 damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
                             else
                             {
@@ -2398,7 +2414,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     ItemIcon itemDetails = child.GetComponent<ItemIcon>();
 
                     for (int i = 0; i < itemDetails.pickupNumber; i++)
-                        activeSoldier.PickUpItem(itemManager.SpawnItem(child.gameObject.name));
+                        activeSoldier.PickUpItemToSlot(itemManager.SpawnItem(child.gameObject.name), "Left_Hand");
                 }
             }
 
@@ -2411,7 +2427,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (itemDetails.destination == null)
                         activeSoldier.DropItem(itemDetails.linkedItem);
                     else
-                        itemDetails.destination.GetComponent<Soldier>().PickUpItem(activeSoldier.DropItem(itemDetails.linkedItem));
+                        itemDetails.destination.GetComponent<Soldier>().PickUpItemToSlot(activeSoldier.DropItem(itemDetails.linkedItem), "Left_Hand");
                 }
                     
             }
@@ -2421,7 +2437,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 ItemIcon itemDetails = child.GetComponent<ItemIcon>();
 
                 if (itemDetails.pickupNumber == 0)
-                    activeSoldier.PickUpItem(itemDetails.linkedItem);
+                    activeSoldier.PickUpItemToSlot(itemDetails.linkedItem, "Left_Hand");
             }
 
             foreach (Transform allyButton in allyButtonContentUI)
@@ -2430,7 +2446,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     ItemIcon itemDetails = child.GetComponent<ItemIcon>();
 
                     if (itemDetails.pickupNumber == 0)
-                        activeSoldier.PickUpItem(itemDetails.linkedItem.owner.DropItem(itemDetails.linkedItem));
+                        activeSoldier.PickUpItemToSlot(itemDetails.linkedItem.owner.DropItem(itemDetails.linkedItem), "Left_Hand");
                 }
 
             menu.CloseConfigureUI();
@@ -2878,14 +2894,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (activeSoldier.StructuralCollapseCheck(structureHeight))
                         {
                             menu.AddXpAlert(activeSoldier, activeSoldier.stats.R.Val, "Survived a " + structureHeight + "cm structural collapse.", true);
-                            menu.AddDamageAlert(activeSoldier, activeSoldier.soldierName + " survived a " + structureHeight + "cm structural collapse.", true);
+                            menu.AddDamageAlert(activeSoldier, activeSoldier.soldierName + " survived a " + structureHeight + "cm structural collapse.", true, false);
                         }
                         else
                         {
-                            if (activeSoldier.inventory.IsWearingJuggernautArmour())
+                            if (activeSoldier.IsWearingJuggernautArmour())
                             {
                                 activeSoldier.MakeUnconscious();
-                                menu.AddDamageAlert(activeSoldier, activeSoldier.soldierName + " survived a " + structureHeight + "cm structural collapse with Juggernaut Armour.", true);
+                                menu.AddDamageAlert(activeSoldier, activeSoldier.soldierName + " survived a " + structureHeight + "cm structural collapse with Juggernaut Armour.", true, false);
                             }
                             else
                             {
@@ -2897,7 +2913,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         
 
                     //run detection alerts
-                    StartCoroutine(DetectionAlertSingle(activeSoldier, "losChange", oldPos, string.Empty));
+                    StartCoroutine(DetectionAlertSingle(activeSoldier, "moveChange", oldPos, string.Empty));
 
                     menu.CloseDamageEventUI();
                 }
@@ -3197,8 +3213,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 {
                                     if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
                                     {
-                                        detectorLabel += CreateDetectionMessage("overwatch", "3cm", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
-                                        overwatchRight = true;
+                                        detectorLabel += CreateDetectionMessage("detected", "3cm", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
+                                        detectedRight = true;
                                     }
                                     else
                                     {
@@ -3228,8 +3244,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 {
                                     if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
                                     {
-                                        detectorLabel += CreateDetectionMessage("overwatch", "half SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
-                                        overwatchRight = true;
+                                        detectorLabel += CreateDetectionMessage("detected", "half SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
+                                        detectedRight = true;
                                     }
                                     else
                                     {
@@ -3259,8 +3275,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 {
                                     if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
                                     {
-                                        detectorLabel += CreateDetectionMessage("overwatch", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
-                                        overwatchRight = true;
+                                        detectorLabel += CreateDetectionMessage("detected", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
+                                        detectedRight = true;
                                     }
                                     else
                                     {
@@ -3330,8 +3346,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 {
                                     if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
                                     {
-                                        counterLabel += CreateDetectionMessage("overwatch", "3cm", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[0], detectee.stats.P.Val);
-                                        overwatchLeft = true;
+                                        if (causeOfLosCheck == "moveChange")
+                                        {
+                                            counterLabel += CreateDetectionMessage("overwatch", "3cm", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[0], detectee.stats.P.Val);
+                                            overwatchLeft = true;
+                                        }
+                                        else
+                                        {
+                                            counterLabel += CreateDetectionMessage("detected", "3cm", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[0], detectee.stats.P.Val);
+                                            detectedLeft = true;
+                                        }
                                     }
                                     else
                                     {
@@ -3361,8 +3385,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 {
                                     if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
                                     {
-                                        counterLabel += CreateDetectionMessage("overwatch", "half SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[1], detectee.stats.P.Val);
-                                        overwatchLeft = true;
+                                        if (causeOfLosCheck == "moveChange")
+                                        {
+                                            counterLabel += CreateDetectionMessage("overwatch", "half SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[1], detectee.stats.P.Val);
+                                            overwatchLeft = true;
+                                        }
+                                        else
+                                        {
+                                            counterLabel += CreateDetectionMessage("detected", "half SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[1], detectee.stats.P.Val);
+                                            detectedLeft = true;
+                                        }
                                     }
                                     else
                                     {
@@ -3392,8 +3424,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 {
                                     if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
                                     {
-                                        counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val);
-                                        overwatchLeft = true;
+                                        if (causeOfLosCheck == "moveChange")
+                                        {
+                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val);
+                                            overwatchLeft = true;
+                                        }
+                                        else
+                                        {
+                                            counterLabel += CreateDetectionMessage("detected", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val);
+                                            detectedLeft = true;
+                                        }
                                     }
                                     else
                                     {
@@ -3472,6 +3512,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             arrowType = "avoidance1WayLeft";
                         else if (detectedLeft)
                             arrowType = "detection1WayLeft";
+                        else if (noDetectLeft)
+                            arrowType = "noDetect2Way";
                         else if (overwatchLeft)
                             arrowType = "overwatch1WayLeft";
                     }
@@ -3539,7 +3581,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (type.Contains("overwatch"))
         {
-            title = "<color=yellow>OVERWATCH</color>\n";
+            title = "<color=yellow>DETECTED OVERWATCH</color>\n";
             join = " did not exceed ";
         }
         else
