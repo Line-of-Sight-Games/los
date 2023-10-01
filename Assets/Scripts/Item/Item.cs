@@ -145,7 +145,7 @@ public class Item : PhysicalObject, IDataPersistence
         { ItemType.ULF_Radio.ToString(), ItemType.ULF_Radio },
         { ItemType.Water_Canteen.ToString(), ItemType.Water_Canteen },
     };
-    public Dictionary<string, object> details = new ();
+    public Dictionary<string, object> details;
     public MainGame game;
     public MainMenu menu; 
     public ItemReader reader;
@@ -506,7 +506,7 @@ public class Item : PhysicalObject, IDataPersistence
 
     public void SaveData(ref GameData data)
     {
-        details = new Dictionary<string, object>();
+        details = new();
 
         //save basic information
         details.Add("itemName", itemName);

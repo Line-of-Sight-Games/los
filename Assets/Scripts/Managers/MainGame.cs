@@ -361,7 +361,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //playdead functions
     public void CheckPlaydead()
     {
-        if (activeSoldier.state.Contains("Playdead"))
+        if (activeSoldier.IsPlayingDead())
             activeSoldier.UnsetPlaydead();
         else
             menu.OpenPlaydeadAlertUI();
@@ -1181,7 +1181,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public float ShooterHealthMod(Soldier shooter)
     {
         float shooterHealthMod;
-        if (shooter.state.Contains("Last Stand"))
+        if (shooter.IsLastStand())
             shooterHealthMod = 0.6f;
         else if (shooter.hp <= shooter.stats.H.Val / 2)
             shooterHealthMod = 0.16f;
@@ -1198,7 +1198,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public float TargetHealthMod(Soldier target)
     {
         float targetHealthMod;
-        if (target.state.Contains("Last Stand"))
+        if (target.IsLastStand())
             targetHealthMod = -0.4f;
         else if (target.hp <= target.stats.H.Val / 2)
             targetHealthMod = -0.14f;
@@ -1934,7 +1934,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public float DefenderHealthMod(Soldier defender)
     {
         float defenderHealthMod;
-        if (defender.state.Contains("Last Stand"))
+        if (defender.IsLastStand())
             defenderHealthMod = 0.8f;
         else if (defender.hp <= activeSoldier.stats.H.Val / 2)
             defenderHealthMod = 0.4f;
@@ -2688,10 +2688,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //trauma functions
     public IEnumerator TraumaCheck(Soldier deadSoldier, int tp, bool commander, bool lastandicide)
     {
-        Debug.Log("Trauma check start");
+        //Debug.Log("Trauma check start");
         //imperceptible delay to allow colliders to be recalculated at new destination
         yield return new WaitForSeconds(0.05f);
-        Debug.Log("Trauma check passed wait");
+        //Debug.Log("Trauma check passed wait");
         if (deadSoldier.IsDead())
         {
             int numberOfPasses;
@@ -3059,7 +3059,60 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             return "Coriolis";
     }
+    public bool GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(Soldier movingSoldier, Soldier detectee, Vector3 movingSoldierOldPosition)
+    {
+        if (detectee.IsOnOverwatch())
+        {
+            //reset bound crosses to zero
+            boundCrossOne = Vector3.zero;
+            boundCrossTwo = Vector3.zero;
 
+            List<Vector3> previousPositionsMovingSoldier = new();
+            List<bool> detecteeSeesMovingSoldier = new();
+            int boundCrossCount = 0;
+
+            float maxSteps = CalculateRange(movingSoldier, movingSoldierOldPosition);
+
+            //Debug.Log("Radius:" + detectee.SRColliderMax.radius);
+            for (int i = 0; i < maxSteps; i++)
+            {
+                Vector3 position = new(movingSoldierOldPosition.x + (movingSoldier.X - movingSoldierOldPosition.x) * (i / maxSteps), movingSoldierOldPosition.y + (movingSoldier.Y - movingSoldierOldPosition.y) * (i / maxSteps), movingSoldierOldPosition.z + (movingSoldier.Z - movingSoldierOldPosition.z) * (i / maxSteps));
+                previousPositionsMovingSoldier.Add(position);
+
+                //record when detectee sees moving soldier
+                if (detectee.PhysicalObjectWithinOverwatchCone(position))
+                    detecteeSeesMovingSoldier.Add(true);
+                else
+                    detecteeSeesMovingSoldier.Add(false);
+
+                //Debug.Log("Point " + i + ": " + CalculateRange(detectee, position));
+            }
+
+            //find borders where moving soldier crossed into detectee radius
+            for (int i = 0; i < detecteeSeesMovingSoldier.Count - 1; i++)
+            {
+                if (detecteeSeesMovingSoldier[i] != detecteeSeesMovingSoldier[i + 1])
+                {
+                    boundCrossCount++;
+                    if (boundCrossOne == Vector3.zero)
+                        boundCrossOne = new(Mathf.Round(previousPositionsMovingSoldier[i].x), Mathf.Round(previousPositionsMovingSoldier[i].y), Mathf.Round(previousPositionsMovingSoldier[i].z));
+                    else
+                        boundCrossTwo = new(Mathf.Round(previousPositionsMovingSoldier[i].x), Mathf.Round(previousPositionsMovingSoldier[i].y), Mathf.Round(previousPositionsMovingSoldier[i].z));
+                }
+            }
+
+            Debug.Log("DetecteeSeesMoving: Bound cross count: " + boundCrossCount);
+            Debug.Log("DetecteeSeesMoving: Bound cross one = " + "X:" + boundCrossOne.x + " Y:" + boundCrossOne.y + " Z:" + boundCrossOne.z);
+            Debug.Log("DetecteeSeesMoving: Bound cross two = " + "X:" + boundCrossTwo.x + " Y:" + boundCrossTwo.y + " Z:" + boundCrossTwo.z);
+
+            if (boundCrossCount > 0)
+                return true;
+
+            return false;
+        }
+
+        return false;
+    }
     public bool GlimpseDetectionDetecteeSeesMoving(Soldier movingSoldier, Soldier detectee, Vector3 movingSoldierOldPosition)
     {
         //reset bound crosses to zero
@@ -3160,7 +3213,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public float CalculateMoveDistance(int x, int y, int z)
     {
         return Vector3.Distance(new Vector3(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), new Vector3(x, y, z));
-        //return Mathf.Sqrt(Mathf.Pow(activeSoldier.X - x, 2) + Mathf.Pow(activeSoldier.Y - y, 2) + Mathf.Pow(activeSoldier.Z - z, 2));
     }
     public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee)
     {
@@ -3461,6 +3513,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                                 avoidanceLeft = true;
                             }
+                            else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detectee, movingSoldierOldPosition))
+                            {
+                                if (boundCrossTwo != Vector3.zero)
+                                    counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                else
+                                    counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
+                                    
+                                overwatchLeft = true;
+                            }
                             else
                             {
                                 if (boundCrossTwo != Vector3.zero)
@@ -3581,7 +3642,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (type.Contains("overwatch"))
         {
-            title = "<color=yellow>DETECTED OVERWATCH</color>\n";
+            title = "<color=yellow>OVERWATCH</color>\n";
             join = " did not exceed ";
         }
         else
@@ -3611,7 +3672,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else
         {
-            title = "<color=green>RETREAT DETECTED</color>\n";
+            title = "<color=red>RETREAT DETECTED</color>\n";
             join = " did not exceed ";
         }
 
@@ -3636,7 +3697,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else
         {
-            title = "<color=green>GLIMPSE DETECTED</color>\n";
+            title = "<color=red>GLIMPSE DETECTED</color>\n";
             join = " did not exceed ";
         }
 

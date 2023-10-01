@@ -29,7 +29,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
         traumaAlertUI, traumaUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
         coverAlertUI, overwatchUI, externalItemSourcesUI, allyItemButtonUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, allyInventoryPanelPrefab, detectionAlertPrefab, 
-        lostLosAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyItemsButtonPrefab, 
+        lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyItemsButtonPrefab, 
         soldierPortraitPrefab, meleeAlertPrefab, overwatchShotUIPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
         overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen;
     public ItemIcon itemIconPrefab;
@@ -464,9 +464,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown dropdown = soldierStatsUI.Find("General").Find("OverrideHealthState").Find("HealthStateDropdown").GetComponent<TMP_Dropdown>();
 
-        if (activeSoldier.state.Contains("Unconscious"))
+        if (activeSoldier.IsUnconscious())
             dropdown.value = 2;
-        else if (activeSoldier.state.Contains("Last Stand"))
+        else if (activeSoldier.IsLastStand())
             dropdown.value = 1;
         else
             dropdown.value = 0;
@@ -883,7 +883,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         Dictionary<Button, string> buttonStates = new();
 
         //display lastandicide button
-        if (activeSoldier.state.Contains("Last Stand"))
+        if (activeSoldier.IsLastStand())
             lastandicideButton.gameObject.SetActive(true);
         else
             lastandicideButton.gameObject.SetActive(false);
@@ -892,20 +892,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             GreyAll("Game Over");
         else if (overrideView)
             GreyOutButtons(AddAllButtons(buttonStates), "Override");
-        else if (activeSoldier.state.Contains("Dead"))
+        else if (activeSoldier.IsDead())
             GreyOutButtons(AddAllButtons(buttonStates), "Dead");
-        else if (activeSoldier.state.Contains("Unconscious"))
+        else if (activeSoldier.IsUnconscious())
             GreyOutButtons(AddAllButtons(buttonStates), "<color=blue>Unconscious</color>");
         else if (activeSoldier.IsStunned())
             GreyOutButtons(AddAllButtons(buttonStates), "Stunned");
-        else if (activeSoldier.state.Contains("Playdead"))
+        else if (activeSoldier.IsPlayingDead())
             GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), playdeadButton), "<color=yellow>Playdead</color>");
         else if (activeSoldier.ap == 0)
             GreyOutButtons(AddAllButtons(buttonStates), "No AP");
         else if (activeSoldier.tp == 4)
         {
             //if in last stand regain control
-            if (activeSoldier.state.Contains("Last Stand"))
+            if (activeSoldier.IsLastStand())
             {
                 buttonStates.Add(moveButton, "Last Stand");
                 GreyOutButtons(buttonStates, "");
@@ -923,7 +923,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
         {
             //block move button
-            if (activeSoldier.state.Contains("Last Stand"))
+            if (activeSoldier.IsLastStand())
                 buttonStates.Add(moveButton, "Last Stand");
             else if (activeSoldier.mp == 0)
                 buttonStates.Add(moveButton, "No MA");
@@ -1173,19 +1173,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public string GetConsciousState()
     {
-        if (activeSoldier.state.Contains("Unconscious"))
+        if (activeSoldier.IsUnconscious())
             return ", <color=blue>Unconscious</color>";
-        else if (activeSoldier.state.Contains("Last Stand"))
+        else if (activeSoldier.IsLastStand())
             return ", <color=red>Last Stand</color>";
-        else if (activeSoldier.state.Contains("Active"))
-            return ", Active";
         else
             return "";
     }
     public string GetArmourState()
     {
         if (activeSoldier.GetArmourHP() > 0)
-            return ", <color=green>Armoured(" + activeSoldier.GetArmourHP() + ")</color>";
+            return $", <color=green>Armoured({activeSoldier.GetArmourHP()})</color>";
         else
             return "";
     }
@@ -1205,7 +1203,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public string GetStunnedState()
     {
         if (activeSoldier.IsStunned())
-            return ", <color=red>Stunned(" + activeSoldier.stunnedRoundsVulnerable + ")</color>";
+            return $", <color=red>Stunned({activeSoldier.stunnedRoundsVulnerable})</color>";
         else
             return "";
     }
@@ -1279,7 +1277,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public string GetPoisonedState()
     {
-        if (activeSoldier.state.Contains("Poisoned"))
+        if (activeSoldier.IsPoisoned())
             return ", <color=red>Poisoned</color>";
         else
             return "";
@@ -1295,7 +1293,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public string GetPlaydeadState()
     {
-        if (activeSoldier.state.Contains("Playdead"))
+        if (activeSoldier.IsPlayingDead())
             return ", <color=yellow>Playdead</color>";
         else
             return "";
@@ -1303,28 +1301,30 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public string GetDrugState()
     {
-        if (activeSoldier.state.Contains("Modafinil"))
-            return ", <color=purple>Modafinil</color>";
-        else if (activeSoldier.state.Contains("Amphetamine"))
-            return ", <color=purple>Amphetamine</color>";
-        else if (activeSoldier.state.Contains("Androstenedione"))
-            return ", <color=purple>Androstenedione</color>";
-        else if (activeSoldier.state.Contains("Cannabinoid"))
-            return ", <color=purple>Cannabinoid</color>";
-        else if (activeSoldier.state.Contains("Shard"))
-            return ", <color=purple>Shard</color>";
-        else if (activeSoldier.state.Contains("Glucocorticoid"))
-            return ", <color=purple>Glucocorticoid</color>";
-        else if (activeSoldier.state.Contains("Danazol"))
-            return ", <color=purple>Danazol</color>";
-        else if (activeSoldier.state.Contains("Trenbolone"))
-            return ", <color=purple>Trenbolone</color>";
-        else
-            return "";
+        string drugState = "";
+
+        if (activeSoldier.IsOnDrug("Modafinil"))
+            drugState += ", <color=purple>Modafinil</color>";
+        if (activeSoldier.IsOnDrug("Amphetamine"))
+            drugState += ", <color=purple>Amphetamine</color>";
+        if (activeSoldier.IsOnDrug("Androstenedione"))
+            drugState += ", <color=purple>Androstenedione</color>";
+        if (activeSoldier.IsOnDrug("Cannabinoid"))
+            drugState += ", <color=purple>Cannabinoid</color>";
+        if (activeSoldier.IsOnDrug("Shard"))
+            drugState += ", <color=purple>Shard</color>";
+        if (activeSoldier.IsOnDrug("Glucocorticoid"))
+            drugState += ", <color=purple>Glucocorticoid</color>";
+        if (activeSoldier.IsOnDrug("Danazol"))
+            drugState += ", <color=purple>Danazol</color>";
+        if (activeSoldier.IsOnDrug("Trenbolone"))
+            drugState += ", <color=purple>Trenbolone</color>";
+
+        return drugState;
     }
     public string GetPatriotState()
     {
-        if (activeSoldier.TerrainOn == activeSoldier.soldierTerrain && activeSoldier.IsPatriot())
+        if (activeSoldier.IsOnNativeTerrain() && activeSoldier.IsPatriot())
             return ", <color=green>Patriotic</color>";
         else
             return "";
@@ -1690,13 +1690,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn == true)
                 {
-                    if (child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED"))
+                    if (child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
                     {
                         //if not a glimpse or a retreat detection, add soldier to revealing list
                         if (!child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
                             allSoldiersRevealing[counter.id].Add(detector.id);
                         else
+                        {
+                            AddLosGlimpseAlert(detector, child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text);
+                            StartCoroutine(OpenLostLOSList());
                             allSoldiersNotRevealing[counter.id].Add(detector.id);
+                        }
 
                         if (detector.IsOnturnAndAlive())
                         {
@@ -1712,10 +1716,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         //check for overwatch shot
                         if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch"))
                         {
-                            if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
-                                StartCoroutine(CreateOverwatchShotUI(counter, detector));
-                            else if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Right"))
-                                StartCoroutine(CreateOverwatchShotUI(detector, counter));
+                            StartCoroutine(CreateOverwatchShotUI(counter, detector));
                             StartCoroutine(OpenOverwatchShotUI());
                         }
                     }
@@ -1733,13 +1734,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
                 {
-                    if (child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED"))
+                    if (child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
                     {
                         //if not a glimpse or a retreat detection, add soldier to revealing list
                         if (!child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
                             allSoldiersRevealing[detector.id].Add(counter.id);
                         else
+                        {
+                            AddLosGlimpseAlert(counter, child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text);
+                            StartCoroutine(OpenLostLOSList());
                             allSoldiersNotRevealing[detector.id].Add(counter.id);
+                        }
 
                         if (counter.IsOnturnAndAlive())
                         {
@@ -1755,10 +1760,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         //check for overwatch shot
                         if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch"))
                         {
-                            if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
-                                StartCoroutine(CreateOverwatchShotUI(counter, detector));
-                            else if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Right"))
-                                StartCoroutine(CreateOverwatchShotUI(detector, counter));
+                            StartCoroutine(CreateOverwatchShotUI(detector, counter));
                             StartCoroutine(OpenOverwatchShotUI());
                         }
                     }
@@ -1841,7 +1843,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         //block duplicate lostlos alerts being created
         foreach (Transform child in lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
-            if (child.GetComponent<SoldierAlert>().soldier == soldier)
+            if (child.GetComponent<SoldierAlert>().soldier == soldier && child.Find("LostLosTitle") != null)
                 Destroy(child.gameObject);
 
         GameObject lostLosAlert = Instantiate(lostLosAlertPrefab, lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
@@ -1849,6 +1851,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         lostLosAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
         lostLosAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         lostLosAlert.transform.Find("LostLosDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " is now hidden, remove him from the board.";
+    }
+    public void AddLosGlimpseAlert(Soldier soldier, string description)
+    {
+        GameObject losGlimpseAlert = Instantiate(losGlimpseAlertPrefab, lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+
+        losGlimpseAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
+        losGlimpseAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
+        //losGlimpseAlert.transform.Find("LosGlimpseTitle").GetComponent<TextMeshProUGUI>().text = ;
+        losGlimpseAlert.transform.Find("LosGlimpseDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} was glimpsed {description}.";
     }
     public IEnumerator OpenLostLOSList()
     {

@@ -35,24 +35,29 @@ public class Terminal : POI, IDataPersistence
 
     public void LoadData(GameData data)
     {
-        //load position
-        x = System.Convert.ToInt32(details["x"]);
-        y = System.Convert.ToInt32(details["y"]);
-        z = System.Convert.ToInt32(details["z"]);
-        terrainOn = (string)details["terrainOn"];
-        MapPhysicalPosition(x, y, z);
+        if (data.allPOIDetails.TryGetValue(id, out details))
+        {
+            //load position
+            x = System.Convert.ToInt32(details["x"]);
+            y = System.Convert.ToInt32(details["y"]);
+            z = System.Convert.ToInt32(details["z"]);
+            terrainOn = (string)details["terrainOn"];
+            MapPhysicalPosition(x, y, z);
 
-        terminalType = (string)details["terminalType"];
+            terminalType = (string)details["terminalType"];
 
-        //load list of soldier already interacted
-        soldierAlreadyInteracted = new();
-        soldierAlreadyInteractedJArray = (JArray)details["soldierAlreadyInteracted"];
-        foreach (string soldierId in soldierAlreadyInteractedJArray)
-            soldierAlreadyInteracted.Add(soldierId);
+            //load list of soldier already interacted
+            soldierAlreadyInteracted = new();
+            soldierAlreadyInteractedJArray = (JArray)details["soldierAlreadyInteracted"];
+            foreach (string soldierId in soldierAlreadyInteractedJArray)
+                soldierAlreadyInteracted.Add(soldierId);
+        }
     }
 
     public void SaveData(ref GameData data)
     {
+        details = new();
+
         //save position
         details.Add("x", x);
         details.Add("y", y);
@@ -62,6 +67,12 @@ public class Terminal : POI, IDataPersistence
 
         //save list of soldiers already interacted
         details.Add("soldierAlreadyInteracted", soldierAlreadyInteracted);
+
+        //add the item in
+        if (data.allPOIDetails.ContainsKey(id))
+            data.allPOIDetails.Remove(id);
+
+        data.allPOIDetails.Add(id, details);
     }
 
     public List<string> SoldiersAlreadyInteracted

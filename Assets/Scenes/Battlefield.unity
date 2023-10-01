@@ -624,6 +624,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9695900}
+  - component: {fileID: 9695901}
   m_Layer: 0
   m_Name: POIManager
   m_TagString: Untagged
@@ -646,6 +647,21 @@ Transform:
   m_Father: {fileID: 628502759}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9695901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9695899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6c65e0c8f5165f4e892786f599b8421, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allPOIIds: []
+  allPOIs: []
+  poiPrefab: {fileID: 3603739637670453529, guid: f3f0f207d4592e440b5bcecda03b2fe8, type: 3}
 --- !u!1 &12394284
 GameObject:
   m_ObjectHideFlags: 0
@@ -19042,7 +19058,7 @@ MonoBehaviour:
   m_Navigation:
     m_Mode: 4
     m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
+    m_SelectOnUp: {fileID: 779687669}
     m_SelectOnDown: {fileID: 1476016737}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
@@ -87847,6 +87863,7 @@ MonoBehaviour:
   allyInventoryPanelPrefab: {fileID: 7652259637319328242, guid: 8476e8afae86b874bbed5ed905e63d46, type: 3}
   detectionAlertPrefab: {fileID: 3979812687729385670, guid: 9c7d13f742678714d9ca102cf8add976, type: 3}
   lostLosAlertPrefab: {fileID: 7610803231150565594, guid: 15297e44138487744bd506a128cc58d2, type: 3}
+  losGlimpseAlertPrefab: {fileID: 7610803231150565594, guid: 53c57f70301713c44ba50738093b4200, type: 3}
   damageAlertPrefab: {fileID: 7610803231150565594, guid: 8d9780e111260094399c47807b31b8fa, type: 3}
   traumaAlertPrefab: {fileID: 7610803231150565594, guid: a391c3fd91219c24292844141cf768f8, type: 3}
   inspirerAlertPrefab: {fileID: 7610803231150565594, guid: b15757f02b379054f887ae02af8c02f4, type: 3}
@@ -98451,7 +98468,7 @@ MonoBehaviour:
     m_Mode: 4
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 298347280}
-    m_SelectOnDown: {fileID: 0}
+    m_SelectOnDown: {fileID: 1858995974}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
@@ -124255,7 +124272,7 @@ MonoBehaviour:
   m_Navigation:
     m_Mode: 4
     m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
+    m_SelectOnUp: {fileID: 1476016737}
     m_SelectOnDown: {fileID: 310933888}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}

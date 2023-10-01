@@ -28,8 +28,8 @@ public class GameData
     public Dictionary<string, Dictionary<string, object>> allSoldiersDetails;
     public List<string> allItemIds;
     public Dictionary<string, Dictionary<string, object>> allItemDetails;
-    public List<string> allTerminalIds;
-    public Dictionary<string, Dictionary<string, object>> allTerminalDetails;
+    public List<string> allPOIIds;
+    public Dictionary<string, Dictionary<string, object>> allPOIDetails;
 
     public GameData()
     {
@@ -62,7 +62,7 @@ public class GameData
         allItemIds = new List<string>();
         allItemDetails = new Dictionary<string, Dictionary<string, object>>();
 
-        allTerminalIds = new List<string>();
-        allTerminalDetails = new Dictionary<string, Dictionary<string, object>>();
+        allPOIIds = new List<string>();
+        allPOIDetails = new Dictionary<string, Dictionary<string, object>>();
     }
 }

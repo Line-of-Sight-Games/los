@@ -71,7 +71,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         GenerateAP();
         xp = 1;
         rank = "Recruit";
-        state.Add("Active");
+        SetState("Active");
         MapPhysicalPosition(0, 0, 0);
 
         return this;
@@ -98,7 +98,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (IsFielded())
         {
-            if (state.Contains("Dead"))
+            if (CheckState("Dead"))
                 return false;
             else
                 return true;
@@ -110,7 +110,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (IsFielded())
         {
-            if (state.Contains("Dead"))
+            if (CheckState("Dead"))
                 return true;
             else
                 return false;
@@ -122,7 +122,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (IsAlive())
         {
-            if (state.Contains("Unconscious"))
+            if (CheckState("Unconscious"))
                 return false;
             else
                 return true;
@@ -132,14 +132,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool IsUnconscious()
     {
-        if (state.Contains("Unconscious"))
+        if (CheckState("Unconscious"))
             return true;
         else
             return false;
     }
     public bool IsLastStand()
     {
-        if (state.Contains("Last Stand"))
+        if (CheckState("Last Stand"))
             return true;
         else
             return false;
@@ -170,7 +170,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool IsPlayingDead()
     {
-        if (IsAlive() && state.Contains("Playdead"))
+        if (IsAlive() && CheckState("Playdead"))
             return true;
         else
             return false;
@@ -525,7 +525,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         state = new();
         stateJArray = (JArray)details["state"];
         foreach (string stateString in stateJArray)
-            state.Add(stateString);
+            SetState(stateString);
 
         //load position
         x = Convert.ToInt32(details["x"]);
@@ -798,7 +798,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             TakeDamage(null, healthRemovedFromStarve, true, new List<string> { "Sustenance" });
         }
 
-        if (roundsWithoutFood >= 30 && !state.Contains("Unconscious"))
+        if (roundsWithoutFood >= 30 && IsConscious())
             MakeUnconscious();
 
         if (roundsWithoutFood >= 40)
@@ -807,7 +807,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
     public void ApplyHealthStateMods()
     {
-        if (state.Contains("Unconscious") || state.Contains("Playdead"))
+        if (CheckState("Unconscious") || CheckState("Playdead"))
         {
             stats.SR.Val = 0;
             stats.E.Val = 0;
@@ -825,7 +825,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
     public void ApplyPlaydeadMods()
     {
-        if (state.Contains("Playdead"))
+        if (CheckState("Playdead"))
             stats.SR.Val = 0;
     }
 
@@ -925,10 +925,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         if (stats.Heal.Val < 0)
             stats.Heal.Val = 0;
     }
-
+    public void SetState(string stateName)
+    {
+        if (!state.Contains(stateName))
+            state.Add(stateName);
+    }
+    public bool CheckState(string stateName)
+    {
+        return state.Contains(stateName);
+    }
+    public void UnsetState(string stateName)
+    {
+        state.RemoveAll(e => e == stateName);
+    }
     public void SetPlaydead()
     {
-        state.Add("Playdead");
+        SetState("Playdead");
 
         stats.L.BaseVal = 0;
         stats.Elec.BaseVal = 0;
@@ -943,15 +955,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
     public void UnsetPlaydead()
     {
-        state.Remove("Playdead");
+        UnsetState("Playdead");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
     }
 
     public IEnumerator TakePoisonDamage()
     {
-        print("take poison damage coroutine");
+        //print("take poison damage coroutine");
         yield return new WaitUntil(() => menu.xpResolvedFlag == true);
-        print("take poison damage coroutine melee flag passed");
+        //print("take poison damage coroutine melee flag passed");
         TakeDamage(soldierManager.FindSoldierById(poisonedBy), 2, false, new List<string>() { "Poison" });
     }
 
@@ -962,7 +974,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         {
             if (IsWearingExoArmour() && game.CoinFlip())
             {
-                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Exo Armour.", true, false);
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Exo Armour.", true, false);
                 damage = 0;
             }
         }
@@ -972,7 +984,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         {
             if (IsWearingJuggernautArmour() && !damagedBy.IsWearingExoArmour())
             {
-                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true, false);
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
             }
         }
@@ -982,7 +994,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         {
             if (IsWearingJuggernautArmour())
             {
-                menu.AddDamageAlert(this, soldierName + " resisted " + damage + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true, false);
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
             }
         }
@@ -998,14 +1010,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                 remainingDamage = inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damage);
 
                 if (remainingDamage < damage)
-                    menu.AddDamageAlert(this, soldierName + " absorbed " + (damage - remainingDamage) + " " + menu.PrintList(damageSource) + " damage with Juggernaut Armour.", true, false);
+                    menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
             }
             else if (IsWearingBodyArmour())
             {
                 remainingDamage = inventory.GetItem("Armour_Body").TakeAblativeDamage(damage);
 
                 if (remainingDamage < damage)
-                    menu.AddDamageAlert(this, soldierName + " absorbed " + (damage - remainingDamage) + " " + menu.PrintList(damageSource) + " damage with Body Armour.", true, false);
+                    menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Body Armour.", true, false);
             }
 
             damage = remainingDamage;
@@ -1014,7 +1026,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         //apply insulator damage halving
         if (IsInsulator() && ResilienceCheck())
         {
-            menu.AddDamageAlert(this, soldierName + " <color=green>Insulated</color> " + (damage - damage/2) + " " + menu.PrintList(damageSource) + " damage.", true, false);
+            menu.AddDamageAlert(this, $"{soldierName} <color=green>Insulated</color> {damage - damage/2} {menu.PrintList(damageSource)} damage.", true, false);
             damage /= 2;
         }
             
@@ -1022,14 +1034,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         //apply stim armour damage reduction
         if (IsWearingStimulantArmour())
         {
-            menu.AddDamageAlert(this, soldierName + " resisted 2 " + menu.PrintList(damageSource) + " damage with Stim Armour.", true, false);
+            menu.AddDamageAlert(this, $"{soldierName} resisted 2 {menu.PrintList(damageSource)} damage with Stim Armour.", true, false);
             damage -= 2;
         }
 
         //block damage if it's first turn and soldier has not used ap
         if (roundsFielded == 0 && !usedAP)
         {
-            menu.AddDamageAlert(this, soldierName + " can't be damaged before using AP. " + damage + " " + menu.PrintList(damageSource) + " damage resisted.", true, false);
+            menu.AddDamageAlert(this, $"{soldierName} can't be damaged before using AP. {damage} {menu.PrintList(damageSource)} damage resisted.", true, false);
             damage = 0;
         }
 
@@ -1037,9 +1049,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         //correct negatives
         if (damage < 0)
             damage = 0;
-
-        Debug.Log("damage: " + damage);
-
 
         return damage;
     }
@@ -1066,24 +1075,27 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                 }
                 else
                 {
-                    if (state.Contains("Unconscious"))
+                    if (CheckState("Unconscious"))
                         Kill(damagedBy, damageSource);
-                    else if (state.Contains("Last Stand"))
+                    else if (CheckState("Last Stand"))
                     {
                         if (!ResilienceCheck())
                             MakeUnconscious();
                         else
+                        {
                             menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
+                            menu.AddDamageAlert(this, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", true, true);
+                        }
                     }
                     else
                     {
                         if (hp == 1)
                         {
-                            if (ResilienceCheck())
+                            if (!ResilienceCheck())
                             {
                                 MakeLastStand();
                                 menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
-                                Debug.Log(soldierName + " resisted unconsciousness but fell into Last Stand.");
+                                menu.AddDamageAlert(this, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", true, true);
                             }
                             else
                                 MakeUnconscious();
@@ -1095,7 +1107,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                             else
                             {
                                 menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
-                                Debug.Log(soldierName + " resisted falling into Last Stand.");
+                                menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
                             }
                         }
                         else if (hp == 3)
@@ -1113,7 +1125,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                             else
                             {
                                 menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
-                                Debug.Log(soldierName + " resisted falling into Last Stand.");
+                                menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
                             }
                         }
                     }
@@ -1124,7 +1136,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             }
 
             //add damage alert
-            menu.AddDamageAlert(this, $"{soldierName} took {damage} {menu.PrintList(damageSource)} damage. He is now {CheckHealthState()}.", false, false);
+            menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage. He is now {CheckHealthState()}.", false, false);
             print(damagedBy.soldierName);
             print(menu.PrintList(damageSource));
             //make sure damage came from another soldier
@@ -1174,7 +1186,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
     public void TakeHeal(Soldier healedBy, int heal, int traumaHeal, bool overhealthEnabled, bool resurrectEnabled)
     {
-        if (state.Contains("Dead"))
+        if (CheckState("Dead"))
         {
             if (resurrectEnabled)
                 Resurrect(heal);
@@ -1183,12 +1195,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         }
         else
         {
-            if (state.Contains("Unconscious"))
+            if (CheckState("Unconscious"))
                 MakeLastStand();
 
             else
             {
-                if (state.Contains("Last Stand"))
+                if (CheckState("Last Stand"))
                     MakeActive();
 
                 hp += heal;
@@ -1203,9 +1215,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                 {
                     //add xp for successful heal
                     if (healedBy == this)
-                        menu.AddXpAlert(healedBy, Mathf.CeilToInt((heal + traumaHeal) / 2.0f), "Healed self by " + heal + " hp and removed " + traumaHeal + " trauma points.", true);
+                        menu.AddXpAlert(healedBy, Mathf.CeilToInt((heal + traumaHeal) / 2.0f), $"Healed self by {heal} hp and removed {traumaHeal} trauma points.", true);
                     else
-                        menu.AddXpAlert(healedBy, heal + traumaHeal, "Healed " + this.soldierName + " by " + heal + " hp and removed " + traumaHeal + " trauma points.", true);
+                        menu.AddXpAlert(healedBy, heal + traumaHeal, $"Healed {soldierName} by {heal} hp and removed {traumaHeal} trauma points.", true);
                 }
             }
         } 
@@ -1824,26 +1836,27 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
     public bool IsPoisoned()
     {
-        if (state.Contains("Poisoned"))
+        if (CheckState("Poisoned"))
             return true;
         else
             return false;
     }
     public void SetPoisoned()
     {
-        state.Add("Poisoned");
-        Debug.Log(soldierName + " is Poisoned.");
+        SetState("Poisoned");
     }
 
     public void UnsetPoisoned()
     {
-        state.Remove("Poisoned");
-        Debug.Log(soldierName + " is no longer poisoned.");
+        UnsetState("Poisoned");
     }
-
+    public bool IsOnDrug(string drugName)
+    {
+        return CheckState(drugName);
+    }
     public bool IsOnOverwatch()
     {
-        if (state.Contains("Overwatch"))
+        if (CheckState("Overwatch"))
             return true;
         else
             return false;
@@ -1854,8 +1867,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         overwatchYPoint = y;
         overwatchConeRadius = r;
         overwatchConeArc = a;
-        state.Add("Overwatch");
-        Debug.Log(soldierName + " is on Overwatch.");
+        SetState("Overwatch");
     }
     public void UnsetOverwatch()
     {
@@ -1863,63 +1875,56 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         overwatchYPoint = 0;
         overwatchConeRadius = 0;
         overwatchConeArc = 0;
-        state.Remove("Overwatch");
+        UnsetState("Overwatch");
     }
     public bool IsBloodRaged()
     {
-        if (state.Contains("Blood Rage"))
+        if (CheckState("Blood Rage"))
             return true;
-        else
-            return false;
+
+        return false;
     }
     public void SetBloodRage()
     {
-        if (!state.Contains("Blood Rage"))
-            state.Add("Blood Rage");
-        
-        Debug.Log(soldierName + " is in Blood Rage.");
+        SetState("Blood Rage");
     }
     public void UnsetBloodRage()
     {
-        state.Remove("Blood Rage");
-        Debug.Log(soldierName + " exits Blood Rage");
+        UnsetState("Blood Rage");
     }
     public bool IsInCover()
     {
-        if (state.Contains("Cover"))
+        if (CheckState("Cover"))
             return true;
-        else
-            return false;
+
+        return false;
     }
     public void SetCover()
     {
-        if (!state.Contains("Cover"))
-            state.Add("Cover");
-        
-        Debug.Log(soldierName + " is in cover.");
+        SetState("Cover");
+    }
+    public void UnsetCover()
+    {
+        UnsetState("Cover");
     }
     public bool IsInteractable()
     {
-        if (state.Contains("Crushed"))
+        if (CheckState("Crushed"))
             return false;
 
         return true;
     }
-    public void UnsetCover()
-    {
-        state.Remove("Cover");
-    }
     public void SetCrushed()
     {
-        if (!state.Contains("Crushed"))
+        if (IsInteractable())
         {
-            state.Add("Crushed");
+            SetState("Crushed");
             DestroyAllItems();
         }
     }
     public void UnsetCrushed()
     {
-        state.Remove("Crushed");
+        UnsetState("Crushed");
     }
     public void MakeStunned(int stunRounds)
     {
@@ -1957,36 +1962,35 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void ClearHealthState()
     {
-        state.Remove("Active");
-        state.Remove("Last Stand");
-        state.Remove("Dead");
-        state.Remove("Unconscious");
+        UnsetState("Active");
+        UnsetState("Last Stand");
+        UnsetState("Dead");
+        UnsetState("Unconscious");
     }
     public void MakeActive()
     {
         ClearHealthState();
-        state.Add("Active");
+        SetState("Active");
         Debug.Log(soldierName + " returns to service.");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
     }
     public void MakeLastStand()
     {
         if (IsWearingJuggernautArmour())
-        {
-            Debug.Log("Resisted last stand with JA");
-        }
+            menu.AddDamageAlert(this, $"{soldierName} resisted <color=red>Last Stand</color> with JA.", true, true);
         else
         {
             ClearHealthState();
-            state.Add("Last Stand");
-            Debug.Log(soldierName + " is in Last Stand.");
+            SetState("Last Stand");
+            menu.AddDamageAlert(this, $"{soldierName} fell into <color=red>Last Stand</color>.", false, true);
             StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
         }
     }
     public void MakeUnconscious()
     {
         ClearHealthState();
-        state.Add("Unconscious");
+        SetState("Unconscious");
+        menu.AddDamageAlert(this, $"{soldierName} fell into <color=blue>Unconscious</color>.", false, true);
 
         //remove all engagements
         if (IsMeleeEngaged())
@@ -1998,7 +2002,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     public void Resurrect(int hp)
     {
         ClearHealthState();
-        state.Add("Active");
+        SetState("Active");
         CheckSpecialityColor(soldierSpeciality);
         TakeHeal(null, hp, 0, true, false);
     }
@@ -2007,7 +2011,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (this.IsAlive())
         {
-            menu.AddDamageAlert(this, soldierName + " was killed instantly by " + menu.PrintList(damageSource) + ".", false, false);
+            menu.AddDamageAlert(this, $"{soldierName} was killed instantly by {menu.PrintList(damageSource)}.", false, false);
             Kill(killedBy, damageSource);
         }
     }
@@ -2020,7 +2024,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
             //make him dead
             ClearHealthState();
-            state.Add("Dead");
+            SetState("Dead");
+            menu.AddDamageAlert(this, $"{soldierName} died!", false, true);
             hp = 0;
 
             //remove all reveals and revealedby
@@ -2029,7 +2034,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
             //remove all instances of anyone else revealing them
             foreach (Soldier s in soldierManager.allSoldiers)
-                s.RevealingSoldiers.Remove(this.id);
+                s.RevealingSoldiers.Remove(id);
 
             //remove all engagements
             if (IsMeleeEngaged())
@@ -2049,18 +2054,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
             //pay xp for relevant damage type kill
             if (damageSource.Contains("Shot"))
-                menu.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), "Killed " + this.soldierName + " with a shot.", false);
+                menu.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
             else if (damageSource.Contains("Melee"))
             {
                 if (damageSource.Contains("Counter"))
-                    menu.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), "Killed " + this.soldierName + " in melee (counterattack).", false);
+                    menu.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
                 else
-                    menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), "Killed " + this.soldierName + " in melee.", false);
+                    menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
                 killedBy.FighterMeleeKillReward();
             }
             else if (damageSource.Contains("Poison"))
-                menu.AddXpAlert(killedBy, 10 + this.stats.R.Val, "Killed " + this.soldierName + " by poisoning.", false);
+                menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
         }
     }
 
@@ -2254,19 +2259,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void SetInspired()
     {
-        state.Add("Inspired");
+        SetState("Inspired");
         if (soldierSpeciality == "Health")
             TakeHeal(null, 1, 0, true, false);
     }
     public void UnsetInspired()
     {
-        state.Remove("Inspired");
+        UnsetState("Inspired");
         if (soldierSpeciality == "Health")
             TakeDamage(null, 1, true, new List<string>() { "Inspirer Debuff" });
     }
     public bool IsInspired()
     {
-        if (state.Contains("Inspired"))
+        if (CheckState("Inspired"))
             return true;
 
         return false;
@@ -2308,15 +2313,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void SetDissuaded()
     {
-        state.Add("Dissuaded");
+        SetState("Dissuaded");
     }
     public void UnsetDissuaded()
     {
-        state.Remove("Dissuaded");
+        UnsetState("Dissuaded");
     }
     public bool IsDissuaded()
     {
-        if (state.Contains("Dissuaded"))
+        if (CheckState("Dissuaded"))
             return true;
 
         return false;
@@ -2624,11 +2629,36 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
         return false;
     }
+    public bool PhysicalObjectWithinOverwatchCone(Vector3 point)
+    {
+        if (IsOnOverwatch())
+        {
+            if (overwatchXPoint != 0 && overwatchYPoint != 0 && PhysicalObjectWithinRadius(point, overwatchConeRadius))
+            {
+                Vector2 centreLine = new(overwatchXPoint - X, overwatchYPoint - Y);
+                Vector2 targetLine = new(point.x - X, point.y - Y);
+                centreLine.Normalize();
+                targetLine.Normalize();
+
+                if (Vector2.Angle(centreLine, targetLine) <= overwatchConeArc / 2.0f)
+                    return true;
+            }
+        }
+
+        return false;
+    }
     public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
     {
         if (game.CalculateRange(this, obj) <= radius)
             return true;
         
+        return false;
+    }
+    public bool PhysicalObjectWithinRadius(Vector3 point, float radius)
+    {
+        if (game.CalculateRange(this, point) <= radius)
+            return true;
+
         return false;
     }
     public bool PhysicalObjectWithinMaxRadius(PhysicalObject obj)

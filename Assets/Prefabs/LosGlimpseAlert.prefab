@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5752205652805527997}
   - component: {fileID: 921480684911140206}
   m_Layer: 5
-  m_Name: LostLosTitle
+  m_Name: LosGlimpseTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,8 +35,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -14, y: 63}
-  m_SizeDelta: {x: 300, y: 78}
+  m_AnchoredPosition: {x: 40, y: 63}
+  m_SizeDelta: {x: 402.04, y: 78}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5752205652805527997
 CanvasRenderer:
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LOS LOST
+  m_text: GLIMPSE ALERT
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 2169772503573654098}
   - component: {fileID: 4252452547141953107}
   m_Layer: 5
-  m_Name: LosLostAlert
+  m_Name: LosGlimpseAlert
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -247,7 +247,7 @@ GameObject:
   - component: {fileID: 2486834703889620057}
   - component: {fileID: 638308051853955374}
   m_Layer: 5
-  m_Name: LostLosDescription
+  m_Name: LosGlimpseDescription
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

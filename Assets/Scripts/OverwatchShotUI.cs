@@ -85,6 +85,19 @@ public class OverwatchShotUI : MonoBehaviour
                         menu.AddXpAlert(shooter, 10, "Overwatch shot hit with a " + chances.Item1 + "% chance on " + target.soldierName + "!", false);
                 }
 
+                //apply overwatch freeze on spot unless resisted
+                if (!resistOverwatchFreeze)
+                {
+                    target.X = xOver;
+                    target.Y = yOver;
+                    target.Z = zOver;
+                    target.terrainOn = overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text;
+                    target.ap = 0;
+                    menu.AddDamageAlert(target, $"{target.soldierName} suffered overwatch daze at X: {target.X}, Y: {target.Y}, Z: {target.Z}, Ter: {target.terrainOn}.", false, true);
+                }
+                else
+                    menu.AddDamageAlert(target, target.soldierName + " resisted overwatch daze.", true, true);
+
                 //don't show los check button if shot hits
                 menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
             }
@@ -92,7 +105,7 @@ public class OverwatchShotUI : MonoBehaviour
             {
                 menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                 menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {game.RandomShotScatterDistance()}cm {game.RandomShotScatterHorizontal()}, {game.RandomShotScatterDistance()}cm {game.RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
-                //show los check button if shot misses
+                //show los check button if shot doesn't hit
                 menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                 //paying xp for dodge
@@ -105,19 +118,6 @@ public class OverwatchShotUI : MonoBehaviour
                 target.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
             }
 
-            //apply overwatch freeze on spot unless resisted
-            if (!resistOverwatchFreeze)
-            {
-                target.X = xOver;
-                target.Y = yOver;
-                target.Z = zOver;
-                target.terrainOn = overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text;
-                target.ap = 0;
-                menu.AddDamageAlert(target, $"{target.soldierName} suffered overwatch daze at X: {target.X}, Y: {target.Y}, Z: {target.Z}, Ter: {target.terrainOn}.", false, true);
-            }
-            else
-                menu.AddDamageAlert(target, target.soldierName + " resisted overwatch daze.", true, true);
-
             //unset overwatch after any shot
             shooter.UnsetOverwatch();
 
@@ -125,8 +125,13 @@ public class OverwatchShotUI : MonoBehaviour
             shooter.PerformLoudAction();
 
             menu.OpenShotResultUI();
-            //destroy this instance of the overwatch shot
-            Destroy(this.gameObject);
+
+            //refresh detections (potentially trigger more overwatch)
+            game.StartCoroutine(game.DetectionAlertSingle(target, "moveChange", Vector3.zero, string.Empty));
+
+            //destroy other overwatch instances
+            foreach (Transform child in menu.overwatchShotUI.transform)
+                Destroy(child.gameObject);
         }
     }
 

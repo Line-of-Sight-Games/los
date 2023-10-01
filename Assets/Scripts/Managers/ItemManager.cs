@@ -24,7 +24,6 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         foreach (string id in allItemIds)
         {
             var newItem = Instantiate(itemPrefab);
-            newItem.MapPhysicalPosition(newItem.X, newItem.Y, newItem.Z);
             newItem.id = id;
             newItem.LoadData(data);
         }
