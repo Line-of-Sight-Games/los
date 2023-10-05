@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 {
@@ -21,7 +22,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     public bool fielded, selected, revealed, usedAP, usedMP, bloodLettedThisTurn;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc;
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, 
+        timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
     public string revealedByTeam, lastChosenStat, poisonedBy;
     public Statline stats;
     public Inventory inventory;
@@ -275,23 +277,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void PickUpItemToSlot(Item item, string slotName)
     {
-        inventory.AddItemToSlot(item, slotName);
+        Inventory.AddItemToSlot(item, slotName);
         item.RunPickupEffect();
     }
     public void BrokenDropAllItems()
     {
         List<Item> itemList = new();
-        foreach (Item item in inventory.AllItems)
+        foreach (Item item in Inventory.AllItems)
             itemList.Add(item);
 
         foreach (Item item in itemList)
-            if (!item.itemName.Contains("Armour"))
-                DropItem(item);
+            DropItem(item);
     }
     public void DestroyAllItems()
     {
         List<Item> itemList = new();
-        foreach (Item item in inventory.AllItems)
+        foreach (Item item in Inventory.AllItems)
             itemList.Add(item);
 
         foreach (Item item in itemList)
@@ -299,7 +300,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public Item DropItem(Item item)
     {
-        inventory.RemoveItem(item);
+        Inventory.RemoveItem(item);
 
         return item;
     }
@@ -311,7 +312,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         int ahp = 0;
 
-        foreach (Item item in inventory.AllItems)
+        foreach (Item item in Inventory.AllItems)
             ahp += item.ablativeHealth;
 
         return ahp;
@@ -447,7 +448,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         details.Add("instantSpeed", instantSpeed);
 
         //save inventory
-        details.Add("inventory", inventory.AllItemIds);
+        details.Add("inventory", Inventory.AllItemIds);
         details.Add("inventorySlots", inventorySlots);
 
         //save list of revealing soldiers
@@ -487,6 +488,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         details.Add("overwatchYPoint", overwatchYPoint);
         details.Add("overwatchConeRadius", overwatchConeRadius);
         details.Add("overwatchConeArc", overwatchConeArc);
+        details.Add("startX", startX);
+        details.Add("startY", startY);
+        details.Add("startZ", startZ);
 
         //add the soldier in
         if (data.allSoldiersDetails.ContainsKey(id))
@@ -608,6 +612,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
         overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
         overwatchConeArc = Convert.ToInt32(details["overwatchConeArc"]);
+        startX = Convert.ToInt32(details["startX"]);
+        startY = Convert.ToInt32(details["startY"]);
+        startZ = Convert.ToInt32(details["startZ"]);
 
         //link to maingame object
         game = FindObjectOfType<MainGame>();
@@ -678,7 +685,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (stats.SR.Val == 0)
         {
-            game.BreakAllMeleeEngagements(this);
+            game.BreakAllControllingMeleeEngagments(this);
         }
     }
     public void ApplyVisMods()
@@ -950,13 +957,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
 
     public void UnsetPlaydead()
     {
         UnsetState("Playdead");
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
 
     public IEnumerator TakePoisonDamage()
@@ -1007,14 +1014,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             //tank the damage on the armour if wearing BA or JA
             if (IsWearingJuggernautArmour())
             {
-                remainingDamage = inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damage);
+                remainingDamage = Inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damage);
 
                 if (remainingDamage < damage)
                     menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
             }
             else if (IsWearingBodyArmour())
             {
-                remainingDamage = inventory.GetItem("Armour_Body").TakeAblativeDamage(damage);
+                remainingDamage = Inventory.GetItem("Armour_Body").TakeAblativeDamage(damage);
 
                 if (remainingDamage < damage)
                     menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Body Armour.", true, false);
@@ -1132,13 +1139,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                 }
 
                 //if not broken by health state change break remaining melee engagements
-                game.BreakAllMeleeEngagements(this);
+                game.BreakAllControllingMeleeEngagments(this);
             }
 
             //add damage alert
             menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage. He is now {CheckHealthState()}.", false, false);
-            print(damagedBy.soldierName);
-            print(menu.PrintList(damageSource));
             //make sure damage came from another soldier
             if (damagedBy != null)
             {
@@ -1148,9 +1153,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             }
         }
         else
-        {
-            Debug.Log("Damage was reduced to 0.");
-        }
+            print("Damage was reduced to 0.");
 
         //make sure damage came from another soldier
         if (damagedBy != null)
@@ -1169,7 +1172,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
     public void TakeTrauma(int trauma)
     {
-
         if (tp < 5)
         {
             tp += trauma;
@@ -1262,7 +1264,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         int carryWeight = 0;
 
-        foreach (Item i in inventory.AllItems)
+        foreach (Item i in Inventory.AllItems)
         {
             if (IsBull() && (i.gunType != null || i.itemName.Contains("Ammo")))
                 carryWeight += 1;
@@ -1349,7 +1351,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     public int GetKd() 
     {
         int kd = 0;
-        foreach (Soldier s in soldierManager.allSoldiers)
+        foreach (Soldier s in game.AllSoldiers())
         {
             if (IsOppositeTeamAs(s) && s.IsDead())
                 kd++;
@@ -1393,7 +1395,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool FindMeleeTargets()
     {
-        foreach (Soldier s in soldierManager.allSoldiers)
+        foreach (Soldier s in game.AllSoldiers())
             if (s.IsAlive() && IsOppositeTeamAs(s) && s.IsRevealed() && PhysicalObjectWithinMeleeRadius(s))
                 return true;
 
@@ -1403,7 +1405,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         int vulnerableTurns = 0;
 
-        foreach (Soldier s in soldierManager.allSoldiers)
+        foreach (Soldier s in game.AllSoldiers())
         {
             if (s.IsAlive() && IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
             {
@@ -1420,7 +1422,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         if (vulnerableTurns > 0)
         {
             if (loudActionRoundsVulnerable == 0)
-                StartCoroutine(game.DetectionAlertSingle(this, "statChange", Vector3.zero, string.Empty));
+                StartCoroutine(game.DetectionAlertSingle(this, "statChange", Vector3.zero, string.Empty, true));
 
             if (vulnerableTurns > loudActionRoundsVulnerable)
                 SetLoudRevealed(vulnerableTurns);
@@ -1430,7 +1432,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         int vulnerableTurns = 0;
 
-        foreach (Soldier s in soldierManager.allSoldiers)
+        foreach (Soldier s in game.AllSoldiers())
         {
             if (s.IsAlive() && IsOppositeTeamAs(s))
             {
@@ -1447,7 +1449,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         if (vulnerableTurns > 0)
         {
             if (loudActionRoundsVulnerable == 0)
-                StartCoroutine(game.DetectionAlertSingle(this, "statChange", Vector3.zero, string.Empty));
+                StartCoroutine(game.DetectionAlertSingle(this, "statChange", Vector3.zero, string.Empty, true));
 
             if (vulnerableTurns > loudActionRoundsVulnerable)
                 SetLoudRevealed(vulnerableTurns);
@@ -1781,7 +1783,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             _ => 0,
         };
     }
-
+    public void IncreaseRoundsWithoutFood()
+    {
+        if (!IsWearingStimulantArmour())
+            RoundsWithoutFood++;
+    }
+    public void ResetRoundsWithoutFood()
+    {
+        RoundsWithoutFood = 0;
+    }
     public void SetLoudRevealed(int rounds)
     {
         loudActionRoundsVulnerable = rounds;
@@ -1868,6 +1878,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         overwatchConeRadius = r;
         overwatchConeArc = a;
         SetState("Overwatch");
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
     public void UnsetOverwatch()
     {
@@ -1876,6 +1887,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         overwatchConeRadius = 0;
         overwatchConeArc = 0;
         UnsetState("Overwatch");
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
     public bool IsBloodRaged()
     {
@@ -1936,7 +1948,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             if (IsMeleeEngaged())
                 StartCoroutine(game.DetermineMeleeControllerMultiple(this));
             
-            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
+            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         }
     }
     public void TranquiliserMakeStunned(int stunRounds)
@@ -1972,7 +1984,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         ClearHealthState();
         SetState("Active");
         Debug.Log(soldierName + " returns to service.");
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
     public void MakeLastStand()
     {
@@ -1983,7 +1995,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             ClearHealthState();
             SetState("Last Stand");
             menu.AddDamageAlert(this, $"{soldierName} fell into <color=red>Last Stand</color>.", false, true);
-            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
+            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         }
     }
     public void MakeUnconscious()
@@ -1996,7 +2008,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty));
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         Debug.Log(soldierName + " is Unconscious.");
     }
     public void Resurrect(int hp)
@@ -2033,7 +2045,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             RevealedBySoldiers.Clear();
 
             //remove all instances of anyone else revealing them
-            foreach (Soldier s in soldierManager.allSoldiers)
+            foreach (Soldier s in game.AllSoldiers())
                 s.RevealingSoldiers.Remove(id);
 
             //remove all engagements
@@ -2069,6 +2081,111 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         }
     }
 
+
+    //detection checks
+    public bool PhysicalObjectWithinOverwatchCone(PhysicalObject obj)
+    {
+        if (IsOnOverwatch())
+        {
+            if (overwatchXPoint != 0 && overwatchYPoint != 0 && PhysicalObjectWithinRadius(obj, overwatchConeRadius))
+            {
+                Vector2 centreLine = new(overwatchXPoint - X, overwatchYPoint - Y);
+                Vector2 targetLine = new(obj.X - X, obj.Y - Y);
+                centreLine.Normalize();
+                targetLine.Normalize();
+
+                if (Vector2.Angle(centreLine, targetLine) <= overwatchConeArc / 2.0f)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    public bool PhysicalObjectWithinOverwatchCone(Vector3 point)
+    {
+        if (IsOnOverwatch())
+        {
+            if (overwatchXPoint != 0 && overwatchYPoint != 0 && PhysicalObjectWithinRadius(point, overwatchConeRadius))
+            {
+                Vector2 centreLine = new(overwatchXPoint - X, overwatchYPoint - Y);
+                Vector2 targetLine = new(point.x - X, point.y - Y);
+                centreLine.Normalize();
+                targetLine.Normalize();
+
+                if (Vector2.Angle(centreLine, targetLine) <= overwatchConeArc / 2.0f)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
+    {
+        if (game.CalculateRange(this, obj) <= radius)
+            return true;
+
+        return false;
+    }
+    public bool PhysicalObjectWithinRadius(Vector3 point, float radius)
+    {
+        if (game.CalculateRange(this, point) <= radius)
+            return true;
+
+        return false;
+    }
+    public bool PhysicalObjectWithinMaxRadius(PhysicalObject obj)
+    {
+        if (PhysicalObjectWithinRadius(obj, this.SRColliderMax.radius))
+            return true;
+
+        return false;
+    }
+    public bool PhysicalObjectWithinHalfRadius(PhysicalObject obj)
+    {
+        if (PhysicalObjectWithinRadius(obj, this.SRColliderHalf.radius))
+            return true;
+
+        return false;
+    }
+    public bool PhysicalObjectWithinMinRadius(PhysicalObject obj)
+    {
+        if (PhysicalObjectWithinRadius(obj, this.SRColliderMin.radius))
+            return true;
+
+        return false;
+    }
+    public bool PhysicalObjectWithinItemRadius(PhysicalObject obj)
+    {
+        if (PhysicalObjectWithinRadius(obj, this.itemCollider.radius))
+            return true;
+
+        return false;
+    }
+    public bool PhysicalObjectWithinMeleeRadius(PhysicalObject obj)
+    {
+        if (PhysicalObjectWithinRadius(obj, this.SRColliderMin.radius))
+            return true;
+
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //status checks
     public bool ResilienceCheck()
     {
         if (game.DiceRoll() <= stats.R.Val)
@@ -2116,43 +2233,37 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
         if (survivalPassesAchieved >= survivalPassesNeeded)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsCommander()
     {
         if (soldierSpeciality == "Leadership")
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsMeleeEngaged()
     {
         if (controlledBySoldiersList.Count > 0 || controllingSoldiersList.Count > 0)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsMeleeControlled()
     {
         if (controlledBySoldiersList.Count > 0)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsMeleeControlling()
     {
         if (controllingSoldiersList.Count > 0 && controlledBySoldiersList.Count == 0)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsMeleeEngagedWith(Soldier s)
     {
         if (controlledBySoldiersList.Contains(s.id) || controllingSoldiersList.Contains(s.id))
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsOnOppositeTerrain()
     {
@@ -2161,16 +2272,120 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             || (TerrainOn == "Desert" && soldierTerrain == "Alpine")
             || (TerrainOn == "Urban" && soldierTerrain == "Jungle"))
             return true;
-        else 
-            return false;
+        return false;
     }
     public bool IsOnNativeTerrain()
     {
         if (TerrainOn == soldierTerrain)
             return true;
-        else
-            return false;
+        return false;
     }
+    public bool IsBroken()
+    {
+        if (tp == 4)
+            return true;
+        return false;
+    }
+    public bool IsFrozen()
+    {
+        if (tp == 3)
+            return true;
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    //item checks
+    public bool HasAnyItemInHand()
+    {
+        if (LeftHandItem != null || RightHandItem != null)
+            return true;
+        return false;
+    }
+    public bool HasGunEquipped()
+    {
+        if (EquippedGun != null)
+            return true;
+        return false;
+    }
+    public bool HasSMGOrPistolEquipped()
+    {
+        if (HasGunEquipped())
+            if (EquippedGun.gunType == "Pistol" || EquippedGun.gunType == "SMG")
+                return true;
+        return false;
+    }
+    public bool IsDualWielding()
+    {
+        if (LeftHandItem != null && RightHandItem != null)
+            return true;
+        return false;
+    }
+    public bool HasArmourIntegrity()
+    {
+        if ((Inventory.FindItem("Armour_Juggernaut") && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0) || (Inventory.FindItem("Armour_Body") && Inventory.GetItem("Armour_Body").ablativeHealth > 0))
+            return true;
+        return false;
+    }
+    public bool IsWearingBodyArmour()
+    {
+        if (Inventory.FindItem("Armour_Body"))
+            return true;
+        return false;
+    }
+    public bool IsWearingJuggernautArmour()
+    {
+        if (Inventory.FindItem("Armour_Juggernaut"))
+            return true;
+        return false;
+    }
+    public bool IsWearingExoArmour()
+    {
+        if (Inventory.FindItem("Armour_Exo"))
+            return true;
+        return false;
+    }
+    public bool IsWearingGhillieArmour()
+    {
+        if (Inventory.FindItem("Armour_Ghillie"))
+            return true;
+        return false;
+    }
+    public bool IsWearingStimulantArmour()
+    {
+        if (Inventory.FindItem("Armour_Stimulant"))
+            return true;
+        return false;
+    }
+    public bool IsCarryingRiotShield()
+    {
+        if (Inventory.FindItem("Riot_Shield"))
+            return true;
+        return false;
+    }
+    public bool IsWearingLogisticsBelt()
+    {
+        if (Inventory.FindItem("Logistics_Belt"))
+            return true;
+        return false;
+    }
+
+
+
+
+
+
+
+
 
 
 
@@ -2481,21 +2696,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
         return false;
     }
-    public bool HasGunEquipped()
-    {
-        if (EquippedGuns.Count > 0)
-            return true;
-
-        return false;
-    }
-    public bool HasSMGOrPistolEquipped()
-    {
-        foreach (Item item in EquippedGuns)
-            if (item.gunType == "Pistol" || item.gunType == "SMG")
-                return true;
-
-        return false;
-    }
 
 
 
@@ -2514,6 +2714,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
 
 
+    //properties
     public int FullMove
     {
         get { return InstantSpeed; }
@@ -2546,160 +2747,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             return instantSpeed; 
         }
     }
-    public bool HasArmourIntegrity()
-    {
-        if ((inventory.FindItem("Armour_Juggernaut") && inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0) || (inventory.FindItem("Armour_Body") && inventory.GetItem("Armour_Body").ablativeHealth > 0))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingBodyArmour()
-    {
-        if (inventory.FindItem("Armour_Body"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingJuggernautArmour()
-    {
-        if (inventory.FindItem("Armour_Juggernaut"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingExoArmour()
-    {
-        if (inventory.FindItem("Armour_Exo"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingGhillieArmour()
-    {
-        if (inventory.FindItem("Armour_Ghillie"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingStimulantArmour()
-    {
-        if (inventory.FindItem("Armour_Stimulant"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsCarryingRiotShield()
-    {
-        if (inventory.FindItem("Riot_Shield"))
-            return true;
-        else
-            return false;
-    }
-    public bool IsWearingLogisticsBelt()
-    {
-        if (inventory.FindItem("Logistics_Belt"))
-            return true;
-        else
-            return false;
-    }
-    public void IncreaseRoundsWithoutFood()
-    {
-        if (!IsWearingStimulantArmour())
-            RoundsWithoutFood++;
-    }
-    public void ResetRoundsWithoutFood()
-    {
-        RoundsWithoutFood = 0;
-    }
-    public bool PhysicalObjectWithinOverwatchCone(PhysicalObject obj)
-    {
-        if (IsOnOverwatch())
-        {
-            if (overwatchXPoint != 0 && overwatchYPoint != 0 && PhysicalObjectWithinRadius(obj, overwatchConeRadius))
-            {
-                Vector2 centreLine = new(overwatchXPoint - X, overwatchYPoint - Y);
-                Vector2 targetLine = new(obj.X - X, obj.Y - Y);
-                centreLine.Normalize();
-                targetLine.Normalize();
-
-                if (Vector2.Angle(centreLine, targetLine) <= overwatchConeArc/2.0f)
-                    return true;
-            }
-        }
-
-        return false;
-    }
-    public bool PhysicalObjectWithinOverwatchCone(Vector3 point)
-    {
-        if (IsOnOverwatch())
-        {
-            if (overwatchXPoint != 0 && overwatchYPoint != 0 && PhysicalObjectWithinRadius(point, overwatchConeRadius))
-            {
-                Vector2 centreLine = new(overwatchXPoint - X, overwatchYPoint - Y);
-                Vector2 targetLine = new(point.x - X, point.y - Y);
-                centreLine.Normalize();
-                targetLine.Normalize();
-
-                if (Vector2.Angle(centreLine, targetLine) <= overwatchConeArc / 2.0f)
-                    return true;
-            }
-        }
-
-        return false;
-    }
-    public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
-    {
-        if (game.CalculateRange(this, obj) <= radius)
-            return true;
-        
-        return false;
-    }
-    public bool PhysicalObjectWithinRadius(Vector3 point, float radius)
-    {
-        if (game.CalculateRange(this, point) <= radius)
-            return true;
-
-        return false;
-    }
-    public bool PhysicalObjectWithinMaxRadius(PhysicalObject obj)
-    {
-        if (PhysicalObjectWithinRadius(obj, this.SRColliderMax.radius))
-            return true;
-
-        return false;
-    }
-    public bool PhysicalObjectWithinHalfRadius(PhysicalObject obj)
-    {
-        if (PhysicalObjectWithinRadius(obj, this.SRColliderHalf.radius))
-            return true;
-
-        return false;
-    }
-    public bool PhysicalObjectWithinMinRadius(PhysicalObject obj)
-    {
-        if (PhysicalObjectWithinRadius(obj, this.SRColliderMin.radius))
-            return true;
-
-        return false;
-    }
-    public bool PhysicalObjectWithinItemRadius(PhysicalObject obj)
-    {
-        if (PhysicalObjectWithinRadius(obj, this.itemCollider.radius))
-            return true;
-
-        return false;
-    }
-    public bool PhysicalObjectWithinMeleeRadius(PhysicalObject obj)
-    {
-        if (PhysicalObjectWithinRadius(obj, this.SRColliderMin.radius))
-            return true;
-
-        return false;
-    }
     public int RoundsWithoutFood
     {
         get { return roundsWithoutFood; }
         set { roundsWithoutFood = value; ApplySustenanceMods(); }
+    }
+    public List<Soldier> EngagedSoldiers
+    {
+        get
+        {
+            List<Soldier> engagedSoldiers = new();
+            foreach(string id in controlledBySoldiersList)
+                engagedSoldiers.Add(soldierManager.FindSoldierById(id));
+            foreach (string id in controllingSoldiersList)
+                engagedSoldiers.Add(soldierManager.FindSoldierById(id));
+            return engagedSoldiers;
+        }
     }
     public List<string> RevealedBySoldiers
     {
@@ -2767,19 +2830,24 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                 return LeftHandItem;
         }
     }
-    public List<Item> EquippedGuns
+    public Item EquippedGun
     {
         get
         {
-            List<Item> gunsEquipped = new();
+            Item gunEquipped = null;
             if (LeftHandItem != null)
+            {
                 if (LeftHandItem.gunType != null)
-                    gunsEquipped.Add(LeftHandItem);
-            if (RightHandItem != null)
-                if (RightHandItem.gunType != null)
-                    gunsEquipped.Add(RightHandItem);
+                    gunEquipped = LeftHandItem;
+            }
+            else
+            {
+                if (RightHandItem != null)
+                    if (RightHandItem.gunType != null)
+                        gunEquipped = RightHandItem;
+            }
 
-            return gunsEquipped;
+            return gunEquipped;
         }
     }
     public Inventory Inventory

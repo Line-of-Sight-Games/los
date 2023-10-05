@@ -1,20 +1,17 @@
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Terminal : POI, IDataPersistence
+public class ExplosiveBarrel : POI, IDataPersistence
 {
-    public string terminalType;
-    public List<string> soldierAlreadyInteracted;
-    public JArray soldierAlreadyInteractedJArray;
-
     private void Start()
     {
-        poiType = "terminal";
+        poiType = "barrel";
     }
 
-    public Terminal Init(Vector3 location, string terrain, string type)
+    public ExplosiveBarrel Init(Vector3 location, string terrain)
     {
         id = GenerateGuid();
         x = (int)location.x;
@@ -22,7 +19,6 @@ public class Terminal : POI, IDataPersistence
         z = (int)location.z;
         terrainOn = terrain;
         MapPhysicalPosition(x, y, z);
-        terminalType = type;
 
         return this;
     }
@@ -31,20 +27,13 @@ public class Terminal : POI, IDataPersistence
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
+            //load position
             poiType = (string)details["poiType"];
             x = Convert.ToInt32(details["x"]);
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
             terrainOn = (string)details["terrainOn"];
             MapPhysicalPosition(x, y, z);
-
-            terminalType = (string)details["terminalType"];
-
-            //load list of soldier already interacted
-            soldierAlreadyInteracted = new();
-            soldierAlreadyInteractedJArray = (JArray)details["soldierAlreadyInteracted"];
-            foreach (string soldierId in soldierAlreadyInteractedJArray)
-                soldierAlreadyInteracted.Add(soldierId);
         }
     }
 
@@ -57,10 +46,6 @@ public class Terminal : POI, IDataPersistence
         details.Add("y", y);
         details.Add("z", z);
         details.Add("terrainOn", terrainOn);
-        details.Add("terminalType", terminalType);
-
-        //save list of soldiers already interacted
-        details.Add("soldierAlreadyInteracted", soldierAlreadyInteracted);
 
         //add the item in
         if (data.allPOIDetails.ContainsKey(id))
@@ -68,11 +53,4 @@ public class Terminal : POI, IDataPersistence
 
         data.allPOIDetails.Add(id, details);
     }
-
-    public List<string> SoldiersAlreadyInteracted
-    {
-        get { return soldierAlreadyInteracted; }
-        set { soldierAlreadyInteracted = value; }
-    }
 }
-

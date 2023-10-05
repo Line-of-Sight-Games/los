@@ -7,11 +7,14 @@ public class POIManager : MonoBehaviour, IDataPersistence
 {
     public List<string> allPOIIds = new();
     public List<POI> allPOIs = new();
-    public Terminal poiPrefab;
+    public POI poiPrefab;
+    public GoodyBox gbPrefab;
+    public Terminal terminalPrefab;
+    public ExplosiveBarrel barrelPrefab;
 
     public void LoadData(GameData data)
     {
-        //destroy existing soldiers ready to regenerate them
+        //destroy existing POIs ready to regenerate them
         IEnumerable<POI> allPOIsInst = FindObjectsOfType<POI>();
         foreach (POI poi in allPOIsInst)
             Destroy(poi.gameObject);
@@ -19,7 +22,27 @@ public class POIManager : MonoBehaviour, IDataPersistence
         allPOIIds = data.allPOIIds;
         foreach (string id in allPOIIds)
         {
-            var newPOI = Instantiate(poiPrefab);
+            POI newPOI = Instantiate(poiPrefab);
+            newPOI.id = id;
+            newPOI.LoadData(data);
+            print($"{newPOI.id}: {newPOI.poiType}: {newPOI.GetType()}");
+            if (newPOI.poiType == "terminal")
+            {
+                Destroy(newPOI.gameObject);
+                newPOI = Instantiate(terminalPrefab);
+                
+            }
+            else if (newPOI.poiType == "gb")
+            {
+                Destroy(newPOI.gameObject);
+                newPOI = Instantiate(gbPrefab);
+            }
+            else if (newPOI.poiType == "barrel")
+            {
+                Destroy(newPOI.gameObject);
+                newPOI = Instantiate(barrelPrefab);
+            }
+            print($"{newPOI.GetType()}");
             newPOI.id = id;
             newPOI.LoadData(data);
         }

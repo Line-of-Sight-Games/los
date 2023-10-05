@@ -582,7 +582,10 @@ public class Item : PhysicalObject, IDataPersistence
 
         //take exo armour health
         if (itemName == "Armour_Exo")
+        {
+            owner.stats.H.BaseVal -= 3;
             owner.TakeDamage(null, 3, true, new List<string>() { "Exo" });
+        }
 
         //reset sustenance for stim armour
         if (itemName == "Armour_Stimulant")

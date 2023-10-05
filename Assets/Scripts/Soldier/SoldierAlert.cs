@@ -242,21 +242,21 @@ public class SoldierAlert : MonoBehaviour
                 {
                     transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>TRAUMA RESISTED</color>";
                     transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = "";
-                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " resisted the trauma." /*(" + rolls + " resilience check)."*/;
-                    soldier.menu.AddXpAlert(soldier, xpOnResist, "Resisted traumatic event at " + distance + " range.", true);
+                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} resisted the trauma.";
+                    soldier.menu.AddXpAlert(soldier, xpOnResist, $"Resisted traumatic event at {distance} range.", true);
                 }
                 else
                 {
                     soldier.TakeTrauma(trauma);
                     transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
-                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " failed to resist the trauma and took " + trauma + " trauma. " + /*(" + rolls + " Resilience check).*/ "He is now " + soldier.GetTraumaState() + ".";
+                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} failed to resist and took {trauma} trauma. He is now {soldier.GetTraumaState()}.";
                 }
             }
             else
             {
                 soldier.TakeTrauma(trauma);
                 transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
-                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = soldier.soldierName + " took " + trauma + " trauma. " + /*(no Resilience check alllowed).*/ "He is now " + soldier.GetTraumaState() + ".";
+                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} took {trauma} trauma. He is now {soldier.GetTraumaState()}.";
             }
             
         }

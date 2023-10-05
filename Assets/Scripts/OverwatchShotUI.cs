@@ -21,7 +21,7 @@ public class OverwatchShotUI : MonoBehaviour
     {
         Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
         Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
-        Item gun = game.itemManager.FindItemById(transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>().value].text);
+        Item gun = shooter.EquippedGun;
         bool resistSuppression = shooter.ResilienceCheck(), resistOverwatchFreeze = target.ResilienceCheck();
         int actingHitChance;
 
@@ -127,7 +127,7 @@ public class OverwatchShotUI : MonoBehaviour
             menu.OpenShotResultUI();
 
             //refresh detections (potentially trigger more overwatch)
-            game.StartCoroutine(game.DetectionAlertSingle(target, "moveChange", Vector3.zero, string.Empty));
+            game.StartCoroutine(game.DetectionAlertSingle(target, "losChange", Vector3.zero, string.Empty, true));
 
             //destroy other overwatch instances
             foreach (Transform child in menu.overwatchShotUI.transform)
@@ -144,7 +144,7 @@ public class OverwatchShotUI : MonoBehaviour
             GameObject shotConfirmUI = transform.Find("ConfirmShotUI").gameObject;
             Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
             Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
-            Item gun = game.itemManager.FindItemById(transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("Gun").Find("GunDropdown").GetComponent<TMP_Dropdown>().value].text);
+            Item gun = shooter.EquippedGun;
             Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
 
             //only shot suppression hit chance if suppressed

@@ -45,10 +45,13 @@ public class SoldierUI : MonoBehaviour
                 linkedSoldier.X = x;
                 linkedSoldier.Y = y;
                 linkedSoldier.Z = z;
+                linkedSoldier.startX = x;
+                linkedSoldier.startY = y;
+                linkedSoldier.startZ = z;
                 linkedSoldier.fielded = true;
                 linkedSoldier.CheckSpecialityColor(linkedSoldier.soldierSpeciality);
                 transform.Find("PopupBox").gameObject.SetActive(false);
-                StartCoroutine(linkedSoldier.game.DetectionAlertSingle(linkedSoldier, "moveChange", Vector3.zero, string.Empty));
+                StartCoroutine(linkedSoldier.game.DetectionAlertSingle(linkedSoldier, "losChange", Vector3.zero, string.Empty, true));
             }
             else
             {

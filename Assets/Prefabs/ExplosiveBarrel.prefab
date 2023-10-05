@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 4380717690802720385}
   - component: {fileID: 4380717690802720384}
   - component: {fileID: 2309383051849836535}
-  - component: {fileID: 3603739637670453529}
+  - component: {fileID: 5756195724281787668}
   m_Layer: 0
-  m_Name: Terminal
+  m_Name: ExplosiveBarrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2a788faceab5c884c8f3313dae0a4c74, type: 2}
+  - {fileID: 2100000, guid: 0ac6dc4482bdb82498c18a9e59a2c83d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,7 +98,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3603739637670453529
+--- !u!114 &5756195724281787668
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,7 +107,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4380717690802720389}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 574bf81b93d489044a21b02e93128742, type: 3}
+  m_Script: {fileID: 11500000, guid: d8c6895da5c07f64e84392cde59fceae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   id: 
@@ -115,6 +115,4 @@ MonoBehaviour:
   x: 0
   y: 0
   z: 0
-  poiType: terminal
-  terminalType: 
-  soldierAlreadyInteracted: []
+  poiType: barrel

@@ -60,7 +60,7 @@ public class Stat
                 if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str"))
                     statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
                 else if (Name == "SR" || Name == "C" || Name == "F" || Name == "P")
-                    statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetectionAlertSingle(statlineBelongsTo.soldierBelongsTo, "statChange", Vector3.zero, string.Empty));
+                    statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetectionAlertSingle(statlineBelongsTo.soldierBelongsTo, "statChange", Vector3.zero, string.Empty, false));
             }
         }
     }
