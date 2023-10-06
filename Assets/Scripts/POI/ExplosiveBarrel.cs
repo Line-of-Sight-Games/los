@@ -11,13 +11,13 @@ public class ExplosiveBarrel : POI, IDataPersistence
         poiType = "barrel";
     }
 
-    public ExplosiveBarrel Init(Vector3 location, string terrain)
+    public ExplosiveBarrel Init(Tuple<Vector3, string> location)
     {
         id = GenerateGuid();
-        x = (int)location.x;
-        y = (int)location.y;
-        z = (int)location.z;
-        terrainOn = terrain;
+        x = (int)location.Item1.x;
+        y = (int)location.Item1.y;
+        z = (int)location.Item1.z;
+        terrainOn = location.Item2;
         MapPhysicalPosition(x, y, z);
 
         return this;

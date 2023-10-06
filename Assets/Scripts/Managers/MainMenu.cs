@@ -48,6 +48,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
         detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist;
+    public Color normalTextColour = new Color(0.196f, 0.196f, 0.196f);
 
     private readonly string[][] allStats =
     {
@@ -968,6 +969,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 buttonStates.Add(shotButton, "Dual Wield"); //TO BE REMOVED AFTER DUAL WIELD RULING
                 buttonStates.Add(overwatchButton, "Dual Wield");
+            }
+            else if (!activeSoldier.EquippedGun.CheckAnyAmmo())
+            {
+                buttonStates.Add(shotButton, "Gun Empty");
+                buttonStates.Add(overwatchButton, "Gun Empty");
             }
 
             //block melee button

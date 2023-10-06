@@ -490,13 +490,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             return null;
     }
-    public Vector3 GetMoveLocation()
+    public bool GetMoveLocation(out Tuple<Vector3, string> moveLocation)
     {
-        return new Vector3(int.Parse(xPos.text), int.Parse(yPos.text), int.Parse(zPos.text));
+        moveLocation = default;
+        if (xPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && yPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && zPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && terrainDropdown.value != 0)
+        {
+            moveLocation = Tuple.Create(new Vector3(int.Parse(xPos.text), int.Parse(yPos.text), int.Parse(zPos.text)), terrainDropdown.options[terrainDropdown.value].text);
+            return true;
+        }
+
+        return false;
     }
     public void ConfirmMove(bool force)
     {
-        //modify AP spend if speed is below 6
         int.TryParse(moveAP.text, out int ap);
 
         if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Planner"))
@@ -513,12 +519,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Exo"))
         {
-            if (terrainDropdown.value != 0)
+            if (GetMoveLocation(out Tuple<Vector3, string> moveToLocation))
             {
-                Vector3 moveToLocation = GetMoveLocation();
-                if (activeSoldier.X != moveToLocation.x || activeSoldier.Y != moveToLocation.y || activeSoldier.Z != moveToLocation.z)
+                if (activeSoldier.X != moveToLocation.Item1.x || activeSoldier.Y != moveToLocation.Item1.y || activeSoldier.Z != moveToLocation.Item1.z)
                 {
-                    if (force || (moveToLocation.x <= activeSoldier.X + 3 && moveToLocation.x >= activeSoldier.X - 3 && moveToLocation.y <= activeSoldier.Y + 3 && moveToLocation.y >= activeSoldier.Y - 3))
+                    if (force || (moveToLocation.Item1.x <= activeSoldier.X + 3 && moveToLocation.Item1.x >= activeSoldier.X - 3 && moveToLocation.Item1.y <= activeSoldier.Y + 3 && moveToLocation.Item1.y >= activeSoldier.Y - 3))
                     {
                         if (CheckAP(ap) && CheckMP(1))
                         {
@@ -534,8 +539,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                     menu.OpenMoveToSameSpotUI();
             }
-            else
-                print("Pick terrain.");
         }
         else
         {
@@ -548,15 +551,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
             else
                 maxMove = activeSoldier.TileMove;
 
-            if (terrainDropdown.value != 0)
+            if (GetMoveLocation(out Tuple<Vector3, string> moveToLocation))
             {
-                Vector3 moveToLocation = GetMoveLocation();
-                if (activeSoldier.X != moveToLocation.x || activeSoldier.Y != moveToLocation.y || activeSoldier.Z != moveToLocation.z)
+                if (activeSoldier.X != moveToLocation.Item1.x || activeSoldier.Y != moveToLocation.Item1.y || activeSoldier.Z != moveToLocation.Item1.z)
                 {
                     //skip supression check if it's already happened before, otherwise run it
                     if (!activeSoldier.IsSuppressed() || (activeSoldier.IsSuppressed() && (moveTypeDropdown.interactable == false || activeSoldier.SuppressionCheck())))
                     {
-                        int distance = CalculateMoveDistance(moveToLocation);
+                        int distance = CalculateMoveDistance(moveToLocation.Item1);
                         if (force || distance <= maxMove)
                         {
                             if (CheckMP(1) && CheckAP(ap))
@@ -573,20 +575,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     menu.OpenMoveToSameSpotUI();
             }
             else
-                print("Pick terrain.");
+                print("Invalid Input");
         }
     }
-    public void PerformMove(Soldier movingSoldier, int ap, Vector3 moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance)
+    public void PerformMove(Soldier movingSoldier, int ap, Tuple<Vector3, string> moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance)
     {
         int.TryParse(fallDistance, out int fallDistanceInt); 
         string launchMelee = string.Empty;
         DeductAP(ap);
         DeductMP(1);
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
-        movingSoldier.X = (int)moveToLocation.x;
-        movingSoldier.Y = (int)moveToLocation.y;
-        movingSoldier.Z = (int)moveToLocation.y;
-        movingSoldier.TerrainOn = terrainDropdown.options[terrainDropdown.value].text;
+        movingSoldier.X = (int)moveToLocation.Item1.x;
+        movingSoldier.Y = (int)moveToLocation.Item1.y;
+        movingSoldier.Z = (int)moveToLocation.Item1.z;
+        movingSoldier.TerrainOn = moveToLocation.Item2;
 
         //activate in cover
         if (coverToggle)
@@ -631,8 +633,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (movingSoldier.IsBroken())
             if (movingSoldier.X == movingSoldier.startX && movingSoldier.Y == movingSoldier.startY && movingSoldier.Z == movingSoldier.startZ)
                 menu.OpenBrokenFledUI();
-
-        print("checkbroken");
     }
 
 
@@ -658,11 +658,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
             UpdateShotType();
             UpdateShotAP(shooter);
 
-            if (shotTypeDropdown.value == 1)
-                UpdateSuppressionValue(shooter);
+            
+            if (shotTypeDropdown.value == 0)
+            {
+                UpdateTargetCover();
+                UpdateTargetFlanking(shooter);
+            }
+            else if (shotTypeDropdown.value == 1)
+                    UpdateSuppressionValue(shooter);
 
-            UpdateTargetCover();
-            UpdateTargetFlanking(shooter);
         } 
     }
     public void UpdateShotType()
@@ -1358,7 +1362,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * TargetHealthMod(target) * ShooterTerrainMod(shooter) * TargetTerrainMod(target) * ElevationMod(shooter, target) * KdMod(shooter) * OverwatchMod(shooter) * FlankingMod(target) * StealthMod(shooter));
         else //cover shot
         {
-            Vector3 coverPosition = GetCoverLocation();
+            GetCoverLocation(out Vector3 coverPosition);
             hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, coverPosition, gun) + 10 * RelevantWeaponSkill(shooter, gun)) * VisMod(shooter) * RainMod(shooter) * WindMod(shooter, coverPosition) * ShooterHealthMod(shooter) * ShooterTerrainMod(shooter) * ElevationMod(shooter, coverPosition));
         }
 
@@ -1391,9 +1395,21 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         return chances;
     }
-    public Vector3 GetCoverLocation()
+    public bool GetCoverLocation(out Vector3 coverLocation)
     {
-        return new Vector3(int.Parse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TextMeshProUGUI>().text), int.Parse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TextMeshProUGUI>().text), int.Parse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TextMeshProUGUI>().text));
+        coverLocation = default;
+        if (menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && 
+            menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
+            menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour)
+        {
+            coverLocation = new Vector3(int.Parse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TMP_InputField>().text),
+                int.Parse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TMP_InputField>().text),
+                int.Parse(menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TMP_InputField>().text));
+
+            return true;
+        }
+
+        return false;
     }
     public void ConfirmShot()
     {
@@ -1540,78 +1556,79 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else //cover shot
             {
-                Vector3 coverLocation = GetCoverLocation();
-                if (PointIsRevealed(shooter, coverLocation))
+                if (GetCoverLocation(out Vector3 coverLocation))
                 {
-                    //deduct ap for aim and shot
-                    DeductAP(ap);
-
-                    gun.SpendSingleAmmo();
-
-                    int randNum1 = RandomNumber(0, 100);
-                    int randNum2 = RandomNumber(0, 100);
-                    Tuple<int, int, int> chances = CalculateHitPercentage(shooter, target, gun);
-                    int coverDamage = CalculateRangeBracket(CalculateRange(shooter, coverLocation)) switch
+                    if (PointIsRevealed(shooter, coverLocation))
                     {
-                        "Melee" or "CQB" => gun.gunCQBCoverDamage,
-                        "Short" => gun.gunShortCoverDamage,
-                        "Medium" => gun.gunMedCoverDamage,
-                        "Long" or "Coriolis" => gun.gunLongCoverDamage,
-                        _ => 0,
-                    };
+                        //deduct ap for aim and shot
+                        DeductAP(ap);
 
-                    //display suppression indicator
-                    if (shooter.IsSuppressed())
-                    {
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+                        gun.SpendSingleAmmo();
 
-                        if (resistSuppression)
+                        int randNum1 = RandomNumber(0, 100);
+                        int randNum2 = RandomNumber(0, 100);
+                        Tuple<int, int, int> chances = CalculateHitPercentage(shooter, target, gun);
+                        int coverDamage = CalculateRangeBracket(CalculateRange(shooter, coverLocation)) switch
                         {
-                            menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                            "Melee" or "CQB" => gun.gunCQBCoverDamage,
+                            "Short" => gun.gunShortCoverDamage,
+                            "Medium" => gun.gunMedCoverDamage,
+                            "Long" or "Coriolis" => gun.gunLongCoverDamage,
+                            _ => 0,
+                        };
+
+                        //display suppression indicator
+                        if (shooter.IsSuppressed())
+                        {
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+
+                            if (resistSuppression)
+                            {
+                                menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                                actingHitChance = chances.Item1;
+                            }
+                            else
+                            {
+                                menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
+                                actingHitChance = chances.Item3;
+                            }
+                        }
+                        else
+                        {
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
                             actingHitChance = chances.Item1;
                         }
+
+                        //show los check button
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+
+                        //standard shot hits cover
+                        if (randNum1 <= actingHitChance)
+                        {
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+
+                            //critical shot hits cover
+                            if (randNum2 <= chances.Item2)
+                                menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
+                            else
+                                menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
+
+                        }
                         else
                         {
-                            menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
-                            actingHitChance = chances.Item3;
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                         }
+
+                        //trigger loud action
+                        shooter.PerformLoudAction();
+
+                        menu.OpenShotResultUI();
+                        menu.CloseShotUI();
                     }
                     else
-                    {
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
-                        actingHitChance = chances.Item1;
-                    }
-
-                    //show los check button
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
-
-                    //standard shot hits cover
-                    if (randNum1 <= actingHitChance)
-                    {
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
-
-                        //critical shot hits cover
-                        if (randNum2 <= chances.Item2)
-                            menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
-                        else
-                            menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
-
-                    }
-                    else
-                    {
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
-                    }
-
-                    //trigger loud action
-                    shooter.PerformLoudAction();
-
-                    menu.OpenShotResultUI();
-                    menu.CloseShotUI();
+                        print("Point not revealed.");
                 }
-                else
-                    print("Point not revealed.");
-
             }
         }
         else
@@ -2843,7 +2860,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
         {
             //check input
-            if (menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
+            if (GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation))
             {
                 if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Fall"))
                     activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(menu.damageEventUI.transform.Find("FallDistance").Find("FallInputZ").GetComponent<TMP_InputField>().text)), false, new List<string> { "Fall" });
@@ -2872,18 +2889,32 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
 
                 //move actually proceeds
-                PerformMove(activeSoldier, 0, GetFallOrCollapseLocation(), false, false, string.Empty);
+                PerformMove(activeSoldier, 0, fallCollapseLocation, false, false, string.Empty);
 
                 menu.CloseDamageEventUI();
 
             }
             else
-                print("Pick Terrain");
+                print("Invalid Input");
         }
     }
-    public Vector3 GetFallOrCollapseLocation()
+    public bool GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation)
     {
-        return new Vector3(int.Parse(menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text), int.Parse(menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text), int.Parse(menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text));
+        fallCollapseLocation = default;
+        if (menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
+            menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
+            menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
+            menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
+        {
+            fallCollapseLocation = Tuple.Create(new Vector3(int.Parse(menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text),
+                int.Parse(menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text),
+                int.Parse(menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text)), 
+                menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text);
+
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -3697,25 +3728,38 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_Dropdown terminalTypeDropdown = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").Find("TerminalTypeDropdown").GetComponent<TMP_Dropdown>();
 
         int spawnedObject = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ObjectType").Find("ObjectTypeDropdown").GetComponent<TMP_Dropdown>().value;
-        Vector3 spawnLocation = GetInsertLocation();
         //check input formatting
-        if (spawnedObject != 0 && terrrainDropdownLocal.value != 0)
+        if (spawnedObject != 0 && GetInsertLocation(out Tuple<Vector3, string> spawnLocation))
         {
             if (spawnedObject == 1)
-                Instantiate(gbPrefab).Init(spawnLocation, terrrainDropdownLocal.options[terrrainDropdownLocal.value].text);
+                Instantiate(gbPrefab).Init(spawnLocation);
             else if (spawnedObject == 2)
-                Instantiate(terminalPrefab).Init(spawnLocation, terrrainDropdownLocal.options[terrrainDropdownLocal.value].text, terminalTypeDropdown.options[terminalTypeDropdown.value].text);
+                Instantiate(terminalPrefab).Init(spawnLocation, terminalTypeDropdown.options[terminalTypeDropdown.value].text);
             else if (spawnedObject == 3)
-                Instantiate(barrelPrefab).Init(spawnLocation, terrrainDropdownLocal.options[terrrainDropdownLocal.value].text);
+                Instantiate(barrelPrefab).Init(spawnLocation);
 
             menu.CloseOverrideInsertObjectsUI();
         }
         else
-            print("Pick object type or terrain.");
+            print("Invalid Input");
     }
-    public Vector3 GetInsertLocation()
+    public bool GetInsertLocation(out Tuple<Vector3, string> insertLocation)
     {
-        return new Vector3(int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text), int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>().text), int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text));
+        insertLocation = default;
+        if (menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
+            menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
+            menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
+            menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").Find("TerminalTypeDropdown").GetComponent<TMP_Dropdown>().value != 0)
+        {
+            insertLocation = Tuple.Create(new Vector3(int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text),
+                int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text),
+                int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text)),
+                menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").Find("TerminalTypeDropdown").GetComponent<TMP_Dropdown>().options[menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").Find("TerminalTypeDropdown").GetComponent<TMP_Dropdown>().value].text);
+
+            return true;
+        }
+
+        return false;
     }
     public void UpdateInsertGameObjectsUI()
     {
