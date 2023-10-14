@@ -260,7 +260,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	}
 	public void RandomTerrain()
     {
-		Debug.Log("random terrain");
+		print("random terrain");
 		if (soldierIdentifier.text.Contains("Commander"))
 		{
 			bool checkingValid = true;
@@ -336,7 +336,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	{
 		if (CheckValidDetails())
 		{
-			Debug.Log(soldierName.text + ": " + terrainDropdown.options[terrainDropdown.value].text + " " + GetSpeciality() + " " + abilityDropdown.options[abilityDropdown.value].text);
+			print(soldierName.text + ": " + terrainDropdown.options[terrainDropdown.value].text + " " + GetSpeciality() + " " + abilityDropdown.options[abilityDropdown.value].text);
 			Instantiate(baseSoldier).Init(soldierName.text, currentTeam, terrainDropdown.options[terrainDropdown.value].text, activePortraitDropdown.options[activePortraitDropdown.value].image, activePortraitDropdown.options[activePortraitDropdown.value].text, GetSpeciality(), abilityDropdown.options[abilityDropdown.value].text);
 
 			//refresh input fields and exclude previously chosen options
@@ -397,7 +397,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				terrainDropdown.GetComponent<DropdownController>().optionsToGrey.AddRange(selectedCommanderTerrains);
         }
 		else
-			Debug.Log("Details invalid.");
+			print("Details invalid.");
 	}
 
 	public string GetSpeciality()

@@ -15,24 +15,24 @@ public class SoundManager : MonoBehaviour
     {
         if (!banzaiPlayed)
         {
-            //Debug.Log("played banzai");
+            //print("played banzai");
             noisePlayer.PlayOneShot(banzai);
             banzaiPlayed = true;
         }
     }
     public void PlayOverrideAlarm()
     {
-        //Debug.Log("played override alarm");
+        //print("played override alarm");
         noisePlayer.PlayOneShot(overrideAlarm);
     }
     public void PlayDetectionAlarm()
     {
-        //Debug.Log("played detection alarm");
+        //print("played detection alarm");
         noisePlayer.PlayOneShot(detectionAlarm);
     }
     public void PlayButtonPress()
     {
-        //Debug.Log("played button press");
+        //print("played button press");
         noisePlayer.PlayOneShot(buttonPress);
     }
 

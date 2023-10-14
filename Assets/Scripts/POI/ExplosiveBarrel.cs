@@ -1,14 +1,16 @@
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ExplosiveBarrel : POI, IDataPersistence
+public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable
 {
+    public MainMenu menu;
+    public MainGame game;
     private void Start()
     {
         poiType = "barrel";
+        menu = FindObjectOfType<MainMenu>();
+        game = FindObjectOfType<MainGame>();
     }
 
     public ExplosiveBarrel Init(Tuple<Vector3, string> location)
@@ -52,5 +54,44 @@ public class ExplosiveBarrel : POI, IDataPersistence
             data.allPOIDetails.Remove(id);
 
         data.allPOIDetails.Add(id, details);
+    }
+
+    public IEnumerator ExplosionCheck(Soldier explodedBy)
+    {
+        //imperceptible delay to allow colliders to be recalculated at new destination
+        yield return new WaitUntil(() => menu.shotResolvedFlag == true);
+        bool showExplosionUI = false;
+        
+        foreach (Soldier s in game.AllSoldiers())
+        {
+            if (s.IsAlive())
+            {
+                if (s.PhysicalObjectWithinRadius(this, 3))
+                {
+                    menu.AddExplosionAlert(s, explodedBy, 8);
+                    showExplosionUI = true;
+                }
+                else if (s.PhysicalObjectWithinRadius(this, 8))
+                {
+                    menu.AddExplosionAlert(s, explodedBy, 4);
+                    showExplosionUI = true;
+                }
+                else if (s.PhysicalObjectWithinRadius(this, 15))
+                {
+                    menu.AddExplosionAlert(s, explodedBy, 2);
+                    showExplosionUI = true;
+                }
+            }
+        }
+
+        if (showExplosionUI)
+        {
+            yield return new WaitUntil(() => menu.meleeResolvedFlag == true);
+            menu.OpenExplosionUI();
+        }
+    }
+    public string Id 
+    { 
+        get { return id; } 
     }
 }

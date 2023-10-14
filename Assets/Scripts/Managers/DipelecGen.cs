@@ -165,6 +165,32 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         savedElec.Add(l6Elec[0]);
     }
 
+    public string GetLevelDip(int level)
+    {
+        return _ = level switch
+        {
+            1 => L1Dip,
+            2 => L2Dip,
+            3 => L3Dip,
+            4 => L4Dip,
+            5 => L5Dip,
+            6 => L6Dip,
+            _ => "",
+        };
+    }
+    public string GetLevelElec(int level)
+    {
+        return _ = level switch
+        {
+            1 => L1Elec,
+            2 => L2Elec,
+            3 => L3Elec,
+            4 => L4Elec,
+            5 => L5Elec,
+            6 => L6Elec,
+            _ => "",
+        };
+    }
     public string L1Dip
     {
         get { return savedDip[0]; }

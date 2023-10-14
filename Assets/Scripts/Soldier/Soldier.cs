@@ -8,9 +8,8 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
-using System.Runtime.InteropServices.WindowsRuntime;
 
-public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
+public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable
 {
     public Dictionary<string, object> details;
     public string soldierName, soldierTerrain, soldierSpeciality;
@@ -19,10 +18,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, bloodLettedThisTurn;
+    public bool fielded, selected, revealed, usedAP, usedMP, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, 
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, 
         timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
     public string revealedByTeam, lastChosenStat, poisonedBy;
     public Statline stats;
@@ -78,7 +77,221 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
         return this;
     }
+    public void SaveData(ref GameData data)
+    {
+        details = new Dictionary<string, object>();
 
+        //save basic information
+        details.Add("soldierName", soldierName);
+        details.Add("team", soldierTeam);
+        details.Add("terrain", soldierTerrain);
+        details.Add("portrait", soldierPortraitText);
+        details.Add("speciality", soldierSpeciality);
+        details.Add("abilities", soldierAbilities);
+        details.Add("displayPriority", soldierDisplayPriority);
+        details.Add("fielded", fielded);
+        details.Add("hp", hp);
+        details.Add("ap", ap);
+        details.Add("mp", mp);
+        details.Add("tp", tp);
+        details.Add("xp", xp);
+        details.Add("rank", rank);
+        details.Add("state", state);
+
+        //save position
+        details.Add("x", x);
+        details.Add("y", y);
+        details.Add("z", z);
+        details.Add("terrainOn", terrainOn);
+
+        //save statline
+        details.Add("stats", stats.AllStats);
+        details.Add("instantSpeed", instantSpeed);
+
+        //save inventory
+        details.Add("inventory", Inventory.AllItemIds);
+        details.Add("inventorySlots", inventorySlots);
+
+        //save list of revealing soldiers
+        details.Add("revealingSoldiers", revealingSoldiersList);
+
+        //save list of revealed by soldiers
+        details.Add("revealedBySoldiers", revealedBySoldiersList);
+
+        //save list of controlling soldiers
+        details.Add("controllingSoldiers", controllingSoldiersList);
+
+        //save list of controlled by soldiers
+        details.Add("controlledBySoldiers", controlledBySoldiersList);
+
+        //save other details
+        details.Add("roundsFielded", roundsFielded);
+        details.Add("roundsFieldedConscious", roundsFieldedConscious);
+        details.Add("roundsWithoutFood", roundsWithoutFood);
+        details.Add("revealed", revealed);
+        details.Add("usedAP", usedAP);
+        details.Add("usedMP", usedMP);
+        details.Add("loudActionRoundsVulnerable", loudActionRoundsVulnerable);
+        details.Add("stunnedRoundsVulnerable", stunnedRoundsVulnerable);
+        details.Add("overwatchShotCounter", overwatchShotCounter);
+        details.Add("revealedByTeam", revealedByTeam);
+
+        details.Add("lastChosenStat", lastChosenStat);
+        details.Add("suppressionValue", suppressionValue);
+        details.Add("healthRemovedFromStarve", healthRemovedFromStarve);
+        details.Add("fighterHitCount", fighterHitCount);
+        details.Add("plannerDonatedMove", plannerDonatedMove);
+        details.Add("poisonedBy", poisonedBy);
+        details.Add("timesBloodlet", timesBloodlet);
+        details.Add("bloodLettedThisTurn", bloodLettedThisTurn);
+        details.Add("illusionedThisMove", illusionedThisMove);
+        details.Add("hasKilled", hasKilled);
+        details.Add("guardsmanRetryUsed", guardsmanRetryUsed);
+
+        details.Add("overwatchFirstShotUsed", overwatchFirstShotUsed);
+        details.Add("witnessActiveAbilities", witnessActiveAbilities);
+        details.Add("witnessStoredAbilities", witnessStoredAbilities);
+        details.Add("overwatchXPoint", overwatchXPoint);
+        details.Add("overwatchYPoint", overwatchYPoint);
+        details.Add("overwatchConeRadius", overwatchConeRadius);
+        details.Add("overwatchConeArc", overwatchConeArc);
+        details.Add("startX", startX);
+        details.Add("startY", startY);
+        details.Add("startZ", startZ);
+
+        //add the soldier in
+        if (data.allSoldiersDetails.ContainsKey(id))
+            data.allSoldiersDetails.Remove(id);
+
+        data.allSoldiersDetails.Add(id, details);
+    }
+
+    public void LoadData(GameData data)
+    {
+        data.allSoldiersDetails.TryGetValue(id, out details);
+        //print(id);
+        soldierName = (string)details["soldierName"];
+        soldierTeam = Convert.ToInt32(details["team"]);
+        soldierTerrain = (string)details["terrain"];
+        //load portrait
+        soldierPortrait = LoadPortrait((string)details["portrait"]);
+        soldierPortraitText = (string)details["portrait"];
+        soldierSpeciality = (string)details["speciality"];
+        //load abilities
+        soldierAbilities = new();
+        soldierAbilitiesJArray = (JArray)details["abilities"];
+        foreach (string ability in soldierAbilitiesJArray)
+            soldierAbilities.Add(ability);
+
+        soldierDisplayPriority = Convert.ToInt32(details["displayPriority"]);
+        fielded = (bool)details["fielded"];
+        hp = Convert.ToInt32(details["hp"]);
+        ap = Convert.ToInt32(details["ap"]);
+        mp = Convert.ToInt32(details["mp"]);
+        tp = Convert.ToInt32(details["tp"]);
+        xp = Convert.ToInt32(details["xp"]);
+        rank = (string)details["rank"];
+
+        //load state
+        state = new();
+        stateJArray = (JArray)details["state"];
+        foreach (string stateString in stateJArray)
+            SetState(stateString);
+
+        //load position
+        x = Convert.ToInt32(details["x"]);
+        y = Convert.ToInt32(details["y"]);
+        z = Convert.ToInt32(details["z"]);
+        terrainOn = (string)details["terrainOn"];
+        MapPhysicalPosition(x, y, z);
+
+        //load stats
+        stats = new Statline(this);
+        statsJArray = (JArray)details["stats"];
+        foreach (JObject stat in statsJArray)
+        {
+            stats.SetStat(stat.GetValue("Name").ToString(), (int)stat.GetValue("BaseVal"));
+        }
+        instantSpeed = Convert.ToInt32(details["instantSpeed"]);
+
+        //load items
+        inventory = new Inventory(this);
+        itemsJArray = (JArray)details["inventory"];
+        foreach (string itemId in itemsJArray)
+            inventoryList.Add(itemId);
+
+        inventorySlots = JsonConvert.DeserializeObject<Dictionary<string, string>>(details["inventorySlots"].ToString());
+
+        //load list of revealing soldiers
+        revealingSoldiersList = new();
+        revealingSoldiersJArray = (JArray)details["revealingSoldiers"];
+        foreach (string soldierId in revealingSoldiersJArray)
+            revealingSoldiersList.Add(soldierId);
+
+        //load list of revealed by soldiers
+        revealedBySoldiersList = new();
+        revealedBySoldiersJArray = (JArray)details["revealedBySoldiers"];
+        foreach (string soldierId in revealedBySoldiersJArray)
+            revealedBySoldiersList.Add(soldierId);
+
+        //load list of controlling soldiers
+        controllingSoldiersList = new();
+        controllingSoldiersJArray = (JArray)details["controllingSoldiers"];
+        foreach (string soldierId in controllingSoldiersJArray)
+            controllingSoldiersList.Add(soldierId);
+
+        //load list of controlled by soldiers
+        controlledBySoldiersList = new();
+        controlledBySoldiersJArray = (JArray)details["controlledBySoldiers"];
+        foreach (string soldierId in controlledBySoldiersJArray)
+        {
+            controlledBySoldiersList.Add(soldierId);
+        }
+
+        //load other details
+        roundsFielded = Convert.ToInt32(details["roundsFielded"]);
+        roundsFieldedConscious = Convert.ToInt32(details["roundsFieldedConscious"]);
+        roundsWithoutFood = Convert.ToInt32(details["roundsWithoutFood"]);
+        revealed = (bool)details["revealed"];
+        usedAP = (bool)details["usedAP"];
+        usedMP = (bool)details["usedMP"];
+        loudActionRoundsVulnerable = Convert.ToInt32(details["loudActionRoundsVulnerable"]);
+        stunnedRoundsVulnerable = Convert.ToInt32(details["stunnedRoundsVulnerable"]);
+        overwatchShotCounter = Convert.ToInt32(details["overwatchShotCounter"]);
+        revealedByTeam = (string)details["revealedByTeam"];
+        lastChosenStat = (string)details["lastChosenStat"];
+        suppressionValue = Convert.ToInt32(details["suppressionValue"]);
+        healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
+        fighterHitCount = Convert.ToInt32(details["fighterHitCount"]);
+        plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
+        poisonedBy = (string)details["poisonedBy"];
+        bloodLettedThisTurn = (bool)details["bloodLettedThisTurn"];
+        illusionedThisMove = (bool)details["illusionedThisMove"];
+        hasKilled = (bool)details["hasKilled"];
+        overwatchFirstShotUsed = (bool)details["overwatchFirstShotUsed"];
+        guardsmanRetryUsed = (bool)details["guardsmanRetryUsed"];
+
+        //load witness stored active abilities
+        witnessActiveAbilities = new();
+        witnessActiveAbilitiesJArray = (JArray)details["witnessActiveAbilities"];
+        foreach (string ability in witnessActiveAbilitiesJArray)
+            witnessActiveAbilities.Add(ability);
+        //load witness stored loading abilities
+        witnessStoredAbilities = new();
+        witnessStoredAbilitiesJArray = (JArray)details["witnessStoredAbilities"];
+        foreach (string ability in witnessStoredAbilitiesJArray)
+            witnessStoredAbilities.Add(ability);
+        overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
+        overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
+        overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
+        overwatchConeArc = Convert.ToInt32(details["overwatchConeArc"]);
+        startX = Convert.ToInt32(details["startX"]);
+        startY = Convert.ToInt32(details["startY"]);
+        startZ = Convert.ToInt32(details["startZ"]);
+
+        //link to maingame object
+        game = FindObjectOfType<MainGame>();
+    }
     public Soldier LinkWithUI(GameObject displayPanel)
     {
         soldierUI = Instantiate(soldierUIPrefab, displayPanel.transform);
@@ -247,6 +460,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         else
             return false;
     }
+    public bool IsHidden()
+    {
+        return !IsRevealed();
+    }
     public bool IsRevealing(string id)
     {
         if (IsAbleToSee() && RevealingSoldiers.Contains(id))
@@ -280,14 +497,26 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         Inventory.AddItemToSlot(item, slotName);
         item.RunPickupEffect();
     }
-    public void BrokenDropAllItems()
+    public void BrokenDropAllItemsExceptArmour()
     {
         List<Item> itemList = new();
         foreach (Item item in Inventory.AllItems)
-            itemList.Add(item);
+            if (!item.itemName.Contains("Armour"))
+                itemList.Add(item);
 
         foreach (Item item in itemList)
             DropItem(item);
+    }
+    public void FrozenMultiShot()
+    {
+        if (HasGunEquipped())
+        {
+            if (EquippedGun.CheckAnyAmmo())
+            {
+                StartCoroutine(menu.CreateOverwatchShotUI(this, ClosestEnemyVisible()));
+                StartCoroutine(menu.OpenOverwatchShotUI());
+            }
+        }
     }
     public void DestroyAllItems()
     {
@@ -387,7 +616,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public int RankDifferenceTo(Soldier s)
     {
-        Debug.Log((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
+        print((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
         return (int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f));
     }
     public string GetTraumaState()
@@ -416,209 +645,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         return stats;
     }
 
-    public void SaveData(ref GameData data)
-    {
-        details = new Dictionary<string, object>();
-
-        //save basic information
-        details.Add("soldierName", soldierName);
-        details.Add("team", soldierTeam);
-        details.Add("terrain", soldierTerrain);
-        details.Add("portrait", soldierPortraitText);
-        details.Add("speciality", soldierSpeciality);
-        details.Add("abilities", soldierAbilities);
-        details.Add("displayPriority", soldierDisplayPriority);
-        details.Add("fielded", fielded);
-        details.Add("hp", hp);
-        details.Add("ap", ap);
-        details.Add("mp", mp);
-        details.Add("tp", tp);
-        details.Add("xp", xp);
-        details.Add("rank", rank);
-        details.Add("state", state);
-
-        //save position
-        details.Add("x", x);
-        details.Add("y", y);
-        details.Add("z", z);
-        details.Add("terrainOn", terrainOn);
-
-        //save statline
-        details.Add("stats", stats.AllStats);
-        details.Add("instantSpeed", instantSpeed);
-
-        //save inventory
-        details.Add("inventory", Inventory.AllItemIds);
-        details.Add("inventorySlots", inventorySlots);
-
-        //save list of revealing soldiers
-        details.Add("revealingSoldiers", revealingSoldiersList);
-
-        //save list of revealed by soldiers
-        details.Add("revealedBySoldiers", revealedBySoldiersList);
-
-        //save list of controlling soldiers
-        details.Add("controllingSoldiers", controllingSoldiersList);
-
-        //save list of controlled by soldiers
-        details.Add("controlledBySoldiers", controlledBySoldiersList);
-
-        //save other details
-        details.Add("roundsFielded", roundsFielded);
-        details.Add("roundsFieldedConscious", roundsFieldedConscious);
-        details.Add("roundsWithoutFood", roundsWithoutFood);
-        details.Add("revealed", revealed);
-        details.Add("usedAP", usedAP);
-        details.Add("usedMP", usedMP);
-        details.Add("loudActionRoundsVulnerable", loudActionRoundsVulnerable);
-        details.Add("stunnedRoundsVulnerable", stunnedRoundsVulnerable);
-        details.Add("revealedByTeam", revealedByTeam);
-        
-        details.Add("lastChosenStat", lastChosenStat);
-        details.Add("suppressionValue", suppressionValue);
-        details.Add("healthRemovedFromStarve", healthRemovedFromStarve);
-        details.Add("fighterHitCount", fighterHitCount);
-        details.Add("plannerDonatedMove", plannerDonatedMove);
-        details.Add("poisonedBy", poisonedBy);
-        details.Add("timesBloodlet", timesBloodlet);
-        details.Add("bloodLettedThisTurn", bloodLettedThisTurn);
-        details.Add("witnessActiveAbilities", witnessActiveAbilities);
-        details.Add("witnessStoredAbilities", witnessStoredAbilities);
-        details.Add("overwatchXPoint", overwatchXPoint);
-        details.Add("overwatchYPoint", overwatchYPoint);
-        details.Add("overwatchConeRadius", overwatchConeRadius);
-        details.Add("overwatchConeArc", overwatchConeArc);
-        details.Add("startX", startX);
-        details.Add("startY", startY);
-        details.Add("startZ", startZ);
-
-        //add the soldier in
-        if (data.allSoldiersDetails.ContainsKey(id))
-            data.allSoldiersDetails.Remove(id);
-
-        data.allSoldiersDetails.Add(id, details);
-    }
-
-    public void LoadData(GameData data)
-    {
-        data.allSoldiersDetails.TryGetValue(id, out details);
-        //Debug.Log(id);
-        soldierName = (string)details["soldierName"];
-        soldierTeam = Convert.ToInt32(details["team"]);
-        soldierTerrain = (string)details["terrain"];
-        //load portrait
-        soldierPortrait = LoadPortrait((string)details["portrait"]);
-        soldierPortraitText = (string)details["portrait"];
-        soldierSpeciality = (string)details["speciality"];
-        //load abilities
-        soldierAbilities = new();
-        soldierAbilitiesJArray = (JArray)details["abilities"];
-        foreach (string ability in soldierAbilitiesJArray)
-            soldierAbilities.Add(ability);
-
-        soldierDisplayPriority = Convert.ToInt32(details["displayPriority"]);
-        fielded = (bool)details["fielded"];
-        hp = Convert.ToInt32(details["hp"]);
-        ap = Convert.ToInt32(details["ap"]);
-        mp = Convert.ToInt32(details["mp"]);
-        tp = Convert.ToInt32(details["tp"]);
-        xp = Convert.ToInt32(details["xp"]);
-        rank = (string)details["rank"];
-
-        //load state
-        state = new();
-        stateJArray = (JArray)details["state"];
-        foreach (string stateString in stateJArray)
-            SetState(stateString);
-
-        //load position
-        x = Convert.ToInt32(details["x"]);
-        y = Convert.ToInt32(details["y"]);
-        z = Convert.ToInt32(details["z"]);
-        terrainOn = (string)details["terrainOn"];
-        MapPhysicalPosition(x, y, z);
-
-        //load stats
-        stats = new Statline(this);
-        statsJArray = (JArray)details["stats"];
-        foreach (JObject stat in statsJArray)
-        {
-            stats.SetStat(stat.GetValue("Name").ToString(), (int)stat.GetValue("BaseVal"));
-        }
-        instantSpeed = Convert.ToInt32(details["instantSpeed"]);
-
-        //load items
-        inventory = new Inventory(this);
-        itemsJArray = (JArray)details["inventory"];
-        foreach (string itemId in itemsJArray)
-            inventoryList.Add(itemId);
-
-        inventorySlots = JsonConvert.DeserializeObject<Dictionary<string, string>>(details["inventorySlots"].ToString());
-
-        //load list of revealing soldiers
-        revealingSoldiersList = new();
-        revealingSoldiersJArray = (JArray)details["revealingSoldiers"];
-        foreach (string soldierId in  revealingSoldiersJArray)
-            revealingSoldiersList.Add(soldierId);
-
-        //load list of revealed by soldiers
-        revealedBySoldiersList = new();
-        revealedBySoldiersJArray = (JArray)details["revealedBySoldiers"];
-        foreach (string soldierId in revealedBySoldiersJArray)
-            revealedBySoldiersList.Add(soldierId);
-
-        //load list of controlling soldiers
-        controllingSoldiersList = new();
-        controllingSoldiersJArray = (JArray)details["controllingSoldiers"];
-        foreach (string soldierId in controllingSoldiersJArray)
-            controllingSoldiersList.Add(soldierId);
-
-        //load list of controlled by soldiers
-        controlledBySoldiersList = new();
-        controlledBySoldiersJArray = (JArray)details["controlledBySoldiers"];
-        foreach (string soldierId in controlledBySoldiersJArray)
-        {
-            controlledBySoldiersList.Add(soldierId);
-        }
-
-        //load other details
-        roundsFielded = Convert.ToInt32(details["roundsFielded"]);
-        roundsFieldedConscious = Convert.ToInt32(details["roundsFieldedConscious"]);
-        roundsWithoutFood = Convert.ToInt32(details["roundsWithoutFood"]);
-        revealed = (bool)details["revealed"];
-        usedAP = (bool)details["usedAP"];
-        usedMP = (bool)details["usedMP"];
-        loudActionRoundsVulnerable = Convert.ToInt32(details["loudActionRoundsVulnerable"]);
-        stunnedRoundsVulnerable = Convert.ToInt32(details["stunnedRoundsVulnerable"]);
-        revealedByTeam = (string)details["revealedByTeam"];
-        lastChosenStat = (string)details["lastChosenStat"];
-        suppressionValue = Convert.ToInt32(details["suppressionValue"]);
-        healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
-        fighterHitCount = Convert.ToInt32(details["fighterHitCount"]);
-        plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
-        poisonedBy = (string)details["poisonedBy"];
-        bloodLettedThisTurn = (bool)details["bloodLettedThisTurn"];
-        //load witness stored active abilities
-        witnessActiveAbilities = new();
-        witnessActiveAbilitiesJArray = (JArray)details["witnessActiveAbilities"];
-        foreach (string ability in witnessActiveAbilitiesJArray)
-            witnessActiveAbilities.Add(ability);
-        //load witness stored loading abilities
-        witnessStoredAbilities = new();
-        witnessStoredAbilitiesJArray = (JArray)details["witnessStoredAbilities"];
-        foreach (string ability in witnessStoredAbilitiesJArray)
-            witnessStoredAbilities.Add(ability);
-        overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
-        overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
-        overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
-        overwatchConeArc = Convert.ToInt32(details["overwatchConeArc"]);
-        startX = Convert.ToInt32(details["startX"]);
-        startY = Convert.ToInt32(details["startY"]);
-        startZ = Convert.ToInt32(details["startZ"]);
-
-        //link to maingame object
-        game = FindObjectOfType<MainGame>();
-    }
     private void Update()
     {
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
@@ -1178,11 +1204,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
             //perform frozen shenanigans
             if (tp == 3)
-                print("performing frozen shenanigans");
+            {
+                FrozenMultiShot();
+            }
 
             //drop all items for broken
             if (tp == 4)
-                BrokenDropAllItems();
+                BrokenDropAllItemsExceptArmour();
         }
     }
 
@@ -1193,7 +1221,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             if (resurrectEnabled)
                 Resurrect(heal);
             else
-                Debug.Log("Can't heal a dead soldier");
+                print("Can't heal a dead soldier");
         }
         else
         {
@@ -1272,7 +1300,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
                 carryWeight += i.weight;
         }
 
-        //Debug.Log("Carry Weight: " + carryWeight);
+        //print("Carry Weight: " + carryWeight);
         return carryWeight;
     }
     public int ApplyTerrainModsMove()
@@ -1284,7 +1312,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         else if (IsOnOppositeTerrain())
             terrainModMove = -1;
 
-        //Debug.Log("Terrain Mod Move: " + terrainModMove);
+        //print("Terrain Mod Move: " + terrainModMove);
         return terrainModMove;
     }
     public float ApplyVisModsMove()
@@ -1304,7 +1332,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             };
         }
 
-        //Debug.Log("Vis Mod Move: " + visModMove);
+        //print("Vis Mod Move: " + visModMove);
         return 1 - visModMove;
     }
 
@@ -1317,7 +1345,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             _ => 0.0f,
         };
 
-        //Debug.Log("Rain Mod Move: " + rainModMove);
+        //print("Rain Mod Move: " + rainModMove);
         return 1 - rainModMove;
     }
 
@@ -1330,7 +1358,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         else if (RoundsWithoutFood >= 10)
             sustenanceModMove = 0.2f;
 
-        //Debug.Log("Sustenance Mod Move: " + sustenanceModMove);
+        //print("Sustenance Mod Move: " + sustenanceModMove);
         return 1 - sustenanceModMove;
     }
 
@@ -1344,7 +1372,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             _ => 0.0f,
         };
 
-        //Debug.Log("Trauma Mod Move: " + traumaModMove);
+        //print("Trauma Mod Move: " + traumaModMove);
         return 1 - traumaModMove;
     }
 
@@ -1366,7 +1394,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         float kdModMove = (2 * GetKd() / 100f);
 
-        //Debug.Log("Kd Mod Move: " + kdModMove);
+        //print("Kd Mod Move: " + kdModMove);
         return 1 - kdModMove;
     }
 
@@ -1374,7 +1402,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         float suppressionModMove = (suppressionValue / 100f);
 
-        //Debug.Log("Suppression Mod Move: " + suppressionModMove);
+        //print("Suppression Mod Move: " + suppressionModMove);
         return 1 - suppressionModMove;
     }
     public void DisplayStats()
@@ -1795,7 +1823,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     public void SetLoudRevealed(int rounds)
     {
         loudActionRoundsVulnerable = rounds;
-        Debug.Log(soldierName + " is vulnerable to detection for " + rounds + " rounds.");
+        print(soldierName + " is vulnerable to detection for " + rounds + " rounds.");
     }
 
     public bool IsSuppressed()
@@ -1841,7 +1869,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     public void SetStunned(int rounds)
     {
         stunnedRoundsVulnerable = rounds;
-        Debug.Log(soldierName + " is Stunned for " + rounds + " rounds.");
     }
 
     public bool IsPoisoned()
@@ -1877,17 +1904,55 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         overwatchYPoint = y;
         overwatchConeRadius = r;
         overwatchConeArc = a;
+        guardsmanRetryUsed = false;
+        if (IsGuardsman())
+            overwatchShotCounter = 2;
+        else
+            overwatchShotCounter = 1;
         SetState("Overwatch");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
+    public void DecrementOverwatch()
+    {
+        if (IsOnOverwatch())
+        {
+            if (!IsGuardsman()) 
+            {
+                overwatchShotCounter--;
+                guardsmanRetryUsed = false;
+                menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+            }
+            else
+            {
+                if (guardsmanRetryUsed)
+                {
+                    overwatchShotCounter--;
+                    guardsmanRetryUsed = false;
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+                }
+                else
+                {
+                    guardsmanRetryUsed = true;
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
+                }
+            }
+
+            if (overwatchShotCounter == 0)
+                UnsetOverwatch();
+        }
+    }
     public void UnsetOverwatch()
     {
-        overwatchXPoint = 0;
-        overwatchYPoint = 0;
-        overwatchConeRadius = 0;
-        overwatchConeArc = 0;
-        UnsetState("Overwatch");
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+        if (IsOnOverwatch())
+        {
+            overwatchShotCounter = 0;
+            overwatchXPoint = 0;
+            overwatchYPoint = 0;
+            overwatchConeRadius = 0;
+            overwatchConeArc = 0;
+            UnsetState("Overwatch");
+            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+        }
     }
     public bool IsBloodRaged()
     {
@@ -1947,7 +2012,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             //remove all engagements
             if (IsMeleeEngaged())
                 StartCoroutine(game.DetermineMeleeControllerMultiple(this));
-            
+
+            if (ResilienceCheck())
+                menu.AddDamageAlert(this, $"{this.soldierName} resisted being stanned for {stunnedRoundsVulnerable} rounds.", true, true);
+            else
+                menu.AddDamageAlert(this, $"{this.soldierName} suffered stun for {stunnedRoundsVulnerable}.", true, true);
+
             StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         }
     }
@@ -1983,7 +2053,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         ClearHealthState();
         SetState("Active");
-        Debug.Log(soldierName + " returns to service.");
+        print(soldierName + " returns to service.");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
     public void MakeLastStand()
@@ -2009,7 +2079,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
-        Debug.Log(soldierName + " is Unconscious.");
+        print(soldierName + " is Unconscious.");
     }
     public void Resurrect(int hp)
     {
@@ -2064,20 +2134,26 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
             //re-render as dead
             CheckSpecialityColor(soldierSpeciality);
 
-            //pay xp for relevant damage type kill
-            if (damageSource.Contains("Shot"))
-                menu.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
-            else if (damageSource.Contains("Melee"))
+            if (killedBy != null)
             {
-                if (damageSource.Contains("Counter"))
-                    menu.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
-                else
-                    menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
+                //pay xp for relevant damage type kill
+                if (damageSource.Contains("Shot"))
+                    menu.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
+                else if (damageSource.Contains("Melee"))
+                {
+                    if (damageSource.Contains("Counter"))
+                        menu.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
+                    else
+                        menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
-                killedBy.FighterMeleeKillReward();
+                    killedBy.FighterMeleeKillReward();
+                }
+                else if (damageSource.Contains("Poison"))
+                    menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
+
+                //set haskilled flag for avenger
+                killedBy.hasKilled = true;
             }
-            else if (damageSource.Contains("Poison"))
-                menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
         }
     }
 
@@ -2168,11 +2244,99 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
 
         return false;
     }
+    public bool TerminalInRange()
+    {
+        foreach (Terminal t in FindObjectsOfType<Terminal>())
+            if (PhysicalObjectWithinMeleeRadius(t))
+                return true;
+        return false;
+    }
+    public Terminal ClosestTerminal()
+    {
+        if (TerminalInRange())
+        {
+            List<Tuple<float, Terminal>> soldierDistanceToTerminals = new();
 
+            foreach (Terminal t in FindObjectsOfType<Terminal>())
+                soldierDistanceToTerminals.Add(Tuple.Create(game.CalculateRange(this, t), t));
 
+            soldierDistanceToTerminals = soldierDistanceToTerminals.OrderBy(t => t.Item1).ToList();
 
+            if (soldierDistanceToTerminals.Count > 0)
+                return soldierDistanceToTerminals[0].Item2;
+        }
 
+        return null;
+    }
+    public Soldier ClosestAlly()
+    {
+        List<Tuple<float, Soldier>> soldierDistances = new();
 
+        foreach (Soldier s in game.AllSoldiers())
+            if (s.IsSameTeamAs(this))
+                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+
+        soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
+
+        if (soldierDistances.Count > 0)
+            return soldierDistances[0].Item2;
+
+        return null;
+    }
+    public Soldier ClosestAllyMobile()
+    {
+        List<Tuple<float, Soldier>> soldierDistances = new();
+
+        foreach (Soldier s in game.AllSoldiers())
+            if (s.IsSameTeamAs(this) && s.IsAbleToWalk())
+                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+
+        soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
+
+        if (soldierDistances.Count > 0)
+            return soldierDistances[0].Item2;
+
+        return null;
+    }
+    public Soldier ClosestEnemy()
+    {
+        List<Tuple<float, Soldier>> soldierDistances = new();
+
+        foreach (Soldier s in game.AllSoldiers())
+            if (s.IsOppositeTeamAs(this))
+                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+
+        soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
+
+        if (soldierDistances.Count > 0)
+            return soldierDistances[0].Item2;
+        else
+            return null;
+    }
+    public Soldier ClosestEnemyVisible()
+    {
+        List<Tuple<float, Soldier>> soldierDistances = new();
+
+        foreach (Soldier s in game.AllSoldiers())
+            if (s.IsOppositeTeamAs(this) && s.IsRevealed())
+                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+
+        soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
+
+        if (soldierDistances.Count > 0)
+            return soldierDistances[0].Item2;
+        return null;
+    }
+    public bool PhysicalObjectIsRevealed(PhysicalObject obj)
+    {
+        bool objectIsRevealed = false;
+
+        foreach (Soldier s in game.AllSoldiers())
+            if (s.IsAbleToSee() && IsSameTeamAsIncludingSelf(s))
+                if (game.CalculateRange(s, obj) <= s.SRColliderMax.radius)
+                    objectIsRevealed = true;
+        return objectIsRevealed;
+    }
 
 
 
@@ -2460,6 +2624,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (IsConscious())
             if (soldierAbilities.Contains("Tranquiliser"))
+                return true;
+
+        return false;
+    }
+    public bool IsIllusionist()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Illusionist"))
                 return true;
 
         return false;
@@ -2769,7 +2941,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
         get { return revealedBySoldiersList; }
         set
         {
-            //Debug.Log("Setting RevealedBySoldiers");
+            //print("Setting RevealedBySoldiers");
             if (revealedBySoldiersList.Any() && !value.Any() && IsAlive() && !IsPlayingDead())
             {
                 revealedBySoldiersList = value;
@@ -2853,5 +3025,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory
     public Inventory Inventory
     {
         get { return inventory; }
+    }
+    public string Id
+    {
+        get { return id; }
     }
 }

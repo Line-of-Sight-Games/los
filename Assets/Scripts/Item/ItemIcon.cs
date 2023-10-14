@@ -48,7 +48,7 @@ public class ItemIcon : MonoBehaviour
 
     public void PlayButtonPress()
     {
-        //Debug.Log("played button press from soldier UI");
+        //print("played button press from soldier UI");
         noisePlayerItemIcon.PlayOneShot(buttonPress);
     }
     public void Update()
@@ -184,7 +184,7 @@ public class ItemIcon : MonoBehaviour
 
     public void SwapClicked(string itemSourceParent)
     {
-        Debug.Log("Swap clicked " + itemSourceParent);
+        print("Swap clicked " + itemSourceParent);
         if (pickupNumber > 0)
             pickupNumber--;
 

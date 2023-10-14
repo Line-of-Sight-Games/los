@@ -38,7 +38,7 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
         dataPersistenceManager = FindObjectOfType<DataPersistenceManager>();
         if (dataPersistenceManager == null)
         {
-            Debug.Log("Found the data persistence mnanager");
+            print("Found the data persistence mnanager");
         }
     }
 
@@ -104,12 +104,12 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
             }
             else
             {
-                Debug.Log("Create a popup which says their x, y, z values must not be negative.");
+                print("Create a popup which says their x, y, z values must not be negative.");
             }
         }
         else
         {
-            Debug.Log("Create a popup which says their formatting was wrong and to try again.");
+            print("Create a popup which says their formatting was wrong and to try again.");
         }
     }
 }

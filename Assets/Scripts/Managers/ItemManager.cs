@@ -50,14 +50,14 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         IEnumerable<Soldier> allSoldiers = FindObjectsOfType<Soldier>();
         foreach (Soldier soldier in allSoldiers)
         {
-            //Debug.Log("check soldier " + soldier.soldierName);
+            //print("check soldier " + soldier.soldierName);
             foreach (string itemId in soldier.inventoryList)
             {
-                //Debug.Log("soldier's itemlist " + itemId);
+                //print("soldier's itemlist " + itemId);
                 foreach (Item item in allItems)
                 {
-                    //Debug.Log("item name " + item.itemName);
-                    //Debug.Log("item id " + item.id);
+                    //print("item name " + item.itemName);
+                    //print("item id " + item.id);
                     if (item.id == itemId)
                     {
                         soldier.Inventory.AddItem(item);

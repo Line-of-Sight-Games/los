@@ -1,10 +1,7 @@
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class OverwatchShotUI : MonoBehaviour
 {
@@ -20,118 +17,128 @@ public class OverwatchShotUI : MonoBehaviour
     public void ConfirmShotOverwatch()
     {
         Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-        Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
+        IAmShootable target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
         Item gun = shooter.EquippedGun;
-        bool resistSuppression = shooter.ResilienceCheck(), resistOverwatchFreeze = target.ResilienceCheck();
         int actingHitChance;
 
         //apply overwatch interrupt if resilience check failed
         Transform overwatchLocation = transform.Find("TargetPanel").Find("OverwatchLocation");
         if (int.TryParse(overwatchLocation.Find("XPos").GetComponent<TMP_InputField>().text, out int xOver) && int.TryParse(overwatchLocation.Find("YPos").GetComponent<TMP_InputField>().text, out int yOver) && int.TryParse(overwatchLocation.Find("ZPos").GetComponent<TMP_InputField>().text, out int zOver) && overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
         {
+            game.tempShooterTarget = Tuple.Create(shooter, target);
             gun.SpendSingleAmmo();
             int randNum1 = game.RandomNumber(0, 100);
             int randNum2 = game.RandomNumber(0, 100);
             Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
 
-            //display suppression indicator
-            if (shooter.IsSuppressed())
+            if (target is Soldier targetSoldier)
             {
-                menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
-
-                if (resistSuppression)
+                //display suppression indicator
+                if (shooter.IsSuppressed())
                 {
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+
+                    if (shooter.ResilienceCheck())
+                    {
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                        actingHitChance = chances.Item1;
+                    }
+                    else
+                    {
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
+                        actingHitChance = chances.Item3;
+                    }
+                }
+                else
+                {
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
                     actingHitChance = chances.Item1;
                 }
-                else
+
+                //standard shot hits
+                if (randNum1 <= actingHitChance)
                 {
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
-                    actingHitChance = chances.Item3;
-                }
-            }
-            else
-            {
-                menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
-                actingHitChance = chances.Item1;
-            }
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
-            //standard shot hits
-            if (randNum1 <= actingHitChance)
-            {
-                menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                    //standard shot crit hits
+                    if (randNum2 <= chances.Item2)
+                    {
+                        targetSoldier.TakeDamage(shooter, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL HIT </color>";
 
-                //standard shot crit hits
-                if (randNum2 <= chances.Item2)
-                {
-                    target.TakeDamage(shooter, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL HIT </color>";
-
-                    //paying xp for hit
-                    if (chances.Item1 >= 10)
-                        menu.AddXpAlert(shooter, 8, "Critical overwatch shot on " + target.soldierName + "!", false);
+                        //paying xp for hit
+                        if (chances.Item1 >= 10)
+                            menu.AddXpAlert(shooter, 8, "Critical overwatch shot on " + targetSoldier.soldierName + "!", false);
+                        else
+                            menu.AddXpAlert(shooter, 10, "Critical overwatch shot with a " + chances.Item1 + "% chance on " + targetSoldier.soldierName + "!", false);
+                    }
                     else
-                        menu.AddXpAlert(shooter, 10, "Critical overwatch shot with a " + chances.Item1 + "% chance on " + target.soldierName + "!", false);
-                }
-                else
-                {
-                    target.TakeDamage(shooter, gun.gunDamage, false, new List<string>() { "Shot" });
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
+                    {
+                        targetSoldier.TakeDamage(shooter, gun.gunDamage, false, new List<string>() { "Shot" });
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
-                    //paying xp for hit
-                    if (chances.Item1 >= 10)
-                        menu.AddXpAlert(shooter, 2, "Overwatch shot hit on " + target.soldierName + ".", false);
+                        //paying xp for hit
+                        if (chances.Item1 >= 10)
+                            menu.AddXpAlert(shooter, 2, "Overwatch shot hit on " + targetSoldier.soldierName + ".", false);
+                        else
+                            menu.AddXpAlert(shooter, 10, "Overwatch shot hit with a " + chances.Item1 + "% chance on " + targetSoldier.soldierName + "!", false);
+                    }
+
+                    //apply overwatch freeze on spot unless resisted
+                    if (targetSoldier.ResilienceCheck())
+                        menu.AddDamageAlert(targetSoldier, targetSoldier.soldierName + " resisted overwatch daze.", true, true);
                     else
-                        menu.AddXpAlert(shooter, 10, "Overwatch shot hit with a " + chances.Item1 + "% chance on " + target.soldierName + "!", false);
-                }
+                    {
+                        targetSoldier.X = xOver;
+                        targetSoldier.Y = yOver;
+                        targetSoldier.Z = zOver;
+                        targetSoldier.terrainOn = overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text;
+                        targetSoldier.ap = 0;
+                        menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} suffered overwatch daze at X: {targetSoldier.X}, Y: {targetSoldier.Y}, Z: {targetSoldier.Z}, Ter: {targetSoldier.terrainOn}.", false, true);
+                    }
 
-                //apply overwatch freeze on spot unless resisted
-                if (!resistOverwatchFreeze)
+
+                    //don't show los check button if shot hits
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
+                }
+                else
                 {
-                    target.X = xOver;
-                    target.Y = yOver;
-                    target.Z = zOver;
-                    target.terrainOn = overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text;
-                    target.ap = 0;
-                    menu.AddDamageAlert(target, $"{target.soldierName} suffered overwatch daze at X: {target.X}, Y: {target.Y}, Z: {target.Z}, Ter: {target.terrainOn}.", false, true);
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {game.RandomShotScatterDistance()}cm {game.RandomShotScatterHorizontal()}, {game.RandomShotScatterDistance()}cm {game.RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    //show los check button if shot doesn't hit
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+
+                    //show guardsman retry if gun has ammo
+                    if (shooter.IsGuardsman() && shooter.EquippedGun.CheckAnyAmmo())
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
+                    else
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+
+                    //paying xp for dodge
+                    if (chances.Item1 <= 90)
+                        menu.AddXpAlert(targetSoldier, 1, "Dodged overwatch shot from " + shooter.soldierName + ".", false);
+                    else
+                        menu.AddXpAlert(targetSoldier, 10, "Dodged overwatch shot with a " + chances.Item1 + "% chance from " + shooter.soldierName + "!", false);
+
+                    //push the no damage attack through for witness trigger
+                    targetSoldier.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
                 }
-                else
-                    menu.AddDamageAlert(target, target.soldierName + " resisted overwatch daze.", true, true);
 
-                //don't show los check button if shot hits
-                menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
+                //unset overwatch after any shot
+                shooter.DecrementOverwatch();
+
+                //trigger loud action
+                shooter.PerformLoudAction();
+
+                menu.OpenShotResultUI();
+
+                //refresh detections (potentially trigger more overwatch)
+                game.StartCoroutine(game.DetectionAlertSingle(targetSoldier, "losChange", Vector3.zero, string.Empty, true));
+
+                //destroy other overwatch instances
+                foreach (Transform child in menu.overwatchShotUI.transform)
+                    Destroy(child.gameObject);
             }
-            else
-            {
-                menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {game.RandomShotScatterDistance()}cm {game.RandomShotScatterHorizontal()}, {game.RandomShotScatterDistance()}cm {game.RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
-                //show los check button if shot doesn't hit
-                menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
-
-                //paying xp for dodge
-                if (chances.Item1 <= 90)
-                    menu.AddXpAlert(target, 1, "Dodged overwatch shot from " + shooter.soldierName + ".", false);
-                else
-                    menu.AddXpAlert(target, 10, "Dodged overwatch shot with a " + chances.Item1 + "% chance from " + shooter.soldierName + "!", false);
-
-                //push the no damage attack through for witness trigger
-                target.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
-            }
-
-            //unset overwatch after any shot
-            shooter.UnsetOverwatch();
-
-            //trigger loud action
-            shooter.PerformLoudAction();
-
-            menu.OpenShotResultUI();
-
-            //refresh detections (potentially trigger more overwatch)
-            game.StartCoroutine(game.DetectionAlertSingle(target, "losChange", Vector3.zero, string.Empty, true));
-
-            //destroy other overwatch instances
-            foreach (Transform child in menu.overwatchShotUI.transform)
-                Destroy(child.gameObject);
         }
     }
 

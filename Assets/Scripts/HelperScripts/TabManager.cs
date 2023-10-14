@@ -36,11 +36,11 @@ public class TabManager : MonoBehaviour
                     system.SetSelectedGameObject(next.gameObject, new BaseEventData(system));
                 }
                 else
-                    Debug.Log("next nagivation element not found");
+                    print("next nagivation element not found");
             }
         }
         //else
-            //Debug.Log("no game object currently selected");
+            //print("no game object currently selected");
     }
 }
 

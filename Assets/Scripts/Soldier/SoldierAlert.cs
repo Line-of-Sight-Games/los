@@ -58,7 +58,7 @@ public class SoldierAlert : MonoBehaviour
 
     public void PlayButtonPress()
     {
-        //Debug.Log("played button press from soldier alert");
+        //print("played button press from soldier alert");
         noisePlayerSoldierAlert.PlayOneShot(buttonPress);
     }
 

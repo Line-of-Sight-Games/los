@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class POIManager : MonoBehaviour, IDataPersistence
@@ -75,14 +73,14 @@ public class POIManager : MonoBehaviour, IDataPersistence
                 return s;
         }
         return null;
-    }
-    public Soldier FindSoldierById(string id)
+    }*/
+    public POI FindPOIById(string id)
     {
-        foreach (Soldier s in allSoldiers)
+        foreach (POI poi in FindObjectsOfType<POI>())
         {
-            if (s.id == id)
-                return s;
+            if (poi.id == id)
+                return poi;
         }
         return null;
-    }*/
+    }
 }

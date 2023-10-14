@@ -19,7 +19,7 @@ public class DataPersistenceManager : MonoBehaviour
     {
         if (Instance != null)
         {
-            Debug.Log("Found more than one Data Persistence Manager in the scene.");
+            print("Found more than one Data Persistence Manager in the scene.");
         }
         Instance = this;
     }
@@ -36,7 +36,7 @@ public class DataPersistenceManager : MonoBehaviour
         //Load any saved data from data handler
         if (gameData == null)
         {
-            Debug.Log("No data was found. Starting new game.");
+            print("No data was found. Starting new game.");
             NewGame();
         }
         //Push loaded data to all other scripts that need it
@@ -48,7 +48,7 @@ public class DataPersistenceManager : MonoBehaviour
 
     public void SaveGame()
     {
-        //Debug.Log("Saving game");
+        //print("Saving game");
         dataPersistanceObjects = FindAllDataPersistenceObjects();
         //pass data to other scripts to update it
         foreach (IDataPersistence dataPersistenceObj in dataPersistanceObjects)

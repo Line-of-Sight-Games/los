@@ -14,7 +14,7 @@ public class PhysicalObject : MonoBehaviour
 
     public void MapPhysicalPosition(int x, int y, int z)
     {
-        //Debug.Log("Mapped physical position");
+        //print("Mapped physical position");
         transform.position = new Vector3(x - 0.5f, z, y - 0.5f);
     }
 

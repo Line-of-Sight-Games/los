@@ -42,7 +42,7 @@ public class Inventory
 
     public void RemoveItem(Item item)
     {
-        //Debug.Log("ran remove item");
+        //print("ran remove item");
         itemList.Remove(item);
         item.transform.SetParent(null, true);
         item.X = linkedSoldier.X;

@@ -10,12 +10,6 @@ public class ToggleController : MonoBehaviour
 
     private void Start()
     {
-        if (toggle == null)
-        {
-            Debug.LogError("Toggle reference not set in ToggleBackgroundChanger script.");
-            return;
-        }
-
         // Save the original colors
         originalColors = toggle.colors;
 

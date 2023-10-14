@@ -636,7 +636,10 @@ public class Item : PhysicalObject, IDataPersistence
         if (ammo > 0)
             return true;
         else
+        {
+            owner.UnsetOverwatch();
             return false;
+        }
     }
 
     public bool CheckSpecificAmmo(int ammo, bool fromSuppression)

@@ -20,7 +20,7 @@ public class SoldierUI : MonoBehaviour
 
     public void PlayButtonPress()
     {
-        //Debug.Log("played button press from soldier UI");
+        //print("played button press from soldier UI");
         noisePlayerSoldierUI.PlayOneShot(buttonPress);
     }
 
@@ -38,7 +38,7 @@ public class SoldierUI : MonoBehaviour
     {
         if (int.TryParse(xSize.text, out x) && int.TryParse(ySize.text, out y) && int.TryParse(zSize.text, out z) && terrainDropdown.value != 0)
         {
-            //Debug.Log(x + ":" + linkedSoldier.game.maxX + " " + y + ":" + linkedSoldier.game.maxY + " " + z + ":" + linkedSoldier.game.maxZ);
+            //print(x + ":" + linkedSoldier.game.maxX + " " + y + ":" + linkedSoldier.game.maxY + " " + z + ":" + linkedSoldier.game.maxZ);
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
                 linkedSoldier.TerrainOn = terrainDropdown.options[terrainDropdown.value].text;
@@ -55,12 +55,12 @@ public class SoldierUI : MonoBehaviour
             }
             else
             {
-                Debug.Log("Create a popup which says their attempted move was outside of boundaries.");
+                print("Create a popup which says their attempted move was outside of boundaries.");
             }
         }
         else
         {
-            Debug.Log("Create a popup which says their formatting was wrong and to try again.");
+            print("Create a popup which says their formatting was wrong and to try again.");
         }
     }
 

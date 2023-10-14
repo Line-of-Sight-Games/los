@@ -3,15 +3,19 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Terminal : POI, IDataPersistence
+public class Terminal : POI, IDataPersistence, IAmShootable
 {
     public string terminalType;
-    public List<string> soldierAlreadyInteracted;
-    public JArray soldierAlreadyInteractedJArray;
+    public bool terminalEnabled;
+    public List<string> soldiersAlreadyNegotiated;
+    public JArray soldiersAlreadyNegotiatedJArray;
+    public List<string> soldiersAlreadyHacked;
+    public JArray soldiersAlreadyHackedJArray;
 
     private void Start()
     {
         poiType = "terminal";
+        terminalEnabled = true;
     }
 
     public Terminal Init(Tuple<Vector3, string> location, string type)
@@ -39,12 +43,19 @@ public class Terminal : POI, IDataPersistence
             MapPhysicalPosition(x, y, z);
 
             terminalType = (string)details["terminalType"];
+            terminalEnabled = (bool)details["terminalEnabled"];
 
-            //load list of soldier already interacted
-            soldierAlreadyInteracted = new();
-            soldierAlreadyInteractedJArray = (JArray)details["soldierAlreadyInteracted"];
-            foreach (string soldierId in soldierAlreadyInteractedJArray)
-                soldierAlreadyInteracted.Add(soldierId);
+            //load list of soldier already negotiated
+            soldiersAlreadyNegotiated = new();
+            soldiersAlreadyNegotiatedJArray = (JArray)details["soldiersAlreadyNegotiated"];
+            foreach (string soldierId in soldiersAlreadyNegotiatedJArray)
+                soldiersAlreadyNegotiated.Add(soldierId);
+
+            //load list of soldier already hacked
+            soldiersAlreadyHacked = new();
+            soldiersAlreadyHackedJArray = (JArray)details["soldiersAlreadyHacked"];
+            foreach (string soldierId in soldiersAlreadyHackedJArray)
+                soldiersAlreadyHacked.Add(soldierId);
         }
     }
 
@@ -57,10 +68,14 @@ public class Terminal : POI, IDataPersistence
         details.Add("y", y);
         details.Add("z", z);
         details.Add("terrainOn", terrainOn);
+
         details.Add("terminalType", terminalType);
+        details.Add("terminalEnabled", terminalEnabled);
 
         //save list of soldiers already interacted
-        details.Add("soldierAlreadyInteracted", soldierAlreadyInteracted);
+        details.Add("soldiersAlreadyNegotiated", soldiersAlreadyNegotiated);
+        details.Add("soldiersAlreadyHacked", soldiersAlreadyHacked);
+        
 
         //add the item in
         if (data.allPOIDetails.ContainsKey(id))
@@ -69,10 +84,19 @@ public class Terminal : POI, IDataPersistence
         data.allPOIDetails.Add(id, details);
     }
 
-    public List<string> SoldiersAlreadyInteracted
+    public List<string> SoldiersAlreadyNegotiated
     {
-        get { return soldierAlreadyInteracted; }
-        set { soldierAlreadyInteracted = value; }
+        get { return soldiersAlreadyNegotiated; }
+        set { soldiersAlreadyNegotiated = value; }
+    }
+    public List<string> SoldiersAlreadyHacked
+    {
+        get { return soldiersAlreadyHacked; }
+        set { soldiersAlreadyHacked = value; }
+    }
+    public string Id
+    {
+        get { return id; }
     }
 }
 
