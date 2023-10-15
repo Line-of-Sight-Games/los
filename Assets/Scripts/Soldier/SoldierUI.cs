@@ -53,14 +53,6 @@ public class SoldierUI : MonoBehaviour
                 transform.Find("PopupBox").gameObject.SetActive(false);
                 StartCoroutine(linkedSoldier.game.DetectionAlertSingle(linkedSoldier, "losChange", Vector3.zero, string.Empty, true));
             }
-            else
-            {
-                print("Create a popup which says their attempted move was outside of boundaries.");
-            }
-        }
-        else
-        {
-            print("Create a popup which says their formatting was wrong and to try again.");
         }
     }
 

@@ -1243,7 +1243,7 @@
       "Consumable": false,
       "Fragile": true,
       "Unbreakable": false,
-      "MeleeDamage": 4,
+      "MeleeDamage": 2,
       "Charges": 0,
       "Poisonable": false,
       "PoisonedBy": "",

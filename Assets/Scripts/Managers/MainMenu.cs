@@ -42,7 +42,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public float turnTime;
     public string meleeChargeIndicator;
     public Soldier activeSoldier;
-    public bool overrideView, displayLOSArrows, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, meleeResolvedFlag, shotResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, 
+    public bool overrideView, displayLOSArrows, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, 
         xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
@@ -1141,7 +1141,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("Name").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierName;
             soldierStatsUI.Find("General").Find("Rank").GetComponent<TextMeshProUGUI>().text = activeSoldier.rank;
             soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierTerrain;
-            soldierStatsUI.Find("General").Find("Specialty").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierSpeciality;
+            soldierStatsUI.Find("General").Find("Specialty").GetComponent<TextMeshProUGUI>().text = activeSoldier.PrintSoldierSpeciality();
             soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = PrintList(activeSoldier.soldierAbilities);
             soldierStatsUI.Find("General").Find("Location").Find("LocationX").GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationY").GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
@@ -1577,6 +1577,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (childCount > 0)
         {
+            detectionResolvedFlag = false;
+            FreezeTime();
+
             if (overwatchCount > 1) //more than a single overwatch line detected
                 detectionUI.transform.Find("MultiOverwatchAlert").gameObject.SetActive(true);
             else
@@ -1593,14 +1596,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             else
                 detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
 
-            FreezeTime();
             detectionAlertUI.SetActive(true);
             soundManager.PlayDetectionAlarm();
         }
     }
     public void CloseGMAlertDetectionUI()
     {
-        UnfreezeTime();
         detectionAlertUI.SetActive(false);
     }
     public void IllusionistMoveUndo()
@@ -1903,8 +1904,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CloseDetectionUI()
     {
-        detectionUI.SetActive(false);
+        detectionResolvedFlag = true;
         UnfreezeTime();
+        detectionUI.SetActive(false);
     }
     public void AddLostLosAlert(Soldier soldier)
     {
@@ -2603,10 +2605,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         clearMeleeFlag = true;
         meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
         meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        meleeUI.transform.Find("AttackerWeapon").Find("WeaponDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
-        meleeUI.transform.Find("AttackerWeapon").Find("WeaponDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").Find("WeaponDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
-        meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").Find("WeaponDropdown").GetComponent<TMP_Dropdown>().value = 0;
+        meleeUI.transform.Find("AttackerWeapon").Find("WeaponImage").GetComponent<Image>().sprite = null;
+        meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").Find("WeaponImage").GetComponent<Image>().sprite = null;
         meleeUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
         meleeUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value = 0;
         ClearFlankersUI(flankersMeleeAttackerUI);

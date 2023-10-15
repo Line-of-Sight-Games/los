@@ -558,7 +558,32 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 gameObject.GetComponent<Renderer>().material = materials[soldierTeam];
         }
     }
-
+    public string PrintSoldierSpeciality()
+    {
+        return soldierSpeciality switch
+        {
+            "Leadership" => "Commander (L)",
+            "Health",
+            "Resilience",
+            "Speed",
+            "Evasion",
+            "Stealth",
+            "Perceptiveness",
+            "Camouflage",
+            "Sight Radius",
+            "Rifle",
+            "Assault Rifle",
+            "Light Machine Gun",
+            "Sniper Rifle",
+            "Sub-Machine Gun",
+            "Shotgun",
+            "Melee",
+            "Strength",
+            "Diplomacy",
+            "Electronics",
+            "Healing"
+        };
+    }
     public void IncrementXP(int xp, bool learnerEnabled)
     {
         if (learnerEnabled && IsLearner()) 
@@ -1210,7 +1235,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
             //drop all items for broken
             if (tp == 4)
+            {
                 BrokenDropAllItemsExceptArmour();
+                foreach (Soldier s in game.AllSoldiers())
+                    game.BreakMeleeEngagement(this, s);
+            }
         }
     }
 
@@ -2977,7 +3006,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         get
         {
-            inventorySlots.TryGetValue("Right_and", out string rightHand);
+            inventorySlots.TryGetValue("Right_Hand", out string rightHand);
             return itemManager.FindItemById(rightHand);
         }
     }
