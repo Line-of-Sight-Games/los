@@ -85,7 +85,7 @@ public class OverwatchShotUI : MonoBehaviour
                     }
 
                     //apply overwatch freeze on spot unless resisted
-                    if (targetSoldier.ResilienceCheck())
+                    if (targetSoldier.ResilienceCheck() || targetSoldier.IsGuardsman())
                         menu.AddDamageAlert(targetSoldier, targetSoldier.soldierName + " resisted overwatch daze.", true, true);
                     else
                     {
@@ -120,7 +120,7 @@ public class OverwatchShotUI : MonoBehaviour
                     else
                         menu.AddXpAlert(targetSoldier, 10, "Dodged overwatch shot with a " + chances.Item1 + "% chance from " + shooter.soldierName + "!", false);
 
-                    //push the no damage attack through for witness trigger
+                    //push the no damage attack through for abilities trigger
                     targetSoldier.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
                 }
 

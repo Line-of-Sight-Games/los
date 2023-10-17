@@ -8,6 +8,8 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
+using System.Xml.Linq;
+using UnityEditor.Experimental.GraphView;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable
 {
@@ -23,12 +25,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, 
         timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
-    public string revealedByTeam, lastChosenStat, poisonedBy;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting;
     public Statline stats;
     public Inventory inventory;
-    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, witnessActiveAbilities;
+    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, witnessActiveAbilities, isSpottedBy;
     public Item itemPrefab;
-    private JArray stateJArray, statsJArray, soldierAbilitiesJArray, itemsJArray, controllingSoldiersJArray, controlledBySoldiersJArray, revealedBySoldiersJArray, revealingSoldiersJArray, witnessStoredAbilitiesJArray, witnessActiveAbilitiesJArray;
+    private JArray stateJArray, statsJArray, soldierAbilitiesJArray, itemsJArray, controllingSoldiersJArray, controlledBySoldiersJArray, revealedBySoldiersJArray, revealingSoldiersJArray, 
+        witnessStoredAbilitiesJArray, witnessActiveAbilitiesJArray, isSpottedByJArray;
     public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
     public BoxCollider bodyCollider;
     public Dictionary<string, string> inventorySlots = new()
@@ -39,7 +42,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
 
-    public GameObject soldierUI, soldierUIPrefab;
+    public GameObject soldierUI, soldierUIPrefab, soldierSnapshotAlertPrefab;
     public MainGame game;
     public MainMenu menu;
     public SoldierManager soldierManager;
@@ -147,10 +150,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         details.Add("illusionedThisMove", illusionedThisMove);
         details.Add("hasKilled", hasKilled);
         details.Add("guardsmanRetryUsed", guardsmanRetryUsed);
-
+        details.Add("isSpotting", isSpotting);
+        details.Add("isSpottedBy", isSpottedBy);
         details.Add("overwatchFirstShotUsed", overwatchFirstShotUsed);
         details.Add("witnessActiveAbilities", witnessActiveAbilities);
         details.Add("witnessStoredAbilities", witnessStoredAbilities);
+
         details.Add("overwatchXPoint", overwatchXPoint);
         details.Add("overwatchYPoint", overwatchYPoint);
         details.Add("overwatchConeRadius", overwatchConeRadius);
@@ -270,7 +275,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         hasKilled = (bool)details["hasKilled"];
         overwatchFirstShotUsed = (bool)details["overwatchFirstShotUsed"];
         guardsmanRetryUsed = (bool)details["guardsmanRetryUsed"];
-
+        isSpotting = (string)details["isSpotting"];
+        //load spotted by list
+        isSpottedBy = new();
+        isSpottedByJArray = (JArray)details["isSpottedBy"];
+        foreach (string spotterId in isSpottedByJArray)
+            isSpottedBy.Add(spotterId);
         //load witness stored active abilities
         witnessActiveAbilities = new();
         witnessActiveAbilitiesJArray = (JArray)details["witnessActiveAbilities"];
@@ -281,6 +291,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         witnessStoredAbilitiesJArray = (JArray)details["witnessStoredAbilities"];
         foreach (string ability in witnessStoredAbilitiesJArray)
             witnessStoredAbilities.Add(ability);
+
         overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
         overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
         overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
@@ -563,25 +574,26 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         return soldierSpeciality switch
         {
             "Leadership" => "Commander (L)",
-            "Health",
-            "Resilience",
-            "Speed",
-            "Evasion",
-            "Stealth",
-            "Perceptiveness",
-            "Camouflage",
-            "Sight Radius",
-            "Rifle",
-            "Assault Rifle",
-            "Light Machine Gun",
-            "Sniper Rifle",
-            "Sub-Machine Gun",
-            "Shotgun",
-            "Melee",
-            "Strength",
-            "Diplomacy",
-            "Electronics",
-            "Healing"
+            "Health" => "Spartan (H)",
+            "Resilience" => "Survivor (R)",
+            "Speed" => "Runner (S)",
+            "Evasion" => "Evader (E)",
+            "Stealth" => "Assassin (F)",
+            "Perceptiveness" => "Seeker (P)",
+            "Camouflage" => "Chameleon (C)",
+            "Sight Radius" => "Scout (SR)",
+            "Rifle" => "Infantryman (Ri)",
+            "Assault Rifle" => "Operator (AR)",
+            "Light Machine Gun" => "Earthquake (LMG)",
+            "Sniper Rifle" => "Hunter (Sn)",
+            "Sub-Machine Gun" => "Cyclone (SMG)",
+            "Shotgun" => "Hammer (Sh)",
+            "Melee" => "Wolf (M)",
+            "Strength" => "Hercules (Str)",
+            "Diplomacy" => "Diplomat (Dip)",
+            "Electronics" => "Technician (Elec)",
+            "Healing" => "Medic (Heal)",
+            _ => "Unknown",
         };
     }
     public void IncrementXP(int xp, bool learnerEnabled)
@@ -643,18 +655,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         print((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
         return (int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f));
-    }
-    public string GetTraumaState()
-    {
-        return tp switch
-        {
-            0 => "Committed",
-            1 => "<color=yellow>Wavering</color>",
-            2 => "<color=yellow>Shaken</color>",
-            3 => "<color=orange>Frozen</color>",
-            4 => "<color=red>Broken</color>",
-            _ => "<color=blue>Desensitised</color>",
-        };
     }
 
     public string[] Promote(string choiceStat)
@@ -1216,7 +1216,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 foreach (string ability in damagedBy.soldierAbilities)
                     witnessStoredAbilities.Add(ability);
             }
+
+            //informer ability display info
+            if (IsInformer())
+                AddSoldierSnapshot(damagedBy);
         }
+    }
+    public void AddSoldierSnapshot(Soldier attackedBy)
+    {
+        GameObject snapshot = Instantiate(soldierSnapshotAlertPrefab, menu.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+
+        snapshot.GetComponent<SoldierAlert>().SetSoldier(this);
+        snapshot.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(attackedBy);
+        snapshot.transform.Find("SnapshotDetails").GetComponent<TextMeshProUGUI>().text = $"{soldierName} was informed of an attacker ({attackedBy.soldierName}). Click to see details.";
+
+        //try and open damagealert
+        StartCoroutine(menu.OpenDamageList());
     }
 
 
@@ -1466,13 +1481,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (s.IsAlive() && IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
             {
-                if (PhysicalObjectWithinMinRadius(s) && vulnerableTurns < 3)
+                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 3)
                     vulnerableTurns = 3;
-                else if (PhysicalObjectWithinHalfRadius(s) && vulnerableTurns < 2)
+                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 2)
                     vulnerableTurns = 2;
-                else if (PhysicalObjectWithinMaxRadius(s) && vulnerableTurns < 1)
+                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 1)
                     vulnerableTurns = 1;
             }
+
+            if (vulnerableTurns > 0 && s.IsSpotter() && IsHidden())
+                s.SetSpotting(this);
         }
 
         //rerun detection alerts if loud action performed for first time
@@ -1491,15 +1509,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (Soldier s in game.AllSoldiers())
         {
+            print(s.soldierName);
             if (s.IsAlive() && IsOppositeTeamAs(s))
             {
-                if (PhysicalObjectWithinMinRadius(s) && vulnerableTurns < 3)
+                print(s.soldierName + " is alive and opposite team");
+                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 3)
                     vulnerableTurns = 3;
-                else if (PhysicalObjectWithinHalfRadius(s) && vulnerableTurns < 2)
+                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 2)
                     vulnerableTurns = 2;
-                else if (PhysicalObjectWithinMaxRadius(s) && vulnerableTurns < 1)
+                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 1)
                     vulnerableTurns = 1;
+
+                print(s.soldierName + " is alive and opposite team and " + vulnerableTurns);
             }
+
+            if (vulnerableTurns > 0 && s.IsSpotter() && IsHidden())
+                s.SetSpotting(this);
         }
 
         //rerun detection alerts if loud action performed for first time
@@ -2596,29 +2621,82 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
-    public bool IsJammer()
+    public bool IsBloodletter()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Jammer"))
+            if (soldierAbilities.Contains("Bloodletter"))
                 return true;
 
         return false;
     }
-    public bool IsLearner()
+    public void TakeBloodlettingDamage()
+    {
+        timesBloodlet++;
+        bloodLettedThisTurn = true;
+        SetBloodRage();
+        stats.H.BaseVal--;
+        hp--;
+    }
+    public bool IsExperimentalist()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Learner"))
+            if (soldierAbilities.Contains("Experimentalist"))
                 return true;
 
         return false;
     }
-    public bool IsGuardsman()
+    public bool IsBull()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Guardsman"))
+            if (soldierAbilities.Contains("Bull"))
                 return true;
 
         return false;
+    }
+    public bool IsCalculator()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Calculator"))
+                return true;
+
+        return false;
+    }
+    public int CalculatorBonus()
+    {
+        if (IsCalculator())
+            return 1;
+
+        return 0;
+    }
+    public bool IsDissuader()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Dissuader"))
+                return true;
+
+        return false;
+    }
+    public void SetDissuaded()
+    {
+        SetState("Dissuaded");
+    }
+    public void UnsetDissuaded()
+    {
+        UnsetState("Dissuaded");
+    }
+    public bool IsDissuaded()
+    {
+        if (CheckState("Dissuaded"))
+            return true;
+
+        return false;
+    }
+    public int DissuaderPenalty()
+    {
+        if (IsDissuaded())
+            return -1;
+
+        return 0;
     }
     public bool IsFighter()
     {
@@ -2641,18 +2719,26 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             mp += 1;
         }
     }
-    public bool IsPatriot()
+    public bool IsGuardsman()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Patriot"))
+            if (soldierAbilities.Contains("Guardsman"))
                 return true;
 
         return false;
     }
-    public bool IsTranquiliser()
+    public bool IsGunner()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Tranquiliser"))
+            if (soldierAbilities.Contains("Gunner"))
+                return true;
+
+        return false;
+    }
+    public bool IsInsulator()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Insulator"))
                 return true;
 
         return false;
@@ -2702,7 +2788,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 _ => 0,
             };
         }
-        
+
         return 0;
     }
     public int InspirerBonusWeapon(Item gun)
@@ -2719,48 +2805,72 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return 0;
     }
-    public bool IsDissuader()
+    public bool IsInformer()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Dissuader"))
+            if (soldierAbilities.Contains("Informer"))
                 return true;
 
         return false;
     }
-    public void SetDissuaded()
+    public bool IsJammer()
     {
-        SetState("Dissuaded");
-    }
-    public void UnsetDissuaded()
-    {
-        UnsetState("Dissuaded");
-    }
-    public bool IsDissuaded()
-    {
-        if (CheckState("Dissuaded"))
-            return true;
+        if (IsConscious())
+            if (soldierAbilities.Contains("Jammer"))
+                return true;
 
         return false;
     }
-    public int DissuaderPenalty()
+    public bool IsLocator()
     {
-        if (IsDissuaded())
-            return -1;
-        
+        if (IsConscious())
+            if (soldierAbilities.Contains("Locator"))
+                return true;
+
+        return false;
+    }
+    public int LocatorBonus()
+    {
+        if (IsLocator())
+            return 1;
+
         return 0;
     }
-    public bool IsBull()
+    public bool IsLearner()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Bull"))
+            if (soldierAbilities.Contains("Learner"))
                 return true;
 
         return false;
     }
-    public bool IsGunner()
+    public bool IsPolitician()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Gunner"))
+            if (soldierAbilities.Contains("Politician"))
+                return true;
+
+        return false;
+    }
+    public int PoliticianBonus()
+    {
+        if (IsPolitician())
+            return 1;
+
+        return 0;
+    }
+    public bool IsPlanner()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Planner"))
+                return true;
+
+        return false;
+    }
+    public bool IsPatriot()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Patriot"))
                 return true;
 
         return false;
@@ -2778,7 +2888,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsConscious())
             if (soldierAbilities.Contains("Sharpshooter"))
                 return true;
-
         return false;
     }
     public bool IsSprinter()
@@ -2786,16 +2895,47 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsConscious())
             if (soldierAbilities.Contains("Sprinter"))
                 return true;
-
         return false;
     }
-    public bool IsWitness()
+    public bool IsSpotter()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Witness"))
+            if (soldierAbilities.Contains("Spotter"))
                 return true;
-
         return false;
+    }
+    public bool IsSpotted()
+    {
+        if (isSpottedBy.Count > 0)
+            return true;
+        return false;
+    }
+    public bool IsSpotting()
+    {
+        if (IsSpotter())
+            if (isSpotting != string.Empty)
+                return true;
+        return false;
+    }
+    public void SetSpotting(Soldier spottingSoldier)
+    {
+        if (!spottingSoldier.isSpottedBy.Contains(Id))
+        {
+            spottingSoldier.isSpottedBy.Add(Id);
+            isSpotting = spottingSoldier.Id;
+        }
+    }
+    public void RemoveSpottedBy(string spotterId)
+    {
+        isSpottedBy.Remove(spotterId);
+    }
+    public void RemoveAllSpotting()
+    {
+        if (IsSpotting())
+        {
+            game.soldierManager.FindSoldierById(isSpotting).RemoveSpottedBy(Id);
+            isSpotting = string.Empty;
+        }
     }
     public bool IsTactician()
     {
@@ -2809,90 +2949,21 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsTactician())
             return 1;
-        
-        return 0;
-    }
-    public bool IsPolitician()
-    {
-        if (IsConscious())
-            if (soldierAbilities.Contains("Politician"))
-                return true;
-
-        return false;
-    }
-    public int PoliticianBonus()
-    {
-        if (IsPolitician())
-            return 1;
 
         return 0;
     }
-    public bool IsCalculator()
+    public bool IsTranquiliser()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Calculator"))
+            if (soldierAbilities.Contains("Tranquiliser"))
                 return true;
 
         return false;
     }
-    public int CalculatorBonus()
-    {
-        if (IsCalculator())
-            return 1;
-            
-        return 0;
-    }
-    public bool IsLocator()
+    public bool IsWitness()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Locator"))
-                return true;
-
-        return false;
-    }
-    public int LocatorBonus()
-    {
-        if (IsLocator())
-            return 1;
-            
-        return 0;
-    }
-    public bool IsPlanner()
-    {
-        if (IsConscious())
-            if (soldierAbilities.Contains("Planner"))
-                return true;
-
-        return false;
-    }
-    public bool IsBloodletter()
-    {
-        if (IsConscious())
-            if (soldierAbilities.Contains("Bloodletter"))
-                return true;
-
-        return false;
-    }
-    public void TakeBloodlettingDamage()
-    {
-        timesBloodlet++;
-        bloodLettedThisTurn = true;
-        SetBloodRage();
-        stats.H.BaseVal--;
-        hp--;
-    }
-    public bool IsInsulator()
-    {
-        if (IsConscious())
-            if (soldierAbilities.Contains("Insulator"))
-                return true;
-
-        return false;
-    }
-    public bool IsExperimentalist()
-    {
-        if (IsConscious())
-            if (soldierAbilities.Contains("Experimentalist"))
+            if (soldierAbilities.Contains("Witness"))
                 return true;
 
         return false;
@@ -2901,6 +2972,256 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+    //status
+    public void PaintSpeciality(Transform soldierStatsUI)
+    {
+        TextMeshProUGUI[] statLabels = soldierStatsUI.Find("Stats").Find("Labels").GetComponentsInChildren<TextMeshProUGUI>();
+
+        foreach (TextMeshProUGUI t in statLabels)
+        {
+            foreach (string[] s in menu.AllStats)
+            {
+                Color displayColor = Color.white;
+                if (t.text == s[0] && s[1] == soldierSpeciality)
+                {
+                    displayColor = Color.green;
+                    t.color = displayColor;
+                    break;
+                }
+                else
+                    t.color = displayColor;
+            }
+        }
+    }
+    public string GetHealthState()
+    {
+        if (hp > stats.H.Val)
+            return "<color=green>Overhealth</color>";
+        else if (hp == stats.H.Val)
+            return "Full Health";
+        else if (hp <= 0)
+            return "<color=red>Dead</color>";
+        else if (hp <= stats.H.Val / 3)
+            return "<color=red>Critically Injured</color>";
+        else if (hp <= stats.H.Val / 2)
+            return "<color=orange>Severely Injured</color>";
+        else
+            return "<color=yellow>Injured</color>";
+    }
+
+    public string GetConsciousState()
+    {
+        if (IsUnconscious())
+            return ", <color=blue>Unconscious</color>";
+        else if (IsLastStand())
+            return ", <color=red>Last Stand</color>";
+        else
+            return "";
+    }
+    public string GetArmourState()
+    {
+        if (GetArmourHP() > 0)
+            return $", <color=green>Armoured({GetArmourHP()})</color>";
+        return "";
+    }
+    public string GetTraumaState()
+    {
+        return tp switch
+        {
+            0 => ", Committed",
+            1 => ", <color=yellow>Wavering</color>",
+            2 => ", <color=yellow>Shaken</color>",
+            3 => ", <color=orange>Frozen</color>",
+            4 => ", <color=red>Broken</color>",
+            _ => ", <color=blue>Desensitised</color>",
+        };
+    }
+    public string GetStunnedState()
+    {
+        if (IsStunned())
+            return $", <color=red>Stunned({stunnedRoundsVulnerable})</color>";
+        return "";
+    }
+
+    public string GetHungerState()
+    {
+        if (RoundsWithoutFood >= 30)
+            return ", <color=red>Starving</color>";
+        else if (RoundsWithoutFood >= 20)
+            return ", <color=orange>Very Hungry</color>";
+        else if (RoundsWithoutFood >= 10)
+            return ", <color=yellow>Hungry</color>";
+        else
+            return "";
+    }
+    public string GetMeleeControlState()
+    {
+        string controlString = "";
+
+        if (controllingSoldiersList.Count > 0)
+        {
+            controlString += ", <color=green>Controlling (";
+
+            for (int i = 0; i < controllingSoldiersList.Count; i++)
+            {
+                if (i > 0)
+                    controlString += ", " + soldierManager.FindSoldierById(controllingSoldiersList[i]).soldierName;
+                else
+                    controlString += soldierManager.FindSoldierById(controllingSoldiersList[i]).soldierName;
+            }
+            controlString += ")</color>";
+        }
+
+        if (controlledBySoldiersList.Count > 0)
+        {
+            controlString += ", <color=red>Controlled By (";
+
+            for (int i = 0; i < controlledBySoldiersList.Count; i++)
+            {
+                if (i > 0)
+                    controlString += ", " + soldierManager.FindSoldierById(controlledBySoldiersList[i]).soldierName;
+                else
+                    controlString += soldierManager.FindSoldierById(controlledBySoldiersList[i]).soldierName;
+            }
+            controlString += ")</color>";
+        }
+
+        return controlString;
+    }
+    public string GetCoverState()
+    {
+        if (IsInCover())
+            return ", <color=green>Taking Cover</color>";
+        return "";
+    }
+    public string GetOverwatchState()
+    {
+        if (IsOnOverwatch())
+            return ", <color=green>Overwatch</color>";
+        return "";
+    }
+    public string GetLoudDetectedState()
+    {
+        if (loudActionRoundsVulnerable > 0)
+            return $", <color=red>Vulnerable({loudActionRoundsVulnerable})</color>";
+        return "";
+    }
+
+    public string GetPoisonedState()
+    {
+        if (IsPoisoned())
+            return ", <color=red>Poisoned</color>";
+        return "";
+    }
+
+    public string GetSuppressionState()
+    {
+        if (GetSuppression() > 0)
+            return $", <color=orange>Suppressed ({GetSuppression()})</color>";
+        return "";
+    }
+
+    public string GetPlaydeadState()
+    {
+        if (IsPlayingDead())
+            return ", <color=yellow>Playdead</color>";
+        return "";
+    }
+
+    public string GetDrugState()
+    {
+        string drugState = "";
+
+        if (IsOnDrug("Modafinil"))
+            drugState += ", <color=purple>Modafinil</color>";
+        if (IsOnDrug("Amphetamine"))
+            drugState += ", <color=purple>Amphetamine</color>";
+        if (IsOnDrug("Androstenedione"))
+            drugState += ", <color=purple>Androstenedione</color>";
+        if (IsOnDrug("Cannabinoid"))
+            drugState += ", <color=purple>Cannabinoid</color>";
+        if (IsOnDrug("Shard"))
+            drugState += ", <color=purple>Shard</color>";
+        if (IsOnDrug("Glucocorticoid"))
+            drugState += ", <color=purple>Glucocorticoid</color>";
+        if (IsOnDrug("Danazol"))
+            drugState += ", <color=purple>Danazol</color>";
+        if (IsOnDrug("Trenbolone"))
+            drugState += ", <color=purple>Trenbolone</color>";
+
+        return drugState;
+    }
+    public string GetPatriotState()
+    {
+        if (IsOnNativeTerrain() && IsPatriot())
+            return ", <color=green>Patriotic</color>";
+        return "";
+    }
+    public string GetInspiredState()
+    {
+        if (IsInspired())
+            return ", <color=green>Inspired</color>";
+        return "";
+    }
+    public string GetDissuadedState()
+    {
+        if (IsDissuaded())
+            return ", <color=red>Dissuaded</color>";
+        return "";
+    }
+    public string GetBloodRageState()
+    {
+        if (IsBloodRaged())
+            return ", <color=green>Blood Rage</color>";
+        return "";
+    }
+    public string GetSpottingState()
+    {
+        if (IsSpotting())
+            return $", <color=green>Spotting ({soldierManager.FindSoldierById(isSpotting).soldierName})</color>";
+        return "";
+    }
+    public string GetStatus()
+    {
+        string status = "";
+        status += GetHealthState();
+
+        if (IsAlive())
+        {
+            status += GetConsciousState();
+            status += GetArmourState();
+            status += GetTraumaState();
+            status += GetStunnedState();
+            status += GetHungerState();
+            status += GetLoudDetectedState();
+            status += GetMeleeControlState();
+            status += GetOverwatchState();
+            status += GetCoverState();
+            status += GetPoisonedState();
+            status += GetSuppressionState();
+            status += GetPlaydeadState();
+            status += GetDrugState();
+
+            status += GetPatriotState();
+            status += GetInspiredState();
+            status += GetDissuadedState();
+            status += GetBloodRageState();
+            status += GetSpottingState();
+        }
+        return status;
+    }
 
 
 

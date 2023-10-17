@@ -270,6 +270,47 @@ public class SoldierAlert : MonoBehaviour
         traumaButton.SetActive(false);
         transform.Find("TraumaToggle").gameObject.SetActive(false);
     }
+
+    public void OpenSoldierSnapshot()
+    {
+        MainMenu menu = FindObjectOfType<MainMenu>();
+        GameObject soldierSnapshot = Instantiate(menu.soldierSnapshotPrefab, menu.damageUI.transform);
+        soldierSnapshot.transform.SetAsLastSibling();
+        Transform soldierBanner = soldierSnapshot.transform.Find("SoldierBanner");
+
+        soldierBanner.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
+        soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = "HP: " + soldier.GetFullHP().ToString();
+        soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = "AP: " + soldier.ap.ToString();
+        soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MA: " + soldier.mp.ToString();
+        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Max Move: " + soldier.InstantSpeed.ToString();
+        soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = "XP: " + soldier.xp.ToString();
+        soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = "Status: " + soldier.GetStatus();
+
+        Transform soldierStatsUI = soldierSnapshot.transform.Find("SoldierStatsUI");
+
+        soldier.PaintSpeciality(soldierStatsUI);
+
+        foreach (string[] s in menu.AllStats)
+        {
+            Color displayColor = Color.white;
+            if (soldier.stats.GetStat(s[0]).Val < soldier.stats.GetStat(s[0]).BaseVal)
+                displayColor = Color.red;
+            else if (soldier.stats.GetStat(s[0]).Val > soldier.stats.GetStat(s[0]).BaseVal)
+                displayColor = Color.green;
+
+            soldierStatsUI.Find("Stats").Find("Base").Find(s[0]).GetComponent<TextMeshProUGUI>().text = soldier.stats.GetStat(s[0].ToString()).BaseVal.ToString();
+            soldierStatsUI.Find("Stats").Find("Active").Find(s[0]).GetComponent<TextMeshProUGUI>().text = soldier.stats.GetStat(s[0].ToString()).Val.ToString();
+            soldierStatsUI.Find("Stats").Find("Active").Find(s[0]).GetComponent<TextMeshProUGUI>().color = displayColor;
+        }
+
+        soldierStatsUI.Find("General").Find("Name").GetComponent<TextMeshProUGUI>().text = soldier.soldierName;
+        soldierStatsUI.Find("General").Find("Rank").GetComponent<TextMeshProUGUI>().text = soldier.rank;
+        soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().text = soldier.soldierTerrain;
+        soldierStatsUI.Find("General").Find("Specialty").GetComponent<TextMeshProUGUI>().text = soldier.PrintSoldierSpeciality();
+        soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = menu.PrintList(soldier.soldierAbilities);
+        soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().text = soldier.RoundsWithoutFood.ToString();
+        soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = soldier.tp.ToString();
+    }
 }
 
 

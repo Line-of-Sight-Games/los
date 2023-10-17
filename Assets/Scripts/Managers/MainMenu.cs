@@ -28,7 +28,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
         traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
         coverAlertUI, overwatchUI, externalItemSourcesUI, allyItemButtonUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, allyInventoryPanelPrefab, detectionAlertPrefab, 
-        lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyItemsButtonPrefab, 
+        lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyItemsButtonPrefab, soldierSnapshotPrefab, 
         soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
         overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen;
     public ItemIcon itemIconPrefab;
@@ -716,13 +716,21 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Soldier s in game.AllSoldiers())
         {
             if (overrideView)
+            {
                 s.soldierUI.SetActive(true);
+                s.soldierUI.transform.Find("ActionButton").GetComponent<Button>().interactable = true;
+            }
             else
             {
-                if (s.soldierTeam == game.currentTeam)
+                if (s.soldierTeam == game.currentTeam || s.IsSpotted())
                     s.soldierUI.SetActive(true);
                 else
                     s.soldierUI.SetActive(false);
+
+                if (s.soldierTeam != game.currentTeam && s.IsSpotted())
+                    s.soldierUI.transform.Find("ActionButton").GetComponent<Button>().interactable = false;
+                else
+                    s.soldierUI.transform.Find("ActionButton").GetComponent<Button>().interactable = true;
             }
         }
     }
@@ -734,7 +742,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 s.GetComponent<Renderer>().enabled = true;
             else
             {
-                if (s.soldierTeam == game.currentTeam || s.IsRevealed() || s.IsDead() || s.IsPlayingDead())
+                if (s.soldierTeam == game.currentTeam || s.IsRevealed() || s.IsDead() || s.IsPlayingDead() || s.IsSpotted())
                     s.GetComponent<Renderer>().enabled = true;
                 else
                     s.GetComponent<Renderer>().enabled = false;
@@ -1069,7 +1077,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MA: " + activeSoldier.mp.ToString();
         soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Max Move: " + activeSoldier.InstantSpeed.ToString();
         soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = "XP: " + activeSoldier.xp.ToString();
-        soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = "Status: " + GetStatus();
+        soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = "Status: " + activeSoldier.GetStatus();
 
         if (overrideView)
         {
@@ -1093,7 +1101,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         var soldierStatsUI = soldierBanner.Find("SoldierStatsUI");
         if (soldierStatsUI.gameObject.activeInHierarchy)
         {
-            PaintSpeciality(soldierStatsUI);
+            activeSoldier.PaintSpeciality(soldierStatsUI);
 
             foreach (string[] s in allStats)
             {
@@ -1151,249 +1159,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
         }
     }
-    public void PaintSpeciality(Transform soldierStatsUI)
-    {
-        TextMeshProUGUI[] statLabels = soldierStatsUI.Find("Stats").Find("Labels").GetComponentsInChildren<TextMeshProUGUI>();
-
-        foreach (TextMeshProUGUI t in statLabels)
-        {
-            foreach (string[] s in allStats)
-            {
-                Color displayColor = Color.white;
-                if (t.text == s[0] && s[1] == activeSoldier.soldierSpeciality)
-                {
-                    displayColor = Color.green;
-                    t.color = displayColor;
-                    break;
-                }
-                else
-                    t.color = displayColor;
-            }
-        }
-    }
-    public string GetHealthState()
-    {
-        int hp = activeSoldier.hp;
-
-        if (hp > activeSoldier.stats.H.Val)
-            return "<color=green>Overhealth</color>";
-        else if (hp == activeSoldier.stats.H.Val)
-            return "Full Health";
-        else if (hp <= 0)
-            return "<color=red>Dead</color>";
-        else if (hp <= activeSoldier.stats.H.Val / 3)
-            return "<color=red>Critically Injured</color>";
-        else if (hp <= activeSoldier.stats.H.Val / 2)
-            return "<color=orange>Severely Injured</color>";
-        else
-            return "<color=yellow>Injured</color>";
-    }
-
-    public string GetConsciousState()
-    {
-        if (activeSoldier.IsUnconscious())
-            return ", <color=blue>Unconscious</color>";
-        else if (activeSoldier.IsLastStand())
-            return ", <color=red>Last Stand</color>";
-        else
-            return "";
-    }
-    public string GetArmourState()
-    {
-        if (activeSoldier.GetArmourHP() > 0)
-            return $", <color=green>Armoured({activeSoldier.GetArmourHP()})</color>";
-        else
-            return "";
-    }
-    public string GetTraumaState()
-    {
-        return activeSoldier.tp switch
-        {
-            0 => ", Committed",
-            1 => ", <color=yellow>Wavering</color>",
-            2 => ", <color=yellow>Shaken</color>",
-            3 => ", <color=orange>Frozen</color>",
-            4 => ", <color=red>Broken</color>",
-            _ => ", <color=blue>Desensitised</color>",
-        };
-    }
-
-    public string GetStunnedState()
-    {
-        if (activeSoldier.IsStunned())
-            return $", <color=red>Stunned({activeSoldier.stunnedRoundsVulnerable})</color>";
-        else
-            return "";
-    }
-
-    public string GetHungerState()
-    {
-        if (activeSoldier.RoundsWithoutFood >= 30)
-            return ", <color=red>Starving</color>";
-        else if (activeSoldier.RoundsWithoutFood >= 20)
-            return ", <color=orange>Very Hungry</color>";
-        else if (activeSoldier.RoundsWithoutFood >= 10)
-            return ", <color=yellow>Hungry</color>";
-        else
-            return "";
-    }
-    public string GetMeleeControlState()
-    {
-        string controlString = "";
-
-        if (activeSoldier.controllingSoldiersList.Count > 0)
-        {
-            controlString += ", <color=green>Controlling (";
-
-            for (int i = 0; i < activeSoldier.controllingSoldiersList.Count; i++)
-            {
-                if (i > 0)
-                    controlString += ", " + soldierManager.FindSoldierById(activeSoldier.controllingSoldiersList[i]).soldierName;
-                else
-                    controlString += soldierManager.FindSoldierById(activeSoldier.controllingSoldiersList[i]).soldierName;
-            }
-            controlString += ")</color>";
-        }
-            
-        if (activeSoldier.controlledBySoldiersList.Count > 0)
-        {
-            controlString += ", <color=red>Controlled By (";
-
-            for (int i = 0; i < activeSoldier.controlledBySoldiersList.Count; i++)
-            {
-                if (i > 0)
-                    controlString += ", " + soldierManager.FindSoldierById(activeSoldier.controlledBySoldiersList[i]).soldierName;
-                else
-                    controlString += soldierManager.FindSoldierById(activeSoldier.controlledBySoldiersList[i]).soldierName;
-            }
-            controlString += ")</color>";
-        }
-
-        return controlString;
-    }
-    public string GetCoverState()
-    {
-        if (activeSoldier.IsInCover())
-            return ", <color=green>Taking Cover</color>";
-        else
-            return "";
-    }
-    public string GetOverwatchState()
-    {
-        if (activeSoldier.IsOnOverwatch())
-            return ", <color=green>Overwatch</color>";
-        else
-            return "";
-    }
-    public string GetLoudDetectedState()
-    {
-        if (activeSoldier.loudActionRoundsVulnerable > 0)
-            return ", <color=red>Vulnerable(" + activeSoldier.loudActionRoundsVulnerable + ")</color>";
-        else
-            return "";
-    }
-
-    public string GetPoisonedState()
-    {
-        if (activeSoldier.IsPoisoned())
-            return ", <color=red>Poisoned</color>";
-        else
-            return "";
-    }
-
-    public string GetSuppressionState()
-    {
-        if (activeSoldier.GetSuppression() > 0)
-            return ", <color=orange>Suppressed (" + activeSoldier.GetSuppression() + ")</color>";
-        else
-            return "";
-    }
-
-    public string GetPlaydeadState()
-    {
-        if (activeSoldier.IsPlayingDead())
-            return ", <color=yellow>Playdead</color>";
-        else
-            return "";
-    }
-
-    public string GetDrugState()
-    {
-        string drugState = "";
-
-        if (activeSoldier.IsOnDrug("Modafinil"))
-            drugState += ", <color=purple>Modafinil</color>";
-        if (activeSoldier.IsOnDrug("Amphetamine"))
-            drugState += ", <color=purple>Amphetamine</color>";
-        if (activeSoldier.IsOnDrug("Androstenedione"))
-            drugState += ", <color=purple>Androstenedione</color>";
-        if (activeSoldier.IsOnDrug("Cannabinoid"))
-            drugState += ", <color=purple>Cannabinoid</color>";
-        if (activeSoldier.IsOnDrug("Shard"))
-            drugState += ", <color=purple>Shard</color>";
-        if (activeSoldier.IsOnDrug("Glucocorticoid"))
-            drugState += ", <color=purple>Glucocorticoid</color>";
-        if (activeSoldier.IsOnDrug("Danazol"))
-            drugState += ", <color=purple>Danazol</color>";
-        if (activeSoldier.IsOnDrug("Trenbolone"))
-            drugState += ", <color=purple>Trenbolone</color>";
-
-        return drugState;
-    }
-    public string GetPatriotState()
-    {
-        if (activeSoldier.IsOnNativeTerrain() && activeSoldier.IsPatriot())
-            return ", <color=green>Patriotic</color>";
-        else
-            return "";
-    }
-    public string GetInspiredState()
-    {
-        if (activeSoldier.IsInspired())
-            return ", <color=green>Inspired</color>";
-        else
-            return "";
-    }
-    public string GetDissuadedState()
-    {
-        if (activeSoldier.IsDissuaded())
-            return ", <color=red>Dissuaded</color>";
-        else
-            return "";
-    }
-    public string GetBloodRageState()
-    {
-        if (activeSoldier.IsBloodRaged())
-            return ", <color=green>Blood Rage</color>";
-        else
-            return "";
-    }
-    public string GetStatus()
-    {
-        string status = "";
-        status += GetHealthState();
-
-        if (activeSoldier.IsAlive())
-        {
-            status += GetConsciousState();
-            status += GetArmourState();
-            status += GetTraumaState();
-            status += GetStunnedState();
-            status += GetHungerState();
-            status += GetLoudDetectedState();
-            status += GetMeleeControlState();
-            status += GetOverwatchState();
-            status += GetCoverState();
-            status += GetPoisonedState();
-            status += GetSuppressionState();
-            status += GetPlaydeadState();
-            status += GetDrugState();
-
-            status += GetPatriotState();
-            status += GetInspiredState();
-            status += GetDissuadedState();
-            status += GetBloodRageState();
-        }
+    
         
         
 
@@ -1495,9 +1261,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
              spot
 
          end*/
-
-        return status;
-    }
 
     public void CloseSoldierMenu()
     {
@@ -3593,5 +3356,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         SetTeamTurnStartFlagTo(true);
         teamTurnStartUI.SetActive(false);
+    }
+
+
+
+
+
+
+
+    //properties
+    public string[][] AllStats
+    {
+        get
+        {
+            return allStats;
+        }
     }
 }

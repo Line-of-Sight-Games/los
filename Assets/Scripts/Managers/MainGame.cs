@@ -227,10 +227,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (s.stunnedRoundsVulnerable > 0)
                     s.stunnedRoundsVulnerable--;
 
-                //decrement loud action counter
-                if (s.loudActionRoundsVulnerable > 0)
-                    s.loudActionRoundsVulnerable--;
-
                 //unset suppression
                 s.UnsetSuppression();
             }
@@ -239,6 +235,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //unset overwatch
                 if (s.IsOnOverwatch())
                     s.UnsetOverwatch();
+
+                //decrement loud action counter
+                if (s.loudActionRoundsVulnerable > 0)
+                    s.loudActionRoundsVulnerable--;
             }
         }
 
@@ -1049,7 +1049,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         shotLine.Normalize();
         Vector2 windLine = weather.CurrentWindDirection;
         float shotAngleRelativeToWind = Vector2.Angle(shotLine, windLine);
-        print("WIND: " + windLine + " SHOT: " + shotLine + "ANGLE: " + shotAngleRelativeToWind);
+        //print("WIND: " + windLine + " SHOT: " + shotLine + "ANGLE: " + shotAngleRelativeToWind);
 
         float windMod;
 
@@ -1441,7 +1441,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     else
                         menu.AddXpAlert(targetSoldier, 10, $"Dodged shot with a {chances.Item1}% chance from {shooter.soldierName}!", false);
 
-                    //push the no damage attack through for witness trigger
+                    //push the no damage attack through for abilities trigger
                     targetSoldier.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
                 }
             }
@@ -2079,7 +2079,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         {
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
 
-                            //push the no damage attack through for witness trigger
+                            //push the no damage attack through for abilities trigger
                             defender.TakeDamage(attacker, meleeDamage, true, new List<string>() { "Melee" });
                         }
                     }
@@ -2468,6 +2468,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             activeSoldier.ap -= ap;
             activeSoldier.usedAP = true;
+
+            //break spotter ability
+            activeSoldier.RemoveAllSpotting();
         }
     }
     public void DeductMP(int mp)
@@ -3076,7 +3079,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee, bool triggersOverwatch)
     {
-        //print(GetCallingFunctionName());
+        print(GetCallingFunctionName());
         yield return new WaitUntil(() => menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true && menu.overrideView == false);
 
         string movingSoldierActiveStat = "F";
