@@ -2,56 +2,52 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 [System.Serializable]
 public class Inventory
 {
     [JsonIgnore] public Item itemPrefab;
-    [JsonIgnore] public Soldier linkedSoldier;
+    [JsonIgnore] public IHaveInventory linkedInventoryObject;
     private List<Item> itemList;
     private List<string> itemIds;
 
-    public Inventory(Soldier soldier)
+    public Inventory(IHaveInventory inventoryObject)
     {
         itemList = new List<Item>();
         itemIds = new List<string>();
-        linkedSoldier = soldier;
+        linkedInventoryObject = inventoryObject;
     }
 
     public void AddItemToSlot(Item item, string slotName)
     {
-        //save the item id in the appropriate slot
-        linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = item.id;
-
-        itemList.Add(item);
-        itemIds.Add(item.id);
-        item.transform.SetParent(linkedSoldier.gameObject.transform, true);
-        item.transform.localPosition = new Vector3(0, 0, 0);
-        item.owner = linkedSoldier;
+        if (linkedInventoryObject is Soldier linkedSoldier)
+        {
+            //save the item id in the appropriate slot
+            linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = item.id;
+        }
     }
-
     public void AddItem(Item item)
     {
         itemList.Add(item);
         itemIds.Add(item.id);
-        item.transform.SetParent(linkedSoldier.gameObject.transform, true);
+        item.transform.SetParent(linkedInventoryObject.GameObject.transform, true);
         item.transform.localPosition = new Vector3(0, 0, 0);
-        item.owner = linkedSoldier;
+        item.owner = linkedInventoryObject;
     }
-
     public void RemoveItem(Item item)
     {
         //print("ran remove item");
         itemList.Remove(item);
         item.transform.SetParent(null, true);
-        item.X = linkedSoldier.X;
-        item.Y = linkedSoldier.Y;
-        item.Z = linkedSoldier.Z;
+        item.X = linkedInventoryObject.X;
+        item.Y = linkedInventoryObject.Y;
+        item.Z = linkedInventoryObject.Z;
         item.owner = null;
     }
 
-    public bool FindItem(string name)
+    public bool HasItem(string name)
     {
         foreach (Item i in itemList)
             if (i.itemName == name)

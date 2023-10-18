@@ -8,8 +8,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
-using System.Xml.Linq;
-using UnityEditor.Experimental.GraphView;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable
 {
@@ -36,8 +34,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public BoxCollider bodyCollider;
     public Dictionary<string, string> inventorySlots = new()
     {
-        { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "Left_Leg", "" }, { "Right_Leg", "" }, { "Left_Hand", "" }, { "Right_Hand", "" }, { "Left_Brace", "" },
-        { "Right_Brace", "" }, { "Backpack1", "" }, { "Backpack2", "" }, { "Backpack3", "" }, { "Armour1", "" }, { "Armour2", "" }, { "Armour3", "" }, { "Armour4", "" }, { "Misc", "" }
+        { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }, { "LeftBrace", "" },
+        { "RightBrace", "" }, { "Backpack1", "" }, { "Backpack2", "" }, { "Backpack3", "" }, { "Armour1", "" }, { "Armour2", "" }, { "Armour3", "" }, { "Armour4", "" }, { "Misc", "" }
     };
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
@@ -536,7 +534,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             itemList.Add(item);
 
         foreach (Item item in itemList)
-            item.manager.DestroyItem(item);
+            item.itemManager.DestroyItem(item);
     }
     public Item DropItem(Item item)
     {
@@ -2040,7 +2038,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsInteractable()
     {
-        if (CheckState("Crushed"))
+        if (CheckState("Crushed") || IsMeleeControlled())
             return false;
 
         return true;
@@ -2550,49 +2548,49 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasArmourIntegrity()
     {
-        if ((Inventory.FindItem("Armour_Juggernaut") && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0) || (Inventory.FindItem("Armour_Body") && Inventory.GetItem("Armour_Body").ablativeHealth > 0))
+        if ((Inventory.HasItem("Armour_Juggernaut") && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0) || (Inventory.HasItem("Armour_Body") && Inventory.GetItem("Armour_Body").ablativeHealth > 0))
             return true;
         return false;
     }
     public bool IsWearingBodyArmour()
     {
-        if (Inventory.FindItem("Armour_Body"))
+        if (Inventory.HasItem("Armour_Body"))
             return true;
         return false;
     }
     public bool IsWearingJuggernautArmour()
     {
-        if (Inventory.FindItem("Armour_Juggernaut"))
+        if (Inventory.HasItem("Armour_Juggernaut"))
             return true;
         return false;
     }
     public bool IsWearingExoArmour()
     {
-        if (Inventory.FindItem("Armour_Exo"))
+        if (Inventory.HasItem("Armour_Exo"))
             return true;
         return false;
     }
     public bool IsWearingGhillieArmour()
     {
-        if (Inventory.FindItem("Armour_Ghillie"))
+        if (Inventory.HasItem("Armour_Ghillie"))
             return true;
         return false;
     }
     public bool IsWearingStimulantArmour()
     {
-        if (Inventory.FindItem("Armour_Stimulant"))
+        if (Inventory.HasItem("Armour_Stimulant"))
             return true;
         return false;
     }
     public bool IsCarryingRiotShield()
     {
-        if (Inventory.FindItem("Riot_Shield"))
+        if (Inventory.HasItem("Riot_Shield"))
             return true;
         return false;
     }
     public bool IsWearingLogisticsBelt()
     {
-        if (Inventory.FindItem("Logistics_Belt"))
+        if (Inventory.HasItem("Logistics_Belt"))
             return true;
         return false;
     }
@@ -3319,7 +3317,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         get 
         {
-            inventorySlots.TryGetValue("Left_Hand", out string leftHand);
+            inventorySlots.TryGetValue("LeftHand", out string leftHand);
             return itemManager.FindItemById(leftHand);
         }
     }
@@ -3327,7 +3325,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         get
         {
-            inventorySlots.TryGetValue("Right_Hand", out string rightHand);
+            inventorySlots.TryGetValue("RightHand", out string rightHand);
             return itemManager.FindItemById(rightHand);
         }
     }
@@ -3379,5 +3377,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string Id
     {
         get { return id; }
+    }
+    public GameObject GameObject
+    {
+        get { return gameObject; }
     }
 }

@@ -149,8 +149,8 @@ public class Item : PhysicalObject, IDataPersistence
     public MainGame game;
     public MainMenu menu; 
     public ItemReader reader;
-    public ItemManager manager;
-    public Soldier owner;
+    public ItemManager itemManager;
+    public IHaveInventory owner;
 
     public ItemType itemType;
     public Sprite itemImage;
@@ -211,7 +211,7 @@ public class Item : PhysicalObject, IDataPersistence
         game = FindObjectOfType<MainGame>();
         menu = FindObjectOfType<MainMenu>();
         reader = FindObjectOfType<ItemReader>();
-        manager = FindObjectOfType<ItemManager>();
+        itemManager = FindObjectOfType<ItemManager>();
     }
 
     public Item Init(string name)
@@ -274,7 +274,7 @@ public class Item : PhysicalObject, IDataPersistence
             gunLongCoverDamage = reader.allItems.items[itemIndex].Long_Cov_Damage;
         }
 
-        manager.RefreshItemList();
+        itemManager.RefreshItemList();
 
         return this;
     }
@@ -576,81 +576,92 @@ public class Item : PhysicalObject, IDataPersistence
 
     public void RunPickupEffect()
     {
-        //unset cover for JA wearers
-        if (itemName == "Armour_Juggernaut")
-            owner.UnsetCover();
-
-        //take exo armour health
-        if (itemName == "Armour_Exo")
+        if (owner is Soldier owningSoldier)
         {
-            owner.stats.H.BaseVal -= 3;
-            owner.TakeDamage(null, 3, true, new List<string>() { "Exo" });
-        }
+            //unset cover for JA wearers
+            if (itemName == "Armour_Juggernaut")
+                owningSoldier.UnsetCover();
 
-        //reset sustenance for stim armour
-        if (itemName == "Armour_Stimulant")
-            owner.ResetRoundsWithoutFood();
-
-        //spawn small medkit inside brace
-        if (itemName == "Brace")
-            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Small"), "Misc");
-
-        //spawn med medkit in bag
-        if (itemName == "Bag")
-            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Medium"), "Misc");
-
-        //spawn small & med medkit in backpack
-        if (itemName == "Backpack")
-        {
-            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Small"), "Misc");
-            owner.PickUpItemToSlot(owner.game.itemManager.SpawnItem("Medkit_Medium"), "Misc");
-        }
-
-        //perform ability effects
-        if (gunType != null)
-        {
-            if (owner.IsGunner())
+            //take exo armour health
+            if (itemName == "Armour_Exo")
             {
-                //one time 1.5 bonus to max clip and ammo
-                if (gunMaxClip == gunBaseMaxClip)
+                owningSoldier.stats.H.BaseVal -= 3;
+                owningSoldier.TakeDamage(null, 3, true, new List<string>() { "Exo" });
+            }
+
+            //reset sustenance for stim armour
+            if (itemName == "Armour_Stimulant")
+                owningSoldier.ResetRoundsWithoutFood();
+
+            //spawn small medkit inside brace
+            if (itemName == "Brace")
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc");
+
+            //spawn med medkit in bag
+            if (itemName == "Bag")
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc");
+
+            //spawn small & med medkit in backpack
+            if (itemName == "Backpack")
+            {
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc");
+            }
+
+            //perform ability effects
+            if (gunType != null)
+            {
+                if (owningSoldier.IsGunner())
                 {
-                    gunMaxClip = Mathf.FloorToInt(gunMaxClip*1.5f);
-                    ammo = Mathf.FloorToInt(ammo * 1.5f);
-                }
-                
-                //add 1 round to empty guns
-                if (ammo == 0)
-                    ammo++;
-            }
+                    //one time 1.5 bonus to max clip and ammo
+                    if (gunMaxClip == gunBaseMaxClip)
+                    {
+                        gunMaxClip = Mathf.FloorToInt(gunMaxClip * 1.5f);
+                        ammo = Mathf.FloorToInt(ammo * 1.5f);
+                    }
 
-            if (owner.IsPlanner())
-            {
-                ammo += game.DiceRoll();
-                if (ammo > gunMaxClip)
-                    ammo = gunMaxClip;
+                    //add 1 round to empty guns
+                    if (ammo == 0)
+                        ammo++;
+                }
+
+                if (owningSoldier.IsPlanner())
+                {
+                    ammo += game.DiceRoll();
+                    if (ammo > gunMaxClip)
+                        ammo = gunMaxClip;
+                }
             }
-        }
+        } 
     }
     public bool CheckAnyAmmo()
     {
-        if (ammo > 0)
-            return true;
-        else
+        if (owner is Soldier owningSoldier)
         {
-            owner.UnsetOverwatch();
-            return false;
+            if (ammo > 0)
+                return true;
+            else
+            {
+                owningSoldier.UnsetOverwatch();
+                return false;
+            }
         }
+        return false;
     }
 
     public bool CheckSpecificAmmo(int ammo, bool fromSuppression)
     {
-        if (fromSuppression && owner.IsGunner())
-            ammo--;
+        if (owner is Soldier owningSoldier)
+        {
+            if (fromSuppression && owningSoldier.IsGunner())
+                ammo--;
 
-        if (this.ammo >= ammo)
-            return true;
-        else
-            return false;
+            if (this.ammo >= ammo)
+                return true;
+            else
+                return false;
+        }
+        return false;
     }
 
     public void SpendSingleAmmo()
@@ -660,10 +671,13 @@ public class Item : PhysicalObject, IDataPersistence
 
     public void SpendSpecificAmmo(int ammo, bool fromSuppression)
     {
-        if (fromSuppression && owner.IsGunner())
-            ammo--;
+        if (owner is Soldier owningSoldier)
+        {
+            if (fromSuppression && owningSoldier.IsGunner())
+                ammo--;
 
-        this.ammo -= ammo;
+            this.ammo -= ammo;
+        }
     }
     public int TakeAblativeDamage(int damage)
     {

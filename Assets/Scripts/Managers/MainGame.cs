@@ -46,6 +46,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return soldierManager.allSoldiers;
     }
+    public List<GoodyBox> AllGoodyBoxes()
+    {
+        return FindObjectsOfType<GoodyBox>().ToList();
+    }
     public int RandomNumber(int min, int max)
     {
         return UnityEngine.Random.Range(min, max + 1);
@@ -2148,26 +2152,26 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //configure functions
     public void UpdateConfigureAP()
     {
-        int totalPickup = 0, totalDrop = 0, totalSwap = 0, ap = 0;
+        /*int totalPickup = 0, totalDrop = 0, totalSwap = 0, ap = 0;
 
         foreach (Transform child in groundItemsContentUI)
-            if (child.GetComponent<ItemIcon>().pickupNumber == 0)
+            if (child.GetComponent<GBItemIcon>().pickupNumber == 0)
                 totalPickup++;
 
         foreach (Transform allyButton in allyButtonContentUI)
-            foreach (Transform itemIcon in allyButton.GetComponent<AllyItemsButton>().linkedItemPanel.transform.Find("Viewport").Find("AllyInventoryContent"))
-                if (itemIcon.GetComponent<ItemIcon>().pickupNumber == 0)
+            foreach (Transform itemIcon in allyButton.GetComponent<AllyItemsButton>().linkedItemPanel.transform.Find("Viewport").Find("InventoryContent"))
+                if (itemIcon.GetComponent<GBItemIcon>().pickupNumber == 0)
                     totalSwap++;
 
         foreach (Transform child in allItemsContentUI)
-            if (child.GetComponent<ItemIcon>() != null)
-                if (child.GetComponent<ItemIcon>().pickupNumber > 0)
-                    totalPickup += child.GetComponent<ItemIcon>().pickupNumber;
+            if (child.GetComponent<GBItemIcon>() != null)
+                if (child.GetComponent<GBItemIcon>().pickupNumber > 0)
+                    totalPickup += child.GetComponent<GBItemIcon>().pickupNumber;
 
         foreach (Transform child in inventoryItemsContentUI)
-            if (child.GetComponent<ItemIcon>().pickupNumber == 0)
+            if (child.GetComponent<GBItemIcon>().pickupNumber == 0)
             {
-                if (child.GetComponent<ItemIcon>().destination == null)
+                if (child.GetComponent<GBItemIcon>().destination == null)
                     totalDrop++;
                 else
                     totalSwap++;
@@ -2193,7 +2197,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
             ap = 0;
 
-        menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
+        menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();*/
     }
     public List<Item> FindNearbyItems()
     {
@@ -2208,16 +2212,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmConfigure()
     {
-        int.TryParse(menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
+        /*int.TryParse(menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
 
         if (CheckAP(ap))
         {
             DeductAP(ap);
             foreach (Transform child in allItemsContentUI)
             {
-                if (child.GetComponent<ItemIcon>() != null)
+                if (child.GetComponent<GBItemIcon>() != null)
                 {
-                    ItemIcon itemDetails = child.GetComponent<ItemIcon>();
+                    GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
 
                     for (int i = 0; i < itemDetails.pickupNumber; i++)
                         activeSoldier.PickUpItemToSlot(itemManager.SpawnItem(child.gameObject.name), "Left_Hand");
@@ -2226,7 +2230,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             foreach (Transform child in inventoryItemsContentUI)
             {
-                ItemIcon itemDetails = child.GetComponent<ItemIcon>();
+                GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
 
                 if (itemDetails.pickupNumber == 0)
                 {
@@ -2240,23 +2244,23 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             foreach (Transform child in groundItemsContentUI)
             {
-                ItemIcon itemDetails = child.GetComponent<ItemIcon>();
+                GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
 
                 if (itemDetails.pickupNumber == 0)
                     activeSoldier.PickUpItemToSlot(itemDetails.linkedItem, "Left_Hand");
             }
 
             foreach (Transform allyButton in allyButtonContentUI)
-                foreach (Transform child in allyButton.GetComponent<AllyItemsButton>().linkedItemPanel.transform.Find("Viewport").Find("AllyInventoryContent"))
+                foreach (Transform child in allyButton.GetComponent<AllyItemsButton>().linkedItemPanel.transform.Find("Viewport").Find("InventoryContent"))
                 {
-                    ItemIcon itemDetails = child.GetComponent<ItemIcon>();
+                    GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
 
                     if (itemDetails.pickupNumber == 0)
                         activeSoldier.PickUpItemToSlot(itemDetails.linkedItem.owner.DropItem(itemDetails.linkedItem), "Left_Hand");
                 }
-
+            */
             menu.CloseConfigureUI();
-        }
+        //}
     }
 
 
@@ -3599,13 +3603,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmInsertGameObjects()
     {
         TMP_Dropdown terminalTypeDropdown = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").Find("TerminalTypeDropdown").GetComponent<TMP_Dropdown>();
+        Transform gbItemsPanel = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("AllItemsPanel").Find("Viewport").Find("GoodyBoxItemsContent");
 
         int spawnedObject = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ObjectType").Find("ObjectTypeDropdown").GetComponent<TMP_Dropdown>().value;
         //check input formatting
         if (spawnedObject != 0 && GetInsertLocation(out Tuple<Vector3, string> spawnLocation))
         {
             if (spawnedObject == 1)
-                Instantiate(gbPrefab).Init(spawnLocation);
+            {
+                GoodyBox gb = Instantiate(gbPrefab).Init(spawnLocation);
+                //fill gb with items
+                foreach (Transform child in gbItemsPanel)
+                    gb.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+            }
             else if (spawnedObject == 2)
                 Instantiate(terminalPrefab).Init(spawnLocation, terminalTypeDropdown.options[terminalTypeDropdown.value].text);
             else if (spawnedObject == 3)
@@ -3638,10 +3648,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         int spawnedObject = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ObjectType").Find("ObjectTypeDropdown").GetComponent<TMP_Dropdown>().value;
         GameObject terminalType = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").gameObject;
+        GameObject allItemsPanel = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("AllItemsPanel").gameObject;
+        terminalType.SetActive(false);
+        allItemsPanel.SetActive(false);
 
         if (spawnedObject == 1)
         {
-            terminalType.SetActive(false);
+            allItemsPanel.SetActive(true);
+            activeItemPanel = allItemsPanel.transform;
         }
         else if (spawnedObject == 2)
         {
@@ -3649,11 +3663,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (spawnedObject == 3)
         {
-            terminalType.SetActive(false);
-        }
-        else
-        {
-            terminalType.SetActive(false);
+            
         }
     }
 

@@ -65,5 +65,10 @@ public class SoldierUI : MonoBehaviour
         game.activeSoldier = linkedSoldier;
         menu.menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(false);
         menu.menuUI.transform.Find("Options Panel").Find("SoldierOptions").gameObject.SetActive(true);
+
+        //populate soldier loadout
+        Transform soldierBanner = menu.soldierOptionsUI.transform.Find("SoldierBanner");
+        soldierBanner.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
+        soldierBanner.Find("SoldierStatsUI").Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(linkedSoldier);
     }
 }

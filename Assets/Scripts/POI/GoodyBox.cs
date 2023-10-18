@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static ItemReader;
 
 public class GoodyBox : POI, IDataPersistence, IHaveInventory
 {
@@ -24,7 +25,7 @@ public class GoodyBox : POI, IDataPersistence, IHaveInventory
         z = (int)location.Item1.z;
         terrainOn = location.Item2;
         MapPhysicalPosition(x, y, z);
-        inventory = new Inventory(null);
+        inventory = new Inventory(this);
 
         return this;
     }
@@ -42,7 +43,7 @@ public class GoodyBox : POI, IDataPersistence, IHaveInventory
             MapPhysicalPosition(x, y, z);
 
             //load items
-            inventory = new Inventory(null);
+            inventory = new Inventory(this);
             itemsJArray = (JArray)details["inventory"];
             foreach (string itemId in itemsJArray)
                 inventoryList.Add(itemId);
@@ -69,8 +70,11 @@ public class GoodyBox : POI, IDataPersistence, IHaveInventory
         data.allPOIDetails.Add(id, details);
     }
 
-    public Inventory Inventory
+    public void AddItemToGB(Item item)
     {
-        get { return inventory; }
-    } 
+        inventory.AddItem(item);
+    }
+
+    public Inventory Inventory { get { return inventory; } }
+    public GameObject GameObject { get { return gameObject; } }
 }

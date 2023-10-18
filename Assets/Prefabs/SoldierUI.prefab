@@ -971,8 +971,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  initialiser: 0
   game: {fileID: 0}
+  min: 0
+  max: 0
+  normalColour: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &2687862115611920848
 GameObject:
   m_ObjectHideFlags: 0
@@ -3285,7 +3287,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1334493526485889466}
-        m_TargetAssemblyTypeName: SolderUI, Assembly-CSharp
+        m_TargetAssemblyTypeName: SoldierUI, Assembly-CSharp
         m_MethodName: OpenSoldierMenu
         m_Mode: 1
         m_Arguments:
@@ -4706,8 +4708,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  initialiser: 0
   game: {fileID: 0}
+  min: 0
+  max: 0
+  normalColour: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &7772743642484609598
 GameObject:
   m_ObjectHideFlags: 0
@@ -5212,8 +5216,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  initialiser: 0
   game: {fileID: 0}
+  min: 0
+  max: 0
+  normalColour: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1001 &6764351343910189243
 PrefabInstance:
   m_ObjectHideFlags: 0
