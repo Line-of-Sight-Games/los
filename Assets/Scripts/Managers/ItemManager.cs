@@ -47,20 +47,25 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     public void AssignItemsToOwners()
     {
         IEnumerable<Item> allItems = FindObjectsOfType<Item>();
-        IEnumerable<Soldier> allSoldiers = FindObjectsOfType<Soldier>();
-        foreach (Soldier soldier in allSoldiers)
+        IEnumerable<MonoBehaviour> allObjects = FindObjectsOfType<MonoBehaviour>();
+
+        // Filter objects that implement IHaveInventory interface
+        foreach (MonoBehaviour obj in allObjects)
         {
-            //print("check soldier " + soldier.soldierName);
-            foreach (string itemId in soldier.inventoryList)
+            if (obj is IHaveInventory inventoryObject)
             {
-                //print("soldier's itemlist " + itemId);
-                foreach (Item item in allItems)
+                print("check object " + inventoryObject);
+                foreach (string itemId in inventoryObject.InventoryList)
                 {
-                    //print("item name " + item.itemName);
-                    //print("item id " + item.id);
-                    if (item.id == itemId)
+                    print("soldier's itemlist " + itemId);
+                    foreach (Item item in allItems)
                     {
-                        soldier.Inventory.AddItem(item);
+                        print("item name " + item.itemName);
+                        print("item id " + item.id);
+                        if (item.id == itemId)
+                        {
+                            inventoryObject.Inventory.AddItem(item);
+                        }
                     }
                 }
             }

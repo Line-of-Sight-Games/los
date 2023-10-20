@@ -5,8 +5,11 @@ using UnityEngine;
 public class InventoryDisplayPanelSoldier : MonoBehaviour
 {
     public ItemIcon itemIconPrefab;
+    public Soldier linkedSoldier;
     public InventoryDisplayPanelSoldier Init(Soldier s)
     {
+        linkedSoldier = s;
+        LinkSlots(s);
         GetItemInSlot(s, "Head");
         GetItemInSlot(s, "Chest");
         GetItemInSlot(s, "Back");
@@ -29,7 +32,12 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
 
         return this;
     }
-    
+    public void LinkSlots(Soldier s)
+    {
+        foreach (Transform child in transform)
+            if (child.GetComponent<ItemSlot>() != null)
+                child.GetComponent<ItemSlot>().Init(s);
+    }
 
     public void GetItemInSlot(Soldier s, string slotName)
     {

@@ -5,19 +5,32 @@ using UnityEngine.EventSystems;
 public class ItemSlot : MonoBehaviour, IDropHandler
 {
     public Item item; // The item currently in the slot
+    public IHaveInventory linkedInventoryObject;
 
+    public ItemSlot Init(IHaveInventory linkedInventoryObject)
+    {
+        this.linkedInventoryObject = linkedInventoryObject;
+
+        return this;
+    }
     public void OnDrop(PointerEventData eventData)
     {
         if (eventData.pointerDrag.TryGetComponent<ItemIcon>(out var draggedIcon))
         {
-            // Drop the item into the slot
-            item = draggedIcon.item;
-
-            // Optionally, you can update the visuals or perform other actions
-
-            // Reset the dragged icon's position
-            draggedIcon.transform.SetParent(transform);
-            draggedIcon.transform.localPosition = Vector3.zero;
+            if (linkedInventoryObject is Soldier linkedSoldier)
+                linkedSoldier.PickUpItemToSlot(draggedIcon.item, transform.name);
         }
+    }
+    public void AssignItem(ItemIcon itemIcon)
+    {
+        // Move the item to the new slot
+        itemIcon.originalSlot = transform;
+
+        itemIcon.transform.SetParent(transform);
+        itemIcon.rectTransform.localPosition = Vector3.zero;
+        itemIcon.rectTransform.sizeDelta = Vector2.zero;
+
+        // Set the item in the target slot
+        item = itemIcon.item;
     }
 }

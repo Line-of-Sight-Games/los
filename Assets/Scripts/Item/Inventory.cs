@@ -24,8 +24,16 @@ public class Inventory
     {
         if (linkedInventoryObject is Soldier linkedSoldier)
         {
-            //save the item id in the appropriate slot
+            AddItem(item);
             linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = item.id;
+        }
+    }
+    public void RemoveItemFromSlot(Item item, string slotName)
+    {
+        if (linkedInventoryObject is Soldier linkedSoldier)
+        {
+            AddItem(item);
+            linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = "";
         }
     }
     public void AddItem(Item item)

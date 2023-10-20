@@ -10,6 +10,7 @@ public class InventorySourceIconGoodyBox : InventorySourceIcon
     {
         linkedGB = gb;
         linkedInventoryPanel = inventorySourcePanel;
+
         return this;
     }
 }

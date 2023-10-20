@@ -483,9 +483,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     if (force || (moveToLocation.Item1.x <= activeSoldier.X + 3 && moveToLocation.Item1.x >= activeSoldier.X - 3 && moveToLocation.Item1.y <= activeSoldier.Y + 3 && moveToLocation.Item1.y >= activeSoldier.Y - 3))
                     {
-                        if (CheckAP(ap) && CheckMP(1))
+                        if (CheckAP(ap))
                         {
                             PerformMove(activeSoldier, ap, moveToLocation, meleeToggle.isOn, coverToggle.isOn, fallInput.text);
+                            activeSoldier.mp += 1; //refund ma to make it cost 0 MA
                             //trigger loud action
                             activeSoldier.PerformLoudAction(10);
                         }
@@ -3614,7 +3615,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 GoodyBox gb = Instantiate(gbPrefab).Init(spawnLocation);
                 //fill gb with items
                 foreach (Transform child in gbItemsPanel)
-                    gb.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+                {
+                    ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
+                    if (itemIcon != null && itemIcon.pickupNumber > 0)
+                        for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
+                            gb.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+                }
             }
             else if (spawnedObject == 2)
                 Instantiate(terminalPrefab).Init(spawnLocation, terminalTypeDropdown.options[terminalTypeDropdown.value].text);

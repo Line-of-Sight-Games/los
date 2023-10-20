@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5214819988471038505}
   - component: {fileID: -3382003001501138857}
   - component: {fileID: -8554008635442115429}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: ItemIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,6 +93,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemManager: {fileID: 0}
   item: {fileID: 0}
+  rectTransform: {fileID: 0}
+  originalSlot: {fileID: 0}
 --- !u!225 &-8554008635442115429
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -116,7 +118,7 @@ GameObject:
   - component: {fileID: 6649261553043592044}
   - component: {fileID: 1130294135468012181}
   - component: {fileID: 8960893595880812868}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: ItemImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,7 +173,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fe2184c2d6697b845a6fcbdeb1ac353e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bfd998948a3c1a54eba66163685efc4e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

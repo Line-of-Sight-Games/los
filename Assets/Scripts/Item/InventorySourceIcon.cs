@@ -12,6 +12,13 @@ public class InventorySourceIcon : MonoBehaviour
         menu = FindObjectOfType<MainMenu>();
     }
 
+    public InventorySourceIcon Init(GameObject linkedPanel)
+    {
+        linkedInventoryPanel = linkedPanel;
+
+        return this;
+    }
+
     public void OpenItemPanel()
     {
         menu.OpenInventoryPanel(linkedInventoryPanel);

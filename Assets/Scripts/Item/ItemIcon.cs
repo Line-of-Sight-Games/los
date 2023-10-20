@@ -6,16 +6,20 @@ using UnityEngine.UI;
 using System.Diagnostics.Tracing;
 using UnityEditor;
 using UnityEngine.EventSystems;
+using System.Diagnostics.Contracts;
 
 public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public ItemManager itemManager;
     public Item item; // The item associated with this icon
-    private RectTransform rectTransform;
+    public RectTransform rectTransform;
     private CanvasGroup canvasGroup;
-    private Transform originalSlot;
+    public Transform originalSlot;
+    private Transform temporaryParent;
+
     public ItemIcon Init(Item item)
     {
+        this.item = item;
         gameObject.name = item.itemName;
         transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(this.gameObject.name);
 
@@ -32,6 +36,10 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         canvasGroup.alpha = 0.6f;
         canvasGroup.blocksRaycasts = false;
+
+        temporaryParent = new GameObject("TemporaryParent").transform;
+        temporaryParent.SetParent(GetComponentInParent<Canvas>().transform);
+        transform.SetParent(temporaryParent);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -43,12 +51,24 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
+        Destroy(temporaryParent.gameObject);
 
         // Check if the item was dropped over a valid slot
-        if (eventData.pointerEnter != null && eventData.pointerEnter.GetComponent<ItemSlot>() != null)
+        if (eventData.pointerEnter != null)
         {
-            Transform newSlot = eventData.pointerEnter.transform;
-            originalSlot = newSlot;
+            ItemSlot targetSlot = eventData.pointerEnter.GetComponent<ItemSlot>();
+
+            // Check if the target slot is empty
+            if (targetSlot != null && targetSlot.item == null)
+            {
+                targetSlot.AssignItem(this);
+            }
+            else
+            {
+                // Return the item to the original slot
+                transform.SetParent(originalSlot);
+                rectTransform.localPosition = Vector3.zero;
+            }
         }
         else
         {

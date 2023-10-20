@@ -3371,15 +3371,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
     }
     public Inventory Inventory
-    {
-        get { return inventory; }
-    }
+    { get { return inventory; } }
     public string Id
-    {
-        get { return id; }
-    }
+    { get { return id; } }
     public GameObject GameObject
-    {
-        get { return gameObject; }
-    }
+    { get { return gameObject; } }
+    public List<string> InventoryList { get { return inventoryList; } }
 }
