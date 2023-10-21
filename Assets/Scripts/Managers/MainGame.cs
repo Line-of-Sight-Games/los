@@ -1366,7 +1366,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     //critical shot hits barrel
                     if (randNum2 <= chances.Item2)
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Critically Explodes!</color>";
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
                     StartCoroutine(targetBarrel.ExplosionCheck(shooter));

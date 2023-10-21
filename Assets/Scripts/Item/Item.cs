@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 [System.Serializable]
 public class Item : PhysicalObject, IDataPersistence
@@ -172,7 +174,7 @@ public class Item : PhysicalObject, IDataPersistence
     public string poisonedBy;
     public bool isShareable;
     public bool isTradeable;
-    public string equippableSlots;
+    public List<string> equippableSlots;
     public string blockedByLateral;
     public string blockedByLeftBrace;
     public string blockedByPosterior;
@@ -460,7 +462,7 @@ public class Item : PhysicalObject, IDataPersistence
             poisonedBy = (string)details["poisonedBy"];
             isShareable = (bool)details["isShareable"];
             isTradeable = (bool)details["isTradeable"];
-            equippableSlots = (string)details["equippableSlots"];
+            equippableSlots = (details["equippableSlots"] as JArray).Select(token => token.ToString()).ToList();
             blockedByLateral = (string)details["blockedByLateral"];
             blockedByLeftBrace = (string)details["blockedByLeftBrace"];
             blockedByPosterior = (string)details["blockedByPosterior"];

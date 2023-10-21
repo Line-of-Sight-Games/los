@@ -45,7 +45,7 @@ public class InventorySourcePanel : MonoBehaviour
         foreach (Item i in gb.Inventory.AllItems)
         {
             ItemSlot itemSlot = Instantiate(itemSlotPrefab, this.transform.Find("Viewport").Find("Contents"));
-            itemSlot.AssignItem(Instantiate(itemIconPrefab.Init(i)));
+            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab.Init(i)));
         }
     }
 }

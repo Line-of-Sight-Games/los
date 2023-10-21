@@ -15,13 +15,13 @@ public class ItemSlot : MonoBehaviour, IDropHandler
     }
     public void OnDrop(PointerEventData eventData)
     {
-        if (eventData.pointerDrag.TryGetComponent<ItemIcon>(out var draggedIcon))
+        /*if (eventData.pointerDrag.TryGetComponent<ItemIcon>(out var draggedIcon))
         {
             if (linkedInventoryObject is Soldier linkedSoldier)
                 linkedSoldier.PickUpItemToSlot(draggedIcon.item, transform.name);
-        }
+        }*/
     }
-    public void AssignItem(ItemIcon itemIcon)
+    public void AssignItemIcon(ItemIcon itemIcon)
     {
         // Move the item to the new slot
         itemIcon.originalSlot = transform;
@@ -32,5 +32,9 @@ public class ItemSlot : MonoBehaviour, IDropHandler
 
         // Set the item in the target slot
         item = itemIcon.item;
+    }
+    public void ClearItemIcon()
+    {
+        item = null;
     }
 }

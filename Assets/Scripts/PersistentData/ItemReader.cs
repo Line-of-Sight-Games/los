@@ -51,7 +51,7 @@ public class ItemReader : MonoBehaviour
         public string PoisonedBy;
         public bool Shareable;
         public bool Tradeable;
-        public string EquippableSlots;
+        public List<string> EquippableSlots;
         public string BlockedByLateral;
         public string BlockedByLeftBrace;
         public string BlockedByPosterior;

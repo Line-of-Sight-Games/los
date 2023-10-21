@@ -181,10 +181,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierPortraitText = (string)details["portrait"];
         soldierSpeciality = (string)details["speciality"];
         //load abilities
-        soldierAbilities = new();
+        /*soldierAbilities = new();
         soldierAbilitiesJArray = (JArray)details["abilities"];
         foreach (string ability in soldierAbilitiesJArray)
-            soldierAbilities.Add(ability);
+            soldierAbilities.Add(ability);*/
+        soldierAbilities = (details["abilities"] as JArray).Select(token => token.ToString()).ToList();
 
         soldierDisplayPriority = Convert.ToInt32(details["displayPriority"]);
         fielded = (bool)details["fielded"];

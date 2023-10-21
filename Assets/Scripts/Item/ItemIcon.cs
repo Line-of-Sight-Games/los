@@ -51,17 +51,18 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
-        Destroy(temporaryParent.gameObject);
+        //Destroy(temporaryParent.gameObject);
 
         // Check if the item was dropped over a valid slot
         if (eventData.pointerEnter != null)
         {
             ItemSlot targetSlot = eventData.pointerEnter.GetComponent<ItemSlot>();
-
+            ItemSlot oldSlot = originalSlot.GetComponent<ItemSlot>();
             // Check if the target slot is empty
-            if (targetSlot != null && targetSlot.item == null)
+            if (targetSlot != null && targetSlot.item == null && CheckValidSlot(targetSlot))
             {
-                targetSlot.AssignItem(this);
+                targetSlot.AssignItemIcon(this);
+                oldSlot.ClearItemIcon();
             }
             else
             {
@@ -97,5 +98,11 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     public void RightClick()
     {
 
+    }
+    public bool CheckValidSlot(ItemSlot targetSlot)
+    {
+        if (item.equippableSlots.Contains(targetSlot.name))
+            return true;
+        return false;
     }
 }

@@ -186,6 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemIconPrefab: {fileID: -3382003001501138857, guid: 2cd921e8715b2764a850d2c46266f867, type: 3}
+  linkedSoldier: {fileID: 0}
 --- !u!1 &3573477952752027461
 GameObject:
   m_ObjectHideFlags: 0
@@ -644,7 +645,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: RightHand
+      value: Hand
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -848,7 +849,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: BArmour1
+      value: Armour
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -950,7 +951,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: JArmour1
+      value: Armour
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -1052,7 +1053,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: RightBrace
+      value: Brace
       objectReference: {fileID: 0}
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_IsActive
@@ -1158,7 +1159,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: RightLeg
+      value: Leg
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -1464,7 +1465,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: BArmour2
+      value: Armour
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -1668,7 +1669,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: Backpack1
+      value: Backpack
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -1770,7 +1771,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: JArmour2
+      value: Armour
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -1872,7 +1873,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: LeftLeg
+      value: Leg
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -1974,7 +1975,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: Backpack3
+      value: Backpack
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -2076,7 +2077,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: LeftBrace
+      value: Brace
       objectReference: {fileID: 0}
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_IsActive
@@ -2284,7 +2285,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: Backpack2
+      value: Backpack
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
@@ -2386,7 +2387,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6300890364630198284, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Name
-      value: LeftHand
+      value: Hand
       objectReference: {fileID: 0}
     - target: {fileID: 9065704786864639178, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
       propertyPath: m_Pivot.x
