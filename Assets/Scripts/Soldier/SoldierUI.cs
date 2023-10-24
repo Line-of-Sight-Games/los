@@ -69,6 +69,5 @@ public class SoldierUI : MonoBehaviour
         //populate soldier loadout
         Transform soldierBanner = menu.soldierOptionsUI.transform.Find("SoldierBanner");
         soldierBanner.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
-        soldierBanner.Find("SoldierStatsUI").Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(linkedSoldier);
     }
 }

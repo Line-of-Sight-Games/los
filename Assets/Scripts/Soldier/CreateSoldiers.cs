@@ -21,9 +21,9 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	public TextMeshProUGUI soldierIdentifier, playerIdentifier;
 	public TMP_InputField soldierName;
 	public GameObject createCompletedUI, randomAlertUI;
-	private List<string> allSoldierIds = new();
+	private readonly List<string> allSoldierIds = new();
 	public int currentTeam = 1, maxSoldiersPerTeam, primaries, weapons, supports, soldierIndex = 1;
-	public List<string> bannedNames = new()
+	public readonly List<string> bannedNames = new()
 	{
 		"aeolus","ahole","anal","analannie","analprobe","analsex","anilingus","anus","apeshit","areola","areole","arian","arrse","arse",
 		"arsehole","aryan","ass","assfuck","asshole","assbag","assbagger","assbandit","assbang","assbanged","assbanger","assbangs","assbite","assblaster","assclown",
@@ -113,7 +113,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	public List<string> selectedCommanderTerrains;
 	public List<string> selectedSkills;
 	public List<string> selectedAbilities;
-	private string[] randomNames = 
+	private readonly string[] randomNames = 
 	{
 		"Cory","Pharrell","Bender","Asim","Marc","Sean","Kurt","Edison","Caolan","Shaurya","Jamie-Lee","Rhodri","Enrique","Joel","Reginald","Shaquille","Cruz",
 		"Rudy","Kelly","Tyrique","Willie","Imaan","Jaden","Emilio","Trevor","Yanis","Connor","Sammy","Quinn","Rudi","Ashlea","Lewie","Shawn","Rayan","Maheen","Bhavik",
@@ -127,8 +127,8 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		"Driscoll","Bell","Davies","Mcneill","Franks","Millington","Mclean","Moon","Frank","Martinez","Shannon","Irwin","Neale","Mellor","Armitage","Finch","Small",
 		"Hubert","Freeman","Baker","Carrillo","Timms","Thomas","Watkins","Stafford","Mckenzie","Goddard","Maddox","Simpson","Wooten","Mathis","Stamp", "Banubis"
 	};
-	private int[,] teamBreakdown =
-	{ 
+	private readonly int[,] teamBreakdown =
+	{
 		{ 1, 1, 1 },
 		{ 2, 1, 1 },
 		{ 2, 2, 1 },
@@ -142,62 +142,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		{ 5, 5, 3 },
 		{ 6, 5, 3 },
 		{ 6, 6, 3 }
-	};
-	private string[,] specialities =
-	{
-		{ "Commander (L)", "Leadership" },
-		{ "Spartan (H)", "Health" },
-		{ "Survivor (R)", "Resilience" },
-		{ "Runner (S)", "Speed" },
-		{ "Evader (E)", "Evasion" },
-		{ "Assassin (F)", "Stealth" },
-		{ "Seeker (P)", "Perceptiveness" },
-		{ "Chameleon (C)", "Camouflage" },
-		{ "Scout (SR)", "Sight Radius" },
-		{ "Infantryman (Ri)", "Rifle" },
-		{ "Operator (AR)", "Assault Rifle" },
-		{ "Earthquake (LMG)", "Light Machine Gun" },
-		{ "Hunter (Sn)", "Sniper Rifle" },
-		{ "Cyclone (SMG)", "Sub-Machine Gun" },
-		{ "Hammer (Sh)", "Shotgun" },
-		{ "Wolf (M)", "Melee" },
-		{ "Hercules (Str)", "Strength" },
-		{ "Diplomat (Dip)", "Diplomacy" },
-		{ "Technician (Elec)", "Electronics" },
-		{ "Medic (Heal)", "Healing" }
-	};
-	private string[][] abilities =
-	{
-		new string[] { "Adept", "Aficionado" },
-		new string[] { "Avenger", "Exactor" },
-		new string[] { "Bloodletter", "Masochist" },
-		new string[] { "Bull", "Colossus" },
-		new string[] { "Calculator", "Supercomputer" },
-		new string[] { "Daredevil", "Spider" },
-		new string[] { "Dissuader", "Omen of Death" },
-		new string[] { "Experimentalist", "Chemist" },
-		new string[] { "Fighter", "Pugilist" },
-		new string[] { "Guardsman", "Sentinel" },
-		new string[] { "Gunner", "Cannoneer" },
-		new string[] { "Illusionist", "Ghost" },
-		new string[] { "Informer", "Double Agent" },
-		new string[] { "Inspirer", "Galvaniser" },
-		new string[] { "Insulator", "Absorber" },
-		new string[] { "Jammer", "Corrupter" },
-		new string[] { "Learner", "Mastermind" },
-		new string[] { "Locater", "Logistician" },
-		new string[] { "Patriot", "Zealot" },
-		new string[] { "Planner", "Prophet" },
-		new string[] { "Politician", "Master's Ally" },
-		new string[] { "Revoker", "Pacifier" },
-		new string[] { "Shadow", "Shapeshifter" },
-		new string[] { "Sharpshooter", "Deadeye" },
-		new string[] { "Spotter", "Tracker" },
-		new string[] { "Sprinter", "Olympian" },
-		new string[] { "Tactician", "Creator" },
-		new string[] { "Tranquiliser", "Anaesthetist" },
-		new string[] { "Vaulter", "Acrobat" },
-		new string[] { "Witness", "Hypnotist" },
 	};
 
 	public void LoadData(GameData data)
@@ -430,7 +374,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 	public bool CheckValidDetails()
     {
-		if (soldierName.text.Length > 0 && !bannedNames.Contains(soldierName.text) && terrainDropdown.value != 0 && activeSpecialityDropdown.value != 0 && abilityDropdown.value != 0)
+		if (soldierName.text.Length > 0 && soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color == new Color(0.196f, 0.196f, 0.196f) && terrainDropdown.value != 0 && activeSpecialityDropdown.value != 0 && abilityDropdown.value != 0)
 			return true;
 		else
             return false;

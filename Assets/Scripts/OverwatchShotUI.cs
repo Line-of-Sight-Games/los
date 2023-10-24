@@ -64,7 +64,7 @@ public class OverwatchShotUI : MonoBehaviour
                     if (randNum2 <= chances.Item2)
                     {
                         targetSoldier.TakeDamage(shooter, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL HIT </color>";
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         //paying xp for hit
                         if (chances.Item1 >= 10)

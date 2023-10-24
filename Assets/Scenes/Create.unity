@@ -20738,91 +20738,6 @@ MonoBehaviour:
   weapons: 0
   supports: 0
   soldierIndex: 0
-  bannedNames:
-  - Anubis
-  - Frollo
-  - Elton
-  - Chicago
-  - Omega
-  - Lucky
-  - Simon
-  - Sunshine
-  - Brick
-  - Spectre
-  - Shriek
-  - Rook
-  - Wheels
-  - Heyzeus
-  - Mewham
-  - Mars
-  - Khorne
-  - Smith
-  - Dwayne
-  - Victor
-  - Churchill
-  - Bighammer
-  - Quill
-  - Stark
-  - Cellophane
-  - Cyclops
-  - Ratcliffe
-  - Expendable
-  - Rico
-  - Storm
-  - Victoire
-  - Willow
-  - Horus
-  - Ra
-  - Sekmet
-  - Streaker
-  - Rasputin
-  - Seraph
-  - Mercury
-  - Oryx
-  - McClane
-  - Rambo
-  - Miyagi
-  - Grief
-  - Roach
-  - Nikolai
-  - Woods
-  - Zeus
-  - Hermes
-  - Hades
-  - Theia
-  - Ares
-  - Achilles
-  - Bricke
-  - Geist
-  - Cyrus
-  - Stavanger
-  - Zaiel
-  - Krypton
-  - Lechwe
-  - Leshy
-  - Ceramics
-  - Bundaberg
-  - Gaston
-  - Chaplin
-  - Conan
-  - Lillehammer
-  - Atlas
-  - Wraith
-  - Jazzhands
-  - Ivan
-  - Kamrov
-  - Price
-  - Amun
-  - Wick
-  - Pascal
-  - Hathor
-  - Osiris
-  - Neo
-  - Pete
-  - Ghost
-  - Discofinger
-  - Saladin
-  - Manhattan
   selectedPortraits: []
   selectedCommanderTerrains: []
   selectedSkills: []
@@ -26100,6 +26015,7 @@ MonoBehaviour:
   game: {fileID: 0}
   weather: {fileID: 0}
   dipelec: {fileID: 0}
+  poiManager: {fileID: 0}
   soundManager: {fileID: 0}
   gameTimer: {fileID: 0}
   turnTimer: {fileID: 0}
@@ -26116,6 +26032,8 @@ MonoBehaviour:
   soldierStatsUI: {fileID: 0}
   shotUI: {fileID: 0}
   flankersShotUI: {fileID: 0}
+  shotConfirmUI: {fileID: 0}
+  overwatchShotUI: {fileID: 0}
   shotResultUI: {fileID: 0}
   moveUI: {fileID: 0}
   overmoveUI: {fileID: 0}
@@ -26125,6 +26043,7 @@ MonoBehaviour:
   noMeleeTargetsUI: {fileID: 0}
   meleeBreakEngagementRequestUI: {fileID: 0}
   meleeResultUI: {fileID: 0}
+  meleeConfirmUI: {fileID: 0}
   configureUI: {fileID: 0}
   soldierOptionsAdditionalUI: {fileID: 0}
   dipelecUI: {fileID: 0}
@@ -26137,6 +26056,7 @@ MonoBehaviour:
   damageUI: {fileID: 0}
   traumaAlertUI: {fileID: 0}
   traumaUI: {fileID: 0}
+  explosionUI: {fileID: 0}
   inspirerUI: {fileID: 0}
   xpAlertUI: {fileID: 0}
   xpLogUI: {fileID: 0}
@@ -26148,20 +26068,30 @@ MonoBehaviour:
   coverAlertUI: {fileID: 0}
   overwatchUI: {fileID: 0}
   externalItemSourcesUI: {fileID: 0}
-  allyItemButtonUI: {fileID: 0}
+  inventorySourceIconsUI: {fileID: 0}
   flankersMeleeAttackerUI: {fileID: 0}
   flankersMeleeDefenderUI: {fileID: 0}
-  allyInventoryPanelPrefab: {fileID: 0}
   detectionAlertPrefab: {fileID: 0}
   lostLosAlertPrefab: {fileID: 0}
+  losGlimpseAlertPrefab: {fileID: 0}
   damageAlertPrefab: {fileID: 0}
   traumaAlertPrefab: {fileID: 0}
   inspirerAlertPrefab: {fileID: 0}
   xpAlertPrefab: {fileID: 0}
   promotionAlertPrefab: {fileID: 0}
-  allyItemsButtonPrefab: {fileID: 0}
+  allyInventoryIconPrefab: {fileID: 0}
+  groundInventoryIconPrefab: {fileID: 0}
+  gbInventoryIconPrefab: {fileID: 0}
+  inventoryPanelGroundPrefab: {fileID: 0}
+  inventoryPanelAllyPrefab: {fileID: 0}
+  inventoryPanelGoodyBoxPrefab: {fileID: 0}
+  soldierSnapshotPrefab: {fileID: 0}
   soldierPortraitPrefab: {fileID: 0}
+  possibleFlankerPrefab: {fileID: 0}
   meleeAlertPrefab: {fileID: 0}
+  overwatchShotUIPrefab: {fileID: 0}
+  dipelecRewardPrefab: {fileID: 0}
+  explosionAlertPrefab: {fileID: 0}
   endTurnButton: {fileID: 0}
   overrideButton: {fileID: 0}
   overrideTimeStopIndicator: {fileID: 0}
@@ -26169,9 +26099,12 @@ MonoBehaviour:
   overrideVisibilityDropdown: {fileID: 0}
   overrideInsertObjectsButton: {fileID: 0}
   overrideInsertObjectsUI: {fileID: 0}
+  overrideMuteButton: {fileID: 0}
   undoButton: {fileID: 0}
   blockingScreen: {fileID: 0}
+  itemSlotPrefab: {fileID: 0}
   itemIconPrefab: {fileID: 0}
+  gbItemIconPrefab: {fileID: 0}
   LOSArrowPrefab: {fileID: 0}
   overwatchArcPrefab: {fileID: 0}
   sightRadiusCirclePrefab: {fileID: 0}
@@ -26189,7 +26122,6 @@ MonoBehaviour:
   additionalOptionsButton: {fileID: 0}
   turnTime: 0
   meleeChargeIndicator: 
-  allSoldiers: []
   activeSoldier: {fileID: 0}
   overrideView: 0
   displayLOSArrows: 0
@@ -26197,7 +26129,9 @@ MonoBehaviour:
   clearMeleeFlag: 0
   clearDipelecFlag: 0
   clearMoveFlag: 0
+  detectionResolvedFlag: 0
   meleeResolvedFlag: 0
+  shotResolvedFlag: 0
   inspirerResolvedFlag: 0
   clearDamageEventFlag: 0
   xpResolvedFlag: 0
@@ -26237,7 +26171,11 @@ MonoBehaviour:
   avoidanceOverwatch2WayRight: {fileID: 0}
   overwatch1WayLeft: {fileID: 0}
   overwatch1WayRight: {fileID: 0}
+  noDetect2Way: {fileID: 0}
   fist: {fileID: 0}
+  explosiveBarrel: {fileID: 0}
+  covermanSprite: {fileID: 0}
+  normalTextColour: {r: 0.196, g: 0.196, b: 0.196, a: 1}
   terrainList:
   - Urban
   - Desert
@@ -27985,10 +27923,10 @@ RectTransform:
   m_Father: {fileID: 1868994278}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1420, y: 565.85266}
-  m_SizeDelta: {x: 1000, y: 1028.2747}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -500, y: 0}
+  m_SizeDelta: {x: 1000, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1936689528
 MonoBehaviour:
@@ -28010,7 +27948,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6d273332c8d762b48a50f0c0f87b4bd6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f1f615344048b3b4ca4c43249158cf7a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

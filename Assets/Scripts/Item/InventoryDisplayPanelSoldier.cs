@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class InventoryDisplayPanelSoldier : MonoBehaviour
@@ -28,7 +26,14 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         GetItemInSlot(s, "Armour2");
         GetItemInSlot(s, "Armour3");
         GetItemInSlot(s, "Armour4");
-        //GetItemInSlot(s, "Misc");
+        GetItemInSlot(s, "Misc1");
+        GetItemInSlot(s, "Misc2");
+        GetItemInSlot(s, "Misc3");
+        GetItemInSlot(s, "Misc4");
+        GetItemInSlot(s, "Misc5");
+        GetItemInSlot(s, "Misc6");
+        GetItemInSlot(s, "Misc7");
+        GetItemInSlot(s, "Misc8");
 
         return this;
     }
@@ -44,6 +49,6 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         s.inventorySlots.TryGetValue(slotName, out string itemId);
 
         if (itemId != "")
-            Instantiate(itemIconPrefab.Init(s.itemManager.FindItemById(itemId)), transform.Find(slotName));
+            Instantiate(itemIconPrefab, transform.Find(slotName)).GetComponent<ItemIcon>().Init(s.itemManager.FindItemById(itemId));
     }
 }

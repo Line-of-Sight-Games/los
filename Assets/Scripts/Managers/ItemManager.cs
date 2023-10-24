@@ -54,17 +54,16 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         {
             if (obj is IHaveInventory inventoryObject)
             {
-                print("check object " + inventoryObject);
                 foreach (string itemId in inventoryObject.InventoryList)
                 {
-                    print("soldier's itemlist " + itemId);
                     foreach (Item item in allItems)
                     {
-                        print("item name " + item.itemName);
-                        print("item id " + item.id);
                         if (item.id == itemId)
                         {
-                            inventoryObject.Inventory.AddItem(item);
+                            if (inventoryObject is Soldier inventorySoldier)
+                                inventorySoldier.AssignItemToSlot(item);
+                            else
+                                inventoryObject.Inventory.AddItem(item);
                         }
                     }
                 }

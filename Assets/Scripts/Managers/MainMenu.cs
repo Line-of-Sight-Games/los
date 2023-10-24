@@ -8,7 +8,6 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEngine.UI.CanvasScaler;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -33,7 +32,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
         allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
         meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab;
+        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public OverwatchArc overwatchArcPrefab;
@@ -75,7 +74,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         new string[] { "Elec", "Electronics" },
         new string[] { "Heal", "Healing"},
     };
-    private readonly string[][] abilities =
+
+    private readonly string[][] abilitiesUpgradedAbilities =
 {
         new string[] { "Adept", "Aficionado" },
         new string[] { "Avenger", "Exactor" },
@@ -108,6 +108,29 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         new string[] { "Vaulter", "Acrobat" },
         new string[] { "Witness", "Hypnotist" },
     };
+    public readonly string[,] specialtiesStats =
+    {
+        { "Commander (L)", "Leadership", "L"},
+        { "Spartan (H)", "Health", "H" },
+        { "Survivor (R)", "Resilience", "R"},
+        { "Runner (S)", "Speed", "S" },
+        { "Evader (E)", "Evasion", "E" },
+        { "Assassin (F)", "Stealth", "F" },
+        { "Seeker (P)", "Perceptiveness", "P" },
+        { "Chameleon (C)", "Camouflage", "C" },
+        { "Scout (SR)", "Sight Radius", "SR" },
+        { "Infantryman (Ri)", "Rifle", "Ri" },
+        { "Operator (AR)", "Assault Rifle", "AR" },
+        { "Earthquake (LMG)", "Light Machine Gun", "LMG" },
+        { "Hunter (Sn)", "Sniper Rifle", "Sn" },
+        { "Cyclone (SMG)", "Sub-Machine Gun", "SMG" },
+        { "Hammer (Sh)", "Shotgun", "Sh" },
+        { "Wolf (M)", "Melee", "M" },
+        { "Hercules (Str)", "Strength", "Str" },
+        { "Diplomat (Dip)", "Diplomacy", "Dip" },
+        { "Technician (Elec)", "Electronics", "Elec" },
+        { "Medic (Heal)", "Healing", "Heal" }
+    };
 
     public List<string> terrainList = new() { "Urban", "Desert", "Jungle", "Alpine" };
     public void LoadData(GameData data)
@@ -121,7 +144,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         data.playTimeTotal = playTimeTotal;
         data.turnTime = turnTime;
     }
-
+    public string FindStringInColXReturnStringInColYInMatrix(string[,] matrix, string searchString, int x, int y)
+    {
+        for (int i = 0; i < matrix.GetLength(0); i++)
+            if (matrix[i, x] == searchString)
+                return matrix[i, y];
+        return null;
+    }
     void Start()
     {
         //check you are in corrrect scene
@@ -441,6 +470,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             overrideVersionDisplay.SetActive(false);
             overrideVisibilityDropdown.SetActive(false);
             overrideInsertObjectsButton.SetActive(false);
+            overrideMuteButton.SetActive(false);
         }
         else
             overrideUI.SetActive(true);
@@ -468,6 +498,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             overrideVersionDisplay.SetActive(true);
             overrideVisibilityDropdown.SetActive(true);
             overrideInsertObjectsButton.SetActive(true);
+            overrideMuteButton.SetActive(true);
             GetOverrideVisibility();
         }
     }
@@ -628,7 +659,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (abilityList.Count > 0)
         {
             foreach (string str in abilityList)
-                foreach (string[] abilityTuple in abilities)
+                foreach (string[] abilityTuple in abilitiesUpgradedAbilities)
                     if (abilityTuple[0] == str || abilityTuple[1] == str)
                         invalid = false;
 
@@ -1156,6 +1187,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().text = activeSoldier.TerrainOn;
             soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().text = activeSoldier.RoundsWithoutFood.ToString();
             soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
+            soldierStatsUI.Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(activeSoldier);
         }
     }
     
@@ -1868,7 +1900,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //trauma functions - menu
     public void OpenTraumaUI()
     {
-        traumaUI.SetActive(true);
+        if (OverrideKey())
+        {
+            traumaUI.SetActive(true);
+            CloseTraumaAlertUI();
+        }
     }
 
     public void CloseTraumaUI()
@@ -1916,7 +1952,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         traumaAlertUI.SetActive(true);
     }
-
     public void CloseTraumaAlertUI()
     {
         traumaAlertUI.SetActive(false);
@@ -2347,16 +2382,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CheckMeleeType()
     {
         TMP_Dropdown meleeTypeDropdown = meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>();
+        meleeUI.transform.Find("AttackerWeapon").gameObject.SetActive(false);
+        meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").gameObject.SetActive(false);
+        flankersMeleeAttackerUI.SetActive(false);
+        flankersMeleeDefenderUI.SetActive(false);
 
         if (meleeTypeDropdown.value == 0)
         {
             meleeUI.transform.Find("AttackerWeapon").gameObject.SetActive(true);
             meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").gameObject.SetActive(true);
-        }
-        else
-        {
-            meleeUI.transform.Find("AttackerWeapon").gameObject.SetActive(false);
-            meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").gameObject.SetActive(false);
+            flankersMeleeAttackerUI.SetActive(true);
+            flankersMeleeDefenderUI.SetActive(true);
         }
 
         if (meleeTypeDropdown.options[meleeTypeDropdown.value].text.Contains("Request"))
@@ -2419,7 +2455,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dTer")} " +
                     $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dFlank")} " +
                     $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "suppression")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dStr")}";
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dStr")} " +
+                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "bloodrage")}";
 
                 //add rounding to equation view
                 meleeConfirmUI.transform.Find("EquationPanel").Find("Rounding").GetComponent<TextMeshProUGUI>().text = $"Rounding: {game.meleeParameters.Find(tuple => tuple.Item1 == "rounding").Item2}";
@@ -2614,7 +2651,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         
         //add extra move options for planner/exo
         if (activeSoldier.IsPlanner() && activeSoldier.ClosestAllyMobile() != null && !activeSoldier.usedMP)
-            moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Planner Donate</color>"));
+            moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Planner Donation</color>"));
         if (activeSoldier.IsWearingExoArmour())
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Exo Jump</color>"));
         moveTypeDropdown.AddOptions(moveTypeDetails);
@@ -2791,6 +2828,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Transform child in configureUI.transform.Find("ExternalItemSources").Find("InventorySourceIconPanel").Find("Viewport").Find("Contents"))
             Destroy(child.gameObject);
 
+        //ClearInventoryPanel(configureUI.transform.Find("InventorySourcePanelAlly").gameObject);
+        ClearInventoryPanel(configureUI.transform.Find("InventorySourcePanelGround").gameObject);
+        ClearInventoryPanel(configureUI.transform.Find("InventorySourcePanelGB").gameObject);
         //CloseInventoryPanel(configureUI.transform.Find("InventorySourcePanelAlly").gameObject);
         CloseInventoryPanel(configureUI.transform.Find("InventorySourcePanelGround").gameObject);
         CloseInventoryPanel(configureUI.transform.Find("InventorySourcePanelGB").gameObject);
@@ -2798,6 +2838,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenInventoryPanel(GameObject itemPanel)
     {
         itemPanel.SetActive(true);
+
     }
     public void ClearInventoryPanel(GameObject itemPanel)
     {
@@ -2806,7 +2847,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CloseInventoryPanel(GameObject itemPanel)
     {
-        ClearInventoryPanel(itemPanel);
         itemPanel.SetActive(false);
     }
     public void CloseConfigureUI()

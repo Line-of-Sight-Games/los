@@ -88,6 +88,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable
         {
             yield return new WaitUntil(() => menu.meleeResolvedFlag == true);
             menu.OpenExplosionUI();
+            Destroy(this.gameObject);
         }
     }
     public string Id 

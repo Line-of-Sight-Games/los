@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class ItemSlot : MonoBehaviour, IDropHandler
+public class ItemSlot : MonoBehaviour
 {
     public Item item; // The item currently in the slot
     public IHaveInventory linkedInventoryObject;
@@ -12,14 +12,6 @@ public class ItemSlot : MonoBehaviour, IDropHandler
         this.linkedInventoryObject = linkedInventoryObject;
 
         return this;
-    }
-    public void OnDrop(PointerEventData eventData)
-    {
-        /*if (eventData.pointerDrag.TryGetComponent<ItemIcon>(out var draggedIcon))
-        {
-            if (linkedInventoryObject is Soldier linkedSoldier)
-                linkedSoldier.PickUpItemToSlot(draggedIcon.item, transform.name);
-        }*/
     }
     public void AssignItemIcon(ItemIcon itemIcon)
     {

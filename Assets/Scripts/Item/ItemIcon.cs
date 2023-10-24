@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine.EventSystems;
 using System.Diagnostics.Contracts;
 
-public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public ItemManager itemManager;
     public Item item; // The item associated with this icon
@@ -22,6 +22,12 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
         this.item = item;
         gameObject.name = item.itemName;
         transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(this.gameObject.name);
+        transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{item.weight}";
+        if (item.ammo != 0)
+        {
+            transform.Find("Ammo").gameObject.SetActive(true);
+            transform.Find("Ammo").GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
+        }
 
         return this;
     }
@@ -63,6 +69,7 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
             {
                 targetSlot.AssignItemIcon(this);
                 oldSlot.ClearItemIcon();
+                item.ChangeOwner(item.owner, targetSlot.linkedInventoryObject);
             }
             else
             {
@@ -78,13 +85,6 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
             rectTransform.localPosition = Vector3.zero;
         }
     }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        // You can implement additional behavior when the icon is clicked
-    }
-
-    
     public void Update()
     {
 
@@ -101,8 +101,13 @@ public class ItemIcon : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     }
     public bool CheckValidSlot(ItemSlot targetSlot)
     {
-        if (item.equippableSlots.Contains(targetSlot.name))
-            return true;
+        foreach (string slot in item.equippableSlots)
+        {
+            print($"Trying Slot: {slot} in {targetSlot.name}");
+            if (targetSlot.name.Contains(slot))
+                return true;
+        }
+            
         return false;
     }
 }

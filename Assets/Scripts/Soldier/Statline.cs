@@ -6,7 +6,7 @@ using UnityEngine;
 public class Statline 
 {
     [JsonIgnore] public Soldier soldierBelongsTo;
-    private List<Stat> stats = new();
+    private readonly List<Stat> stats = new();
 
     public Statline(Soldier soldier) 
     {

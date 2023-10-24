@@ -21,21 +21,21 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool fielded, selected, revealed, usedAP, usedMP, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, fighterHitCount, plannerDonatedMove, 
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, plannerDonatedMove, 
         timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting;
     public Statline stats;
     public Inventory inventory;
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, witnessActiveAbilities, isSpottedBy;
     public Item itemPrefab;
-    private JArray stateJArray, statsJArray, soldierAbilitiesJArray, itemsJArray, controllingSoldiersJArray, controlledBySoldiersJArray, revealedBySoldiersJArray, revealingSoldiersJArray, 
-        witnessStoredAbilitiesJArray, witnessActiveAbilitiesJArray, isSpottedByJArray;
+    private JArray statsJArray;
     public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
     public BoxCollider bodyCollider;
     public Dictionary<string, string> inventorySlots = new()
     {
         { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }, { "LeftBrace", "" },
-        { "RightBrace", "" }, { "Backpack1", "" }, { "Backpack2", "" }, { "Backpack3", "" }, { "Armour1", "" }, { "Armour2", "" }, { "Armour3", "" }, { "Armour4", "" }, { "Misc", "" }
+        { "RightBrace", "" }, { "Backpack1", "" }, { "Backpack2", "" }, { "Backpack3", "" }, { "Armour1", "" }, { "Armour2", "" }, { "Armour3", "" }, { "Armour4", "" }, { "Misc1", "" }, { "Misc2", "" },
+        { "Misc3", "" }, { "Misc4", "" }, { "Misc5", "" }, { "Misc6", "" }, { "Misc7", "" }, { "Misc8", "" }
     };
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
@@ -80,87 +80,87 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void SaveData(ref GameData data)
     {
-        details = new Dictionary<string, object>();
+        details = new Dictionary<string, object>
+        {
+            //save basic information
+            { "soldierName", soldierName },
+            { "team", soldierTeam },
+            { "terrain", soldierTerrain },
+            { "portrait", soldierPortraitText },
+            { "speciality", soldierSpeciality },
+            { "abilities", soldierAbilities },
+            { "displayPriority", soldierDisplayPriority },
+            { "fielded", fielded },
+            { "hp", hp },
+            { "ap", ap },
+            { "mp", mp },
+            { "tp", tp },
+            { "xp", xp },
+            { "rank", rank },
+            { "state", state },
 
-        //save basic information
-        details.Add("soldierName", soldierName);
-        details.Add("team", soldierTeam);
-        details.Add("terrain", soldierTerrain);
-        details.Add("portrait", soldierPortraitText);
-        details.Add("speciality", soldierSpeciality);
-        details.Add("abilities", soldierAbilities);
-        details.Add("displayPriority", soldierDisplayPriority);
-        details.Add("fielded", fielded);
-        details.Add("hp", hp);
-        details.Add("ap", ap);
-        details.Add("mp", mp);
-        details.Add("tp", tp);
-        details.Add("xp", xp);
-        details.Add("rank", rank);
-        details.Add("state", state);
+            //save position
+            { "x", x },
+            { "y", y },
+            { "z", z },
+            { "terrainOn", terrainOn },
 
-        //save position
-        details.Add("x", x);
-        details.Add("y", y);
-        details.Add("z", z);
-        details.Add("terrainOn", terrainOn);
+            //save statline
+            { "stats", stats.AllStats },
+            { "instantSpeed", instantSpeed },
 
-        //save statline
-        details.Add("stats", stats.AllStats);
-        details.Add("instantSpeed", instantSpeed);
+            //save inventory
+            { "inventory", Inventory.AllItemIds },
+            { "inventorySlots", inventorySlots },
 
-        //save inventory
-        details.Add("inventory", Inventory.AllItemIds);
-        details.Add("inventorySlots", inventorySlots);
+            //save list of revealing soldiers
+            { "revealingSoldiers", revealingSoldiersList },
 
-        //save list of revealing soldiers
-        details.Add("revealingSoldiers", revealingSoldiersList);
+            //save list of revealed by soldiers
+            { "revealedBySoldiers", revealedBySoldiersList },
 
-        //save list of revealed by soldiers
-        details.Add("revealedBySoldiers", revealedBySoldiersList);
+            //save list of controlling soldiers
+            { "controllingSoldiers", controllingSoldiersList },
 
-        //save list of controlling soldiers
-        details.Add("controllingSoldiers", controllingSoldiersList);
+            //save list of controlled by soldiers
+            { "controlledBySoldiers", controlledBySoldiersList },
 
-        //save list of controlled by soldiers
-        details.Add("controlledBySoldiers", controlledBySoldiersList);
+            //save other details
+            { "roundsFielded", roundsFielded },
+            { "roundsFieldedConscious", roundsFieldedConscious },
+            { "roundsWithoutFood", roundsWithoutFood },
+            { "revealed", revealed },
+            { "usedAP", usedAP },
+            { "usedMP", usedMP },
+            { "loudActionRoundsVulnerable", loudActionRoundsVulnerable },
+            { "stunnedRoundsVulnerable", stunnedRoundsVulnerable },
+            { "overwatchShotCounter", overwatchShotCounter },
+            { "overwatchXPoint", overwatchXPoint },
+            { "overwatchYPoint", overwatchYPoint },
+            { "overwatchConeRadius", overwatchConeRadius },
+            { "overwatchConeArc", overwatchConeArc },
+            { "startX", startX },
+            { "startY", startY },
+            { "startZ", startZ },
+            { "revealedByTeam", revealedByTeam },
+            { "lastChosenStat", lastChosenStat },
+            { "suppressionValue", suppressionValue },
+            { "healthRemovedFromStarve", healthRemovedFromStarve },
+            { "poisonedBy", poisonedBy },
 
-        //save other details
-        details.Add("roundsFielded", roundsFielded);
-        details.Add("roundsFieldedConscious", roundsFieldedConscious);
-        details.Add("roundsWithoutFood", roundsWithoutFood);
-        details.Add("revealed", revealed);
-        details.Add("usedAP", usedAP);
-        details.Add("usedMP", usedMP);
-        details.Add("loudActionRoundsVulnerable", loudActionRoundsVulnerable);
-        details.Add("stunnedRoundsVulnerable", stunnedRoundsVulnerable);
-        details.Add("overwatchShotCounter", overwatchShotCounter);
-        details.Add("revealedByTeam", revealedByTeam);
-
-        details.Add("lastChosenStat", lastChosenStat);
-        details.Add("suppressionValue", suppressionValue);
-        details.Add("healthRemovedFromStarve", healthRemovedFromStarve);
-        details.Add("fighterHitCount", fighterHitCount);
-        details.Add("plannerDonatedMove", plannerDonatedMove);
-        details.Add("poisonedBy", poisonedBy);
-        details.Add("timesBloodlet", timesBloodlet);
-        details.Add("bloodLettedThisTurn", bloodLettedThisTurn);
-        details.Add("illusionedThisMove", illusionedThisMove);
-        details.Add("hasKilled", hasKilled);
-        details.Add("guardsmanRetryUsed", guardsmanRetryUsed);
-        details.Add("isSpotting", isSpotting);
-        details.Add("isSpottedBy", isSpottedBy);
-        details.Add("overwatchFirstShotUsed", overwatchFirstShotUsed);
-        details.Add("witnessActiveAbilities", witnessActiveAbilities);
-        details.Add("witnessStoredAbilities", witnessStoredAbilities);
-
-        details.Add("overwatchXPoint", overwatchXPoint);
-        details.Add("overwatchYPoint", overwatchYPoint);
-        details.Add("overwatchConeRadius", overwatchConeRadius);
-        details.Add("overwatchConeArc", overwatchConeArc);
-        details.Add("startX", startX);
-        details.Add("startY", startY);
-        details.Add("startZ", startZ);
+            //save ability details
+            { "plannerDonatedMove", plannerDonatedMove },
+            { "timesBloodlet", timesBloodlet },
+            { "bloodLettedThisTurn", bloodLettedThisTurn },
+            { "illusionedThisMove", illusionedThisMove },
+            { "hasKilled", hasKilled },
+            { "guardsmanRetryUsed", guardsmanRetryUsed },
+            { "isSpotting", isSpotting },
+            { "isSpottedBy", isSpottedBy },
+            { "overwatchFirstShotUsed", overwatchFirstShotUsed },
+            { "witnessActiveAbilities", witnessActiveAbilities },
+            { "witnessStoredAbilities", witnessStoredAbilities }
+        };
 
         //add the soldier in
         if (data.allSoldiersDetails.ContainsKey(id))
@@ -172,21 +172,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void LoadData(GameData data)
     {
         data.allSoldiersDetails.TryGetValue(id, out details);
-        //print(id);
         soldierName = (string)details["soldierName"];
         soldierTeam = Convert.ToInt32(details["team"]);
         soldierTerrain = (string)details["terrain"];
-        //load portrait
         soldierPortrait = LoadPortrait((string)details["portrait"]);
         soldierPortraitText = (string)details["portrait"];
         soldierSpeciality = (string)details["speciality"];
-        //load abilities
-        /*soldierAbilities = new();
-        soldierAbilitiesJArray = (JArray)details["abilities"];
-        foreach (string ability in soldierAbilitiesJArray)
-            soldierAbilities.Add(ability);*/
         soldierAbilities = (details["abilities"] as JArray).Select(token => token.ToString()).ToList();
-
         soldierDisplayPriority = Convert.ToInt32(details["displayPriority"]);
         fielded = (bool)details["fielded"];
         hp = Convert.ToInt32(details["hp"]);
@@ -195,12 +187,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         tp = Convert.ToInt32(details["tp"]);
         xp = Convert.ToInt32(details["xp"]);
         rank = (string)details["rank"];
-
-        //load state
-        state = new();
-        stateJArray = (JArray)details["state"];
-        foreach (string stateString in stateJArray)
-            SetState(stateString);
+        state = (details["state"] as JArray).Select(token => token.ToString()).ToList();
 
         //load position
         x = Convert.ToInt32(details["x"]);
@@ -213,44 +200,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         stats = new Statline(this);
         statsJArray = (JArray)details["stats"];
         foreach (JObject stat in statsJArray)
-        {
             stats.SetStat(stat.GetValue("Name").ToString(), (int)stat.GetValue("BaseVal"));
-        }
         instantSpeed = Convert.ToInt32(details["instantSpeed"]);
 
-        //load items
+        //load inventory info
         inventory = new Inventory(this);
-        itemsJArray = (JArray)details["inventory"];
-        foreach (string itemId in itemsJArray)
-            inventoryList.Add(itemId);
-
+        inventoryList = (details["inventory"] as JArray).Select(token => token.ToString()).ToList();
         inventorySlots = JsonConvert.DeserializeObject<Dictionary<string, string>>(details["inventorySlots"].ToString());
 
-        //load list of revealing soldiers
-        revealingSoldiersList = new();
-        revealingSoldiersJArray = (JArray)details["revealingSoldiers"];
-        foreach (string soldierId in revealingSoldiersJArray)
-            revealingSoldiersList.Add(soldierId);
-
-        //load list of revealed by soldiers
-        revealedBySoldiersList = new();
-        revealedBySoldiersJArray = (JArray)details["revealedBySoldiers"];
-        foreach (string soldierId in revealedBySoldiersJArray)
-            revealedBySoldiersList.Add(soldierId);
-
-        //load list of controlling soldiers
-        controllingSoldiersList = new();
-        controllingSoldiersJArray = (JArray)details["controllingSoldiers"];
-        foreach (string soldierId in controllingSoldiersJArray)
-            controllingSoldiersList.Add(soldierId);
-
-        //load list of controlled by soldiers
-        controlledBySoldiersList = new();
-        controlledBySoldiersJArray = (JArray)details["controlledBySoldiers"];
-        foreach (string soldierId in controlledBySoldiersJArray)
-        {
-            controlledBySoldiersList.Add(soldierId);
-        }
+        //load associated soldier lists
+        revealingSoldiersList = (details["revealingSoldiers"] as JArray).Select(token => token.ToString()).ToList();
+        revealedBySoldiersList = (details["revealedBySoldiers"] as JArray).Select(token => token.ToString()).ToList();
+        controllingSoldiersList = (details["controllingSoldiers"] as JArray).Select(token => token.ToString()).ToList();
+        controlledBySoldiersList = (details["controlledBySoldiers"] as JArray).Select(token => token.ToString()).ToList();
 
         //load other details
         roundsFielded = Convert.ToInt32(details["roundsFielded"]);
@@ -262,35 +224,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         loudActionRoundsVulnerable = Convert.ToInt32(details["loudActionRoundsVulnerable"]);
         stunnedRoundsVulnerable = Convert.ToInt32(details["stunnedRoundsVulnerable"]);
         overwatchShotCounter = Convert.ToInt32(details["overwatchShotCounter"]);
-        revealedByTeam = (string)details["revealedByTeam"];
-        lastChosenStat = (string)details["lastChosenStat"];
-        suppressionValue = Convert.ToInt32(details["suppressionValue"]);
-        healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
-        fighterHitCount = Convert.ToInt32(details["fighterHitCount"]);
-        plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
-        poisonedBy = (string)details["poisonedBy"];
-        bloodLettedThisTurn = (bool)details["bloodLettedThisTurn"];
-        illusionedThisMove = (bool)details["illusionedThisMove"];
-        hasKilled = (bool)details["hasKilled"];
-        overwatchFirstShotUsed = (bool)details["overwatchFirstShotUsed"];
-        guardsmanRetryUsed = (bool)details["guardsmanRetryUsed"];
-        isSpotting = (string)details["isSpotting"];
-        //load spotted by list
-        isSpottedBy = new();
-        isSpottedByJArray = (JArray)details["isSpottedBy"];
-        foreach (string spotterId in isSpottedByJArray)
-            isSpottedBy.Add(spotterId);
-        //load witness stored active abilities
-        witnessActiveAbilities = new();
-        witnessActiveAbilitiesJArray = (JArray)details["witnessActiveAbilities"];
-        foreach (string ability in witnessActiveAbilitiesJArray)
-            witnessActiveAbilities.Add(ability);
-        //load witness stored loading abilities
-        witnessStoredAbilities = new();
-        witnessStoredAbilitiesJArray = (JArray)details["witnessStoredAbilities"];
-        foreach (string ability in witnessStoredAbilitiesJArray)
-            witnessStoredAbilities.Add(ability);
-
         overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
         overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
         overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
@@ -298,6 +231,23 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         startX = Convert.ToInt32(details["startX"]);
         startY = Convert.ToInt32(details["startY"]);
         startZ = Convert.ToInt32(details["startZ"]);
+        revealedByTeam = (string)details["revealedByTeam"];
+        lastChosenStat = (string)details["lastChosenStat"];
+        suppressionValue = Convert.ToInt32(details["suppressionValue"]);
+        healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
+        poisonedBy = (string)details["poisonedBy"];
+
+        //load abiltiy details
+        plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
+        bloodLettedThisTurn = (bool)details["bloodLettedThisTurn"];
+        illusionedThisMove = (bool)details["illusionedThisMove"];
+        hasKilled = (bool)details["hasKilled"];
+        overwatchFirstShotUsed = (bool)details["overwatchFirstShotUsed"];
+        guardsmanRetryUsed = (bool)details["guardsmanRetryUsed"];
+        isSpotting = (string)details["isSpotting"];
+        isSpottedBy = (details["isSpottedBy"] as JArray).Select(token => token.ToString()).ToList();
+        witnessActiveAbilities = (details["witnessActiveAbilities"] as JArray).Select(token => token.ToString()).ToList();
+        witnessStoredAbilities = (details["witnessStoredAbilities"] as JArray).Select(token => token.ToString()).ToList();
 
         //link to maingame object
         game = FindObjectOfType<MainGame>();
@@ -570,30 +520,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string PrintSoldierSpeciality()
     {
-        return soldierSpeciality switch
-        {
-            "Leadership" => "Commander (L)",
-            "Health" => "Spartan (H)",
-            "Resilience" => "Survivor (R)",
-            "Speed" => "Runner (S)",
-            "Evasion" => "Evader (E)",
-            "Stealth" => "Assassin (F)",
-            "Perceptiveness" => "Seeker (P)",
-            "Camouflage" => "Chameleon (C)",
-            "Sight Radius" => "Scout (SR)",
-            "Rifle" => "Infantryman (Ri)",
-            "Assault Rifle" => "Operator (AR)",
-            "Light Machine Gun" => "Earthquake (LMG)",
-            "Sniper Rifle" => "Hunter (Sn)",
-            "Sub-Machine Gun" => "Cyclone (SMG)",
-            "Shotgun" => "Hammer (Sh)",
-            "Melee" => "Wolf (M)",
-            "Strength" => "Hercules (Str)",
-            "Diplomacy" => "Diplomat (Dip)",
-            "Electronics" => "Technician (Elec)",
-            "Healing" => "Medic (Heal)",
-            _ => "Unknown",
-        };
+        return menu.FindStringInColXReturnStringInColYInMatrix(menu.specialtiesStats, soldierSpeciality, 1, 0);
     }
     public void IncrementXP(int xp, bool learnerEnabled)
     {
@@ -622,7 +549,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "General" or _ => "",
         };
     }
-
     public int MinXPForRank()
     {
         return this.rank switch
@@ -682,10 +608,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
     }
-    public void AssignItemsToSlots()
+    public void AssignItemToSlot(Item item)
     {
+        Dictionary<string, Item> itemsToInsert = new();
         foreach (KeyValuePair<string, string> kvp in inventorySlots)
-            PickUpItemToSlot(itemManager.FindItemById(kvp.Value), kvp.Key);
+            if (kvp.Value == item.id)
+                itemsToInsert.Add(kvp.Key, item);
+        
+        foreach (KeyValuePair<string, Item> kvp in itemsToInsert)
+            Inventory.AddItemToSlot(kvp.Value, kvp.Key);
     }
     public void CalculateActiveStats()
     {
@@ -780,12 +711,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         ApplyPatriotMods();
         ApplyShadowMods();
         ApplyGuardsmanMods();
-        ApplyFighterMods();
 
         //mods applied by allies
         ApplyInspirerBuffMod();
         ApplyPlannerBuffMod();
-        ApplyBloodletterBuffMod();
     }
     public void ApplyWitnessMods()
     {
@@ -812,14 +741,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsGuardsman() && IsOnOverwatch())
             stats.P.Val += 1;
     }
-    public void ApplyFighterMods()
-    {
-        if (IsFighter())
-        {
-            stats.SR.Val += fighterHitCount * 5;
-            stats.S.Val += fighterHitCount * 3;
-        }
-    }
     public void ApplyInspirerBuffMod()
     {
         int inspirerIncrease = soldierSpeciality switch
@@ -836,10 +757,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void ApplyPlannerBuffMod()
     {
         stats.S.Val += plannerDonatedMove;
-    }
-    public void ApplyBloodletterBuffMod()
-    {
-        stats.S.Val += 3 * timesBloodlet;
     }
     public void ApplySustenanceMods()
     {
@@ -1120,6 +1037,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             //remove overwatch if damage taken
             UnsetOverwatch();
+            //remove all spotting if damage taken
+            RemoveAllSpotting();
 
             if (hp > 0)
             {
@@ -1227,7 +1146,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         snapshot.GetComponent<SoldierAlert>().SetSoldier(this);
         snapshot.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(attackedBy);
-        snapshot.transform.Find("SnapshotDetails").GetComponent<TextMeshProUGUI>().text = $"{soldierName} was informed of an attacker ({attackedBy.soldierName}). Click to see details.";
+        snapshot.transform.Find("SnapshotDetails").GetComponent<TextMeshProUGUI>().text = $"{soldierName} has informed on an attacker ({attackedBy.soldierName}). Click to see details.";
 
         //try and open damagealert
         StartCoroutine(menu.OpenDamageList());
@@ -1486,10 +1405,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     vulnerableTurns = 2;
                 else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 1)
                     vulnerableTurns = 1;
-            }
 
-            if (vulnerableTurns > 0 && s.IsSpotter() && IsHidden())
-                s.SetSpotting(this);
+                if (s.IsSpotter() && IsHidden())
+                    s.SetSpotting(this);
+            }
         }
 
         //rerun detection alerts if loud action performed for first time
@@ -1508,10 +1427,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (Soldier s in game.AllSoldiers())
         {
-            print(s.soldierName);
             if (s.IsAlive() && IsOppositeTeamAs(s))
             {
-                print(s.soldierName + " is alive and opposite team");
                 if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 3)
                     vulnerableTurns = 3;
                 else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 2)
@@ -1519,11 +1436,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 1)
                     vulnerableTurns = 1;
 
-                print(s.soldierName + " is alive and opposite team and " + vulnerableTurns);
+                if (s.IsSpotter() && IsHidden())
+                    s.SetSpotting(this);
             }
-
-            if (vulnerableTurns > 0 && s.IsSpotter() && IsHidden())
-                s.SetSpotting(this);
         }
 
         //rerun detection alerts if loud action performed for first time
@@ -1919,11 +1834,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
             return false;
     }
-    public void SetStunned(int rounds)
-    {
-        stunnedRoundsVulnerable = rounds;
-    }
-
     public bool IsPoisoned()
     {
         if (CheckState("Poisoned"))
@@ -1969,7 +1879,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsOnOverwatch())
         {
-            if (!IsGuardsman()) 
+            if (!IsGuardsman())
             {
                 overwatchShotCounter--;
                 guardsmanRetryUsed = false;
@@ -2009,18 +1919,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsBloodRaged()
     {
-        if (CheckState("Blood Rage"))
+        if (CheckState("Bloodrage"))
             return true;
 
         return false;
     }
     public void SetBloodRage()
     {
-        SetState("Blood Rage");
+        SetState("Bloodrage");
     }
     public void UnsetBloodRage()
     {
-        UnsetState("Blood Rage");
+        UnsetState("Bloodrage");
     }
     public bool IsInCover()
     {
@@ -2056,20 +1966,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         UnsetState("Crushed");
     }
-    public void MakeStunned(int stunRounds)
+    public void SetStunned(int stunRounds)
     {
         if (stunRounds > stunnedRoundsVulnerable)
         {
-            SetStunned(stunRounds);
+            stunnedRoundsVulnerable = stunRounds;
 
             //remove all engagements
             if (IsMeleeEngaged())
                 StartCoroutine(game.DetermineMeleeControllerMultiple(this));
-
-            if (ResilienceCheck())
-                menu.AddDamageAlert(this, $"{this.soldierName} resisted being stanned for {stunnedRoundsVulnerable} rounds.", true, true);
-            else
-                menu.AddDamageAlert(this, $"{this.soldierName} suffered stun for {stunnedRoundsVulnerable}.", true, true);
 
             StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         }
@@ -2081,7 +1986,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
         {
             menu.AddDamageAlert(this, $"Suffered a {stunRounds} round stun.", false, true);
-            MakeStunned(stunRounds);
+            SetStunned(stunRounds);
         }
     }
     public string CheckHealthState()
@@ -2630,11 +2535,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void TakeBloodlettingDamage()
     {
-        timesBloodlet++;
+        stats.S.BaseVal += 3;
         bloodLettedThisTurn = true;
         SetBloodRage();
         stats.H.BaseVal--;
-        hp--;
+        TakeDamage(this, 1, true, new() { "Bloodletting" });
     }
     public bool IsExperimentalist()
     {
@@ -2708,7 +2613,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void FighterMeleeHitReward()
     {
         if (IsFighter())
-            fighterHitCount++;
+        {
+            stats.SR.BaseVal += 5;
+            stats.S.BaseVal += 3;
+        }
     }
     public void FighterMeleeKillReward()
     {
@@ -2716,6 +2624,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             ap += 3;
             mp += 1;
+            usedMP = false;
         }
     }
     public bool IsGuardsman()
@@ -2766,9 +2675,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void UnsetInspired()
     {
-        UnsetState("Inspired");
-        if (soldierSpeciality == "Health")
-            TakeDamage(null, 1, true, new List<string>() { "Inspirer Debuff" });
+        if (IsInspired())
+        {
+            UnsetState("Inspired");
+            if (soldierSpeciality == "Health")
+                TakeDamage(null, 1, true, new List<string>() { "Inspirer Debuff" });
+        }
     }
     public bool IsInspired()
     {
@@ -3183,7 +3095,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetBloodRageState()
     {
         if (IsBloodRaged())
-            return ", <color=green>Blood Rage</color>";
+            return ", <color=green>Bloodrage</color>";
         return "";
     }
     public string GetSpottingState()

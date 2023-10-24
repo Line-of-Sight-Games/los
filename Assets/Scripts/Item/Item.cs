@@ -597,17 +597,17 @@ public class Item : PhysicalObject, IDataPersistence
 
             //spawn small medkit inside brace
             if (itemName == "Brace")
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc1");
 
             //spawn med medkit in bag
             if (itemName == "Bag")
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc2");
 
             //spawn small & med medkit in backpack
             if (itemName == "Backpack")
             {
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc");
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc3");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc4");
             }
 
             //perform ability effects
@@ -702,5 +702,12 @@ public class Item : PhysicalObject, IDataPersistence
             return $"({gunCQBCoverDamage})";
         else
             return $"({gunCQBCoverDamage},{gunShortCoverDamage},{gunMedCoverDamage},{gunLongCoverDamage}-c,s,m,l)";
+    }
+    public void ChangeOwner(IHaveInventory from, IHaveInventory to)
+    {
+        if (from.Inventory.AllItemIds.Contains(id))
+            from.Inventory.AllItemIds.Remove(id);
+        if (!to.Inventory.AllItemIds.Contains(id))
+            to.Inventory.AllItemIds.Add(id);
     }
 }

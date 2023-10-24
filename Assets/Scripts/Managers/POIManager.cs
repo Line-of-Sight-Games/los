@@ -23,7 +23,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
             POI newPOI = Instantiate(poiPrefab);
             newPOI.id = id;
             newPOI.LoadData(data);
-            print($"{newPOI.id}: {newPOI.poiType}: {newPOI.GetType()}");
+            //print($"{newPOI.id}: {newPOI.poiType}: {newPOI.GetType()}");
             if (newPOI.poiType == "terminal")
             {
                 Destroy(newPOI.gameObject);
@@ -40,7 +40,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
                 Destroy(newPOI.gameObject);
                 newPOI = Instantiate(barrelPrefab);
             }
-            print($"{newPOI.GetType()}");
+            //print($"{newPOI.GetType()}");
             newPOI.id = id;
             newPOI.LoadData(data);
         }
