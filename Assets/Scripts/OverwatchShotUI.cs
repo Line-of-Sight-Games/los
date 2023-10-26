@@ -63,7 +63,7 @@ public class OverwatchShotUI : MonoBehaviour
                     //standard shot crit hits
                     if (randNum2 <= chances.Item2)
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.CritDamage, false, new List<string>() { "Critical", "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         //paying xp for hit
@@ -74,7 +74,7 @@ public class OverwatchShotUI : MonoBehaviour
                     }
                     else
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunDamage, false, new List<string>() { "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.Damage, false, new List<string>() { "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                         //paying xp for hit
@@ -104,7 +104,7 @@ public class OverwatchShotUI : MonoBehaviour
                 else
                 {
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {game.RandomShotScatterDistance()}cm {game.RandomShotScatterHorizontal()}, {game.RandomShotScatterDistance()}cm {game.RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {game.RandomShotScatterDistance()}cm {game.RandomShotScatterHorizontal()}, {game.RandomShotScatterDistance()}cm {game.RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits.Damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                     //show los check button if shot doesn't hit
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 

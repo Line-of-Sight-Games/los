@@ -30,7 +30,7 @@ public class Inventory
     {
         if (linkedInventoryObject is Soldier linkedSoldier)
         {
-            AddItem(item);
+            RemoveItem(item);
             linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = "";
         }
     }
@@ -46,6 +46,7 @@ public class Inventory
     {
         //print("ran remove item");
         itemList.Remove(item);
+        itemIds.Remove(item.id);
         item.transform.SetParent(null, true);
         item.X = linkedInventoryObject.X;
         item.Y = linkedInventoryObject.Y;

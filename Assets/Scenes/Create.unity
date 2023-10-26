@@ -29229,7 +29229,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1535280272}
         m_TargetAssemblyTypeName: CreateSoldiers, Assembly-CSharp
-        m_MethodName: RandomTeam
+        m_MethodName: RandomTeamNonCoroutine
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

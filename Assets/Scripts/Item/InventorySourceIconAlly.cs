@@ -8,8 +8,10 @@ public class InventorySourceIconAlly : InventorySourceIcon
 
     public InventorySourceIcon Init(Soldier s, GameObject inventorySourcePanel)
     {
-            linkedSoldier = s;
-            linkedInventoryPanel = inventorySourcePanel;
+        linkedSoldier = s;
+        linkedInventoryPanel = inventorySourcePanel;
+        transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(s);
+
         return this;
     }
 }

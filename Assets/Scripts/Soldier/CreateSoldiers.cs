@@ -4,6 +4,7 @@ using TMPro;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System;
+using System.Collections;
 
 public class CreateSoldiers : MonoBehaviour, IDataPersistence
 {
@@ -167,11 +168,16 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
     {
         randomAlertUI.SetActive(false);
     }
-    public void RandomTeam()
+	public void RandomTeamNonCoroutine()
+	{
+		StartCoroutine(RandomTeam());
+	}
+    public IEnumerator RandomTeam()
     {
 		for (int i = soldierIndex; i <= maxSoldiersPerTeam; i++)
         {
 			RandomSoldier();
+			yield return new WaitForEndOfFrame();
 			ConfirmButtonPressed();
 			CheckSoldierIndex();
 			CheckPlayerIdentifier();

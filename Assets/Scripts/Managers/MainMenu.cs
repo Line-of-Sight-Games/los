@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -884,20 +885,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenSoldierStatsUI()
     {
-        /*Transform inventoryUI = soldierStatsUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("DisplayInventoryContent");
-
-        foreach (Item i in activeSoldier.inventory.AllItems)
-            Instantiate(itemIconPrefab, inventoryUI).Init(i.itemName, 1, i);*/
-
+        soldierStatsUI.transform.Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(activeSoldier);
         soldierStatsUI.SetActive(true);
     }
     public void CloseSoldierStatsUI()
     {
-        /*Transform inventoryUI = soldierStatsUI.transform.Find("ItemDisplayPanel").Find("Inventory").Find("InventoryPanel").Find("Viewport").Find("DisplayInventoryContent");
-
-        foreach (Transform child in inventoryUI)
-            Destroy(child.gameObject);*/
-
         soldierStatsUI.SetActive(false);
     }
     public void ToggleAdditionalActionMenu()
@@ -1187,7 +1179,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().text = activeSoldier.TerrainOn;
             soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().text = activeSoldier.RoundsWithoutFood.ToString();
             soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
-            soldierStatsUI.Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(activeSoldier);
         }
     }
     
@@ -2021,7 +2012,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         gunImage.sprite = shooter.EquippedGun.itemImage;
 
         //block suppression option if gun does not have enough ammo
-        if (!shooter.EquippedGun.CheckSpecificAmmo(shooter.EquippedGun.gunSuppressionDrain, true))
+        if (!shooter.EquippedGun.CheckSpecificAmmo(shooter.EquippedGun.gunTraits.SuppressDrain, true))
             shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression Shot");
 
         //if soldier engaged in melee block force unaimed shot
@@ -2783,25 +2774,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //configure functions - menu
     public void AddGroundInventorySourceButton()
     {
-        if (game.FindNearbyItems().Count > 0)
+        GameObject groundInventoryPanel = Instantiate(inventoryPanelGroundPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(null).gameObject;
+        Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
+        foreach (Item i in game.FindNearbyItems())
         {
-            GameObject groundInventoryPanel = configureUI.transform.Find("InventorySourcePanelGround").GetComponent<InventorySourcePanel>().Init(null).gameObject;
-            Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
-            foreach (Item i in game.FindNearbyItems())
-                Instantiate(itemSlotPrefab.GetComponent<ItemSlot>().item = i, groundInventoryPanel.transform.Find("Viewport").Find("GroundItemsContent"));
+            ItemSlot itemSlot = Instantiate(itemSlotPrefab, groundInventoryPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>();
+            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
         }
     }
     public void AddAllyInventorySourceButtons()
     {
         foreach (Soldier s in game.AllSoldiers())
             if (s.IsFielded() && activeSoldier.PhysicalObjectWithinItemRadius(s) && (activeSoldier.IsSameTeamAs(s) || s.IsUnconscious()) && s.IsInteractable())
-                Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, configureUI.transform.Find("InventorySourcePanelAlly").GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
+                Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
     }
     public void AddPOIInventorySourceButtons()
     {
         foreach (GoodyBox gb in game.AllGoodyBoxes())
             if (activeSoldier.PhysicalObjectWithinItemRadius(gb))
-                Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, configureUI.transform.Find("InventorySourcePanelGB").GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
+                Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
     }
     public void OpenConfigureUI()
     {
@@ -2828,12 +2819,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Transform child in configureUI.transform.Find("ExternalItemSources").Find("InventorySourceIconPanel").Find("Viewport").Find("Contents"))
             Destroy(child.gameObject);
 
-        //ClearInventoryPanel(configureUI.transform.Find("InventorySourcePanelAlly").gameObject);
-        ClearInventoryPanel(configureUI.transform.Find("InventorySourcePanelGround").gameObject);
-        ClearInventoryPanel(configureUI.transform.Find("InventorySourcePanelGB").gameObject);
-        //CloseInventoryPanel(configureUI.transform.Find("InventorySourcePanelAlly").gameObject);
-        CloseInventoryPanel(configureUI.transform.Find("InventorySourcePanelGround").gameObject);
-        CloseInventoryPanel(configureUI.transform.Find("InventorySourcePanelGB").gameObject);
+        //destroy all item source panels
+        foreach (Transform child in configureUI.transform)
+            if (child.GetComponent<InventorySourcePanel>() != null)
+                Destroy(child.gameObject);
     }
     public void OpenInventoryPanel(GameObject itemPanel)
     {

@@ -1256,7 +1256,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (Item i in Inventory.AllItems)
         {
-            if (IsBull() && (i.gunType != null || i.itemName.Contains("Ammo")))
+            if (IsBull() && (i.IsGun() || i.IsAmmo()))
                 carryWeight += 1;
             else
                 carryWeight += i.weight;
@@ -2442,7 +2442,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool HasSMGOrPistolEquipped()
     {
         if (HasGunEquipped())
-            if (EquippedGun.gunType == "Pistol" || EquippedGun.gunType == "SMG")
+            if (EquippedGun.IsPistol() || EquippedGun.IsSMG())
                 return true;
         return false;
     }
@@ -2704,7 +2704,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public int InspirerBonusWeapon(Item gun)
     {
-        if (IsInspired() && gun.gunType == soldierSpeciality)
+        if (IsInspired() && gun.SpecialityTag() == soldierSpeciality)
             return 5;
 
         return 0;
@@ -3270,14 +3270,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             Item gunEquipped = null;
             if (LeftHandItem != null)
             {
-                if (LeftHandItem.gunType != null)
+                if (LeftHandItem.IsGun())
                     gunEquipped = LeftHandItem;
             }
-            else
+            else if (RightHandItem != null) 
             {
-                if (RightHandItem != null)
-                    if (RightHandItem.gunType != null)
-                        gunEquipped = RightHandItem;
+                if (RightHandItem.IsGun())
+                    gunEquipped = RightHandItem;
             }
 
             return gunEquipped;

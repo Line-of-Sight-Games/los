@@ -52,16 +52,17 @@ public class GoodyBox : POI, IDataPersistence, IHaveInventory
 
     public override void SaveData(ref GameData data)
     {
-        details = new();
+        details = new()
+        {
+            { "poiType", poiType },
+            { "x", x },
+            { "y", y },
+            { "z", z },
+            { "terrainOn", terrainOn },
 
-        details.Add("poiType", poiType);
-        details.Add("x", x);
-        details.Add("y", y);
-        details.Add("z", z);
-        details.Add("terrainOn", terrainOn);
-
-        //save inventory
-        details.Add("inventory", Inventory.AllItemIds);
+            //save inventory
+            { "inventory", Inventory.AllItemIds }
+        };
 
         //add the item in
         if (data.allPOIDetails.ContainsKey(id))
@@ -78,4 +79,5 @@ public class GoodyBox : POI, IDataPersistence, IHaveInventory
     public Inventory Inventory { get { return inventory; } }
     public GameObject GameObject { get { return gameObject; } }
     public List<string> InventoryList { get { return inventoryList; } }
+    public string Id { get { return id; } }
 }

@@ -19,7 +19,7 @@ public class InventorySourcePanel : MonoBehaviour
 
         if (linkedInventorySource is Soldier linkedSoldier)
         {
-            //do some things
+            transform.Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(linkedSoldier);
         }
         else if (linkedInventorySource is GoodyBox linkedGoodyBox)
         {
@@ -44,8 +44,8 @@ public class InventorySourcePanel : MonoBehaviour
     {
         foreach (Item i in gb.Inventory.AllItems)
         {
-            ItemSlot itemSlot = Instantiate(itemSlotPrefab, this.transform.Find("Viewport").Find("Contents"));
-            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab).Init(i));
+            ItemSlot itemSlot = Instantiate(itemSlotPrefab, transform.Find("Viewport").Find("Contents")).Init(gb);
+            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
         }
     }
 }

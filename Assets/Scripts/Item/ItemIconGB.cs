@@ -51,7 +51,6 @@ public class ItemIconGB : MonoBehaviour
     public void Update()
     {
         //suppress ammo count for unspawned items
-        transform.Find("AmmoIndicator").gameObject.SetActive(false);
         transform.Find("AmountIcon").GetComponent<TextMeshProUGUI>().text = pickupNumber.ToString();
 
         if (pickupNumber > 0)

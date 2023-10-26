@@ -130,27 +130,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 return shootable;
         return null;
     }
+    public IHaveInventory FindHasInventoryById(string id)
+    {
+        foreach (IHaveInventory hasInventory in FindObjectsOfType<MonoBehaviour>().OfType<IHaveInventory>())
+            if (hasInventory.Id == id)
+                return hasInventory;
+        return null;
+    }
     public void ToggleMute()
     {
         soundManager.noisePlayer.mute = !soundManager.noisePlayer.mute;
-    }
-    public Transform FindChildRecursively(Transform parent, string childName)
-    {
-        Transform child = parent.Find(childName);
-
-        if (child != null)
-            return child;
-
-        // If not found, search through all immediate children
-        foreach (Transform childTransform in parent)
-        {
-            Transform foundInChildren = FindChildRecursively(childTransform, childName);
-
-            if (foundInChildren != null)
-                return foundInChildren;
-        }
-
-        return null;
     }
 
 
@@ -734,9 +723,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     ap++;
                 else
                 {
-                    ap += shooter.EquippedGun.gunType switch
+                    ap += shooter.EquippedGun.SpecialityTag() switch
                     {
-                        "Sniper" or "LMG" => 2,
+                        "Sniper Rifle" or "Light Machine Gun" => 2,
                         _ => 1,
                     };
                 }
@@ -785,10 +774,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
         {
-            "Melee" or "CQB" => gun.gunCQBSuppressionPenalty,
-            "Short" => gun.gunShortSuppressionPenalty,
-            "Medium" => gun.gunMedSuppressionPenalty,
-            "Long" or "Coriolis" => gun.gunLongSuppressionPenalty,
+            "Melee" or "CQB" => gun.gunTraits.CQBSupPen,
+            "Short" => gun.gunTraits.ShortSupPen,
+            "Medium" => gun.gunTraits.MedSupPen,
+            "Long" or "Coriolis" => gun.gunTraits.LongSupPen,
             _ => 0,
         };
 
@@ -867,33 +856,33 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Melee":
             case "CQB":
                 if (aimTypeDropdown.value == 0)
-                    baseWeaponHitChance = gun.gunCQBA;
+                    baseWeaponHitChance = gun.gunTraits.CQBA;
                 else
-                    baseWeaponHitChance = gun.gunCQBU;
+                    baseWeaponHitChance = gun.gunTraits.CQBU;
                 break;
             case "Short":
                 if (aimTypeDropdown.value == 0)
-                    baseWeaponHitChance = gun.gunShortA;
+                    baseWeaponHitChance = gun.gunTraits.ShortA;
                 else
-                    baseWeaponHitChance = gun.gunShortU;
+                    baseWeaponHitChance = gun.gunTraits.ShortU;
                 break;
             case "Medium":
                 if (aimTypeDropdown.value == 0)
-                    baseWeaponHitChance = gun.gunMedA;
+                    baseWeaponHitChance = gun.gunTraits.MedA;
                 else
-                    baseWeaponHitChance = gun.gunMedU;
+                    baseWeaponHitChance = gun.gunTraits.MedU;
                 break;
             case "Long":
                 if (aimTypeDropdown.value == 0)
-                    baseWeaponHitChance = gun.gunLongA;
+                    baseWeaponHitChance = gun.gunTraits.LongA;
                 else
-                    baseWeaponHitChance = gun.gunLongU;
+                    baseWeaponHitChance = gun.gunTraits.LongU;
                 break;
             case "Coriolis":
                 if (aimTypeDropdown.value == 0)
-                    baseWeaponHitChance = gun.gunCoriolisA;
+                    baseWeaponHitChance = gun.gunTraits.CoriolisA;
                 else
-                    baseWeaponHitChance = gun.gunCoriolisU;
+                    baseWeaponHitChance = gun.gunTraits.CoriolisU;
                 break;
             default:
                 baseWeaponHitChance = 0;
@@ -952,15 +941,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         int juggernautBonus = 0, stimBonus = 0;
 
-        float weaponSkill = gun.gunType switch
+        float weaponSkill = gun.SpecialityTag() switch
         {
             "Assault Rifle" => shooter.stats.AR.Val,
-            "LMG" => shooter.stats.LMG.Val,
+            "Light Machine Gun" => shooter.stats.LMG.Val,
             "Rifle" => shooter.stats.Ri.Val,
             "Shotgun" => shooter.stats.Sh.Val,
-            "SMG" => shooter.stats.SMG.Val,
-            "Sniper" => shooter.stats.Sn.Val,
-            _ => shooter.stats.GetHighestWeaponSkill(),
+            "Sub-Machine Gun" => shooter.stats.SMG.Val,
+            "Sniper Rifle" => shooter.stats.Sn.Val,
+            "Pistol" or _ => shooter.stats.GetHighestWeaponSkill(),
         };
 
         //apply juggernaut armour debuff
@@ -1359,10 +1348,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 int coverDamage = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
                 {
-                    "Melee" or "CQB" => gun.gunCQBCoverDamage,
-                    "Short" => gun.gunShortCoverDamage,
-                    "Medium" => gun.gunMedCoverDamage,
-                    "Long" or "Coriolis" => gun.gunLongCoverDamage,
+                    "Melee" or "CQB" => gun.gunTraits.CQBCovDamage,
+                    "Short" => gun.gunTraits.ShortCovDamage,
+                    "Medium" => gun.gunTraits.MedCovDamage,
+                    "Long" or "Coriolis" => gun.gunTraits.LongCovDamage,
                     _ => 0,
                 };
 
@@ -1384,7 +1373,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits.Damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is ExplosiveBarrel targetBarrel)
@@ -1407,7 +1396,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits.Damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is Soldier targetSoldier) //check if target is soldier
@@ -1428,7 +1417,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //standard shot crit hits
                     if (randNum2 <= chances.Item2)
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunCritDamage, false, new List<string>() { "Critical", "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.CritDamage, false, new List<string>() { "Critical", "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
@@ -1442,7 +1431,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunDamage, false, new List<string>() { "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.Damage, false, new List<string>() { "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
@@ -1458,7 +1447,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunDamage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits.Damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                     //show los check button if shot misses
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
@@ -1479,14 +1468,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (shotTypeDropdown.value == 1) //supression shot
         {
-            gun.SpendSpecificAmmo(gun.gunSuppressionDrain, true);
+            gun.SpendSpecificAmmo(gun.gunTraits.SuppressDrain, true);
 
             int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
             {
-                "Melee" or "CQB" => gun.gunCQBSuppressionPenalty,
-                "Short" => gun.gunShortSuppressionPenalty,
-                "Medium" => gun.gunMedSuppressionPenalty,
-                "Long" or "Coriolis" => gun.gunLongSuppressionPenalty,
+                "Melee" or "CQB" => gun.gunTraits.CQBSupPen,
+                "Short" => gun.gunTraits.ShortSupPen,
+                "Medium" => gun.gunTraits.MedSupPen,
+                "Long" or "Coriolis" => gun.gunTraits.LongSupPen,
                 _ => 0,
             };
             (target as Soldier).SetSuppression(suppressionValue);
@@ -2231,31 +2220,35 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public List<Item> FindNearbyItems()
     {
+        //print("FindNearbyItems");
         List<Item> nearbyGroundItems = new();
-        var allItems = FindObjectsOfType<Item>();
-
-        foreach (Item i in allItems)
+        foreach (Item i in FindObjectsOfType<Item>())
+        {
+            //print($"{activeSoldier.soldierName} @ {activeSoldier.X},{activeSoldier.Y},{activeSoldier.Z} checking {i.itemName} @ {i.X},{i.Y},{i.Z}");
             if (i.transform.parent == null && activeSoldier.PhysicalObjectWithinItemRadius(i))
+            {
+                //print($"itemNearby");
                 nearbyGroundItems.Add(i);
+            }
+        }
 
+        //print(menu.PrintList(nearbyGroundItems));
         return nearbyGroundItems;
     }
     public void ConfirmConfigure()
     {
-        Dictionary<string, Item> itemsToInsert = new();
-        foreach (KeyValuePair<string, string> kvp in activeSoldier.inventorySlots)
+        foreach (ItemIcon itemIcon in menu.configureUI.GetComponentsInChildren<ItemIcon>(true))
         {
-            print($"Key: {kvp.Key} | Value: {kvp.Value}");
-            ItemSlot targetSlot = FindChildRecursively(menu.configureUI.transform.Find("SoldierInventory").Find("SoldierLoadout"), kvp.Key).GetComponent<ItemSlot>();
-            print($"TargetSlot: {targetSlot.name}");
-            if (targetSlot.item != null)
-                itemsToInsert.Add(targetSlot.name, targetSlot.item);
-            
-            print($"Post Value: {kvp.Value}");
+            Item item = itemIcon.item;
+            if (item.markedForAction != string.Empty)
+            {
+                string[] instructions = item.markedForAction.Split('|');
+                item.MoveItem(FindHasInventoryById(instructions[0]), instructions[1], FindHasInventoryById(instructions[2]), instructions[3]);
+            }
         }
+            
+        //ConfirmSoldierLoadout();
         
-        foreach (KeyValuePair<string, Item> kvp in itemsToInsert)
-            activeSoldier.PickUpItemToSlot(kvp.Value, kvp.Key);
 
         /*int.TryParse(menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
 
