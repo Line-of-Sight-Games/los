@@ -66,7 +66,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
             if (targetSlot != null)
             {
-                if (targetSlot.item == null && CheckValidSlot(targetSlot))
+                if (CheckValidSlot(targetSlot))
                 {
                     targetSlot.AssignItemIcon(this);
                     SetCurrentSlot();
@@ -135,15 +135,8 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public bool CheckValidSlot(ItemSlot targetSlot)
     {
         foreach (string slot in item.equippableSlots)
-        {
-            print($"Trying Slot: {slot} in {targetSlot.name}");
-            if (targetSlot.name.Contains(slot))
+            if (targetSlot.item == null && !targetSlot.unavailable && (targetSlot.name.Contains(slot) || targetSlot.name.Contains("ItemSlot")))
                 return true;
-
-            if (targetSlot.name.Contains("ItemSlot"))
-                return true;
-        }
-            
         return false;
     }
     public void ReturnToOldSlot()

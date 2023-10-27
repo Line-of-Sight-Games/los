@@ -8,6 +8,7 @@
       "LoudRadius": 22,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -19,6 +20,7 @@
       "LoudRadius": 34,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -30,6 +32,7 @@
       "LoudRadius": 22,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -41,6 +44,7 @@
       "LoudRadius": 22,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -52,6 +56,7 @@
       "LoudRadius": 34,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -63,6 +68,7 @@
       "LoudRadius": 22,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -74,6 +80,7 @@
       "LoudRadius": 24,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -83,7 +90,7 @@
       "Weight": 2,
       "Ammo": 10,
       "MeleeDamage": 2,
-      "GunTraits" : {
+      "GunTraits": {
         "MaxClip": 10,
         "BaseMaxClip": 10,
         "Damage": 4,
@@ -117,7 +124,7 @@
       "Weight": 3,
       "Ammo": 5,
       "MeleeDamage": 2,
-      "GunTraits" : {
+      "GunTraits": {
         "MaxClip": 5,
         "BaseMaxClip": 5,
         "Damage": 5,
@@ -151,7 +158,7 @@
       "Weight": 3,
       "Ammo": 6,
       "MeleeDamage": 2,
-      "GunTraits" : {
+      "GunTraits": {
         "MaxClip": 6,
         "BaseMaxClip": 6,
         "Damage": 5,
@@ -184,6 +191,7 @@
       "Traits": [ "Ablative", "Unbreakable", "Storage" ],
       "Weight": 4,
       "AblativeHealth": 4,
+      "GunTraits": {},
       "EquippableSlots": [ "Chest" ],
       "WhereEquipped": ""
     },
@@ -191,6 +199,7 @@
       "Name": "Armour_Exo",
       "Traits": [],
       "Weight": 3,
+      "GunTraits": {},
       "EquippableSlots": [ "Chest" ],
       "BlockedSlots": [ "Back", "Leg", "Lateral", "Posterior" ],
       "WhereEquipped": ""
@@ -199,6 +208,7 @@
       "Name": "Armour_Ghillie",
       "Traits": [ "Unbreakable" ],
       "Weight": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Chest" ],
       "BlockedSlots": [ "Leg", "Posterior" ],
       "WhereEquipped": ""
@@ -208,6 +218,7 @@
       "Traits": [ "Ablative", "Unbreakable", "Storage" ],
       "Weight": 14,
       "AblativeHealth": 18,
+      "GunTraits": {},
       "EquippableSlots": [ "Chest" ],
       "BlockedSlots": [ "Posterior" ],
       "WhereEquipped": ""
@@ -216,6 +227,7 @@
       "Name": "Armour_Stimulant",
       "Traits": [],
       "Weight": 2,
+      "GunTraits": {},
       "EquippableSlots": [ "Chest" ],
       "WhereEquipped": ""
     },
@@ -223,6 +235,7 @@
       "Name": "Backpack",
       "Traits": [ "Storage" ],
       "Weight": 4,
+      "GunTraits": {},
       "EquippableSlots": [ "Back" ],
       "WhereEquipped": ""
     },
@@ -230,6 +243,7 @@
       "Name": "Bag",
       "Traits": [ "Storage" ],
       "Weight": 2,
+      "GunTraits": {},
       "EquippableSlots": [ "Posterior" ],
       "WhereEquipped": ""
     },
@@ -238,6 +252,7 @@
       "Traits": [ "Useable", "Fragile" ],
       "Weight": 1,
       "MeleeDamage": 0,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -245,6 +260,7 @@
       "Name": "Brace",
       "Traits": [ "Storage" ],
       "Weight": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Leg" ],
       "WhereEquipped": ""
     },
@@ -254,6 +270,7 @@
       "Weight": 2,
       "LoudRadius": 10,
       "MeleeDamage": 0,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -263,6 +280,7 @@
       "Weight": 2,
       "LoudRadius": 10,
       "MeleeDamage": 0,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -272,6 +290,7 @@
       "Weight": 2,
       "LoudRadius": 18,
       "MeleeDamage": 3,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -283,6 +302,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -292,6 +312,7 @@
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -301,6 +322,7 @@
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -310,6 +332,7 @@
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -319,6 +342,7 @@
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -327,6 +351,7 @@
       "Traits": [],
       "Weight": 1,
       "MeleeDamage": 5,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "BlockedByPosterior": "Back",
       "BlockedByLateral": "LeftBrace"
@@ -339,6 +364,7 @@
       "LoudRadius": 24,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Hand" ],
       "WhereEquipped": ""
     },
@@ -349,6 +375,7 @@
       "HPGranted": 4,
       "LoudRadius": 24,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Misc" ],
       "WhereEquipped": ""
     },
@@ -359,6 +386,7 @@
       "HPGranted": 2,
       "LoudRadius": 24,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Misc" ],
       "WhereEquipped": ""
     },
@@ -368,7 +396,7 @@
       "Weight": 5,
       "Ammo": 16,
       "MeleeDamage": 2,
-      "GunTraits" : {
+      "GunTraits": {
         "MaxClip": 16,
         "BaseMaxClip": 16,
         "Damage": 6,
@@ -402,7 +430,7 @@
       "Weight": 6,
       "Ammo": 16,
       "MeleeDamage": 2,
-      "GunTraits" : {
+      "GunTraits": {
         "MaxClip": 16,
         "BaseMaxClip": 16,
         "Damage": 6,
@@ -436,7 +464,7 @@
       "Weight": 6,
       "Ammo": 12,
       "MeleeDamage": 2,
-      "GunTraits" : {
+      "GunTraits": {
         "MaxClip": 12,
         "BaseMaxClip": 12,
         "Damage": 5,
@@ -468,6 +496,7 @@
       "Name": "Logistics_Belt",
       "Traits": [],
       "Weight": 2,
+      "GunTraits": {},
       "EquippableSlots": [ "Posterior" ],
       "WhereEquipped": ""
     },
@@ -477,7 +506,7 @@
       "Weight": 1,
       "Ammo": 8,
       "MeleeDamage": 0,
-      "GunTraits" : {
+      "GunTraits": {
         "MaxClip": 8,
         "BaseMaxClip": 8,
         "Damage": 1,
@@ -580,6 +609,7 @@
       "LoudRadius": 6,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -690,6 +720,7 @@
       "Traits": [ "Unbreakable" ],
       "Weight": 8,
       "MeleeDamage": 0,
+      "GunTraits": {},
       "EquippableSlots": [ "Hand" ],
       "WhereEquipped": ""
     },
@@ -1003,6 +1034,7 @@
       "Name": "Suppressor",
       "Traits": [],
       "Weight": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Misc" ],
       "WhereEquipped": ""
     },
@@ -1013,6 +1045,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1023,6 +1056,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1033,6 +1067,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1043,6 +1078,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1053,6 +1089,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1063,6 +1100,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1073,6 +1111,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1083,6 +1122,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1093,6 +1133,7 @@
       "MeleeDamage": 0,
       "Charges": 1,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1103,6 +1144,7 @@
       "LoudRadius": 10,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1113,6 +1155,7 @@
       "LoudRadius": 14,
       "MeleeDamage": 0,
       "Charges": 1,
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
@@ -1121,6 +1164,7 @@
       "Traits": [ "Useable", "Fragile" ],
       "Weight": 5,
       "LoudRadius": 24,
+      "GunTraits": {},
       "EquippableSlots": [ "Back" ],
       "WhereEquipped": ""
     },
@@ -1132,6 +1176,7 @@
       "MeleeDamage": 0,
       "Charges": 4,
       "PoisonedBy": "",
+      "GunTraits": {},
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     }

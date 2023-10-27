@@ -59,12 +59,12 @@ public class Item : PhysicalObject, IDataPersistence
         weight = reader.allItems.items[itemIndex].Weight;
         ammo = reader.allItems.items[itemIndex].Ammo;
         meleeDamage = reader.allItems.items[itemIndex].MeleeDamage;
-        gunTraits = reader.allItems.items[itemIndex].GunTraits;
         ablativeHealth = reader.allItems.items[itemIndex].AblativeHealth;
         hpGranted = reader.allItems.items[itemIndex].HPGranted;
         loudRadius = reader.allItems.items[itemIndex].LoudRadius;
         charges = reader.allItems.items[itemIndex].Charges;
         poisonedBy = reader.allItems.items[itemIndex].PoisonedBy;
+        gunTraits = reader.allItems.items[itemIndex].GunTraits;
         equippableSlots = reader.allItems.items[itemIndex].EquippableSlots;
         whereEquipped = reader.allItems.items[itemIndex].WhereEquipped;
 

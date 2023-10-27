@@ -24,6 +24,10 @@ public class ItemSlot : MonoBehaviour
     }
     public void ClearItemIcon()
     {
+        foreach(Transform child in transform)
+            if (child.name != "Blocked")
+                Destroy(child.gameObject);
+
         item = null;
     }
     private void Update()

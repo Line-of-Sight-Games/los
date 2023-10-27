@@ -7,29 +7,29 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
 {
     static string[,] blockedSlotMatrix = new string[,]
     {
-        {"SlotsBlocked", "Head","Chest","Back","LeftHand","RightHand","Lateral","Posterior","LeftLeg","LeftBrace","RightLeg","RightBrace","Armour1","Armour2","Armour3","Armour4","Backpack1","Backpack2","Backpack3","Misc1","Misc2","Misc3","Misc4","Misc5","Misc6","Misc7","Misc8" },
-        {"Binoculars", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Claymore", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"E_Tool", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Food_Pack", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Grenade_Flashbang", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Grenade_Frag", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Grenade_Smoke", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Grenade_Tabun", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Knife", "", "", "", "", "", "LeftBrace", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Poison_Satchel", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Amphetamine", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Androstenedione", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Cannabinoid", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Danazol", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Glucocorticoid", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Modafinil", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Shard", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Trenbolone", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Syringe_Unlabelled", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Thermal_Camera", "", "", "", "", "", "LeftBrace", "", "", "Lateral", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"UHF_Radio", "", "", "", "", "", "", "", "", "Lateral", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"Water_Canteen", "", "", "", "", "", "", "", "", "Lateral", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"SlotsBlocked", "Head","Chest","Back","LeftHand","RightHand","Lateral","Posterior","LeftLeg","LeftBrace","RightLeg","RightBrace","Armour1","Armour2","Armour3","Armour4","Backpack1","Backpack2","Backpack3","Misc1","Misc2","Misc3","Misc4","Misc5"},
+        {"Binoculars", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Claymore", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"E_Tool", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Food_Pack", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Grenade_Flashbang", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Grenade_Frag", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Grenade_Smoke", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Grenade_Tabun", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Knife", "", "", "", "", "", "LeftBrace", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Poison_Satchel", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Amphetamine", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Androstenedione", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Cannabinoid", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Danazol", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Glucocorticoid", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Modafinil", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Shard", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Trenbolone", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Syringe_Unlabelled", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Thermal_Camera", "", "", "", "", "", "", "", "", "Lateral", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"UHF_Radio", "", "", "", "", "", "", "", "", "Lateral", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Water_Canteen", "", "", "", "", "", "", "", "", "Lateral", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
     };
     public ItemIcon itemIconPrefab;
     public Soldier linkedSoldier;
@@ -58,9 +58,6 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         RemoveItemIconInSlot("Misc3");
         RemoveItemIconInSlot("Misc4");
         RemoveItemIconInSlot("Misc5");
-        RemoveItemIconInSlot("Misc6");
-        RemoveItemIconInSlot("Misc7");
-        RemoveItemIconInSlot("Misc8");
 
         linkedSoldier = s;
         LinkSlots(s);
@@ -87,9 +84,6 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         AddItemIconInSlot(s, "Misc3");
         AddItemIconInSlot(s, "Misc4");
         AddItemIconInSlot(s, "Misc5");
-        AddItemIconInSlot(s, "Misc6");
-        AddItemIconInSlot(s, "Misc7");
-        AddItemIconInSlot(s, "Misc8");
 
         return this;
     }
@@ -101,50 +95,132 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
     }
     public void RemoveItemIconInSlot(string slotName)
     {
-        FindChildRecursively(transform, slotName).GetComponent<ItemSlot>().ClearItemIcon();
+        transform.FindRecursively(slotName).GetComponent<ItemSlot>().ClearItemIcon();
     }
     public void AddItemIconInSlot(Soldier s, string slotName)
     {
+        Transform targetSlot = transform.FindRecursively(slotName);
         s.inventorySlots.TryGetValue(slotName, out string itemId);
 
         if (itemId != "")
-            Instantiate(itemIconPrefab, FindChildRecursively(transform, slotName)).GetComponent<ItemIcon>().Init(s.itemManager.FindItemById(itemId));
+            targetSlot.GetComponent<ItemSlot>().AssignItemIcon(Instantiate(itemIconPrefab, targetSlot).GetComponent<ItemIcon>().Init(s.itemManager.FindItemById(itemId)));
     }
-    public Transform FindChildRecursively(Transform parent, string childName)
-    {
-        Transform child = parent.Find(childName);
-
-        if (child != null)
-            return child;
-
-        // If not found, search through all immediate children
-        foreach (Transform childTransform in parent)
-        {
-            Transform foundInChildren = FindChildRecursively(childTransform, childName);
-
-            if (foundInChildren != null)
-                return foundInChildren;
-        }
-
-        return null;
-    }
-
     private void Update()
     {
         DisplayAvailableSlots();
     }
     public void DisplayAvailableSlots()
     {
-        CheckSlotAvailable("Posterior");
-        CheckSlotAvailable("Lateral");
-        CheckSlotAvailable("LeftBrace");
+        //slot hiding and revealing
+        if (CheckSlotContains("Back", "Backpack"))
+        {
+            RevealSlot("Backpack1");
+            RevealSlot("Backpack2");
+            RevealSlot("Backpack3");
+            RevealSlot("Misc1");
+            RevealSlot("Misc2");
+        }
+        else
+        {
+            HideSlot("Backpack1");
+            HideSlot("Backpack2");
+            HideSlot("Backpack3");
+            HideSlot("Misc1");
+            HideSlot("Misc2");
+        }
+        if (CheckSlotContains("Chest", "Armour_Body"))
+        {
+            RevealSlot("Armour1");
+            RevealSlot("Armour2");
+            HideSlot("Armour3");
+            HideSlot("Armour4");
+            RevealSlot("ArmourLine");
+        }
+        else if (CheckSlotContains("Chest", "Armour_Juggernaut"))
+        {
+            RevealSlot("Armour1");
+            RevealSlot("Armour2");
+            RevealSlot("Armour3");
+            RevealSlot("Armour4");
+            RevealSlot("ArmourLine");
+        }
+        else
+        {
+            HideSlot("Armour1");
+            HideSlot("Armour2");
+            HideSlot("Armour3");
+            HideSlot("Armour4");
+            HideSlot("ArmourLine");
+        }
+        if (CheckSlotContains("LeftLeg", "Brace"))
+        {
+            RevealSlot("LeftBrace");
+            RevealSlot("Misc5");
+        }
+        else
+        {
+            HideSlot("LeftBrace");
+            HideSlot("Misc5");
+        }
+        if (CheckSlotContains("RightLeg", "Brace"))
+        {
+            RevealSlot("RightBrace");
+            RevealSlot("Misc4");
+        }
+        else
+        {
+            HideSlot("RightBrace");
+            HideSlot("Misc4");
+        }
+        if (CheckSlotContains("Posterior", "Bag"))
+            RevealSlot("Misc3");
+        else
+            HideSlot("Misc3");
+
+        //dynamic slot blocking
+        UnblockAllSlots();
+        BlockSlotsCheck("Posterior");
+        BlockSlotsCheck("Lateral");
+        BlockSlotsCheck("LeftBrace");
     }
-    public void CheckSlotAvailable(string slotName)
+    public void UnblockAllSlots()
     {
-        if (FindChildRecursively(transform, slotName).TryGetComponent<ItemSlot>(out var slot))
-            for (int i = 0; i < blockedSlotMatrix.GetLength(0); i++)
-                for (int j = 0; j < blockedSlotMatrix.GetLength(j); j++)
-                    if (blockedSlotMatrix[i, 0] == slot.item.itemName && blockedSlotMatrix[0, j] == slotName)
-                        FindChildRecursively(transform, blockedSlotMatrix[0, j]).GetComponent<ItemSlot>().unavailable = true;
+        foreach (Transform child in transform)
+            if (child.TryGetComponent(out ItemSlot slot))
+                slot.unavailable = false;
+    }
+    public void BlockSlotsCheck(string slotName)
+    {
+        Transform targetTransform = transform.FindRecursively(slotName);
+        if (targetTransform != null)
+            if (targetTransform.TryGetComponent(out ItemSlot slot))
+                if (slot.item != null)
+                    for (int i = 0; i < blockedSlotMatrix.GetLength(0); i++)
+                        for (int j = 0; j < blockedSlotMatrix.GetLength(1); j++)
+                            if (blockedSlotMatrix[i, 0] == slot.item.itemName && blockedSlotMatrix[0, j] == slotName)
+                                if (transform.FindRecursively(blockedSlotMatrix[i, j]) != null)
+                                    if (transform.FindRecursively(blockedSlotMatrix[i, j]).TryGetComponent(out ItemSlot blockedSlot))
+                                        blockedSlot.unavailable = true;
+    }
+    public bool CheckSlotContains(string slotName, string itemName)
+    {
+        Transform targetTransform = transform.FindRecursively(slotName);
+        if (targetTransform != null)
+            foreach (Transform child in targetTransform)
+                if (child.name == itemName)
+                    return true;
+        return false;
+    }
+    public void RevealSlot(string slotName)
+    {
+        Transform targetTransform = transform.FindRecursively(slotName);
+        if (targetTransform != null)
+            targetTransform.gameObject.SetActive(true);
+    }
+    public void HideSlot(string slotName)
+    {
+        Transform targetTransform = transform.FindRecursively(slotName);
+        if (targetTransform != null)
+            targetTransform.gameObject.SetActive(false);
     }
 }
