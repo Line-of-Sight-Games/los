@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -17,7 +18,14 @@ public class Inventory
         itemIds = new List<string>();
         linkedInventoryObject = inventoryObject;
     }
-
+    public Item GetItemInSlot(string slotName)
+    {
+        if (linkedInventoryObject is Soldier linkedSoldier)
+            foreach (Item i in itemList)
+                if (i.id == linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key])
+                    return i;
+        return null;
+    }
     public void AddItemToSlot(Item item, string slotName)
     {
         if (linkedInventoryObject is Soldier linkedSoldier)
@@ -32,6 +40,14 @@ public class Inventory
         {
             RemoveItem(item);
             linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = "";
+        }
+    }
+    public void ConsumeItemInSlot(Item item, string slotName)
+    {
+        if (item != null)
+        {
+            RemoveItemFromSlot(item, slotName);
+            item.itemManager.DestroyItem(item);
         }
     }
     public void AddItem(Item item)
@@ -54,7 +70,15 @@ public class Inventory
         item.owner = null;
     }
 
-    public bool HasItem(string name)
+    public bool HasItem(string id)
+    {
+        foreach (Item i in itemList)
+            if (i.id == id)
+                return true;
+
+        return false;
+    }
+    public bool HasItemOfType(string name)
     {
         foreach (Item i in itemList)
             if (i.itemName == name)
@@ -62,7 +86,6 @@ public class Inventory
 
         return false;
     }
-
     public Item GetItem(string name)
     {
         foreach (Item i in itemList)

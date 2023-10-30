@@ -759,10 +759,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else if (target is Soldier targetSoldier)
         {
             if (targetSoldier.IsInCover())
-            {
                 menu.shotUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(true);
-                menu.shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().value = 0;
-            }
                 
             UpdateTargetFlanking(shooter, targetSoldier);
         }
@@ -953,7 +950,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         };
 
         //apply juggernaut armour debuff
-        if (shooter.IsWearingJuggernautArmour())
+        if (shooter.IsWearingJuggernautArmour(false))
             juggernautBonus = -1;
         weaponSkill += juggernautBonus;
 
@@ -1408,8 +1405,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     if (targetSoldier.IsMeleeEngaged()) //pick random target to hit in engagement
                     {
-                        targetSoldier = originalTarget.EngagedSoldiers[RandomNumber(0, originalTarget.EngagedSoldiers.Count - 1)];
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee aiming for {originalTarget.soldierName}, hit {targetSoldier.soldierName}.";
+                        int randNum3 = RandomNumber(0, originalTarget.EngagedSoldiers.Count);
+                        if (randNum3 > 0)
+                        {
+                            targetSoldier = originalTarget.EngagedSoldiers[randNum3 - 1];
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee aiming for {originalTarget.soldierName}, hit {targetSoldier.soldierName}.";
+                        }
+                        else
+                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee and hit intended target.";
                     }
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
@@ -1613,7 +1616,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float inspirerBonus, attackerMeleeSkill = attacker.stats.M.Val;
 
         //apply JA debuff
-        if (attacker.IsWearingJuggernautArmour())
+        if (attacker.IsWearingJuggernautArmour(false))
             juggernautBonus = -1;
         attackerMeleeSkill += juggernautBonus;
 
@@ -1716,7 +1719,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float inspirerBonus, defenderMeleeSkill = defender.stats.M.Val;
 
         //apply JA debuff
-        if (defender.IsWearingJuggernautArmour())
+        if (defender.IsWearingJuggernautArmour(false))
             juggernautBonus = -1;
         defenderMeleeSkill += juggernautBonus;
 
@@ -2068,14 +2071,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         //melee attack proceeds
                         if (meleeDamage > 0)
                         {
-                            if (attacker.IsWearingExoArmour() && !defender.IsWearingJuggernautArmour()) //exo kill on standard man
+                            if (attacker.IsWearingExoArmour() && !defender.IsWearingJuggernautArmour(false)) //exo kill on standard man
                             {
                                 damageMessage = "<color=green>INSTANT KILL\n(Exo Armour)</color>";
                                 instantKill = true;
                             }
                             else
                             {
-                                if (defender.IsWearingJuggernautArmour() && !attacker.IsWearingExoArmour())
+                                if (defender.IsWearingJuggernautArmour(false) && !attacker.IsWearingExoArmour())
                                     damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
                                 else
                                     damageMessage = "<color=green>Successful Attack\n(" + meleeDamage + " Damage)</color>";
@@ -2088,7 +2091,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             //play counterattack sound
                             soundManager.PlayCounterattack();
 
-                            if (!defender.IsWearingExoArmour() && attacker.IsWearingJuggernautArmour()) //no damage counter against jugs
+                            if (!defender.IsWearingExoArmour() && attacker.IsWearingJuggernautArmour(false)) //no damage counter against jugs
                                 damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
                             else
                             {
@@ -2169,32 +2172,31 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
     //configure functions
-    public void UpdateConfigureAP()
+    public int UpdateConfigureAP()
     {
-        /*int totalPickup = 0, totalDrop = 0, totalSwap = 0, ap = 0;
+        int totalDrop = 0, totalPickup = 0, totalSwap = 0, ap = 0;
 
-        foreach (Transform child in groundItemsContentUI)
-            if (child.GetComponent<GBItemIcon>().pickupNumber == 0)
-                totalPickup++;
-
-        foreach (Transform allyButton in allyButtonContentUI)
-            foreach (Transform itemIcon in allyButton.GetComponent<AllyItemsButton>().linkedItemPanel.transform.Find("Viewport").Find("InventoryContent"))
-                if (itemIcon.GetComponent<GBItemIcon>().pickupNumber == 0)
-                    totalSwap++;
-
-        foreach (Transform child in allItemsContentUI)
-            if (child.GetComponent<GBItemIcon>() != null)
-                if (child.GetComponent<GBItemIcon>().pickupNumber > 0)
-                    totalPickup += child.GetComponent<GBItemIcon>().pickupNumber;
-
-        foreach (Transform child in inventoryItemsContentUI)
-            if (child.GetComponent<GBItemIcon>().pickupNumber == 0)
+        foreach (ItemIcon itemIcon in menu.configureUI.GetComponentsInChildren<ItemIcon>(true))
+        {
+            Item item = itemIcon.item;
+            if (item.markedForAction != string.Empty)
             {
-                if (child.GetComponent<GBItemIcon>().destination == null)
-                    totalDrop++;
-                else
+                string[] instructions = item.markedForAction.Split('|');
+                if (instructions[0] == instructions[2] && instructions[1] != instructions[3])
                     totalSwap++;
+                else if (instructions[2] == "none")
+                {
+                    if (!instructions[1].Contains("Hand"))
+                        totalDrop++;
+                }
+                else
+                    totalPickup++;
+
+                if (item.IsArmour())
+                    ap = 3;
             }
+        }
+        print($"totaldrop|{totalDrop} totalswap|{totalSwap} totalpickup|{totalPickup}");
 
         //calculate ap required for action
         if (totalDrop > 2)
@@ -2216,91 +2218,51 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
             ap = 0;
 
-        menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();*/
+        menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
+        return ap;
     }
     public List<Item> FindNearbyItems()
     {
-        //print("FindNearbyItems");
         List<Item> nearbyGroundItems = new();
         foreach (Item i in FindObjectsOfType<Item>())
-        {
-            //print($"{activeSoldier.soldierName} @ {activeSoldier.X},{activeSoldier.Y},{activeSoldier.Z} checking {i.itemName} @ {i.X},{i.Y},{i.Z}");
             if (i.transform.parent == null && activeSoldier.PhysicalObjectWithinItemRadius(i))
-            {
-                //print($"itemNearby");
                 nearbyGroundItems.Add(i);
-            }
-        }
 
-        //print(menu.PrintList(nearbyGroundItems));
         return nearbyGroundItems;
     }
     public void ConfirmConfigure()
     {
-        foreach (ItemIcon itemIcon in menu.configureUI.GetComponentsInChildren<ItemIcon>(true))
-        {
-            Item item = itemIcon.item;
-            if (item.markedForAction != string.Empty)
-            {
-                string[] instructions = item.markedForAction.Split('|');
-                item.MoveItem(FindHasInventoryById(instructions[0]), instructions[1], FindHasInventoryById(instructions[2]), instructions[3]);
-            }
-        }
-            
-        //ConfirmSoldierLoadout();
-        
-
-        /*int.TryParse(menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
-
-        if (CheckAP(ap))
+        int ap = UpdateConfigureAP();
+        if (CheckAP(ap)) 
         {
             DeductAP(ap);
-            foreach (Transform child in allItemsContentUI)
+            foreach (ItemIcon itemIcon in menu.configureUI.GetComponentsInChildren<ItemIcon>(true))
             {
-                if (child.GetComponent<GBItemIcon>() != null)
+                Item item = itemIcon.item;
+                if (item.markedForAction != string.Empty)
                 {
-                    GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
-
-                    for (int i = 0; i < itemDetails.pickupNumber; i++)
-                        activeSoldier.PickUpItemToSlot(itemManager.SpawnItem(child.gameObject.name), "Left_Hand");
+                    string[] instructions = item.markedForAction.Split('|');
+                    print(item.markedForAction);
+                    item.MoveItem(FindHasInventoryById(instructions[0]), instructions[1], FindHasInventoryById(instructions[2]), instructions[3]);
                 }
             }
-
-            foreach (Transform child in inventoryItemsContentUI)
-            {
-                GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
-
-                if (itemDetails.pickupNumber == 0)
-                {
-                    if (itemDetails.destination == null)
-                        activeSoldier.DropItem(itemDetails.linkedItem);
-                    else
-                        itemDetails.destination.GetComponent<Soldier>().PickUpItemToSlot(activeSoldier.DropItem(itemDetails.linkedItem), "Left_Hand");
-                }
-                    
-            }
-
-            foreach (Transform child in groundItemsContentUI)
-            {
-                GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
-
-                if (itemDetails.pickupNumber == 0)
-                    activeSoldier.PickUpItemToSlot(itemDetails.linkedItem, "Left_Hand");
-            }
-
-            foreach (Transform allyButton in allyButtonContentUI)
-                foreach (Transform child in allyButton.GetComponent<AllyItemsButton>().linkedItemPanel.transform.Find("Viewport").Find("InventoryContent"))
-                {
-                    GBItemIcon itemDetails = child.GetComponent<GBItemIcon>();
-
-                    if (itemDetails.pickupNumber == 0)
-                        activeSoldier.PickUpItemToSlot(itemDetails.linkedItem.owner.DropItem(itemDetails.linkedItem), "Left_Hand");
-                }
-            */
-        menu.CloseConfigureUI();
-        //}
+            activeSoldier.PerformLoudAction(5);
+            menu.CloseConfigureUI();
+        }
     }
+    //item functions
+    public void ConfirmUseBasicItem()
+    {
 
+        Item itemUsed = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsed;
+        Item itemUsedOn = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedOn;
+        ItemIcon linkedIcon = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon;
+        string slotName = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName;
+
+        DeductAP(itemUsed.usageAP);
+        itemUsed.UseItemInSlot(slotName, linkedIcon, itemUsedOn);
+        menu.CloseUseBasicItemUI();
+    }
 
 
 
@@ -2773,7 +2735,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else
                     {
-                        if (activeSoldier.IsWearingJuggernautArmour())
+                        if (activeSoldier.IsWearingJuggernautArmour(false))
                         {
                             activeSoldier.MakeUnconscious();
                             menu.AddDamageAlert(activeSoldier, $"{activeSoldier.soldierName} survived a {structureHeight}cm structural collapse with Juggernaut Armour.", true, false);
@@ -3499,17 +3461,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (arrowType == "detection2Way" && movingSoldier.RevealedBySoldiers.Contains(detectee.id) && detectee.RevealedBySoldiers.Contains(movingSoldier.id))
                         {
                             addDetection = false;
-                            print(arrowType + ": soldiers can already see each other");
+                            //print(arrowType + ": soldiers can already see each other");
                         }
                         else if (arrowType == "detection1WayRight" && detectee.RevealedBySoldiers.Contains(movingSoldier.id))
                         {
                             addDetection = false;
-                            print(arrowType + ": onturn can see offturn (1 way)");
+                            //print(arrowType + ": onturn can see offturn (1 way)");
                         }
                         else if (arrowType == "detection1WayLeft" && movingSoldier.RevealedBySoldiers.Contains(detectee.id))
                         {
                             addDetection = false;
-                            print(arrowType + ": offturn can see onturn (1 way)");
+                            //print(arrowType + ": offturn can see onturn (1 way)");
                         }
                     }
 

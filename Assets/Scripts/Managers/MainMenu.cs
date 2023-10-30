@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -33,7 +34,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
         allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
         meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab;
+        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useBasicItemUI, ULFResultUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public OverwatchArc overwatchArcPrefab;
@@ -46,7 +47,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public string meleeChargeIndicator;
     public Soldier activeSoldier;
     public bool overrideView, displayLOSArrows, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, 
-        xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag;
+        xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
         detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist, explosiveBarrel, covermanSprite;
@@ -885,11 +886,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenSoldierStatsUI()
     {
+        onItemUseScreen = true;
         soldierStatsUI.transform.Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(activeSoldier);
         soldierStatsUI.SetActive(true);
     }
     public void CloseSoldierStatsUI()
     {
+        onItemUseScreen = false;
         soldierStatsUI.SetActive(false);
     }
     public void ToggleAdditionalActionMenu()
@@ -970,7 +973,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(moveButton, "Melee Controlling");
 
             //block cover button
-            if (activeSoldier.IsWearingJuggernautArmour())
+            if (activeSoldier.IsWearingJuggernautArmour(false))
                 buttonStates.Add(coverButton, "<color=green>Juggernaut</color>");
             else if (activeSoldier.IsInCover())
                 buttonStates.Add(coverButton, "<color=green>Taking Cover</color>");
@@ -1019,7 +1022,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(dipElecButton, "Terminal Disabled");
 
             //block playdead button
-            if (activeSoldier.IsWearingJuggernautArmour())
+            if (activeSoldier.IsWearingJuggernautArmour(false))
                 buttonStates.Add(playdeadButton, "Juggernaut");
 
             GreyOutButtons(buttonStates, "");
@@ -2660,7 +2663,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
 
         //block cover for JA
-        if (activeSoldier.IsWearingJuggernautArmour())
+        if (activeSoldier.IsWearingJuggernautArmour(false))
             coverToggle.interactable = false;
 
         //block melee toggle if within engage distance of enemy
@@ -2785,7 +2788,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void AddAllyInventorySourceButtons()
     {
         foreach (Soldier s in game.AllSoldiers())
-            if (s.IsFielded() && activeSoldier.PhysicalObjectWithinItemRadius(s) && (activeSoldier.IsSameTeamAs(s) || s.IsUnconscious()) && s.IsInteractable())
+            if (s.IsFielded() && activeSoldier.PhysicalObjectWithinItemRadius(s) && (activeSoldier.IsSameTeamAs(s) || s.IsUnconscious() || s.IsDead()) && s.IsInteractable())
                 Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
     }
     public void AddPOIInventorySourceButtons()
@@ -2841,6 +2844,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CloseConfigureUI()
     {
         ClearConfigureUI();
+        if (configureButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text == "Spawn Config")
+            activeSoldier.usedAP = true;
         configureUI.SetActive(false);
     }
 
@@ -2992,35 +2997,32 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //damage event functions - menu
     public void OpenDamageEventUI()
     {
-        if (OverrideKey())
-        {
-            TMP_Dropdown damageEventTypeDropdown = damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>();
-            damageEventTypeDropdown.ClearOptions();
+        TMP_Dropdown damageEventTypeDropdown = damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>();
+        damageEventTypeDropdown.ClearOptions();
 
-            //generate damage event type dropdown
-            List<TMP_Dropdown.OptionData> damageEventTypeDetails = new()
+        //generate damage event type dropdown
+        List<TMP_Dropdown.OptionData> damageEventTypeDetails = new()
         {
-            new TMP_Dropdown.OptionData("Fall Damage"),
-            new TMP_Dropdown.OptionData("Structural Collapse"),
-            new TMP_Dropdown.OptionData("Other"),
+        new TMP_Dropdown.OptionData("Fall Damage"),
+        new TMP_Dropdown.OptionData("Structural Collapse"),
+        new TMP_Dropdown.OptionData("Other"),
         };
-            if (activeSoldier.IsBloodletter() && !activeSoldier.bloodLettedThisTurn)
-                damageEventTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Bloodletting</color>"));
-            damageEventTypeDropdown.AddOptions(damageEventTypeDetails);
+        if (activeSoldier.IsBloodletter() && !activeSoldier.bloodLettedThisTurn)
+            damageEventTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Bloodletting</color>"));
+        damageEventTypeDropdown.AddOptions(damageEventTypeDetails);
 
-            //prefill movement position inputs with current position
-            damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
-            damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
-            damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
+        //prefill movement position inputs with current position
+        damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
+        damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
+        damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
 
-            /*//block bloodletter if already bloodletted this turn
-            if (activeSoldier.IsBloodletter() && activeSoldier.bloodLettedThisTurn)
-                damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Bloodletting");
-            else
-                damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();*/
+        /*//block bloodletter if already bloodletted this turn
+        if (activeSoldier.IsBloodletter() && activeSoldier.bloodLettedThisTurn)
+            damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Bloodletting");
+        else
+            damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();*/
 
-            damageEventUI.SetActive(true);
-        }
+        damageEventUI.SetActive(true);
     }
     public void ClearDamageEventUI()
     {
@@ -3301,6 +3303,39 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
 
+
+
+    //item functions
+    public void OpenUseBasicItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon)
+    {
+
+        useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsed = itemUsed;
+        useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon = linkedIcon;
+        useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
+
+        useBasicItemUI.transform.Find("OptionPanel").Find("Warning").Find("Text").GetComponent<TextMeshProUGUI>().text = linkedIcon.item.name switch
+        {
+            "Food_Pack" => "Consume food pack?",
+            "ULF_Radio" => "Attempt to use ULF radio?",
+            "Water_Canteen" => "Drink water?",
+            _ => "Unrecognised item.",
+        };
+
+        useBasicItemUI.SetActive(true);
+    }
+    public void CloseUseBasicItemUI()
+    {
+        useBasicItemUI.SetActive(false);
+    }
+    public void OpenULFResultUI(string message)
+    {
+        ULFResultUI.transform.Find("OptionPanel").Find("Result").Find("Text").GetComponent<TextMeshProUGUI>().text = message;
+        ULFResultUI.SetActive(true);
+    }
+    public void CloseULFResultUI()
+    {
+        ULFResultUI.SetActive(false);
+    }
 
 
 

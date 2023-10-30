@@ -12,7 +12,7 @@ public class ItemSlot : MonoBehaviour
 
         return this;
     }
-    public void AssignItemIcon(ItemIcon itemIcon)
+    public ItemSlot AssignItemIcon(ItemIcon itemIcon)
     {
         itemIcon.transform.SetParent(transform);
         itemIcon.rectTransform.localPosition = Vector3.zero;
@@ -21,6 +21,8 @@ public class ItemSlot : MonoBehaviour
 
         // Set the item in the target slot
         item = itemIcon.item;
+
+        return this;
     }
     public void ClearItemIcon()
     {

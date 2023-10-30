@@ -23,6 +23,7 @@ public class Item : PhysicalObject, IDataPersistence
 
     public string itemName;
     public List<string> traits;
+    public int usageAP;
     public int weight;
     public int ammo;
     public int ablativeHealth;
@@ -56,6 +57,7 @@ public class Item : PhysicalObject, IDataPersistence
         this.name = name;
         itemName = name;
         traits = reader.allItems.items[itemIndex].Traits;
+        usageAP = reader.allItems.items[itemIndex].UsageAP;
         weight = reader.allItems.items[itemIndex].Weight;
         ammo = reader.allItems.items[itemIndex].Ammo;
         meleeDamage = reader.allItems.items[itemIndex].MeleeDamage;
@@ -237,20 +239,13 @@ public class Item : PhysicalObject, IDataPersistence
             itemName = (string)details["itemName"];
             Init(itemName);
             id = tempId;
-            traits = (details["traits"] as JArray).Select(token => token.ToString()).ToList();
             weight = System.Convert.ToInt32(details["weight"]);
             ammo = System.Convert.ToInt32(details["ammo"]);
-            meleeDamage = System.Convert.ToInt32(details["meleeDamage"]);
             ablativeHealth = System.Convert.ToInt32(details["ablativeHealth"]);
-            hpGranted = System.Convert.ToInt32(details["hpGranted"]);
-            loudRadius = System.Convert.ToInt32(details["loudRadius"]);
             charges = System.Convert.ToInt32(details["charges"]);
             poisonedBy = (string)details["poisonedBy"];
             equippableSlots = (details["equippableSlots"] as JArray).Select(token => token.ToString()).ToList();
             whereEquipped = (string)details["whereEquipped"];
-
-            //load gun stats
-            gunTraits = JsonConvert.DeserializeObject<ItemReader.GunTraits>(details["gunTraits"].ToString());
 
             //load position
             x = System.Convert.ToInt32(details["x"]);
@@ -266,20 +261,14 @@ public class Item : PhysicalObject, IDataPersistence
         {
             //save basic information
             { "itemName", itemName },
-            { "traits", traits },
             { "weight", weight },
             { "ammo", ammo },
-            { "meleeDamage", meleeDamage },
             { "ablativeHealth", ablativeHealth },
             { "hpGranted", hpGranted },
-            { "loudRadius", loudRadius },
             { "charges", charges },
             { "poisonedBy", poisonedBy },
             { "equippableSlots", equippableSlots },
             { "whereEquipped", whereEquipped },
-
-            //save gun information
-            { "gunTraits", gunTraits },
 
             //save position
             { "x", x },
@@ -294,7 +283,7 @@ public class Item : PhysicalObject, IDataPersistence
         data.allItemDetails.Add(id, details);
     }
 
-    public void RunPickupEffect()
+    public void RunPickupEffect(string slotName)
     {
         if (owner is Soldier owningSoldier)
         {
@@ -315,17 +304,22 @@ public class Item : PhysicalObject, IDataPersistence
 
             //spawn small medkit inside brace
             if (itemName == "Brace")
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc1");
+            {
+                if (slotName == "LeftBrace")
+                    owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc5");
+                else if (slotName == "RightBrace")
+                    owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc4");
+            }
 
             //spawn med medkit in bag
             if (itemName == "Bag")
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc2");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc3");
 
             //spawn small & med medkit in backpack
             if (itemName == "Backpack")
             {
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc3");
-                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc4");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc1");
+                owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Medium"), "Misc2");
             }
 
             //perform ability effects
@@ -353,6 +347,33 @@ public class Item : PhysicalObject, IDataPersistence
                 }
             }
         } 
+    }
+    public void RunDropEffect(string slotName)
+    {
+        print("running drop effect");
+        if (owner is Soldier owningSoldier)
+        {
+            print("soldier is owner");
+            //spawn small medkit inside brace
+            if (itemName == "Brace")
+            {
+                if (slotName == "LeftBrace")
+                    owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc5"), "Misc5");
+                else if (slotName == "RightBrace")
+                    owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc4"), "Misc4");
+            }
+
+            //spawn med medkit in bag
+            if (itemName == "Bag")
+                owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc3"), "Misc3");
+
+            //spawn small & med medkit in backpack
+            if (itemName == "Backpack")
+            {
+                owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc1"), "Misc1");
+                owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc2"), "Misc2");
+            }
+        }
     }
     public bool CheckAnyAmmo()
     {
@@ -424,16 +445,105 @@ public class Item : PhysicalObject, IDataPersistence
     public void MoveItem(IHaveInventory fromOwner, string fromSlot, IHaveInventory toOwner, string toSlot)
     {
         if (fromOwner is Soldier fromOwnerSoldier)
-            fromOwnerSoldier.Inventory.RemoveItemFromSlot(this, fromSlot);
+            fromOwnerSoldier.DropItemFromSlot(this, fromSlot);
         else if (fromOwner == null) { }
         else
             fromOwner.Inventory.RemoveItem(this);
 
         if (toOwner is Soldier toOwnerSoldier)
-            toOwnerSoldier.Inventory.AddItemToSlot(this, toSlot);
+            toOwnerSoldier.PickUpItemToSlot(this, toSlot);
         else if (toOwner == null) { }
         else
             toOwner.Inventory.AddItem(this);
+
+        markedForAction = string.Empty;
+    }
+    public void UseULF()
+    {
+        if (owner is Soldier linkedSoldier)
+        {
+            int dip = linkedSoldier.stats.Dip.Val, elec = linkedSoldier.stats.Elec.Val;
+            //locator and politician bonus
+            if (linkedSoldier.IsLocator())
+                elec++;
+            if (linkedSoldier.IsPolitician())
+                dip++;
+
+            int avgDipElec = (dip + elec + 1) / 2;
+
+            if (game.DiceRoll() <= avgDipElec)
+            {
+                menu.AddXpAlert(linkedSoldier, 2, $"{linkedSoldier.soldierName} successfully used a ULF radio.", true);
+                menu.OpenULFResultUI("<color=green>Successful</color> ULF use!");
+            }
+            else
+                menu.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
+        }
+    }
+    public void UseItemInSlot(string slotName, ItemIcon linkedIcon, Item itemUsedOn)
+    {
+        if (owner is Soldier linkedSoldier)
+        {
+            switch (itemName)
+            {
+                case "Food_Pack":
+                    linkedSoldier.roundsWithoutFood -= 10;
+                    linkedSoldier.PerformLoudAction(8);
+                    break;
+                case "ULF_Radio":
+                    UseULF();
+                    linkedSoldier.PerformLoudAction(24);
+                    break;
+                case "Water_Canteen":
+                    linkedSoldier.roundsWithoutFood -= 5;
+                    weight--;
+                    linkedSoldier.PerformLoudAction(8);
+                    break;
+                default:
+                    break;
+            }
+
+            //decrement item charges and remove if consumable
+            if (IsConsumable())
+            {
+                charges--;
+                if (charges <= 0)
+                {
+                    linkedSoldier.Inventory.ConsumeItemInSlot(this, slotName);
+                    Destroy(linkedIcon.gameObject);
+                }
+            }
+        }
+    }
+    public bool IsDestructible()
+    {
+        if (!traits.Contains("Unbreakable"))
+            return true;
+        return false;
+    }
+    public bool IsUsable()
+    {
+        if (traits.Contains("Usable"))
+            return true;
+        return false;
+    }
+    public bool IsConsumable()
+    {
+        if (traits.Contains("Consumable"))
+            return true;
+        return false;
+    }
+    public bool IsPoisonable()
+    {
+        if (traits.Contains("Poisonable"))
+            return true;
+        return false;
+    }
+    public bool IsArmour()
+    {
+        if (traits.Contains("Armour"))
+            return true;
+        return false;
     }
     public bool IsGun()
     {
@@ -444,6 +554,12 @@ public class Item : PhysicalObject, IDataPersistence
     public bool IsAmmo()
     {
         if (traits.Contains("Ammo"))
+            return true;
+        return false;
+    }
+    public bool IsPoisonSatchel()
+    {
+        if (itemName == "Poison_Satchel")
             return true;
         return false;
     }

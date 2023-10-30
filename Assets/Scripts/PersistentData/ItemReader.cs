@@ -13,6 +13,7 @@ public class ItemReader : MonoBehaviour
     {
         public string Name;
         public List<string> Traits;
+        public int UsageAP;
         public int Weight;
         public List<string> EquippableSlots;
         public string WhereEquipped;

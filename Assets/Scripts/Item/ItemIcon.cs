@@ -7,6 +7,7 @@ using System.Diagnostics.Tracing;
 using UnityEditor;
 using UnityEngine.EventSystems;
 using System.Diagnostics.Contracts;
+using System;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -27,17 +28,23 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         originalSlot = transform.parent.GetComponent<ItemSlot>();
         currentSlot = originalSlot;
         originalInventoryObject = originalSlot.linkedInventoryObject;
+        item.markedForAction = string.Empty;
+
+        return this;
+    }
+    private void Update()
+    {
         transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(this.gameObject.name);
-        transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{item.weight}";
-        if (item.ammo != 0)
+        if (item.owner is Soldier linkedSoldier && linkedSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
+            transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{1}";
+        else
+            transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{item.weight}";
+        if (item.IsGun() || item.IsAmmo())
         {
             transform.Find("Ammo").gameObject.SetActive(true);
             transform.Find("Ammo").GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
         }
-
-        return this;
     }
-
     public void OnBeginDrag(PointerEventData eventData)
     {
         canvasGroup.alpha = 0.6f;
@@ -56,81 +63,94 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         canvasGroup.blocksRaycasts = true;
         GameObject targetDrop = eventData.pointerEnter;
         string originalInventoryId = "none", targetInventoryId = "none", originalSlotName = originalSlot.name, targetSlotName = "none";
-
-        if (targetDrop != null)
+        if (!menu.onItemUseScreen)
         {
-            ItemSlot targetSlot = targetDrop.GetComponent<ItemSlot>();
-            InventorySourcePanel targetPanel = targetDrop.GetComponentInParent<InventorySourcePanel>();
-            if (originalInventoryObject != null)
-                originalInventoryId = originalInventoryObject.Id;
-
-            if (targetSlot != null)
+            if (targetDrop != null)
             {
-                if (CheckValidSlot(targetSlot))
-                {
-                    targetSlot.AssignItemIcon(this);
-                    SetCurrentSlot();
+                ItemSlot targetSlot = targetDrop.GetComponent<ItemSlot>();
+                InventorySourcePanel targetPanel = targetDrop.GetComponentInParent<InventorySourcePanel>();
+                if (originalInventoryObject != null)
+                    originalInventoryId = originalInventoryObject.Id;
 
-                    targetSlotName = targetSlot.name;
-                    if (targetSlot.linkedInventoryObject != null)
-                        targetInventoryId = targetSlot.linkedInventoryObject.Id;
-                    if (targetSlot == originalSlot)
-                        item.markedForAction = string.Empty;
+                if (targetSlot != null)
+                {
+                    if (CheckValidSlot(targetSlot))
+                    {
+                        SetCurrentSlot(targetSlot.AssignItemIcon(this));
+
+                        targetSlotName = targetSlot.name;
+                        if (targetSlot.linkedInventoryObject != null)
+                            targetInventoryId = targetSlot.linkedInventoryObject.Id;
+                        if (targetSlot == originalSlot)
+                            item.markedForAction = string.Empty;
+                        else
+                            item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
+                    }
                     else
+                        ReturnToOldSlot();
+                }
+                else if (targetPanel != null)
+                {
+
+                    if (targetPanel.linkedInventorySource == originalInventoryObject)
+                    {
+                        ReturnToOriginalSlot();
+
+                        item.markedForAction = string.Empty;
+                    }
+                    else if (targetPanel.name.Contains("Ground"))
+                    {
+                        SetCurrentSlot(Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this));
+
+                        targetSlotName = transform.parent.name;
                         item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
-                }
-                else
-                    ReturnToOldSlot();
-                //item.ChangeOwner(item.owner, targetPanel.linkedInventorySource);
-            }
-            else if (targetPanel != null)
-            {
-                
-                if (targetPanel.linkedInventorySource == originalInventoryObject)
-                {
-                    ReturnToOldSlot();
+                    }
+                    else if (targetPanel.name.Contains("GB"))
+                    {
+                        SetCurrentSlot(Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this));
 
-                    item.markedForAction = string.Empty;
-                }
-                else if (targetPanel.name.Contains("Ground"))
-                {
-                    Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this);
-                    SetCurrentSlot();
-
-                    targetSlotName = transform.parent.name;
-                    item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
-                }
-                else if (targetPanel.name.Contains("GB"))
-                {
-                    Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this);
-                    SetCurrentSlot();
-
-                    targetInventoryId = targetPanel.linkedInventorySource.Id;
-                    targetSlotName = transform.parent.name;
-                    item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
+                        targetInventoryId = targetPanel.linkedInventorySource.Id;
+                        targetSlotName = transform.parent.name;
+                        item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
+                    }
+                    else
+                        ReturnToOldSlot();
                 }
                 else
                     ReturnToOldSlot();
             }
             else
                 ReturnToOldSlot();
+
+            menu.game.UpdateConfigureAP();
         }
         else
             ReturnToOldSlot();
     }
-    public void Update()
+    public void UseItem()
     {
-
-    }
-
-    public void LeftClick()
-    {
-
-    }
-
-    public void RightClick()
-    {
-
+        if (menu.onItemUseScreen)
+        {
+            if (item.owner is Soldier linkedSoldier)
+            {
+                if (linkedSoldier.game.CheckAP(item.usageAP))
+                {
+                    if (item.IsUsable())
+                    {
+                        switch (item.itemName)
+                        {
+                            case "Food_Pack":
+                            case "Water_Canteen":
+                            case "ULF_Radio":
+                                menu.OpenUseBasicItemUI(item, transform.parent.name, this);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
     }
     public bool CheckValidSlot(ItemSlot targetSlot)
     {
@@ -139,13 +159,19 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 return true;
         return false;
     }
+    public void ReturnToOriginalSlot()
+    {
+        SetCurrentSlot(originalSlot);
+        originalSlot.AssignItemIcon(this);
+    }
     public void ReturnToOldSlot()
     {
+        SetCurrentSlot(currentSlot);
         currentSlot.AssignItemIcon(this);
     }
-    public void SetCurrentSlot()
+    public void SetCurrentSlot(ItemSlot slot)
     {
         currentSlot.ClearItemIcon();
-        currentSlot = transform.parent.GetComponent<ItemSlot>();
+        currentSlot = slot;
     }
 }

@@ -2,7 +2,7 @@
   "items": [
     {
       "Name": "Ammo_AR",
-      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "Weight": 2,
       "Ammo": 8,
       "LoudRadius": 22,
@@ -14,7 +14,7 @@
     },
     {
       "Name": "Ammo_LMG",
-      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "Weight": 3,
       "Ammo": 10,
       "LoudRadius": 34,
@@ -26,7 +26,7 @@
     },
     {
       "Name": "Ammo_Pi",
-      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "Weight": 1,
       "Ammo": 6,
       "LoudRadius": 22,
@@ -38,7 +38,7 @@
     },
     {
       "Name": "Ammo_Ri",
-      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "Weight": 1,
       "Ammo": 6,
       "LoudRadius": 22,
@@ -50,7 +50,7 @@
     },
     {
       "Name": "Ammo_Sh",
-      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 34,
@@ -62,7 +62,7 @@
     },
     {
       "Name": "Ammo_SMG",
-      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 22,
@@ -74,7 +74,7 @@
     },
     {
       "Name": "Ammo_Sn",
-      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 24,
@@ -188,7 +188,7 @@
     },
     {
       "Name": "Armour_Body",
-      "Traits": [ "Ablative", "Unbreakable", "Storage" ],
+      "Traits": [ "Armour", "Ablative", "Unbreakable", "Storage" ],
       "Weight": 4,
       "AblativeHealth": 4,
       "GunTraits": {},
@@ -197,38 +197,35 @@
     },
     {
       "Name": "Armour_Exo",
-      "Traits": [],
+      "Traits": [ "Armour" ],
       "Weight": 3,
       "GunTraits": {},
-      "EquippableSlots": [ "Chest" ],
-      "BlockedSlots": [ "Back", "Leg", "Lateral", "Posterior" ],
+      "EquippableSlots": [ "Head" ],
       "WhereEquipped": ""
     },
     {
       "Name": "Armour_Ghillie",
-      "Traits": [ "Unbreakable" ],
+      "Traits": [ "Armour", "Unbreakable" ],
       "Weight": 1,
       "GunTraits": {},
-      "EquippableSlots": [ "Chest" ],
-      "BlockedSlots": [ "Leg", "Posterior" ],
+      "EquippableSlots": [ "Head" ],
       "WhereEquipped": ""
     },
     {
       "Name": "Armour_Juggernaut",
-      "Traits": [ "Ablative", "Unbreakable", "Storage" ],
+      "Traits": [ "Armour", "Ablative", "Unbreakable", "Storage" ],
       "Weight": 14,
       "AblativeHealth": 18,
       "GunTraits": {},
-      "EquippableSlots": [ "Chest" ],
-      "BlockedSlots": [ "Posterior" ],
+      "EquippableSlots": [ "Head" ],
       "WhereEquipped": ""
     },
     {
       "Name": "Armour_Stimulant",
-      "Traits": [],
+      "Traits": [ "Armour" ],
       "Weight": 2,
       "GunTraits": {},
-      "EquippableSlots": [ "Chest" ],
+      "EquippableSlots": [ "Head" ],
       "WhereEquipped": ""
     },
     {
@@ -249,7 +246,8 @@
     },
     {
       "Name": "Binoculars",
-      "Traits": [ "Useable", "Fragile" ],
+      "Traits": [ "Usable", "Fragile" ],
+      "UsageAP": 2,
       "Weight": 1,
       "MeleeDamage": 0,
       "GunTraits": {},
@@ -266,7 +264,8 @@
     },
     {
       "Name": "Claymore",
-      "Traits": [ "Useable", "Fragile", "Placeable" ],
+      "Traits": [ "Usable", "Fragile", "Placeable" ],
+      "UsageAP": 2,
       "Weight": 2,
       "LoudRadius": 10,
       "MeleeDamage": 0,
@@ -276,17 +275,19 @@
     },
     {
       "Name": "Deployment_Beacon",
-      "Traits": [ "Useable", "Fragile", "Placeable" ],
+      "Traits": [ "Usable", "Fragile", "Placeable" ],
+      "UsageAP": 3,
       "Weight": 2,
       "LoudRadius": 10,
       "MeleeDamage": 0,
       "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour" ],
       "WhereEquipped": ""
     },
     {
       "Name": "E_Tool",
-      "Traits": [ "Useable" ],
+      "Traits": [ "Usable" ],
+      "UsageAP": 2,
       "Weight": 2,
       "LoudRadius": 18,
       "MeleeDamage": 3,
@@ -296,7 +297,8 @@
     },
     {
       "Name": "Food_Pack",
-      "Traits": [ "Useable", "Consumable", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "UsageAP": 3,
       "Weight": 1,
       "LoudRadius": 8,
       "MeleeDamage": 0,
@@ -308,7 +310,8 @@
     },
     {
       "Name": "Grenade_Flashbang",
-      "Traits": [ "Useable", "Consumable" ],
+      "Traits": [ "Usable", "Consumable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -318,7 +321,8 @@
     },
     {
       "Name": "Grenade_Frag",
-      "Traits": [ "Useable", "Consumable" ],
+      "Traits": [ "Usable", "Consumable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -328,7 +332,8 @@
     },
     {
       "Name": "Grenade_Smoke",
-      "Traits": [ "Useable", "Consumable" ],
+      "Traits": [ "Usable", "Consumable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -338,7 +343,8 @@
     },
     {
       "Name": "Grenade_Tabun",
-      "Traits": [ "Useable", "Consumable" ],
+      "Traits": [ "Usable", "Consumable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -358,7 +364,8 @@
     },
     {
       "Name": "Medkit_Large",
-      "Traits": [ "Useable", "Consumable", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "UsageAP": 3,
       "Weight": 6,
       "HPGranted": 8,
       "LoudRadius": 24,
@@ -370,7 +377,8 @@
     },
     {
       "Name": "Medkit_Medium",
-      "Traits": [ "Useable", "Consumable", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "UsageAP": 3,
       "Weight": 0,
       "HPGranted": 4,
       "LoudRadius": 24,
@@ -381,7 +389,8 @@
     },
     {
       "Name": "Medkit_Small",
-      "Traits": [ "Useable", "Consumable", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "UsageAP": 3,
       "Weight": 0,
       "HPGranted": 2,
       "LoudRadius": 24,
@@ -605,6 +614,7 @@
     {
       "Name": "Poison_Satchel",
       "Traits": [ "Usable", "Consumable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "LoudRadius": 6,
       "MeleeDamage": 0,
@@ -1040,7 +1050,8 @@
     },
     {
       "Name": "Syringe_Amphetamine",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1051,7 +1062,8 @@
     },
     {
       "Name": "Syringe_Androstenedione",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1062,7 +1074,8 @@
     },
     {
       "Name": "Syringe_Cannabinoid",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1073,7 +1086,8 @@
     },
     {
       "Name": "Syringe_Danazol",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1084,7 +1098,8 @@
     },
     {
       "Name": "Syringe_Glucocorticoid",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1095,7 +1110,8 @@
     },
     {
       "Name": "Syringe_Modafinil",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1106,7 +1122,8 @@
     },
     {
       "Name": "Syringe_Shard",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1117,7 +1134,8 @@
     },
     {
       "Name": "Syringe_Trenbolone",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1128,7 +1146,8 @@
     },
     {
       "Name": "Syringe_Unlabelled",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
@@ -1139,18 +1158,20 @@
     },
     {
       "Name": "Thermal_Camera",
-      "Traits": [ "Useable", "Consumable", "Fragile", "Placeable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Placeable" ],
+      "UsageAP": 3,
       "Weight": 2,
       "LoudRadius": 10,
       "MeleeDamage": 0,
       "Charges": 1,
       "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": ""
     },
     {
       "Name": "UHF_Radio",
-      "Traits": [ "Useable", "Consumable", "Fragile" ],
+      "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 3,
       "Weight": 1,
       "LoudRadius": 14,
       "MeleeDamage": 0,
@@ -1161,7 +1182,8 @@
     },
     {
       "Name": "ULF_Radio",
-      "Traits": [ "Useable", "Fragile" ],
+      "Traits": [ "Usable", "Fragile" ],
+      "UsageAP": 3,
       "Weight": 5,
       "LoudRadius": 24,
       "GunTraits": {},
@@ -1170,7 +1192,8 @@
     },
     {
       "Name": "Water_Canteen",
-      "Traits": [ "Useable", "Consumable", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "UsageAP": 2,
       "Weight": 4,
       "LoudRadius": 8,
       "MeleeDamage": 0,

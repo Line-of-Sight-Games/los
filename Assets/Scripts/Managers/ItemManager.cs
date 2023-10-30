@@ -80,7 +80,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     }
     public void DestroyItem(Item item)
     {
-        Destroy(item);
+        Destroy(item.gameObject);
         RefreshItemList();
     }
     public void RefreshItemList()

@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.Search;
+using System.Linq;
 using UnityEngine;
 
 public class InventoryDisplayPanelSoldier : MonoBehaviour
@@ -8,6 +9,10 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
     static string[,] blockedSlotMatrix = new string[,]
     {
         {"SlotsBlocked", "Head","Chest","Back","LeftHand","RightHand","Lateral","Posterior","LeftLeg","LeftBrace","RightLeg","RightBrace","Armour1","Armour2","Armour3","Armour4","Backpack1","Backpack2","Backpack3","Misc1","Misc2","Misc3","Misc4","Misc5"},
+        {"Armour_Exo", "Back|LeftLeg|RightLeg|Lateral|Posterior", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Armour_Ghillie", "Chest|LeftLeg|RightLeg|Posterior", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Armour_Juggernaut", "Chest|Posterior", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Armour_Stim", "Chest", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Binoculars", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Claymore", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"E_Tool", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
@@ -136,7 +141,7 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
             HideSlot("Armour4");
             RevealSlot("ArmourLine");
         }
-        else if (CheckSlotContains("Chest", "Armour_Juggernaut"))
+        else if (CheckSlotContains("Head", "Armour_Juggernaut"))
         {
             RevealSlot("Armour1");
             RevealSlot("Armour2");
@@ -179,6 +184,7 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
 
         //dynamic slot blocking
         UnblockAllSlots();
+        BlockSlotsCheck("Head");
         BlockSlotsCheck("Posterior");
         BlockSlotsCheck("Lateral");
         BlockSlotsCheck("LeftBrace");
@@ -198,9 +204,13 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
                     for (int i = 0; i < blockedSlotMatrix.GetLength(0); i++)
                         for (int j = 0; j < blockedSlotMatrix.GetLength(1); j++)
                             if (blockedSlotMatrix[i, 0] == slot.item.itemName && blockedSlotMatrix[0, j] == slotName)
-                                if (transform.FindRecursively(blockedSlotMatrix[i, j]) != null)
-                                    if (transform.FindRecursively(blockedSlotMatrix[i, j]).TryGetComponent(out ItemSlot blockedSlot))
-                                        blockedSlot.unavailable = true;
+                                blockedSlotMatrix[i,j].ToString().Split('|').ToList().ForEach(part => BlockSlot(part));
+    }
+    public void BlockSlot(string slotName)
+    {
+        if (transform.FindRecursively(slotName) != null)
+            if (transform.FindRecursively(slotName).TryGetComponent(out ItemSlot blockedSlot))
+                blockedSlot.unavailable = true;
     }
     public bool CheckSlotContains(string slotName, string itemName)
     {

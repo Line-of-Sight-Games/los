@@ -454,8 +454,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void PickUpItemToSlot(Item item, string slotName)
     {
-        Inventory.AddItemToSlot(item, slotName);
-        item.RunPickupEffect();
+        if (!Inventory.HasItem(item.id))
+        {
+            Inventory.AddItemToSlot(item, slotName);
+            item.RunPickupEffect(slotName);
+        }
+    }
+    public void DropItemFromSlot(Item item, string slotName)
+    {
+        print("running dropitemfromslot");
+        if (Inventory.HasItem(item.id))
+        {
+            print("found the item for drop");
+            item.RunDropEffect(slotName);
+            Inventory.RemoveItemFromSlot(item, slotName);
+            
+        }
     }
     public void BrokenDropAllItemsExceptArmour()
     {
@@ -485,7 +499,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             itemList.Add(item);
 
         foreach (Item item in itemList)
-            item.itemManager.DestroyItem(item);
+            if (item.IsDestructible())
+                item.itemManager.DestroyItem(item);
     }
     public Item DropItem(Item item)
     {
@@ -578,7 +593,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public int RankDifferenceTo(Soldier s)
     {
-        print((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
+        //print((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
         return (int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f));
     }
 
@@ -817,7 +832,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void ApplyItemMods()
     {
-        if (IsWearingBodyArmour())
+        if (IsWearingBodyArmour(false))
         {
             stats.C.Val--;
             stats.F.Val--;
@@ -835,7 +850,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             stats.Str.Val *= 3;
         }
 
-        if (IsWearingJuggernautArmour())
+        if (IsWearingJuggernautArmour(false))
         {
             stats.C.Val = 0;
             stats.F.Val = 0;
@@ -956,7 +971,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to melee damage
         if (damageSource.Contains("Melee"))
         {
-            if (IsWearingJuggernautArmour() && !damagedBy.IsWearingExoArmour())
+            if (IsWearingJuggernautArmour(false) && !damagedBy.IsWearingExoArmour())
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
@@ -966,7 +981,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to explosive damage
         if (damageSource.Contains("Explosive"))
         {
-            if (IsWearingJuggernautArmour())
+            if (IsWearingJuggernautArmour(false))
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
@@ -979,14 +994,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             int remainingDamage = damage;
 
             //tank the damage on the armour if wearing BA or JA
-            if (IsWearingJuggernautArmour())
+            if (IsWearingJuggernautArmour(true))
             {
                 remainingDamage = Inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damage);
 
                 if (remainingDamage < damage)
                     menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
             }
-            else if (IsWearingBodyArmour())
+            else if (IsWearingBodyArmour(true))
             {
                 remainingDamage = Inventory.GetItem("Armour_Body").TakeAblativeDamage(damage);
 
@@ -2016,7 +2031,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void MakeLastStand()
     {
-        if (IsWearingJuggernautArmour())
+        if (IsWearingJuggernautArmour(false))
             menu.AddDamageAlert(this, $"{soldierName} resisted <color=red>Last Stand</color> with JA.", true, true);
         else
         {
@@ -2336,9 +2351,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         int survivalPassesAchieved = 0;
         int survivalAttempts = 1;
 
-        if (IsWearingJuggernautArmour() && HasArmourIntegrity())
+        if (IsWearingJuggernautArmour(true))
             survivalAttempts += 2;
-        else if (IsWearingBodyArmour() && HasArmourIntegrity())
+        else if (IsWearingBodyArmour(true))
             survivalAttempts++;
 
         for (int i = 0; i < survivalPassesNeeded; i++)
@@ -2454,49 +2469,49 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasArmourIntegrity()
     {
-        if ((Inventory.HasItem("Armour_Juggernaut") && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0) || (Inventory.HasItem("Armour_Body") && Inventory.GetItem("Armour_Body").ablativeHealth > 0))
+        if (IsWearingJuggernautArmour(true) || IsWearingBodyArmour(true))
             return true;
         return false;
     }
-    public bool IsWearingBodyArmour()
+    public bool IsWearingBodyArmour(bool hasIntegrity)
     {
-        if (Inventory.HasItem("Armour_Body"))
-            return true;
+        if (Inventory.HasItemOfType("Armour_Body"))
+            return hasIntegrity && Inventory.GetItem("Armour_Body").ablativeHealth > 0;
         return false;
     }
-    public bool IsWearingJuggernautArmour()
+    public bool IsWearingJuggernautArmour(bool hasIntegrity)
     {
-        if (Inventory.HasItem("Armour_Juggernaut"))
-            return true;
+        if (Inventory.HasItemOfType("Armour_Juggernaut"))
+            return hasIntegrity && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0;
         return false;
     }
     public bool IsWearingExoArmour()
     {
-        if (Inventory.HasItem("Armour_Exo"))
+        if (Inventory.HasItemOfType("Armour_Exo"))
             return true;
         return false;
     }
     public bool IsWearingGhillieArmour()
     {
-        if (Inventory.HasItem("Armour_Ghillie"))
+        if (Inventory.HasItemOfType("Armour_Ghillie"))
             return true;
         return false;
     }
     public bool IsWearingStimulantArmour()
     {
-        if (Inventory.HasItem("Armour_Stimulant"))
+        if (Inventory.HasItemOfType("Armour_Stimulant"))
             return true;
         return false;
     }
     public bool IsCarryingRiotShield()
     {
-        if (Inventory.HasItem("Riot_Shield"))
+        if (Inventory.HasItemOfType("Riot_Shield"))
             return true;
         return false;
     }
     public bool IsWearingLogisticsBelt()
     {
-        if (Inventory.HasItem("Logistics_Belt"))
+        if (Inventory.HasItemOfType("Logistics_Belt"))
             return true;
         return false;
     }
@@ -3268,16 +3283,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         get
         {
             Item gunEquipped = null;
-            if (LeftHandItem != null)
-            {
-                if (LeftHandItem.IsGun())
-                    gunEquipped = LeftHandItem;
-            }
-            else if (RightHandItem != null) 
-            {
-                if (RightHandItem.IsGun())
-                    gunEquipped = RightHandItem;
-            }
+            if (LeftHandItem != null && LeftHandItem.IsGun())
+                gunEquipped = LeftHandItem;
+            if (RightHandItem != null && RightHandItem.IsGun())
+                gunEquipped = RightHandItem;
 
             return gunEquipped;
         }
