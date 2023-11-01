@@ -34,7 +34,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
         allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
         meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useBasicItemUI, ULFResultUI;
+        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useBasicItemUI, ULFResultUI, useMedkitUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public OverwatchArc overwatchArcPrefab;
@@ -1910,6 +1910,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         GameObject traumaAlert = Instantiate(traumaAlertPrefab, traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
         traumaAlert.GetComponent<SoldierAlert>().SetSoldier(friendly);
 
+        traumaAlert.transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = $"{trauma}";
+        traumaAlert.transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = reason;
+        traumaAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(friendly);
+        traumaAlert.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = rolls.ToString();
+        traumaAlert.transform.Find("XpOnResist").GetComponent<TextMeshProUGUI>().text = xpOnResist.ToString();
+        traumaAlert.transform.Find("Distance").GetComponent<TextMeshProUGUI>().text = range;
+
         //block invalid trauma alerts being created
         if (friendly.tp >= 5)
         {
@@ -1927,19 +1934,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
             else if (friendly.IsResilient())
             {
-                traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
-                traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
-                traumaAlert.transform.Find("ConfirmButton").gameObject.SetActive(false);
-                traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>RESILIENT</color>";
+                traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>TRAUMA RESISTED</color>";
+                traumaAlert.transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = $"<color=green>{trauma}</color>";
             }
         }
 
-        traumaAlert.transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = trauma.ToString();
-        traumaAlert.transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = reason;
-        traumaAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(friendly);
-        traumaAlert.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = rolls.ToString();
-        traumaAlert.transform.Find("XpOnResist").GetComponent<TextMeshProUGUI>().text = xpOnResist.ToString();
-        traumaAlert.transform.Find("Distance").GetComponent<TextMeshProUGUI>().text = range;
+        
     }
 
     public void OpenTraumaAlertUI()
@@ -3336,8 +3336,42 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         ULFResultUI.SetActive(false);
     }
+    public void OpenUseMedkitUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon)
+    {
+        TMP_Dropdown targetDropdown = useMedkitUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
+        targetDropdown.ClearOptions();
+        List<TMP_Dropdown.OptionData> targetOptionDataList = new();
+        useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsed = itemUsed;
+        useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon = linkedIcon;
+        useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
 
+        useMedkitUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = linkedIcon.item.name switch
+        {
+            "Medkit_Large" => "Use Large Medkit?",
+            "Medkit_Medium" => "Use Medium Medkit?",
+            "Medkit_Small" => "Use Small Medkit?",
+            _ => "Unrecognised item.",
+        };
 
+        //generate target list
+        foreach (Soldier s in game.AllSoldiers())
+        {
+            TMP_Dropdown.OptionData targetOptionData = null;
+            if (activeSoldier.IsSameTeamAsIncludingSelf(s) && (s.IsInjured() || s.IsTraumatised()) && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
+                    targetOptionData = new(s.Id, s.soldierPortrait);
+
+            if (targetOptionData != null)
+                targetOptionDataList.Add(targetOptionData);
+        }
+        targetDropdown.AddOptions(targetOptionDataList);
+
+        if (targetOptionDataList.Count > 0)
+            useMedkitUI.SetActive(true);
+    }
+    public void CloseUseMedkitUI()
+    {
+        useMedkitUI.SetActive(false);
+    }
 
 
 

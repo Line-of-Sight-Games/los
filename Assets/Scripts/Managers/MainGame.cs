@@ -2260,10 +2260,21 @@ public class MainGame : MonoBehaviour, IDataPersistence
         string slotName = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName;
 
         DeductAP(itemUsed.usageAP);
-        itemUsed.UseItemInSlot(slotName, linkedIcon, itemUsedOn);
+        itemUsed.UseItemInSlot(slotName, linkedIcon, itemUsedOn, null);
         menu.CloseUseBasicItemUI();
     }
+    public void ConfirmUseMedkit()
+    {
 
+        Item itemUsed = menu.useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsed;
+        Soldier soldierUsedOn = soldierManager.FindSoldierById(menu.useMedkitUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useMedkitUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
+        ItemIcon linkedIcon = menu.useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon;
+        string slotName = menu.useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName;
+
+        DeductAP(itemUsed.usageAP);
+        itemUsed.UseItemInSlot(slotName, linkedIcon, null, soldierUsedOn);
+        menu.CloseUseMedkitUI();
+    }
 
 
 
@@ -2570,49 +2581,47 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                     int rolls = 0, xpOnResist = 0;
                                     if (friendly.PhysicalObjectWithinMaxRadius(deadSoldier))
                                     {
-                                        if (friendly.IsResilient())
-                                            menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " has " + friendly.stats.R.Val + " Resilience. He is immune to trauma.", 0, 0, "");
-                                        else
+                                        string range = CalculateRangeBracket(CalculateRange(deadSoldier, friendly));
+                                        switch (range)
                                         {
-                                            string range = CalculateRangeBracket(CalculateRange(deadSoldier, friendly));
-                                            switch (range)
-                                            {
-                                                case "Melee":
-                                                    rolls = 0;
-                                                    xpOnResist = 5;
-                                                    break;
-                                                case "CQB":
-                                                    rolls = 0;
-                                                    xpOnResist = 4;
-                                                    break;
-                                                case "Short":
-                                                    rolls = 1;
-                                                    xpOnResist = 3;
-                                                    break;
-                                                case "Medium":
-                                                    rolls = 2;
-                                                    xpOnResist = 2;
-                                                    break;
-                                                case "Long":
-                                                    rolls = 3;
-                                                    xpOnResist = 1;
-                                                    break;
-                                                default:
-                                                    rolls = 3;
-                                                    xpOnResist = 1;
-                                                    break;
-                                            }
-
-                                            //add rolls for rank differential
-                                            if (deadSoldier.MinXPForRank() > friendly.MinXPForRank())
-                                                rolls += 0;
-                                            else if (deadSoldier.MinXPForRank() == friendly.MinXPForRank())
-                                                rolls += 1;
-                                            else
-                                                rolls += 2;
-
-                                            menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " is within " + range + " range of " + deadSoldier.soldierName + ". Check for LOS?", rolls, xpOnResist, range);
+                                            case "Melee":
+                                                rolls = 0;
+                                                xpOnResist = 5;
+                                                break;
+                                            case "CQB":
+                                                rolls = 0;
+                                                xpOnResist = 4;
+                                                break;
+                                            case "Short":
+                                                rolls = 1;
+                                                xpOnResist = 3;
+                                                break;
+                                            case "Medium":
+                                                rolls = 2;
+                                                xpOnResist = 2;
+                                                break;
+                                            case "Long":
+                                                rolls = 3;
+                                                xpOnResist = 1;
+                                                break;
+                                            default:
+                                                rolls = 3;
+                                                xpOnResist = 1;
+                                                break;
                                         }
+
+                                        //add rolls for rank differential
+                                        if (deadSoldier.MinXPForRank() > friendly.MinXPForRank())
+                                            rolls += 0;
+                                        else if (deadSoldier.MinXPForRank() == friendly.MinXPForRank())
+                                            rolls += 1;
+                                        else
+                                            rolls += 2;
+
+                                        if (friendly.IsResilient())
+                                            menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is Resilient. Within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
+                                        else
+                                            menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
 
                                         showTraumaUI = true;
                                     }

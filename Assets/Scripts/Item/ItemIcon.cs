@@ -1,13 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System.Diagnostics.Tracing;
-using UnityEditor;
 using UnityEngine.EventSystems;
-using System.Diagnostics.Contracts;
-using System;
+using System.Linq;
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -74,7 +71,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
                 if (targetSlot != null)
                 {
-                    if (CheckValidSlot(targetSlot))
+                    if (CheckValidSlot(targetSlot) && CheckBlockedSlotsAreFree(targetSlot))
                     {
                         SetCurrentSlot(targetSlot.AssignItemIcon(this));
 
@@ -144,6 +141,11 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                             case "ULF_Radio":
                                 menu.OpenUseBasicItemUI(item, transform.parent.name, this);
                                 break;
+                            case "Medkit_Large":
+                            case "Medkit_Medium":
+                            case "Medkit_Small":
+                                menu.OpenUseMedkitUI(item, transform.parent.name, this);
+                                break;
                             default:
                                 break;
                         }
@@ -158,6 +160,59 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             if (targetSlot.item == null && !targetSlot.unavailable && (targetSlot.name.Contains(slot) || targetSlot.name.Contains("ItemSlot")))
                 return true;
         return false;
+    }
+    public bool CheckEmptySlot(ItemSlot targetSlot)
+    {
+        if (targetSlot.item == null)
+            return true;
+        return false;
+    }
+    /*public bool CheckInventorySlotsAreFree(GameObject targetDrop)
+    {
+        if (item.HasInventory())
+        {
+            InventorySourcePanel targetPanel = targetDrop.GetComponentInParent<InventorySourcePanel>();
+            if (targetPanel is InventoryDisplayPanelSoldier inventoryDisplay)
+            {
+                if (inventoryDisplay != null)
+                {
+                    if (item.itemName == "Backpack")
+                        if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Backpack1").GetComponent<ItemSlot>())
+                            || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Backpack2").GetComponent<ItemSlot>())
+                            || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Backpack3").GetComponent<ItemSlot>()))
+                            return false;
+                        else if (item.itemName == "Armour_Body" || item.itemName == "Armour_Juggernaut")
+                            if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour1").GetComponent<ItemSlot>())
+                                || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour2").GetComponent<ItemSlot>())
+                                || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour3").GetComponent<ItemSlot>())
+                                || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour4").GetComponent<ItemSlot>()))
+                                return false;
+                            else if (item.itemName == "Brace" && currentSlot.name == "LeftLeg")
+                                if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("LeftBrace").GetComponent<ItemSlot>()))
+                                    return false;
+                                else if (item.itemName == "Brace" && currentSlot.name == "RightLeg")
+                                    if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("RightBrace").GetComponent<ItemSlot>()))
+                                        return false;
+                }
+            }
+        }
+        return true;
+    }*/
+    public bool CheckBlockedSlotsAreFree(ItemSlot targetSlot)
+    {
+        InventoryDisplayPanelSoldier inventoryDisplay = targetSlot.GetComponentInParent<InventoryDisplayPanelSoldier>();
+        if (inventoryDisplay != null)
+            for (int i = 0; i < inventoryDisplay.blockedSlotMatrix.GetLength(0); i++)
+                for (int j = 0; j < inventoryDisplay.blockedSlotMatrix.GetLength(1); j++)
+                    if (inventoryDisplay.blockedSlotMatrix[i, 0] == item.itemName && inventoryDisplay.blockedSlotMatrix[0, j] == targetSlot.name)
+                    {
+                        List<string> slotNames = inventoryDisplay.blockedSlotMatrix[i, j].ToString().Split('|').ToList();
+                        foreach (string slotName in slotNames)
+                            if (slotName != "")
+                                if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively(slotName).GetComponent<ItemSlot>()))
+                                    return false; 
+                    }
+        return true;                
     }
     public void ReturnToOriginalSlot()
     {

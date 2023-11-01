@@ -6,11 +6,13 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable
 {
     public MainMenu menu;
     public MainGame game;
+    public POIManager poiManager;
     private void Start()
     {
         poiType = "barrel";
         menu = FindObjectOfType<MainMenu>();
         game = FindObjectOfType<MainGame>();
+        poiManager = FindObjectOfType<POIManager>();
     }
 
     public ExplosiveBarrel Init(Tuple<Vector3, string> location)
@@ -41,13 +43,14 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable
 
     public override void SaveData(ref GameData data)
     {
-        details = new();
-
-        details.Add("poiType", poiType);
-        details.Add("x", x);
-        details.Add("y", y);
-        details.Add("z", z);
-        details.Add("terrainOn", terrainOn);
+        details = new()
+        {
+            { "poiType", poiType },
+            { "x", x },
+            { "y", y },
+            { "z", z },
+            { "terrainOn", terrainOn }
+        };
 
         //add the item in
         if (data.allPOIDetails.ContainsKey(id))
@@ -88,7 +91,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable
         {
             yield return new WaitUntil(() => menu.meleeResolvedFlag == true);
             menu.OpenExplosionUI();
-            Destroy(this.gameObject);
+            poiManager.DestroyPOI(this);
         }
     }
     public string Id 

@@ -31,7 +31,7 @@ public class Inventory
         if (linkedInventoryObject is Soldier linkedSoldier)
         {
             AddItem(item);
-            linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = item.id;
+            linkedSoldier.inventorySlots[slotName] = item.id;
         }
     }
     public void RemoveItemFromSlot(Item item, string slotName)
@@ -39,7 +39,8 @@ public class Inventory
         if (linkedInventoryObject is Soldier linkedSoldier)
         {
             RemoveItem(item);
-            linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key] = "";
+            if (linkedSoldier.inventorySlots[slotName] == item.id)
+                linkedSoldier.inventorySlots[slotName] = "";
         }
     }
     public void ConsumeItemInSlot(Item item, string slotName)

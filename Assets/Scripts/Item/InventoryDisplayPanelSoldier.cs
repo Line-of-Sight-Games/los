@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class InventoryDisplayPanelSoldier : MonoBehaviour
 {
-    static string[,] blockedSlotMatrix = new string[,]
+    public string[,] blockedSlotMatrix = new string[,]
     {
         {"SlotsBlocked", "Head","Chest","Back","LeftHand","RightHand","Lateral","Posterior","LeftLeg","LeftBrace","RightLeg","RightBrace","Armour1","Armour2","Armour3","Armour4","Backpack1","Backpack2","Backpack3","Misc1","Misc2","Misc3","Misc4","Misc5"},
         {"Armour_Exo", "Back|LeftLeg|RightLeg|Lateral|Posterior", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
@@ -22,7 +22,9 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         {"Grenade_Smoke", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Grenade_Tabun", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Knife", "", "", "", "", "", "LeftBrace", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Medkit_Large", "", "", "", "RightHand", "LeftHand", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Poison_Satchel", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"Riot_Shield", "", "", "", "RightHand", "LeftHand", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Syringe_Amphetamine", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Syringe_Androstenedione", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"Syringe_Cannabinoid", "", "", "", "", "", "", "Back", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
@@ -185,6 +187,8 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         //dynamic slot blocking
         UnblockAllSlots();
         BlockSlotsCheck("Head");
+        BlockSlotsCheck("LeftHand");
+        BlockSlotsCheck("RightHand");
         BlockSlotsCheck("Posterior");
         BlockSlotsCheck("Lateral");
         BlockSlotsCheck("LeftBrace");

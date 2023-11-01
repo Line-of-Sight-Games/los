@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class POIManager : MonoBehaviour, IDataPersistence
@@ -58,22 +59,15 @@ public class POIManager : MonoBehaviour, IDataPersistence
 
         data.allPOIIds = allPOIIds;
     }
-    
-    /*
-
-    public void RefreshSoldierList()
+    public void DestroyPOI(POI poi)
     {
-        allSoldiers = FindObjectsOfType<Soldier>().ToList();
+        Destroy(poi.gameObject);
+        RefreshPOIList();
     }
-    public Soldier FindSoldierByName(string name)
+    public void RefreshPOIList()
     {
-        foreach (Soldier s in allSoldiers)
-        {
-            if (s.soldierName == name)
-                return s;
-        }
-        return null;
-    }*/
+        allPOIs = FindObjectsOfType<POI>().ToList();
+    }
     public POI FindPOIById(string id)
     {
         foreach (POI poi in FindObjectsOfType<POI>())

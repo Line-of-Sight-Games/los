@@ -305,9 +305,9 @@ public class Item : PhysicalObject, IDataPersistence
             //spawn small medkit inside brace
             if (itemName == "Brace")
             {
-                if (slotName == "LeftBrace")
+                if (slotName == "LeftLeg")
                     owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc5");
-                else if (slotName == "RightBrace")
+                else if (slotName == "RightLeg")
                     owningSoldier.PickUpItemToSlot(itemManager.SpawnItem("Medkit_Small"), "Misc4");
             }
 
@@ -480,12 +480,20 @@ public class Item : PhysicalObject, IDataPersistence
                 menu.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
         }
     }
-    public void UseItemInSlot(string slotName, ItemIcon linkedIcon, Item itemUsedOn)
+    public void UseItemInSlot(string slotName, ItemIcon linkedIcon, Item itemUsedOn, Soldier soldierUsedOn)
     {
         if (owner is Soldier linkedSoldier)
         {
             switch (itemName)
             {
+                case "Medkit_Small":
+                case "Medkit_Medium":
+                case "Medkit_Large":
+                    if (poisonedBy != "")
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    else
+                        soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
+                    break;
                 case "Food_Pack":
                     linkedSoldier.roundsWithoutFood -= 10;
                     linkedSoldier.PerformLoudAction(8);
@@ -542,6 +550,12 @@ public class Item : PhysicalObject, IDataPersistence
     public bool IsArmour()
     {
         if (traits.Contains("Armour"))
+            return true;
+        return false;
+    }
+    public bool HasInventory()
+    {
+        if (traits.Contains("Storage"))
             return true;
         return false;
     }

@@ -247,14 +247,14 @@ public class SoldierAlert : MonoBehaviour
                 {
                     soldier.TakeTrauma(trauma);
                     transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
-                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} failed to resist and took {trauma} trauma. He is now {soldier.GetTraumaState()}.";
+                    transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} failed to resist and took {trauma} trauma. He is now{soldier.GetTraumaState()}.";
                 }
             }
             else
             {
                 soldier.TakeTrauma(trauma);
                 transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
-                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} took {trauma} trauma. He is now {soldier.GetTraumaState()}.";
+                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} took {trauma} trauma. He is now{soldier.GetTraumaState()}.";
             }
             
         }

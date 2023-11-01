@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
+using UnityEditor.ShaderKeywordFilter;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable
 {
@@ -304,6 +305,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         else
             return false;
+    }
+    public bool IsInjured()
+    {
+        if (IsAlive())
+            if (hp < stats.H.Val)
+                return true;
+        return false;
+    }
+    public bool IsTraumatised()
+    {
+        if (IsAlive())
+            if (tp > 0)
+                return true;
+        return false;
     }
     public bool IsUnconscious()
     {
@@ -1204,41 +1219,52 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (CheckState("Unconscious"))
                 MakeLastStand();
-
             else
             {
+                int actualHeal = Heal(heal, overhealthEnabled);
+                int actualTraumaHeal = HealTrauma(traumaHeal);
+
                 if (CheckState("Last Stand"))
                     MakeActive();
-
-                hp += heal;
-
-                //no overfilling health via heal unless overhealth is enabled
-                if (!overhealthEnabled && hp > stats.H.Val)
-                    hp = stats.H.Val;
-
-                HealTrauma(traumaHeal);
-
+                
+                //xp for healing
                 if (healedBy != null)
                 {
                     //add xp for successful heal
                     if (healedBy == this)
-                        menu.AddXpAlert(healedBy, Mathf.CeilToInt((heal + traumaHeal) / 2.0f), $"Healed self by {heal} hp and removed {traumaHeal} trauma points.", true);
+                        menu.AddXpAlert(healedBy, Mathf.CeilToInt((actualHeal + actualTraumaHeal) / 2.0f), $"Healed self by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
                     else
-                        menu.AddXpAlert(healedBy, heal + traumaHeal, $"Healed {soldierName} by {heal} hp and removed {traumaHeal} trauma points.", true);
+                        menu.AddXpAlert(healedBy, actualHeal + actualTraumaHeal, $"Healed {soldierName} by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
                 }
             }
         } 
     }
-
-    public void HealTrauma(int traumaHeal)
+    public int Heal(int heal, bool overhealthEnabled)
     {
+        int actualHeal = heal;
+        hp += heal;
+
+        //no overfilling health via heal unless overhealth is enabled
+        if (!overhealthEnabled && hp > stats.H.Val)
+        {
+            actualHeal = heal - (hp - stats.H.Val);
+            hp = stats.H.Val;
+        }
+        return actualHeal;
+    }
+    public int HealTrauma(int traumaHeal)
+    {
+        int actualTraumaHeal = 0;
         //don't heal if already desensitised or commited
         if (tp < 5 && tp > 0)
+        {
+            actualTraumaHeal = traumaHeal;
             tp -= traumaHeal;
-
+        }
         //correct negatives
         if (tp < 0)
             tp = 0;
+        return actualTraumaHeal;
     }
 
     public void CalculateInstantSpeed()
@@ -1848,6 +1874,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         else
             return false;
+    }
+    public void TakePoisoning(string poisonedBy)
+    {
+        this.poisonedBy = poisonedBy;
+        menu.AddDamageAlert(this, $"{soldierName} was poisoned!", false, true);
+        SetPoisoned();
     }
     public bool IsPoisoned()
     {
@@ -2635,11 +2667,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void FighterMeleeKillReward()
     {
-        if (IsFighter() && usedMP)
+        if (IsFighter())
         {
             ap += 3;
-            mp += 1;
-            usedMP = false;
+            if (usedMP)
+            {
+                mp += 1;
+                usedMP = false;
+            }
         }
     }
     public bool IsGuardsman()
