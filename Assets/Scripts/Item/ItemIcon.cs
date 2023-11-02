@@ -126,33 +126,11 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void UseItem()
     {
-        if (menu.onItemUseScreen)
-        {
+        if (menu.onItemUseScreen && !menu.overrideView)
             if (item.owner is Soldier linkedSoldier)
-            {
                 if (linkedSoldier.game.CheckAP(item.usageAP))
-                {
                     if (item.IsUsable())
-                    {
-                        switch (item.itemName)
-                        {
-                            case "Food_Pack":
-                            case "Water_Canteen":
-                            case "ULF_Radio":
-                                menu.OpenUseBasicItemUI(item, transform.parent.name, this);
-                                break;
-                            case "Medkit_Large":
-                            case "Medkit_Medium":
-                            case "Medkit_Small":
-                                menu.OpenUseMedkitUI(item, transform.parent.name, this);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-        }
+                        menu.OpenUseItemUI(item, transform.parent.name, this);
     }
     public bool CheckValidSlot(ItemSlot targetSlot)
     {

@@ -34,7 +34,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
         allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
         meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useBasicItemUI, ULFResultUI, useMedkitUI;
+        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, ULFResultUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public OverwatchArc overwatchArcPrefab;
@@ -1867,9 +1867,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Sight Radius" => "+10 SR",
             "Rifle" => "+5% Ri Aim",
             "Assault Rifle" => "+5% AR Aim",
-            "LMG" => "+5% LMG Aim",
-            "Sniper" => "+5% Sn Aim",
-            "SMG" => "+5% SMG Aim",
+            "Light Machine Gun" => "+5% LMG Aim",
+            "Sniper Rifle" => "+5% Sn Aim",
+            "Sub-Machine Gun" => "+5% SMG Aim",
             "Shotgun" => "+5% Sh Aim",
             "Melee" => "+0.5 M",
             _ => "+1 AP",
@@ -2781,8 +2781,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
         foreach (Item i in game.FindNearbyItems())
         {
-            ItemSlot itemSlot = Instantiate(itemSlotPrefab, groundInventoryPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>();
-            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
+            if (i.transform.parent == null)
+            {
+                ItemSlot itemSlot = Instantiate(itemSlotPrefab, groundInventoryPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>();
+                itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
+            }
         }
     }
     public void AddAllyInventorySourceButtons()
@@ -3306,26 +3309,245 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //item functions
-    public void OpenUseBasicItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon)
+    public void OpenUseItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon)
     {
-
-        useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsed = itemUsed;
-        useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon = linkedIcon;
-        useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
-
-        useBasicItemUI.transform.Find("OptionPanel").Find("Warning").Find("Text").GetComponent<TextMeshProUGUI>().text = linkedIcon.item.name switch
+        useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(true);
+        TMP_Dropdown targetDropdown = useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
+        targetDropdown.ClearOptions();
+        List<TMP_Dropdown.OptionData> targetOptionDataList = new();
+        useItemUI.GetComponent<ConfirmUseItemUI>().itemUsed = itemUsed;
+        useItemUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon = linkedIcon;
+        useItemUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
+        useItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = itemUsed.itemName switch
         {
+            "Ammo_AR" => "Reload Assault Rifle?",
+            "Ammo_LMG" => "Reload Light Machine Gun?",
+            "Ammo_Pi" => "Reload Pistol?",
+            "Ammo_Ri" => "Reload Rifle?",
+            "Ammo_Sh" => "Reload Shotgun?",
+            "Ammo_SMG" => "Reload Sub-Machine Gun?",
+            "Ammo_Sn" => "Reload Sniper?",
             "Food_Pack" => "Consume food pack?",
             "ULF_Radio" => "Attempt to use ULF radio?",
             "Water_Canteen" => "Drink water?",
-            _ => "Unrecognised item.",
+            "Medkit_Large" => "Use Large Medkit?",
+            "Medkit_Medium" => "Use Medium Medkit?",
+            "Medkit_Small" => "Use Small Medkit?",
+            "Poison_Satchel" => "Administer Posion?",
+            "Syringe_Amphetamine" => "Administer Amphetamine?",
+            "Syringe_Androstenedione" => "Administer Androstenedione?",
+            "Syringe_Cannabinoid" => "Administer Cannabinoid?",
+            "Syringe_Danazol" => "Administer Danazol?",
+            "Syringe_Glucocorticoid" => "Administer Glucocorticoid?",
+            "Syringe_Modafinil" => "Administer Modafinil?",
+            "Syringe_Shard" => "Administer Shard?",
+            "Syringe_Trenbolone" => "Administer Trenbolone?",
+            "Syringe_Unlabelled" => "Administer Unlabelled Syringe?",
+            _ => "Unrecognised item",
         };
 
-        useBasicItemUI.SetActive(true);
+        if (itemUsed.itemName.Contains("Medkit"))
+        {
+            foreach (Soldier s in game.AllSoldiers())
+            {
+                TMP_Dropdown.OptionData targetOptionData = null;
+                if (activeSoldier.IsSameTeamAsIncludingSelf(s) && (s.IsInjured() || s.IsTraumatised()) && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
+                    targetOptionData = new(s.Id, s.soldierPortrait);
+
+                if (targetOptionData != null)
+                    targetOptionDataList.Add(targetOptionData);
+            }
+            targetDropdown.AddOptions(targetOptionDataList);
+
+            if (targetOptionDataList.Count > 0)
+            {
+                game.UpdateSoldierUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                useItemUI.SetActive(true);
+            }
+        }
+        else if (itemUsed.itemName.Contains("Syringe"))
+        {
+            foreach (Soldier s in game.AllSoldiers())
+            {
+                TMP_Dropdown.OptionData targetOptionData = null;
+                if (s.IsAlive() && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
+                    targetOptionData = new(s.Id, s.soldierPortrait);
+
+                if (targetOptionData != null)
+                    targetOptionDataList.Add(targetOptionData);
+            }
+            targetDropdown.AddOptions(targetOptionDataList);
+
+            if (targetOptionDataList.Count > 0)
+            {
+                game.UpdateSoldierUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                useItemUI.SetActive(true);
+            }
+        }
+        else if (itemUsed.itemName.Equals("Poison_Satchel"))
+        {
+            foreach (Item i in game.FindNearbyItems())
+            {
+                TMP_Dropdown.OptionData targetOptionData = null;
+                if (i.IsPoisonable())
+                    targetOptionData = new(i.id, i.itemImage);
+
+                if (targetOptionData != null)
+                    targetOptionDataList.Add(targetOptionData);
+            }
+            targetDropdown.AddOptions(targetOptionDataList);
+
+            if (targetOptionDataList.Count > 0)
+            {
+                game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                useItemUI.SetActive(true);
+            }
+        }
+        else if (itemUsed.traits.Contains("Ammo"))
+        {
+            if (itemUsed.itemName.Contains("AR"))
+            {
+                foreach (Item i in itemUsed.owner.Inventory.AllItems)
+                {
+                    TMP_Dropdown.OptionData targetOptionData = null;
+                    if (i.IsAssaultRifle())
+                        targetOptionData = new(i.id, i.itemImage);
+
+                    if (targetOptionData != null)
+                        targetOptionDataList.Add(targetOptionData);
+                }
+                targetDropdown.AddOptions(targetOptionDataList);
+
+                if (targetOptionDataList.Count > 0)
+                {
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    useItemUI.SetActive(true);
+                }
+            }
+            else if (itemUsed.itemName.Contains("LMG"))
+            {
+                foreach (Item i in itemUsed.owner.Inventory.AllItems)
+                {
+                    TMP_Dropdown.OptionData targetOptionData = null;
+                    if (i.IsLMG())
+                        targetOptionData = new(i.id, i.itemImage);
+
+                    if (targetOptionData != null)
+                        targetOptionDataList.Add(targetOptionData);
+                }
+                targetDropdown.AddOptions(targetOptionDataList);
+
+                if (targetOptionDataList.Count > 0)
+                {
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    useItemUI.SetActive(true);
+                }
+            }
+            else if (itemUsed.itemName.Contains("Pi"))
+            {
+                foreach (Item i in itemUsed.owner.Inventory.AllItems)
+                {
+                    TMP_Dropdown.OptionData targetOptionData = null;
+                    if (i.IsPistol())
+                        targetOptionData = new(i.id, i.itemImage);
+
+                    if (targetOptionData != null)
+                        targetOptionDataList.Add(targetOptionData);
+                }
+                targetDropdown.AddOptions(targetOptionDataList);
+
+                if (targetOptionDataList.Count > 0)
+                {
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    useItemUI.SetActive(true);
+                }
+            }
+            else if (itemUsed.itemName.Contains("Ri"))
+            {
+                foreach (Item i in itemUsed.owner.Inventory.AllItems)
+                {
+                    TMP_Dropdown.OptionData targetOptionData = null;
+                    if (i.IsRifle())
+                        targetOptionData = new(i.id, i.itemImage);
+
+                    if (targetOptionData != null)
+                        targetOptionDataList.Add(targetOptionData);
+                }
+                targetDropdown.AddOptions(targetOptionDataList);
+
+                if (targetOptionDataList.Count > 0)
+                {
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    useItemUI.SetActive(true);
+                }
+            }
+            else if (itemUsed.itemName.Contains("Sh"))
+            {
+                foreach (Item i in itemUsed.owner.Inventory.AllItems)
+                {
+                    TMP_Dropdown.OptionData targetOptionData = null;
+                    if (i.IsShotgun())
+                        targetOptionData = new(i.id, i.itemImage);
+
+                    if (targetOptionData != null)
+                        targetOptionDataList.Add(targetOptionData);
+                }
+                targetDropdown.AddOptions(targetOptionDataList);
+
+                if (targetOptionDataList.Count > 0)
+                {
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    useItemUI.SetActive(true);
+                }
+            }
+            else if (itemUsed.itemName.Contains("SMG"))
+            {
+                foreach (Item i in itemUsed.owner.Inventory.AllItems)
+                {
+                    TMP_Dropdown.OptionData targetOptionData = null;
+                    if (i.IsSMG())
+                        targetOptionData = new(i.id, i.itemImage);
+
+                    if (targetOptionData != null)
+                        targetOptionDataList.Add(targetOptionData);
+                }
+                targetDropdown.AddOptions(targetOptionDataList);
+
+                if (targetOptionDataList.Count > 0)
+                {
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    useItemUI.SetActive(true);
+                }
+            }
+            else if (itemUsed.itemName.Contains("Sn"))
+            {
+                foreach (Item i in itemUsed.owner.Inventory.AllItems)
+                {
+                    TMP_Dropdown.OptionData targetOptionData = null;
+                    if (i.IsSniper())
+                        targetOptionData = new(i.id, i.itemImage);
+
+                    if (targetOptionData != null)
+                        targetOptionDataList.Add(targetOptionData);
+                }
+                targetDropdown.AddOptions(targetOptionDataList);
+
+                if (targetOptionDataList.Count > 0)
+                {
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    useItemUI.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(false);
+            useItemUI.SetActive(true);
+        }
     }
-    public void CloseUseBasicItemUI()
+    public void CloseUseItemUI()
     {
-        useBasicItemUI.SetActive(false);
+        useItemUI.SetActive(false);
     }
     public void OpenULFResultUI(string message)
     {
@@ -3336,42 +3558,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         ULFResultUI.SetActive(false);
     }
-    public void OpenUseMedkitUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon)
-    {
-        TMP_Dropdown targetDropdown = useMedkitUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
-        targetDropdown.ClearOptions();
-        List<TMP_Dropdown.OptionData> targetOptionDataList = new();
-        useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsed = itemUsed;
-        useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon = linkedIcon;
-        useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
 
-        useMedkitUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = linkedIcon.item.name switch
-        {
-            "Medkit_Large" => "Use Large Medkit?",
-            "Medkit_Medium" => "Use Medium Medkit?",
-            "Medkit_Small" => "Use Small Medkit?",
-            _ => "Unrecognised item.",
-        };
 
-        //generate target list
-        foreach (Soldier s in game.AllSoldiers())
-        {
-            TMP_Dropdown.OptionData targetOptionData = null;
-            if (activeSoldier.IsSameTeamAsIncludingSelf(s) && (s.IsInjured() || s.IsTraumatised()) && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
-                    targetOptionData = new(s.Id, s.soldierPortrait);
 
-            if (targetOptionData != null)
-                targetOptionDataList.Add(targetOptionData);
-        }
-        targetDropdown.AddOptions(targetOptionDataList);
 
-        if (targetOptionDataList.Count > 0)
-            useMedkitUI.SetActive(true);
-    }
-    public void CloseUseMedkitUI()
-    {
-        useMedkitUI.SetActive(false);
-    }
 
 
 

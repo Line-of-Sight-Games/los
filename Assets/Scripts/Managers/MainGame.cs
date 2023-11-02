@@ -321,7 +321,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                 //run things that trigger at the start of players turn
                 if (s.IsInspirer())
-                    InspirerCheck(s);
+                    CheckInspirer(s);
 
                 yield return new WaitUntil(() => menu.inspirerResolvedFlag == true);
 
@@ -2104,7 +2104,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         else
                         {
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
-
+                            
                             //push the no damage attack through for abilities trigger
                             defender.TakeDamage(attacker, meleeDamage, true, new List<string>() { "Melee" });
                         }
@@ -2118,9 +2118,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (meleeTypeDropdown.value == 0 && !damageMessage.Contains("No Damage"))
                 {
                     if (counterattack)
-                        menu.AddXpAlert(defender, 2 + meleeDamage, "Melee counterattack attack on " + attacker.soldierName + " for " + meleeDamage + " damage.", false);
+                        menu.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
                     else
-                        menu.AddXpAlert(attacker, 1, "Successful melee attack on " + defender.soldierName + ".", false);
+                    {
+                        if (meleeDamage == 0)
+                            menu.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
+                        else
+                            menu.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
+                    }
                 }
 
                 //kill if instantKill
@@ -2223,12 +2228,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public List<Item> FindNearbyItems()
     {
-        List<Item> nearbyGroundItems = new();
+        List<Item> nearbyItems = new();
         foreach (Item i in FindObjectsOfType<Item>())
-            if (i.transform.parent == null && activeSoldier.PhysicalObjectWithinItemRadius(i))
-                nearbyGroundItems.Add(i);
+            if (activeSoldier.PhysicalObjectWithinItemRadius(i))
+                nearbyItems.Add(i);
 
-        return nearbyGroundItems;
+        return nearbyItems;
     }
     public void ConfirmConfigure()
     {
@@ -2251,32 +2256,69 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
     }
     //item functions
-    public void ConfirmUseBasicItem()
+    public void ConfirmUseItem(ConfirmUseItemUI useItemUI)
     {
 
-        Item itemUsed = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsed;
-        Item itemUsedOn = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedOn;
-        ItemIcon linkedIcon = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon;
-        string slotName = menu.useBasicItemUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName;
+        Item itemUsed = useItemUI.itemUsed;
+        Item itemUsedOn = useItemUI.itemUsedOn;
+        Soldier soldierUsedOn = useItemUI.soldierUsedOn;
+        ItemIcon linkedIcon = useItemUI.itemUsedIcon;
+        string slotName = useItemUI.itemUsedFromSlotName;
+        int ap = itemUsed.usageAP;
 
-        DeductAP(itemUsed.usageAP);
-        itemUsed.UseItemInSlot(slotName, linkedIcon, itemUsedOn, null);
-        menu.CloseUseBasicItemUI();
+        //adepot ability
+        if (activeSoldier.IsAdept())
+            ap--;
+
+        DeductAP(ap);
+        switch (itemUsed.itemName)
+        {
+            case "Food_Pack":
+            case "Water_Canteen":
+            case "ULF_Radio":
+                itemUsed.UseItemInSlot(slotName, linkedIcon, null, null);
+                menu.CloseUseItemUI();
+                break;
+            case "Ammo_AR":
+            case "Ammo_LMG":
+            case "Ammo_Pi":
+            case "Ammo_Ri":
+            case "Ammo_Sh":
+            case "Ammo_SMG":
+            case "Ammo_Sn":
+            case "Poison_Satchel":
+                itemUsed.UseItemInSlot(slotName, linkedIcon, itemUsedOn, null);
+                menu.CloseUseItemUI();
+                break;
+            case "Medkit_Small":
+            case "Medkit_Medium":
+            case "Medkit_Large":
+            case "Syringe_Amphetamine":
+            case "Syringe_Androstenedione":
+            case "Syringe_Cannabinoid":
+            case "Syringe_Danazol":
+            case "Syringe_Glucocorticoid":
+            case "Syringe_Modafinil":
+            case "Syringe_Shard":
+            case "Syringe_Trenbolone":
+            case "Syringe_Unlabelled":
+                itemUsed.UseItemInSlot(slotName, linkedIcon, null, soldierUsedOn);
+                menu.CloseUseItemUI();
+                break;
+            default:
+                break;
+
+        }
+        menu.CloseUseItemUI();
     }
-    public void ConfirmUseMedkit()
+    public void UpdateSoldierUsedOn(ConfirmUseItemUI useItemUI)
     {
-
-        Item itemUsed = menu.useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsed;
-        Soldier soldierUsedOn = soldierManager.FindSoldierById(menu.useMedkitUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useMedkitUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
-        ItemIcon linkedIcon = menu.useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon;
-        string slotName = menu.useMedkitUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName;
-
-        DeductAP(itemUsed.usageAP);
-        itemUsed.UseItemInSlot(slotName, linkedIcon, null, soldierUsedOn);
-        menu.CloseUseMedkitUI();
+        useItemUI.soldierUsedOn = soldierManager.FindSoldierById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
     }
-
-
+    public void UpdateItemUsedOn(ConfirmUseItemUI useItemUI)
+    {
+        useItemUI.itemUsedOn = itemManager.FindItemById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
+    }
 
 
 
@@ -2792,7 +2834,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
     //inspirer functions
-    public void InspirerCheck(Soldier inspirer)
+    public void CheckInspirer(Soldier inspirer)
     {
         menu.SetInspirerResolvedFlagTo(false);
         bool openInspirerUI = false;

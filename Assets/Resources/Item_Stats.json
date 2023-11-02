@@ -3,6 +3,7 @@
     {
       "Name": "Ammo_AR",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 1,
       "Weight": 2,
       "Ammo": 8,
       "LoudRadius": 22,
@@ -15,6 +16,7 @@
     {
       "Name": "Ammo_LMG",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 3,
       "Weight": 3,
       "Ammo": 10,
       "LoudRadius": 34,
@@ -27,6 +29,7 @@
     {
       "Name": "Ammo_Pi",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 1,
       "Weight": 1,
       "Ammo": 6,
       "LoudRadius": 22,
@@ -39,6 +42,7 @@
     {
       "Name": "Ammo_Ri",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 1,
       "Weight": 1,
       "Ammo": 6,
       "LoudRadius": 22,
@@ -51,6 +55,7 @@
     {
       "Name": "Ammo_Sh",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 3,
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 34,
@@ -63,6 +68,7 @@
     {
       "Name": "Ammo_SMG",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 1,
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 22,
@@ -75,6 +81,7 @@
     {
       "Name": "Ammo_Sn",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "UsageAP": 2,
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 24,

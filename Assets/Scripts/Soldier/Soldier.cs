@@ -962,7 +962,30 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         UnsetState("Playdead");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
-
+    public void TakeDrug(int drugIndex, Soldier owner)
+    {
+        switch (drugIndex)
+        {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            default:
+                break;
+        }
+    }
     public IEnumerator TakePoisonDamage()
     {
         //print("take poison damage coroutine");
@@ -1232,9 +1255,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 {
                     //add xp for successful heal
                     if (healedBy == this)
+                    {
+                        menu.AddDamageAlert(this, $"{soldierName} healed self for {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true, false);
                         menu.AddXpAlert(healedBy, Mathf.CeilToInt((actualHeal + actualTraumaHeal) / 2.0f), $"Healed self by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
+                    }
                     else
+                    {
+                        menu.AddDamageAlert(this, $"{soldierName} was healed by {healedBy.soldierName} for {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true, false);
                         menu.AddXpAlert(healedBy, actualHeal + actualTraumaHeal, $"Healed {soldierName} by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
+                    }
                 }
             }
         } 
@@ -1877,9 +1906,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void TakePoisoning(string poisonedBy)
     {
-        this.poisonedBy = poisonedBy;
-        menu.AddDamageAlert(this, $"{soldierName} was poisoned!", false, true);
-        SetPoisoned();
+        if (ResilienceCheck())
+        {
+            menu.AddXpAlert(this, stats.R.Val, "Resisted poisoning.", true);
+            menu.AddDamageAlert(this, $"{soldierName} resisted poisoning.", true, true);
+        }
+        else
+        {
+            this.poisonedBy = poisonedBy;
+            menu.AddDamageAlert(this, $"{soldierName} was poisoned!", false, true);
+            SetPoisoned();
+        }
     }
     public bool IsPoisoned()
     {

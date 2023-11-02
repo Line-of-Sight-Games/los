@@ -226,6 +226,7 @@ public class Item : PhysicalObject, IDataPersistence
             "Thermal_Camera" => ItemAssets.Instance.Thermal_Camera,
             "UHF_Radio" => ItemAssets.Instance.UHF_Radio,
             "ULF_Radio" => ItemAssets.Instance.ULF_Radio,
+            "Water_Canteen" => ItemAssets.Instance.Water_Canteen,
             _ => null,
         };
     }
@@ -486,30 +487,104 @@ public class Item : PhysicalObject, IDataPersistence
         {
             switch (itemName)
             {
+                case "Ammo_AR":
+                case "Ammo_LMG":
+                case "Ammo_Pi":
+                case "Ammo_Ri":
+                case "Ammo_Sh":
+                case "Ammo_SMG":
+                case "Ammo_Sn":
+                    (this.ammo, itemUsedOn.ammo) = (itemUsedOn.ammo, this.ammo);
+                    if (this.ammo != 0)
+                        charges++; //add a "charge" to ensure ammo is not deleted
+                    break;
+                case "Food_Pack":
+                    if (poisonedBy == null)
+                        linkedSoldier.roundsWithoutFood -= 10;
+                    else
+                        linkedSoldier.TakePoisoning(poisonedBy);
+                    break;
                 case "Medkit_Small":
                 case "Medkit_Medium":
                 case "Medkit_Large":
-                    if (poisonedBy != "")
-                        soldierUsedOn.TakePoisoning(poisonedBy);
-                    else
+                    if (poisonedBy == null)
                         soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
                     break;
-                case "Food_Pack":
-                    linkedSoldier.roundsWithoutFood -= 10;
-                    linkedSoldier.PerformLoudAction(8);
+                case "Poison_Satchel":
+                    itemUsedOn.poisonedBy = linkedSoldier.Id;
+                    break;
+                case "Syringe_Amphetamine":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(0, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Androstenedione":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(1, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Cannabinoid":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(2, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Danazol":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(3, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Glucocorticoid":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(4, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Modafinil":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(5, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Shard":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(6, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Trenbolone":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(7, linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
+                    break;
+                case "Syringe_Unlabelled":
+                    if (poisonedBy == null)
+                        soldierUsedOn.TakeDrug(game.RandomNumber(0, 7), linkedSoldier);
+                    else
+                        soldierUsedOn.TakePoisoning(poisonedBy);
                     break;
                 case "ULF_Radio":
                     UseULF();
-                    linkedSoldier.PerformLoudAction(24);
                     break;
                 case "Water_Canteen":
-                    linkedSoldier.roundsWithoutFood -= 5;
+                    if (poisonedBy == null)
+                        linkedSoldier.roundsWithoutFood -= 5;
+                    else
+                        linkedSoldier.TakePoisoning(poisonedBy);
                     weight--;
-                    linkedSoldier.PerformLoudAction(8);
                     break;
                 default:
                     break;
             }
+
+            //perform loud action
+            linkedSoldier.PerformLoudAction(loudRadius);
 
             //decrement item charges and remove if consumable
             if (IsConsumable())
@@ -565,6 +640,48 @@ public class Item : PhysicalObject, IDataPersistence
             return true;
         return false;
     }
+    public bool IsAssaultRifle()
+    {
+        if (IsGun() && traits.Contains("Assault Rifle"))
+            return true;
+        return false;
+    }
+    public bool IsLMG()
+    {
+        if (IsGun() && traits.Contains("Light Machine Gun"))
+            return true;
+        return false;
+    }
+    public bool IsPistol()
+    {
+        if (IsGun() && traits.Contains("Pistol"))
+            return true;
+        return false;
+    }
+    public bool IsRifle()
+    {
+        if (IsGun() && traits.Contains("Rifle"))
+            return true;
+        return false;
+    }
+    public bool IsShotgun()
+    {
+        if (IsGun() && traits.Contains("Shotgun"))
+            return true;
+        return false;
+    }
+    public bool IsSMG()
+    {
+        if (IsGun() && traits.Contains("Sub-Machine Gun"))
+            return true;
+        return false;
+    }
+    public bool IsSniper()
+    {
+        if (IsGun() && traits.Contains("Sniper Rifle"))
+            return true;
+        return false;
+    }
     public bool IsAmmo()
     {
         if (traits.Contains("Ammo"))
@@ -575,20 +692,6 @@ public class Item : PhysicalObject, IDataPersistence
     {
         if (itemName == "Poison_Satchel")
             return true;
-        return false;
-    }
-    public bool IsPistol()
-    {
-        if (IsGun())
-            if (traits.Contains("Pi"))
-                return true;
-        return false;
-    }
-    public bool IsSMG()
-    {
-        if (IsGun())
-            if (traits.Contains("SMG"))
-                return true;
         return false;
     }
     public string SpecialityTag()
