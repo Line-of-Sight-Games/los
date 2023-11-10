@@ -2,11 +2,10 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable
+public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
 {
-    public MainMenu menu;
-    public MainGame game;
     public POIManager poiManager;
+    public bool triggered;
     private void Start()
     {
         poiType = "barrel";
@@ -59,40 +58,39 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable
         data.allPOIDetails.Add(id, details);
     }
 
-    public IEnumerator ExplosionCheck(Soldier explodedBy)
+    public void CheckExplosion(Soldier explodedBy, GameObject explosionList)
     {
-        //imperceptible delay to allow colliders to be recalculated at new destination
-        yield return new WaitUntil(() => menu.shotResolvedFlag == true);
-        bool showExplosionUI = false;
-        
         foreach (Soldier s in game.AllSoldiers())
         {
             if (s.IsAlive())
             {
                 if (s.PhysicalObjectWithinRadius(this, 3))
-                {
-                    menu.AddExplosionAlert(s, explodedBy, 8);
-                    showExplosionUI = true;
-                }
+                    menu.AddExplosionAlert(explosionList, s, explodedBy, 8, true, true);
                 else if (s.PhysicalObjectWithinRadius(this, 8))
-                {
-                    menu.AddExplosionAlert(s, explodedBy, 4);
-                    showExplosionUI = true;
-                }
+                    menu.AddExplosionAlert(explosionList, s, explodedBy, 4, true, true);
                 else if (s.PhysicalObjectWithinRadius(this, 15))
+                    menu.AddExplosionAlert(explosionList, s, explodedBy, 2, true, true);
+            }
+        }
+        foreach (POI poi in FindObjectsOfType<POI>())
+        {
+            if (poi != this && poi.PhysicalObjectWithinRadius(this, 15))
+            {
+                if (poi is ExplosiveBarrel barrel)
                 {
-                    menu.AddExplosionAlert(s, explodedBy, 2);
-                    showExplosionUI = true;
+                    if (!barrel.triggered)
+                        menu.AddExplosionAlertPOI(explosionList, barrel, explodedBy);
                 }
+                else if (poi is Terminal terminal)
+                    menu.AddExplosionAlertPOI(explosionList, terminal, explodedBy);
             }
         }
 
-        if (showExplosionUI)
-        {
-            yield return new WaitUntil(() => menu.meleeResolvedFlag == true);
+        //if any exploded candidates
+        if (explosionList.transform.childCount > 0)
             menu.OpenExplosionUI();
-            poiManager.DestroyPOI(this);
-        }
+        
+        poiManager.DestroyPOI(this);
     }
     public string Id 
     { 

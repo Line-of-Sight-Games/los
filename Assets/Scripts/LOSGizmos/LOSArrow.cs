@@ -19,6 +19,8 @@ public class LOSArrow : LOSGizmo
         //determine colour based on mutual or team
         if (from.CanSeeInOwnRight(to) && to.CanSeeInOwnRight(from))
             lineRenderer.material.color = Color.green;
+        else if (!from.CanSeeInOwnRight(to) && !to.CanSeeInOwnRight(from))
+            lineRenderer.material.color = Color.grey;
         else
         {
             if (from.soldierTeam == 1)

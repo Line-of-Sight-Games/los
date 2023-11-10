@@ -6,7 +6,14 @@ public class PhysicalObject : MonoBehaviour
 {
     public string id, terrainOn;
     public int x, y, z;
+    public MainGame game;
+    public MainMenu menu;
 
+    private void Awake()
+    {
+        game = FindObjectOfType<MainGame>();
+        menu = FindObjectOfType<MainMenu>();
+    }
     public string GenerateGuid()
     {
         return System.Guid.NewGuid().ToString();
@@ -35,7 +42,20 @@ public class PhysicalObject : MonoBehaviour
         get { return z; }
         set { z = value; MapPhysicalPosition(x, y, z); }
     }
+    public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
+    {
+        if (game.CalculateRange(this, obj) <= radius)
+            return true;
 
+        return false;
+    }
+    public bool PhysicalObjectWithinRadius(Vector3 point, float radius)
+    {
+        if (game.CalculateRange(this, point) <= radius)
+            return true;
+
+        return false;
+    }
     public string TerrainOn
     {
         get { return terrainOn; }

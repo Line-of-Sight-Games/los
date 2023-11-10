@@ -9,6 +9,7 @@ using System.Collections;
 using System;
 using Newtonsoft.Json;
 using UnityEditor.ShaderKeywordFilter;
+using UnityEditor.Experimental.GraphView;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable
 {
@@ -19,11 +20,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, plannerDonatedMove, 
-        timesBloodlet, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, plannerDonatedMove, dugIn, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting;
     public Statline stats;
     public Inventory inventory;
@@ -42,8 +42,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public List<Material> materials;
 
     public GameObject soldierUI, soldierUIPrefab, soldierSnapshotAlertPrefab;
-    public MainGame game;
-    public MainMenu menu;
+    
     public SoldierManager soldierManager;
     public ItemManager itemManager;
 
@@ -148,10 +147,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "suppressionValue", suppressionValue },
             { "healthRemovedFromStarve", healthRemovedFromStarve },
             { "poisonedBy", poisonedBy },
+            { "dugIn", dugIn },
 
             //save ability details
             { "plannerDonatedMove", plannerDonatedMove },
-            { "timesBloodlet", timesBloodlet },
+            { "patriotic", patriotic },
             { "bloodLettedThisTurn", bloodLettedThisTurn },
             { "illusionedThisMove", illusionedThisMove },
             { "hasKilled", hasKilled },
@@ -237,10 +237,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         suppressionValue = Convert.ToInt32(details["suppressionValue"]);
         healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
         poisonedBy = (string)details["poisonedBy"];
+        dugIn = Convert.ToInt32(details["dugIn"]);
 
         //load abiltiy details
         plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
         bloodLettedThisTurn = (bool)details["bloodLettedThisTurn"];
+        patriotic = (bool)details["patriotic"];
         illusionedThisMove = (bool)details["illusionedThisMove"];
         hasKilled = (bool)details["hasKilled"];
         overwatchFirstShotUsed = (bool)details["overwatchFirstShotUsed"];
@@ -467,6 +469,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
             return false;
     }
+    public int RoundByResilience(float numberToRound)
+    {
+        if (ResilienceCheck())
+            return Mathf.FloorToInt(numberToRound);
+        return Mathf.CeilToInt(numberToRound);
+    }
     public void PickUpItemToSlot(Item item, string slotName)
     {
         if (!Inventory.HasItem(item.id))
@@ -486,16 +494,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             
         }
     }
-    public void BrokenDropAllItemsExceptArmour()
-    {
-        List<Item> itemList = new();
-        foreach (Item item in Inventory.AllItems)
-            if (!item.itemName.Contains("Armour"))
-                itemList.Add(item);
-
-        foreach (Item item in itemList)
-            DropItem(item);
-    }
     public void FrozenMultiShot()
     {
         if (HasGunEquipped())
@@ -507,15 +505,52 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
     }
-    public void DestroyAllItems()
+    public void DestroyAllFragileItems()
     {
         List<Item> itemList = new();
+        Dictionary<string, string> itemSlots = new();
         foreach (Item item in Inventory.AllItems)
             itemList.Add(item);
+        foreach (KeyValuePair<string, string> kvp in inventorySlots)
+            itemSlots.Add(kvp.Key, kvp.Value);
 
         foreach (Item item in itemList)
-            if (item.IsDestructible())
-                item.itemManager.DestroyItem(item);
+            if (item.IsFragile())
+                foreach (KeyValuePair<string, string> kvp in itemSlots)
+                    if (kvp.Value == item.id)
+                        Inventory.ConsumeItemInSlot(Inventory.GetItemInSlot(kvp.Key), kvp.Key);
+        menu.AddDamageAlert(this, $"{soldierName} had all fragile items destroyed.", false, true);
+    }
+    public void DestroyAllBreakableItems()
+    {
+        List<Item> itemList = new();
+        Dictionary<string, string> itemSlots = new();
+        foreach (Item item in Inventory.AllItems)
+            itemList.Add(item);
+        foreach (KeyValuePair<string, string> kvp in inventorySlots)
+            itemSlots.Add(kvp.Key, kvp.Value);
+
+        foreach (Item item in itemList)
+            if (item.IsBreakable())
+                foreach (KeyValuePair<string, string> kvp in itemSlots)
+                    if (kvp.Value == item.id)
+                        Inventory.ConsumeItemInSlot(Inventory.GetItemInSlot(kvp.Key), kvp.Key);
+        menu.AddDamageAlert(this, $"{soldierName} had all breakable items destroyed.", false, true);
+    }
+    public void BrokenDropAllItemsExceptArmour()
+    {
+        List<Item> itemList = new();
+        Dictionary<string, string> itemSlots = new();
+        foreach (Item item in Inventory.AllItems)
+            if (!item.itemName.Contains("Armour"))
+                itemList.Add(item);
+        foreach (KeyValuePair<string, string> kvp in inventorySlots)
+            itemSlots.Add(kvp.Key, kvp.Value);
+
+        foreach (Item item in itemList)
+            foreach (KeyValuePair<string, string> kvp in itemSlots)
+                if (kvp.Value == item.id)
+                    DropItemFromSlot(item, kvp.Key);
     }
     public Item DropItem(Item item)
     {
@@ -753,7 +788,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void ApplyPatriotMods()
     {
-        if (IsOnNativeTerrain() && IsPatriot())
+        if (IsPatriotic())
             stats.S.Val += 12;
     }
     public void ApplyShadowMods()
@@ -962,25 +997,55 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         UnsetState("Playdead");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
+    public void UnsetDugIn()
+    {
+        dugIn = 0;
+    }
+    public void IncrementDugIn()
+    {
+        SetDugIn();
+        dugIn++;
+    }
+    public void SetDugIn()
+    {
+        if (dugIn == 0)
+            SetCover();
+    }
     public void TakeDrug(int drugIndex, Soldier owner)
     {
         switch (drugIndex)
         {
             case 0:
+                SetOnDrug("Amphetamine");
+
                 break;
             case 1:
+                SetOnDrug("Androstenedione");
+
                 break;
             case 2:
+                SetOnDrug("Cannabinoid");
+
                 break;
             case 3:
+                SetOnDrug("Danazol");
+
                 break;
             case 4:
+                SetOnDrug("Glucocorticoid");
+
                 break;
             case 5:
+                SetOnDrug("Modafinil");
+
                 break;
             case 6:
+                SetOnDrug("Shard");
+
                 break;
             case 7:
+                SetOnDrug("Trenbolone");
+
                 break;
             default:
                 break;
@@ -1086,6 +1151,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (!skipDamageMods)
             damage = ApplyDamageMods(damagedBy, damage, damageSource);
 
+        //make sure damage came from another soldier
+        if (damagedBy != null && this.IsOppositeTeamAs(damagedBy))
+        {
+            //apply witness ability slurp
+            if (IsWitness())
+            {
+                witnessStoredAbilities.Clear();
+                foreach (string ability in damagedBy.soldierAbilities)
+                    witnessStoredAbilities.Add(ability);
+            }
+
+            //informer ability display info
+            if (IsInformer())
+                AddSoldierSnapshot(damagedBy);
+        }
+
         if (damage > 0)
         {
             //remove overwatch if damage taken
@@ -1104,9 +1185,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 }
                 else
                 {
-                    if (CheckState("Unconscious"))
+                    if (IsUnconscious())
                         Kill(damagedBy, damageSource);
-                    else if (CheckState("Last Stand"))
+                    else if (IsLastStand())
                     {
                         if (!ResilienceCheck())
                             MakeUnconscious();
@@ -1171,26 +1252,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 //apply stun affect from tranquiliser
                 if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")))
-                    TranquiliserMakeStunned(1);
+                    MakeStunned(1);
             }
-        }
-        else
-            print("Damage was reduced to 0.");
-
-        //make sure damage came from another soldier
-        if (damagedBy != null)
-        {
-            //apply witness ability slurp
-            if (IsWitness())
-            {
-                witnessStoredAbilities.Clear();
-                foreach (string ability in damagedBy.soldierAbilities)
-                    witnessStoredAbilities.Add(ability);
-            }
-
-            //informer ability display info
-            if (IsInformer())
-                AddSoldierSnapshot(damagedBy);
         }
     }
     public void AddSoldierSnapshot(Soldier attackedBy)
@@ -1198,6 +1261,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         GameObject snapshot = Instantiate(soldierSnapshotAlertPrefab, menu.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
         snapshot.GetComponent<SoldierAlert>().SetSoldier(this);
+        snapshot.transform.Find("SoldierID").GetComponent<TextMeshProUGUI>().text = attackedBy.Id;
         snapshot.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(attackedBy);
         snapshot.transform.Find("SnapshotDetails").GetComponent<TextMeshProUGUI>().text = $"{soldierName} has informed on an attacker ({attackedBy.soldierName}). Click to see details.";
 
@@ -1231,7 +1295,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void TakeHeal(Soldier healedBy, int heal, int traumaHeal, bool overhealthEnabled, bool resurrectEnabled)
     {
-        if (CheckState("Dead"))
+        if (IsDead())
         {
             if (resurrectEnabled)
                 Resurrect(heal);
@@ -1240,16 +1304,27 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         else
         {
-            if (CheckState("Unconscious"))
+            if (IsUnconscious())
+            {
+                if (healedBy != null)
+                {
+                    menu.AddDamageAlert(this, $"{soldierName} was stabilised by {healedBy.soldierName} (Uncon -> LS).", true, true);
+                    menu.AddXpAlert(healedBy, 2, $"Stabilised {soldierName}.", true);
+                }
                 MakeLastStand();
+            }
             else
             {
                 int actualHeal = Heal(heal, overhealthEnabled);
                 int actualTraumaHeal = HealTrauma(traumaHeal);
 
-                if (CheckState("Last Stand"))
+                if (IsLastStand())
+                {
+                    if (healedBy != null)
+                        menu.AddDamageAlert(this, $"{soldierName} was stabilised by {healedBy.soldierName} (LS -> Active).", true, true);
                     MakeActive();
-                
+                }
+
                 //xp for healing
                 if (healedBy != null)
                 {
@@ -1938,6 +2013,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         return CheckState(drugName);
     }
+    public void SetOnDrug(string drugName)
+    {
+        SetState(drugName);
+    }
+    public void UnsetOnDrug(string drugName)
+    {
+        UnsetState(drugName);
+    }
     public bool IsOnOverwatch()
     {
         if (CheckState("Overwatch"))
@@ -1963,27 +2046,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsOnOverwatch())
         {
-            if (!IsGuardsman())
-            {
-                overwatchShotCounter--;
-                guardsmanRetryUsed = false;
-                menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
-            }
-            else
-            {
-                if (guardsmanRetryUsed)
-                {
-                    overwatchShotCounter--;
-                    guardsmanRetryUsed = false;
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
-                }
-                else
-                {
-                    guardsmanRetryUsed = true;
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
-                }
-            }
-
+            overwatchShotCounter--;
             if (overwatchShotCounter == 0)
                 UnsetOverwatch();
         }
@@ -2043,7 +2106,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsInteractable())
         {
             SetState("Crushed");
-            DestroyAllItems();
+            DestroyAllBreakableItems();
         }
     }
     public void UnsetCrushed()
@@ -2054,7 +2117,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (stunRounds > stunnedRoundsVulnerable)
         {
+            Item leftHand = Inventory.GetItemInSlot("LeftHand"), rightHand = Inventory.GetItemInSlot("RightHand");
             stunnedRoundsVulnerable = stunRounds;
+
+            //drop handheld items
+            if (leftHand != null)
+                DropItemFromSlot(leftHand, "LeftHand");
+            if (rightHand != null)
+                DropItemFromSlot(rightHand, "RightHand");
 
             //remove all engagements
             if (IsMeleeEngaged())
@@ -2063,7 +2133,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         }
     }
-    public void TranquiliserMakeStunned(int stunRounds)
+    public void MakeStunned(int stunRounds)
     {
         if (ResilienceCheck())
             menu.AddDamageAlert(this, $"Resisted a {stunRounds} round stun.", true, true);
@@ -2194,7 +2264,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
 
                 //set haskilled flag for avenger
-                killedBy.hasKilled = true;
+                if (killedBy.IsOppositeTeamAs(this))
+                    killedBy.hasKilled = true;
             }
         }
     }
@@ -2234,20 +2305,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     return true;
             }
         }
-
-        return false;
-    }
-    public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
-    {
-        if (game.CalculateRange(this, obj) <= radius)
-            return true;
-
-        return false;
-    }
-    public bool PhysicalObjectWithinRadius(Vector3 point, float radius)
-    {
-        if (game.CalculateRange(this, point) <= radius)
-            return true;
 
         return false;
     }
@@ -2873,6 +2930,21 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
+    public void SetPatriotic()
+    {
+        if (IsPatriot() && IsOnNativeTerrain())
+            patriotic = true;
+    }
+    public void UnsetPatriotic()
+    {
+        patriotic = false;
+    }
+    public bool IsPatriotic()
+    {
+        if (patriotic)
+            return true;
+        return false;
+    }
     public bool IsShadow()
     {
         if (IsConscious())
@@ -3137,7 +3209,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return ", <color=yellow>Playdead</color>";
         return "";
     }
-
+    public string GetDugInState()
+    {
+        if (dugIn > 0)
+            return $", <color=green>Dug In({dugIn})</color>";
+        return "";
+    }
     public string GetDrugState()
     {
         string drugState = "";
@@ -3163,7 +3240,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string GetPatriotState()
     {
-        if (IsOnNativeTerrain() && IsPatriot())
+        if (IsPatriotic())
             return ", <color=green>Patriotic</color>";
         return "";
     }
@@ -3210,6 +3287,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetPoisonedState();
             status += GetSuppressionState();
             status += GetPlaydeadState();
+            status += GetDugInState();
             status += GetDrugState();
 
             status += GetPatriotState();

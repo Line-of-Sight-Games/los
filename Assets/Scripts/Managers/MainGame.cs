@@ -8,6 +8,8 @@ using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -141,7 +143,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         soundManager.noisePlayer.mute = !soundManager.noisePlayer.mute;
     }
-
+    
 
 
 
@@ -232,6 +234,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //remove dissuaded
                 s.UnsetDissuaded();
 
+                //reset patriot
+                s.UnsetPatriotic();
+
                 //increase rounds fielded
                 s.roundsFielded++;
                 if (s.IsConscious())
@@ -293,10 +298,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (currentTeam == 1)
                 StartRound();
 
-            StartCoroutine(StartPlayerTurn());
+            StartCoroutine(StartTeamTurn());
         }
     }
-    public IEnumerator StartPlayerTurn()
+    public IEnumerator StartTeamTurn()
     {
         if (menu.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
             StartCoroutine(menu.OpenDamageList());
@@ -318,6 +323,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         s.soldierAbilities.Add(ability);
                     }
                 }
+
+                //patriot ability
+                s.SetPatriotic();
 
                 //run things that trigger at the start of players turn
                 if (s.IsInspirer())
@@ -588,6 +596,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //clear planner donated movement
         movingSoldier.plannerDonatedMove = 0;
 
+        //clear e tool dug in
+        movingSoldier.UnsetDugIn();
+
         //check for fall damage
         if (fallDistanceInt > 0)
             movingSoldier.TakeDamage(movingSoldier, CalculateFallDamage(movingSoldier, fallDistanceInt), false, new List<string>() { "Fall" });
@@ -693,7 +704,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (shooter.PhysicalObjectIsRevealed(b))
-                    targetOptionData = new(b.Id, menu.explosiveBarrel);
+                    targetOptionData = new(b.Id, menu.explosiveBarrelSprite);
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
@@ -1295,7 +1306,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         return chances;
     }
-    public void ConfirmShot()
+    public void ConfirmShot(bool retry)
     {
         Soldier shooter = soldierManager.FindSoldierById(menu.shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
         IAmShootable target = FindShootableById(targetDropdown.options[targetDropdown.value].text);
@@ -1388,7 +1399,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
-                    StartCoroutine(targetBarrel.ExplosionCheck(shooter));
+                    targetBarrel.CheckExplosion(shooter, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform));
                 }
                 else
                 {
@@ -1455,7 +1466,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                     //show avenger retry if opponent has killed
-                    if (targetSoldier.hasKilled && shooter.EquippedGun.CheckAnyAmmo())
+                    if (targetSoldier.hasKilled && shooter.EquippedGun.CheckAnyAmmo() && !retry)
                         menu.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
 
                     //paying xp for dodge
@@ -1941,6 +1952,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
             EstablishNoController(attacker, defender);
             controlResult = "<color=orange>No-one Controlling\n(" + attacker.soldierName + " Playdead)</color>";
         }
+        else if (defender.IsBroken())
+        {
+            EstablishNoController(attacker, defender);
+            controlResult = "<color=orange>No-one Controlling\n(" + defender.soldierName + " Broken)</color>";
+        }
         else if (counterattack)
         {
             EstablishNoController(attacker, defender);
@@ -2256,7 +2272,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
     }
     //item functions
-    public void ConfirmUseItem(ConfirmUseItemUI useItemUI)
+    public void ConfirmUseItem(UseItemUI useItemUI)
     {
 
         Item itemUsed = useItemUI.itemUsed;
@@ -2265,14 +2281,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
         ItemIcon linkedIcon = useItemUI.itemUsedIcon;
         string slotName = useItemUI.itemUsedFromSlotName;
         int ap = itemUsed.usageAP;
-
-        //adepot ability
+        //adept ability
         if (activeSoldier.IsAdept())
             ap--;
+        //gunner ability
+        if (activeSoldier.IsGunner() && itemUsed.IsAmmo())
+            ap = 1;
 
-        DeductAP(ap);
         switch (itemUsed.itemName)
         {
+            case "E_Tool":
             case "Food_Pack":
             case "Water_Canteen":
             case "ULF_Radio":
@@ -2305,20 +2323,153 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 itemUsed.UseItemInSlot(slotName, linkedIcon, null, soldierUsedOn);
                 menu.CloseUseItemUI();
                 break;
+            case "UHF_Radio":
+                menu.OpenUHFUI(useItemUI);
+                menu.CloseUseItemUI();
+                break;
             default:
                 break;
 
         }
+        DeductAP(ap);
         menu.CloseUseItemUI();
     }
-    public void UpdateSoldierUsedOn(ConfirmUseItemUI useItemUI)
+    public void UpdateSoldierUsedOn(UseItemUI useItemUI)
     {
         useItemUI.soldierUsedOn = soldierManager.FindSoldierById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
     }
-    public void UpdateItemUsedOn(ConfirmUseItemUI useItemUI)
+    public void UpdateItemUsedOn(UseItemUI useItemUI)
     {
         useItemUI.itemUsedOn = itemManager.FindItemById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
     }
+    public void ConfirmUHF(UseItemUI useUHFUI)
+    {
+        print("confirmUHF");
+        TMP_InputField targetX = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetY = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetZ = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        if (targetX.interactable && !useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy) //first press
+        {
+            if (int.TryParse(useUHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text, out int rolls) && int.TryParse(useUHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text, out int radius) && int.TryParse(useUHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text, out int damage))
+            {
+                if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour)
+                {
+                    int highestRoll = 0, newX, newY;
+                    float scatterDistance;
+                    int scatterDegree = RandomNumber(0, 360);
+                    for (int i = 0; i < rolls; i++)
+                    {
+                        int roll = DiceRoll();
+                        if (roll > highestRoll)
+                            highestRoll = roll;
+                    }
+
+                    scatterDistance = highestRoll switch
+                    {
+                        2 => radius + 1,
+                        3 => 0.75f * radius + 1,
+                        4 => 0.5f * radius + 1,
+                        5 => 0.25f * radius + 1,
+                        6 => 0,
+                        _ => -1,
+                    };
+
+                    if (scatterDistance != -1)
+                    {
+                        (newX, newY) = CalculateScatteredCoordinates(int.Parse(targetX.text), int.Parse(targetY.text), scatterDegree, scatterDistance);
+
+                        if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
+                        {
+                            targetX.text = $"{newX}";
+                            targetX.interactable = false;
+                            targetY.text = $"{newY}";
+                            targetY.interactable = false;
+                            useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZLabel").gameObject.SetActive(true);
+                            useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattered off map";
+                            useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
+                        }
+                    }
+                    else
+                    {
+                        useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Total Missfire";
+                        useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
+                    }
+                }
+            }
+            
+        }
+        else //second press
+        {
+            print("second press");
+
+            if (useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
+            {
+                menu.CloseUHFUI();
+                useUHFUI.itemUsed.UseItemInSlot(useUHFUI.itemUsedFromSlotName, useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+            }
+            else
+            {
+                if (int.TryParse(useUHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text, out int rolls) && int.TryParse(useUHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text, out int radius) && int.TryParse(useUHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text, out int damage))
+                {
+                    if (float.TryParse(targetX.text, out float x) && float.TryParse(targetY.text, out float y) && float.TryParse(targetZ.text, out float z))
+                    {
+                        if (targetZ.textComponent.color == menu.normalTextColour)
+                        {
+                            if (useUHFUI.itemUsed.owner is Soldier linkedSoldier)
+                            {
+                                menu.CloseUHFUI();
+                                useUHFUI.itemUsed.UseItemInSlot(useUHFUI.itemUsedFromSlotName, useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+                                CheckUHFExplosion(linkedSoldier, new Vector3(x, y, z), radius, damage);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    static Tuple<int, int> CalculateScatteredCoordinates(int targetX, int targetY, float scatterDegree, float scatterDistance)
+    {
+        // Convert degree to radians
+        double radians = Math.PI * scatterDegree / 180.0;
+
+        // Calculate new coordinates
+        int newX = Mathf.RoundToInt((float)(targetX + scatterDistance * Math.Cos(radians)));
+        int newY = Mathf.RoundToInt((float)(targetY + scatterDistance * Math.Sin(radians)));
+
+        return Tuple.Create(newX, newY);
+    }
+    public void CheckUHFExplosion(Soldier explodedBy, Vector3 position, int radius, int damage)
+    {
+        //imperceptible delay to allow colliders to be recalculated at new destination
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform);
+
+        foreach (Soldier s in AllSoldiers())
+        {
+            if (s.IsAlive())
+            {
+                if (s.PhysicalObjectWithinRadius(position, radius/2))
+                    menu.AddExplosionAlert(explosionList, s, explodedBy, damage - s.stats.R.Val, true, false);
+                else if (s.PhysicalObjectWithinRadius(position, radius))
+                    menu.AddExplosionAlert(explosionList, s, explodedBy, s.RoundByResilience(damage/2.0f) - s.stats.R.Val, true, false);
+            }
+        }
+        foreach (POI poi in FindObjectsOfType<POI>())
+        {
+            if (poi.PhysicalObjectWithinRadius(position, radius))
+                menu.AddExplosionAlertPOI(explosionList, poi, explodedBy);
+        }
+
+        if (explosionList.transform.Find("Scroll").Find("View").Find("Content").childCount > 0)
+            menu.OpenExplosionUI();
+        else
+            Destroy(explosionList);
+    }
+
+
 
 
 
@@ -2336,61 +2487,29 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown dipelecType = menu.dipelecUI.transform.Find("DipElecType").Find("DipElecTypeDropdown").GetComponent<TMP_Dropdown>();
         TMP_Dropdown level = menu.dipelecUI.transform.Find("Level").Find("LevelDropdown").GetComponent<TMP_Dropdown>();
+        level.GetComponent<DropdownController>().optionsToGrey.Clear();
 
         if (dipelecType.value == 0)
         {
             menu.dipelecUI.transform.Find("Level").gameObject.SetActive(true);
-            switch (level.value)
-            {
-                case 0:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L1Dip;
-                    break;
-                case 1:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L2Dip;
-                    break;
-                case 2:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L3Dip;
-                    break;
-                case 3:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L4Dip;
-                    break;
-                case 4:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L5Dip;
-                    break;
-                case 5:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L6Dip;
-                    break;
-                default:
-                    break;
-            }
+            for (int i = 1; i <= 6; i++)
+                if (activeSoldier.stats.Dip.Val + activeSoldier.TacticianBonus() < i)
+                    level.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
+            if (level.GetComponent<DropdownController>().optionsToGrey.Contains($"{level.value + 1}"))
+                level.value = 0;
+
+            menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.GetLevelDip(level.value + 1);
             menu.dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Dip.Val + activeSoldier.TacticianBonus(), level.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
         }
         else if (dipelecType.value == 1)
         {
             menu.dipelecUI.transform.Find("Level").gameObject.SetActive(true);
-            switch (level.value)
-            {
-                case 0:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L1Elec;
-                    break;
-                case 1:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L2Elec;
-                    break;
-                case 2:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L3Elec;
-                    break;
-                case 3:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L4Elec;
-                    break;
-                case 4:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L5Elec;
-                    break;
-                case 5:
-                    menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.L6Elec;
-                    break;
-                default:
-                    break;
-            }
+            for (int i = 1; i <= 6; i++)
+                if (activeSoldier.stats.Elec.Val + activeSoldier.CalculatorBonus() < i)
+                    level.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
+            if (level.GetComponent<DropdownController>().optionsToGrey.Contains($"{level.value + 1}"))
+                level.value = 0;
+            menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.GetLevelElec(level.value + 1);
             menu.dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Elec.Val + activeSoldier.CalculatorBonus(), level.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
         }
         else
@@ -2446,7 +2565,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     menu.dipelecResultUI.transform.Find("RewardPanel").gameObject.SetActive(true);
                     for (int i = 0; i <= levelDropdown.value; i++)
                     {
+                        print("got into loop");
                         GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("RewardPanel").Find("Scroll").Find("View").Find("Content"));
+                        print("passed instantiation");
                         TextMeshProUGUI textComponent = dipelecReward.GetComponentInChildren<TextMeshProUGUI>();
 
                         textComponent.text = (resultString == "Hack") ? dipelec.GetLevelElec(i+1) : dipelec.GetLevelDip(i+1);
@@ -2461,10 +2582,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
             else
             {
                 menu.dipelecResultUI.transform.Find("RewardPanel").gameObject.SetActive(false);
-                menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Terminal Diabled!";
+                menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Terminal Disabled!";
                 terminal.terminalEnabled = false;
                 if (activeSoldier.hp > 3)
-                    activeSoldier.TakeDamage(null, activeSoldier.hp - 3, true, new List<string>() { "Dipelec" });
+                    activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new List<string>() { "Dipelec" });
             }
 
             menu.OpenDipelecResultUI();
@@ -2731,31 +2852,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
     //damage event functions - game
-    public void ConfirmExplosion()
-    {
-        ScrollRect explosionScroller = menu.explosionUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
-
-        if (explosionScroller.verticalNormalizedPosition <= 0.05f)
-        {
-            Transform explosionAlerts = menu.explosionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
-
-            foreach (Transform child in explosionAlerts)
-            {
-                Soldier hitByExplosion = child.GetComponent<SoldierAlertDouble>().s1;
-                Soldier explodedBy = child.GetComponent<SoldierAlertDouble>().s2;
-                int.TryParse(child.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage);
-                if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
-                    hitByExplosion.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
-                
-                if (child.Find("StunToggle").GetComponent<Toggle>().isOn)
-                    hitByExplosion.SetStunned(1);
-            }
-
-            menu.CloseExplosionUI();
-        }
-        else
-            print("Haven't scrolled all the way to the bottom");
-    }
     public void ConfirmDamageEvent()
     {
         if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Bloodletting"))
@@ -2942,7 +3038,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return Vector3.Distance(new Vector3(obj1.X, obj1.Y, obj1.Z), new Vector3(obj2.X, obj2.Y, obj2.Z));
     }
-    public float CalculateRange(Soldier s1, Vector3 point)
+    public float CalculateRange(PhysicalObject s1, Vector3 point)
     {
         return Vector3.Distance(new Vector3(s1.X, s1.Y, s1.Z), point);
     }
@@ -3132,7 +3228,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee, bool triggersOverwatch)
     {
         //print(GetCallingFunctionName());
-        yield return new WaitUntil(() => menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true && menu.overrideView == false);
+        yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true && menu.overrideView == false);
 
         string movingSoldierActiveStat = "F";
         string detecteeActiveStat = "C";

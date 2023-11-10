@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class DipelecGen : MonoBehaviour, IDataPersistence
 {
-    private string[] l1Dip =
+    private readonly string[] l1Dip =
     {
         "Receive a single piece of medium-level advice if it is asked in the form of a yes/no Question",
         "Retry your next missed shot once (excluding overwatch) (Must have required ammo)",
@@ -16,7 +16,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "Next successful shot will stun enemy soldier for one turn",
         "Negotiator receives 1Elec. If he has previously failed a hack, rerun it (most recent attempt at same level for 0AP) with the new Elec skill",
     };
-    private string[] l2Dip =
+    private readonly string[] l2Dip =
     {
         "Next shot will hit (XP given)",
         "For one turn, the Player can ask if any revealed enemies are in cover. If any are, all enemy covers will be cancelled. If they are not, the Player retains the ability for another turn (Player may use this on the current turn or use anytime provided notice is given the previous turn) (Opponent informed once covers are cancelled)",
@@ -29,7 +29,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "At the beginning of the Opponent's next turn, their overwatch will be disabled for 6 turns (Opponent informed)",
         "Poison the first soldier (friendly or enemy, no XP) encountered in a wind direction (8 options) chosen by the Player. Player may also poison closest soldier to centre if desired (Opposed informed if enemy poisoined)",
     };
-    private string[] l3Dip =
+    private readonly string[] l3Dip =
     {
         "Field a randomly generated Recruit in your chosen specialty at a valid spawn point (Opponent informed of extra man). He may field with one gun, one knife or one grenade",
         "Place 3 thermal cameras anywhere on the map (negotiator to receive XP for detections)",
@@ -42,7 +42,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "Choose a soldier. Completely rebuild (choose) their specialty, ability and skill point distribution (duplicates only permitted for deceased soldiers). Their XP, body and equipment will be conserved. They may equip a gun or swap if one is already equipped.",
         "Enemy Corporals (and above) will be unable to take cover, equip new Specialty Armours or control engagements (Opponent informed)",
     };
-    private string[] l4Dip =
+    private readonly string[] l4Dip =
     {
         "After any attempted shot (either to or from the enemy), teleport the relevant enemy anywhere along the bullet's trajectory (Can be mid-air...enemy will fall). Can be used twice (Opponent informed after each use)",
         "Administer any one drug to any one soldier without a side effect",
@@ -55,7 +55,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "+2 increments to all soldiers' Support and Weapon skills",
         "Any enemies including and above the rank of Captain are executed. If none exist, one random unfielded soldier will be executed, if none exist, the most experienced enemy will have his HP halved (round down) (Opponent informed)",
     };
-    private string[] l5Dip =
+    private readonly string[] l5Dip =
     {
         "All fielded enemies become Frozen. Unfielded enemies are executed (Opponent informed)",
         "Entire team's Dip and Elec skills are added together to deliver a UHF strike. If Negotiator is sole survivor, his skill points will be doubled. If no enemies are killed by this strike, it may be redone (once, XP given)",
@@ -63,12 +63,12 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "All enemies must pass a deathroll to survive (no XP). If they all survive, all except the lowest ranked (Opponent chooses sole survivor if there are ties) will all be executed (Opponent informed)",
         "Disable two of either shooting, melee or explosives for the enemy (Oppponent informed)",
     };
-    private string[] l6Dip =
+    private readonly string[] l6Dip =
     {
         "Victory",
     };
 
-    private string[] l1Elec =
+    private readonly string[] l1Elec =
     {
         "Hacker receives 1Dip. If he has previously failed a negotiation, rerun it (most recent attempt at same level for 0AP) with the new Dip skill",
         "Receive 9S and 15SR to distribute amongst fielded soldiers as desired",
@@ -81,7 +81,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "All fielded soldiers (except the hacker) receive 2XP or the hacker receives 6XP",
         "Any soldiers between half and full health will be fully healed. If this does not apply to any soldiers. Receive 2H to distribute amongst team (cannot be applied to soldiers below half health)",
     };
-    private string[] l2Elec =
+    private readonly string[] l2Elec =
     {
         "Choose a soldier to link with. Any HP lost by either soldier will now be split 50/50 between the nominated soldier and the hacker. If damage is an odd number, reduce it by 1 first. Both soldiers receive 1H",
         "All fielded soldiers receive +1 increment to their specialty",
@@ -94,7 +94,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "10SR awarded to fielded soldiers and entire weather forecast is known.",
         "At the beginning of the Player's next turn, reveal all enemies visible from directly above (no XP). If this reveals no new enemies, award 9S to all fielded soldiers",
     };
-    private string[] l3Elec =
+    private readonly string[] l3Elec =
     {
         "Distribute 8AP amongst fielded soldiers",
         "Soldiers will be fully healed (no XP). Soldiers already on full health receive 1H",
@@ -107,7 +107,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "-12S to all fielded enemies (Opponent informed)",
         "Soldiers can permanently retry failed rolls involving R",
     };
-    private string[] l4Elec =
+    private readonly string[] l4Elec =
     {
         "All fielded soldiers (except the hacker…unless he is the sole survivor) shall have their first ability upgraded",
         "Permanently remove all current and future appearances of a list of items specified by the Player (Opponent informed)",
@@ -120,7 +120,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "All fielded soldiers shall earn a 'life'. Completely ignore the event that would have killed them(once each)",
         "All actions now cost 1 less AP",
     };
-    private string[] l5Elec =
+    private readonly string[] l5Elec =
     {
         "The Player receives 2 minutes to alter anything they want on the map. This can't damage enemy units, should debris be placed on them, they will be placed on top. All enemy soldiers are revealed before the 2 minutes commences (Opponent informed)",
         "Any damage dealt to any enemy soldier shall also be applied to his allies (Opponent informed)",
@@ -128,7 +128,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "All soldiers become invisible to everything until any soldier issues or takes damage",
         "Deploy 2 Captains anywhere on the map. Player shall choose skill points, skin, upgraded ability and 1 weapon, 1 item and 1 armour each",
     };
-    private string[] l6Elec =
+    private readonly string[] l6Elec =
     {
         "Victory",
     };

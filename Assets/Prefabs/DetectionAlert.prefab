@@ -835,7 +835,7 @@ GameObject:
   - component: {fileID: 7636288976933444018}
   - component: {fileID: 5627292259881211051}
   - component: {fileID: 4663678771508208206}
-  - component: {fileID: 8152828442118025241}
+  - component: {fileID: 5127266957262803186}
   m_Layer: 5
   m_Name: DetectionAlert
   m_TagString: Untagged
@@ -904,7 +904,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8152828442118025241
+--- !u!114 &5127266957262803186
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -913,7 +913,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3979812687729385670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e09db47f05f64f74998f3dd66a25dc3f, type: 3}
+  m_Script: {fileID: 11500000, guid: 08596fdd59f29a74296721a53770f953, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   s1: {fileID: 0}

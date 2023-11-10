@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -11,8 +11,6 @@ using System.Runtime.InteropServices.WindowsRuntime;
 public class Item : PhysicalObject, IDataPersistence
 {
     public Dictionary<string, object> details;
-    public MainGame game;
-    public MainMenu menu; 
     public ItemReader reader;
     public ItemManager itemManager;
     public IHaveInventory owner;
@@ -351,11 +349,9 @@ public class Item : PhysicalObject, IDataPersistence
     }
     public void RunDropEffect(string slotName)
     {
-        print("running drop effect");
         if (owner is Soldier owningSoldier)
         {
-            print("soldier is owner");
-            //spawn small medkit inside brace
+            //despawn small medkit inside brace
             if (itemName == "Brace")
             {
                 if (slotName == "LeftBrace")
@@ -364,11 +360,11 @@ public class Item : PhysicalObject, IDataPersistence
                     owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc4"), "Misc4");
             }
 
-            //spawn med medkit in bag
+            //despawn med medkit in bag
             if (itemName == "Bag")
                 owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc3"), "Misc3");
 
-            //spawn small & med medkit in backpack
+            //despawn small & med medkit in backpack
             if (itemName == "Backpack")
             {
                 owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc1"), "Misc1");
@@ -459,6 +455,29 @@ public class Item : PhysicalObject, IDataPersistence
 
         markedForAction = string.Empty;
     }
+    public Tuple<int, string, int, int, int> GetUHFStrike()
+    {
+        if (owner is Soldier linkedSoldier)
+        {
+            int dip = linkedSoldier.stats.Dip.Val, elec = linkedSoldier.stats.Elec.Val;
+            //locator and politician bonus
+            if (linkedSoldier.IsLocator())
+                elec++;
+            if (linkedSoldier.IsPolitician())
+                dip++;
+
+            //keep values within bouds
+            if (dip > 9)
+                dip = 9;
+            if (elec > 9)
+                elec = 9;
+            
+            int dipelecScore = itemManager.scoreTable[dip, elec];
+            Tuple<int, string, int, int, int> strike = itemManager.GetStrike(dipelecScore);
+            return strike;
+        }
+        return null;
+    }
     public void UseULF()
     {
         if (owner is Soldier linkedSoldier)
@@ -487,6 +506,9 @@ public class Item : PhysicalObject, IDataPersistence
         {
             switch (itemName)
             {
+                case "E_Tool":
+                    linkedSoldier.IncrementDugIn();
+                    break;
                 case "Ammo_AR":
                 case "Ammo_LMG":
                 case "Ammo_Pi":
@@ -598,9 +620,21 @@ public class Item : PhysicalObject, IDataPersistence
             }
         }
     }
-    public bool IsDestructible()
+    public bool IsBreakable()
     {
         if (!traits.Contains("Unbreakable"))
+            return true;
+        return false;
+    }
+    public bool IsFragile()
+    {
+        if (traits.Contains("Fragile"))
+            return true;
+        return false;
+    }
+    public bool IsUnbreakable()
+    {
+        if (traits.Contains("Unbreakable"))
             return true;
         return false;
     }

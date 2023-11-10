@@ -10,6 +10,7 @@ public class InventorySourceIconGoodyBox : InventorySourceIcon
     {
         linkedGB = gb;
         linkedInventoryPanel = inventorySourcePanel;
+        transform.GetComponentInChildren<POIPortrait>().Init(gb);
 
         return this;
     }

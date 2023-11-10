@@ -33,8 +33,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, 
         lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
         allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
-        meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionAlertPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, ULFResultUI;
+        meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
+        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, ULFResultUI, UHFUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public OverwatchArc overwatchArcPrefab;
@@ -46,11 +46,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public float turnTime;
     public string meleeChargeIndicator;
     public Soldier activeSoldier;
-    public bool overrideView, displayLOSArrows, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, 
+    public bool overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, 
         xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
-        detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist, explosiveBarrel, covermanSprite;
+        detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist, explosiveBarrelSprite, goodyBoxSprite,
+        terminalSprite, drugCabinetSprite, covermanSprite;
     public Color normalTextColour = new(0.196f, 0.196f, 0.196f);
 
     private readonly string[][] allStats =
@@ -193,6 +194,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 turnTimer.text = FormatFloatTime(game.maxTurnTime - turnTime);
                 TurnTimerColour();
                 ChangeRoundIndicators();
+                CloseExplosionUI();
 
                 //show LOS gizmos
                 DisplayLOSGizmos();
@@ -211,6 +213,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
         }
     }
+    
+
 
 
 
@@ -309,6 +313,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 arrow.transform.SetAsLastSibling();
             }
         }
+    }
+    public void CreateLOSArrowPair(Soldier s1, Soldier s2)
+    {
+        LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s1, s2);
+        arrow.transform.SetAsLastSibling();
+    }
+    public void DestroyLOSArrowPair(Soldier s1, Soldier s2)
+    {
+        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+        foreach (LOSArrow arrow in LOSArrows)
+            if (arrow.from == s1 && arrow.to == s2)
+                Destroy(arrow.gameObject);
     }
     public void DestroyLOSArrows()
     {
@@ -1355,6 +1371,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //detection functions - menu
     public void OpenGMAlertDetectionUI()
     {
+        detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
+        detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(false);
         int childCount = 0, overwatchCount = 0;
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
         {
@@ -1376,14 +1394,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //illusionist ability
             if (activeSoldier != null)
             {
-                if (activeSoldier.IsIllusionist() && activeSoldier.IsHidden() && !activeSoldier.illusionedThisMove) //check if it's active in heirarchy
+                if (activeSoldier.IsIllusionist() && activeSoldier.IsHidden() && !activeSoldier.illusionedThisMove)
+                {
                     detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(true);
-                else
-                    detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
+                    detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(true);
+                }
             }
-            else
-                detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
-
+            
             detectionAlertUI.SetActive(true);
             soundManager.PlayDetectionAlarm();
         }
@@ -1403,11 +1420,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         activeSoldier.ap += game.tempMove.Item3;
         activeSoldier.mp += game.tempMove.Item4;
 
-        //destory detection alerts
+        //destroy detection alerts
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
             Destroy(child.gameObject);
 
-        CloseGMAlertDetectionUI();
+        CloseDetectionUI();
     }
     public bool AllDetectionsMutual()
     {
@@ -1454,7 +1471,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
         //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
-            if ((child.GetComponent<SoldierAlertDouble>().s1 == detector && child.GetComponent<SoldierAlertDouble>().s2 == counter) || (child.GetComponent<SoldierAlertDouble>().s1 == counter && child.GetComponent<SoldierAlertDouble>().s2 == detector))
+            if ((child.GetComponent<SoldierAlertLOS>().s1 == detector && child.GetComponent<SoldierAlertLOS>().s2 == counter) || (child.GetComponent<SoldierAlertLOS>().s1 == counter && child.GetComponent<SoldierAlertLOS>().s2 == detector))
                 Destroy(child.gameObject);
 
         GameObject detectionAlert = Instantiate(detectionAlertPrefab, detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
@@ -1465,7 +1482,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (counterLabel.Contains("Not detected"))
             detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
 
-        detectionAlert.GetComponent<SoldierAlertDouble>().SetSoldiers(detector, counter);
+        detectionAlert.GetComponent<SoldierAlertLOS>().SetSoldiers(detector, counter);
         detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
 
         detectionAlert.transform.Find("Detector").Find("DetectorSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + detector.stats.SR.Val + ")";
@@ -1541,8 +1558,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             Transform detectionAlert = detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
             foreach (Transform child in detectionAlert)
             {
-                Soldier detector = child.GetComponent<SoldierAlertDouble>().s1;
-                Soldier counter = child.GetComponent<SoldierAlertDouble>().s2;
+                Soldier detector = child.GetComponent<SoldierAlertLOS>().s1;
+                Soldier counter = child.GetComponent<SoldierAlertLOS>().s2;
 
                 if (child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn == true)
                 {
@@ -1979,19 +1996,47 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         explosionUI.SetActive(true);
     }
-
     public void CloseExplosionUI()
     {
-        explosionUI.SetActive(false);
+        if (explosionUI.transform.childCount == 0)
+            explosionUI.SetActive(false);
     }
-    public void AddExplosionAlert(Soldier hitByExplosion, Soldier explodedBy, int damage)
+    public void AddExplosionAlert(GameObject explosionList, Soldier hitByExplosion, Soldier explodedBy, int damage, bool causesDamage, bool causesStun)
     {
-        GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+        GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
         explosionAlert.transform.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
-        explosionAlert.GetComponent<SoldierAlertDouble>().SetSoldiers(hitByExplosion, explodedBy);
+        explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, hitByExplosion);
 
         explosionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(hitByExplosion);
+        if (damage > 5)
+        {
+            explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
+            explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Breakable Items Destroyed";
+        }
+        else if (damage > 0)
+        {
+            explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
+            explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Fragile Items Destroyed";
+        }
+        if (causesDamage)
+        {
+            explosionAlert.transform.Find("DamageQuestion").gameObject.SetActive(true);
+            explosionAlert.transform.Find("DamageToggle").gameObject.SetActive(true);
+        }
+        if (causesStun)
+        {
+            explosionAlert.transform.Find("StunQuestion").gameObject.SetActive(true);
+            explosionAlert.transform.Find("StunToggle").gameObject.SetActive(true);
+        }
     }
+    public void AddExplosionAlertPOI(GameObject explosionList, POI poiHit, Soldier explodedBy)
+    {
+        GameObject explosionAlert = Instantiate(explosionAlertPOIPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
+        explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, poiHit);
+
+        explosionAlert.transform.Find("POIPortrait").GetComponent<POIPortrait>().Init(poiHit);
+    }
+
 
 
 
@@ -2001,6 +2046,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //shot functions - menu
     public void OpenShotUI()
     {
+        //clear old data
+        ClearShotUI();
+        ClearShotConfirmUI();
+
         //set shooter details
         Soldier shooter = activeSoldier;
         shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
@@ -2155,8 +2204,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public void CloseShotUI()
     {
-        ClearShotUI();
-        ClearShotConfirmUI();
         shotUI.SetActive(false);
         shotConfirmUI.SetActive(false);
     }
@@ -2901,16 +2948,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = "";
         dipelecUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "";
         dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
-        foreach (Transform child in dipelecResultUI.transform.Find("RewardPanel").Find("Scroll").Find("View").Find("Content"))
-            Destroy(child.gameObject);
         clearDipelecFlag = false;
     }
     public void OpenDipelecResultUI()
     {
         dipelecResultUI.SetActive(true);
     }
+    public void ClearDipelecResultUI()
+    {
+        foreach (Transform child in dipelecResultUI.transform.Find("RewardPanel").Find("Scroll").Find("View").Find("Content"))
+            Destroy(child.gameObject);
+    }
     public void CloseDipelecResultUI()
     {
+        ClearDipelecResultUI();
         dipelecResultUI.SetActive(false);
     }
     
@@ -3312,14 +3363,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenUseItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon)
     {
         useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(true);
+
         TMP_Dropdown targetDropdown = useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
         targetDropdown.ClearOptions();
         List<TMP_Dropdown.OptionData> targetOptionDataList = new();
-        useItemUI.GetComponent<ConfirmUseItemUI>().itemUsed = itemUsed;
-        useItemUI.GetComponent<ConfirmUseItemUI>().itemUsedIcon = linkedIcon;
-        useItemUI.GetComponent<ConfirmUseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
+        useItemUI.GetComponent<UseItemUI>().itemUsed = itemUsed;
+        useItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
+        useItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
         useItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = itemUsed.itemName switch
         {
+            "E_Tool" => "Dig bunker?",
             "Ammo_AR" => "Reload Assault Rifle?",
             "Ammo_LMG" => "Reload Light Machine Gun?",
             "Ammo_Pi" => "Reload Pistol?",
@@ -3328,8 +3381,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_SMG" => "Reload Sub-Machine Gun?",
             "Ammo_Sn" => "Reload Sniper?",
             "Food_Pack" => "Consume food pack?",
-            "ULF_Radio" => "Attempt to use ULF radio?",
-            "Water_Canteen" => "Drink water?",
             "Medkit_Large" => "Use Large Medkit?",
             "Medkit_Medium" => "Use Medium Medkit?",
             "Medkit_Small" => "Use Small Medkit?",
@@ -3343,6 +3394,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Syringe_Shard" => "Administer Shard?",
             "Syringe_Trenbolone" => "Administer Trenbolone?",
             "Syringe_Unlabelled" => "Administer Unlabelled Syringe?",
+            "UHF_Radio" => "Call UHF strike?",
+            "ULF_Radio" => "Attempt to use ULF radio?",
+            "Water_Canteen" => "Drink water?",
             _ => "Unrecognised item",
         };
 
@@ -3361,7 +3415,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             if (targetOptionDataList.Count > 0)
             {
-                game.UpdateSoldierUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                game.UpdateSoldierUsedOn(useItemUI.GetComponent<UseItemUI>());
                 useItemUI.SetActive(true);
             }
         }
@@ -3380,7 +3434,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             if (targetOptionDataList.Count > 0)
             {
-                game.UpdateSoldierUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                game.UpdateSoldierUsedOn(useItemUI.GetComponent<UseItemUI>());
                 useItemUI.SetActive(true);
             }
         }
@@ -3399,7 +3453,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             if (targetOptionDataList.Count > 0)
             {
-                game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                 useItemUI.SetActive(true);
             }
         }
@@ -3420,7 +3474,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -3439,7 +3493,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -3458,7 +3512,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -3477,7 +3531,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -3496,7 +3550,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -3515,7 +3569,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -3534,7 +3588,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<ConfirmUseItemUI>());
+                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -3542,7 +3596,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
         {
             useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(false);
-            useItemUI.SetActive(true);
+            if (itemUsed.itemName.Equals("E_Tool"))
+            {
+                if (activeSoldier.TerrainOn != "Urban")
+                    useItemUI.SetActive(true);
+            }
+            else
+                useItemUI.SetActive(true);
         }
     }
     public void CloseUseItemUI()
@@ -3558,6 +3618,39 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         ULFResultUI.SetActive(false);
     }
+    public void OpenUHFUI(UseItemUI useItemUI)
+    {
+        UHFUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        UHFUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        UHFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        Tuple<int, string, int, int, int> strike = useItemUI.itemUsed.GetUHFStrike();
+        UHFUI.transform.Find("OptionPanel").Find("StrikeName").Find("Text").GetComponent<TextMeshProUGUI>().text = strike.Item2;
+        UHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text = $"{strike.Item3}";
+        UHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = $"{strike.Item4}";
+        UHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text = $"{strike.Item5}";
+
+        UHFUI.SetActive(true);
+    }
+    public void CloseUHFUI()
+    {
+        ClearUHFUI();
+        UHFUI.SetActive(false);
+    }
+    public void ClearUHFUI()
+    {
+        UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        UHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "";
+        UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
+        UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
+        UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZLabel").gameObject.SetActive(false);
+        UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").gameObject.SetActive(false);
+        UHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
+    }
+
+
 
 
 

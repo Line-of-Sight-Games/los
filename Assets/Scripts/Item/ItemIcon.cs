@@ -127,10 +127,26 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public void UseItem()
     {
         if (menu.onItemUseScreen && !menu.overrideView)
+        {
             if (item.owner is Soldier linkedSoldier)
-                if (linkedSoldier.game.CheckAP(item.usageAP))
+            {
+                int ap = item.usageAP;
+                //adept ability
+                if (linkedSoldier.IsAdept())
+                    ap--;
+                //gunner ability
+                if (linkedSoldier.IsGunner() && item.IsAmmo())
+                    ap = 1;
+
+                if (linkedSoldier.game.CheckAP(ap))
+                {
                     if (item.IsUsable())
                         menu.OpenUseItemUI(item, transform.parent.name, this);
+                }
+            }
+        }
+            
+                
     }
     public bool CheckValidSlot(ItemSlot targetSlot)
     {

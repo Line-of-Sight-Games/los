@@ -20,6 +20,7 @@ public class OverwatchShotUI : MonoBehaviour
         IAmShootable target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
         Item gun = shooter.EquippedGun;
         int actingHitChance;
+        menu.SetShotResolvedFlagTo(false);
 
         //apply overwatch interrupt if resilience check failed
         Transform overwatchLocation = transform.Find("TargetPanel").Find("OverwatchLocation");
@@ -108,11 +109,11 @@ public class OverwatchShotUI : MonoBehaviour
                     //show los check button if shot doesn't hit
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
-                    //show guardsman retry if gun has ammo
+                    /*//show guardsman retry if gun has ammo
                     if (shooter.IsGuardsman() && shooter.EquippedGun.CheckAnyAmmo())
                         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
                     else
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);*/
 
                     //paying xp for dodge
                     if (chances.Item1 <= 90)

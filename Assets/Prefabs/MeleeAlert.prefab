@@ -512,7 +512,7 @@ GameObject:
   - component: {fileID: 7636288976933444018}
   - component: {fileID: 5627292259881211051}
   - component: {fileID: 4663678771508208206}
-  - component: {fileID: 6576918767680111461}
+  - component: {fileID: 463656935014998676}
   m_Layer: 5
   m_Name: MeleeAlert
   m_TagString: Untagged
@@ -581,7 +581,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6576918767680111461
+--- !u!114 &463656935014998676
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -590,7 +590,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3979812687729385670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e09db47f05f64f74998f3dd66a25dc3f, type: 3}
+  m_Script: {fileID: 11500000, guid: 106161cf44ce66c4ba2881ec0fab8d2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   s1: {fileID: 0}
