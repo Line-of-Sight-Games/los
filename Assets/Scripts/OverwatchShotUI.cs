@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class OverwatchShotUI : MonoBehaviour
 {
@@ -13,8 +14,54 @@ public class OverwatchShotUI : MonoBehaviour
         game = FindObjectOfType<MainGame>();
         menu = FindObjectOfType<MainMenu>();
     }
+    public OverwatchShotUI Init(Soldier shooter, Soldier target)
+    {
+        //set shooter
+        transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
 
-    public void ConfirmShotOverwatch()
+        TMP_Dropdown shotTypeDropdown = transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
+        shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+        Image gunImage = transform.Find("Gun").Find("GunImage").GetComponent<Image>();
+        TMP_Dropdown aimDropdown = transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown targetDropdown = transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
+        List<TMP_Dropdown.OptionData> targetDetails = new();
+
+        //display shooter
+        if (shooter.IsBeingRevealedBy(target.id))
+        {
+            transform.Find("ShooterPortrait").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(shooter);
+            transform.Find("ShooterPortrait").gameObject.SetActive(true);
+        }
+        else
+            transform.Find("ShooterPortrait").gameObject.SetActive(false);
+
+        //set as regular shot
+        shotTypeDropdown.value = 0;
+        shotTypeDropdown.interactable = false;
+
+        //set as aimed shot
+        aimDropdown.value = 0;
+        aimDropdown.interactable = false;
+
+        //generate gun image
+        gunImage.sprite = shooter.EquippedGun.itemImage;
+
+        //set target
+        TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait);
+        targetDetails.Add(option);
+        targetDropdown.AddOptions(targetDetails);
+        targetDropdown.interactable = false;
+
+        transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "0";
+
+        //prefill with target's current position
+        transform.Find("TargetPanel").Find("OverwatchLocation").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = target.X.ToString();
+        transform.Find("TargetPanel").Find("OverwatchLocation").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = target.Y.ToString();
+        transform.Find("TargetPanel").Find("OverwatchLocation").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = target.Z.ToString();
+
+        return this;
+    }
+    public void ConfirmShotOverwatch(bool retry)
     {
         Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
         IAmShootable target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
@@ -64,7 +111,7 @@ public class OverwatchShotUI : MonoBehaviour
                     //standard shot crit hits
                     if (randNum2 <= chances.Item2)
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunTraits.CritDamage, false, new List<string>() { "Critical", "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.CritDamage, false, new() { "Critical", "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         //paying xp for hit
@@ -75,7 +122,7 @@ public class OverwatchShotUI : MonoBehaviour
                     }
                     else
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunTraits.Damage, false, new List<string>() { "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.Damage, false, new() { "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                         //paying xp for hit
@@ -109,11 +156,11 @@ public class OverwatchShotUI : MonoBehaviour
                     //show los check button if shot doesn't hit
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
-                    /*//show guardsman retry if gun has ammo
-                    if (shooter.IsGuardsman() && shooter.EquippedGun.CheckAnyAmmo())
+                    //show guardsman retry if gun has ammo
+                    if (shooter.IsGuardsman() && shooter.EquippedGun.CheckAnyAmmo() && !retry && !((Soldier)target).IsRevoker())
                         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
                     else
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);*/
+                        menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
 
                     //paying xp for dodge
                     if (chances.Item1 <= 90)
@@ -122,7 +169,7 @@ public class OverwatchShotUI : MonoBehaviour
                         menu.AddXpAlert(targetSoldier, 10, "Dodged overwatch shot with a " + chances.Item1 + "% chance from " + shooter.soldierName + "!", false);
 
                     //push the no damage attack through for abilities trigger
-                    targetSoldier.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
+                    targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });
                 }
 
                 //unset overwatch after any shot
@@ -136,13 +183,14 @@ public class OverwatchShotUI : MonoBehaviour
                 //refresh detections (potentially trigger more overwatch)
                 game.StartCoroutine(game.DetectionAlertSingle(targetSoldier, "losChange", Vector3.zero, string.Empty, true));
 
-                //destroy other overwatch instances
-                foreach (Transform child in menu.overwatchShotUI.transform)
-                    Destroy(child.gameObject);
+                CloseOverwatchShotUI();
             }
         }
     }
-
+    public void CloseOverwatchShotUI()
+    {
+        gameObject.SetActive(false);
+    }
     public void OpenShotOverwatchConfirmUI()
     {
         Transform overwatchLocation = transform.Find("TargetPanel").Find("OverwatchLocation");

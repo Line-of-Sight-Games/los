@@ -141,12 +141,22 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 if (linkedSoldier.game.CheckAP(ap))
                 {
                     if (item.IsUsable())
-                        menu.OpenUseItemUI(item, transform.parent.name, this);
+                    {
+                        if (linkedSoldier.IsWearingJuggernautArmour(false) && (item.IsGun() || item.IsGrenade()))
+                        {
+                            if (linkedSoldier.HasNothingInBothHands() || linkedSoldier.HasSingleWeaponInEitherHand()) //if hands empty or holding single weapon
+                                menu.OpenUseItemUI(item, transform.parent.name, this);
+                            else if (linkedSoldier.HasSingleNonWeaponInEitherHand() && transform.parent.name.Contains("Hand")) //if holding single non weapon and the item for use is that item in hand
+                                menu.OpenUseItemUI(item, transform.parent.name, this);
+                            else
+                                menu.OpenCannotUseItemUI("Hands Full");
+                        }
+                        else
+                            menu.OpenCannotUseItemUI("Juggernaut Armour Blocking");
+                    }
                 }
             }
         }
-            
-                
     }
     public bool CheckValidSlot(ItemSlot targetSlot)
     {

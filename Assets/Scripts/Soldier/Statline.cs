@@ -23,9 +23,9 @@ public class Statline
         stats.Add(new Stat(this, "SR", "Sight Radius", "maximum sight radius", 100, 10));
         stats.Add(new Stat(this, "Ri", "Rifle", "skill with rifles", 1, 1));
         stats.Add(new Stat(this, "AR", "Assault Rifle", "skill with assault rifles", 1, 1));
-        stats.Add(new Stat(this, "LMG", "LMG", "skill with lmgs", 1, 1));
-        stats.Add(new Stat(this, "Sn", "Sniper", "skill with sniper rifles", 1, 1));
-        stats.Add(new Stat(this, "SMG", "SMG", "skill with smgs", 1, 1));
+        stats.Add(new Stat(this, "LMG", "Light Machine Gun", "skill with lmgs", 1, 1));
+        stats.Add(new Stat(this, "Sn", "Sniper Rifle", "skill with sniper rifles", 1, 1));
+        stats.Add(new Stat(this, "SMG", "Sub-Machine Gun", "skill with smgs", 1, 1));
         stats.Add(new Stat(this, "Sh", "Shotgun", "skill with shotguns", 1, 1));
         stats.Add(new Stat(this, "M", "Melee", "skill with melee weapons", 1, 1));
         stats.Add(new Stat(this, "Str", "Strength", "ability to carry more and throw further", 1, 1));

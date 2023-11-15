@@ -54,7 +54,18 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         Tuple.Create(48, "Sidewinder Airstrike", 60, 6, 34),
         Tuple.Create(49, "Sidewinder Airstrike", 60, 9, 34),
     };
-public void LoadData(GameData data)
+    public string[] drugTable = new string[]
+    {
+        "Amphetamine",
+        "Androstenedione",
+        "Cannabinoid",
+        "Danazol",
+        "Glucocorticoid",
+        "Modafinil",
+        "Shard",
+        "Trenbolone",
+    };
+    public void LoadData(GameData data)
     {
         //destroy items ready to be regenerated
         IEnumerable<Item> allItems = FindObjectsOfType<Item>();

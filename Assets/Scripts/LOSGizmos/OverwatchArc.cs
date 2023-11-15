@@ -7,7 +7,7 @@ public class OverwatchArc : LOSGizmo
     public OverwatchArc Init(Soldier from)
     {
         transform.position = from.transform.position;
-        Vector3 direction = (new Vector3(from.overwatchXPoint, 0, from.overwatchYPoint) - from.transform.position).normalized;
+        Vector3 direction = new Vector3(from.overwatchXPoint - from.X, 0, from.overwatchYPoint - from.Y).normalized;
 
         float angleStep = (from.overwatchConeArc/2f) / numberOfLines;
 

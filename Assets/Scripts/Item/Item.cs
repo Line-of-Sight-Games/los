@@ -294,12 +294,16 @@ public class Item : PhysicalObject, IDataPersistence
             if (itemName == "Armour_Exo")
             {
                 owningSoldier.stats.H.BaseVal -= 3;
-                owningSoldier.TakeDamage(null, 3, true, new List<string>() { "Exo" });
+                owningSoldier.TakeDamage(null, 3, true, new() { "Exo" });
             }
 
             //reset sustenance for stim armour
             if (itemName == "Armour_Stimulant")
+            {
                 owningSoldier.ResetRoundsWithoutFood();
+                for (int i = 0; i < itemManager.drugTable.Length; i++)
+                    owningSoldier.UnsetOnDrug(itemManager.drugTable[i]);
+            }
 
             //spawn small medkit inside brace
             if (itemName == "Brace")
@@ -521,84 +525,84 @@ public class Item : PhysicalObject, IDataPersistence
                         charges++; //add a "charge" to ensure ammo is not deleted
                     break;
                 case "Food_Pack":
-                    if (poisonedBy == null)
+                    if (poisonedBy == null || poisonedBy == "")
                         linkedSoldier.roundsWithoutFood -= 10;
                     else
-                        linkedSoldier.TakePoisoning(poisonedBy);
+                        linkedSoldier.TakePoisoning(poisonedBy, true);
                     break;
                 case "Medkit_Small":
                 case "Medkit_Medium":
                 case "Medkit_Large":
-                    if (poisonedBy == null)
+                    if (poisonedBy == null || poisonedBy == "")
                         soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Poison_Satchel":
                     itemUsedOn.poisonedBy = linkedSoldier.Id;
                     break;
                 case "Syringe_Amphetamine":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(0, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Amphetamine", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Androstenedione":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(1, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Androstenedione", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Cannabinoid":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(2, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Cannabinoid", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Danazol":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(3, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Danazol", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Glucocorticoid":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(4, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Glucocorticoid", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Modafinil":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(5, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Modafinil", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Shard":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(6, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Shard", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Trenbolone":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(7, linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug("Trenbolone", linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "Syringe_Unlabelled":
-                    if (poisonedBy == null)
-                        soldierUsedOn.TakeDrug(game.RandomNumber(0, 7), linkedSoldier);
+                    if (poisonedBy == null || poisonedBy == "")
+                        soldierUsedOn.TakeDrug(itemManager.drugTable[game.RandomNumber(0, itemManager.drugTable.Length)], linkedSoldier);
                     else
-                        soldierUsedOn.TakePoisoning(poisonedBy);
+                        soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;
                 case "ULF_Radio":
                     UseULF();
                     break;
                 case "Water_Canteen":
-                    if (poisonedBy == null)
+                    if (poisonedBy == null || poisonedBy == "")
                         linkedSoldier.roundsWithoutFood -= 5;
                     else
-                        linkedSoldier.TakePoisoning(poisonedBy);
+                        linkedSoldier.TakePoisoning(poisonedBy, true);
                     weight--;
                     break;
                 default:
@@ -671,6 +675,24 @@ public class Item : PhysicalObject, IDataPersistence
     public bool IsGun()
     {
         if (traits.Contains("Gun"))
+            return true;
+        return false;
+    }
+    public bool IsGrenade()
+    {
+        if (name.Contains("Grenade"))
+            return true;
+        return false;
+    }
+    public bool IsRiotShield()
+    {
+        if (name.Equals("Riot_Shield"))
+            return true;
+        return false;
+    }
+    public bool IsWeapon()
+    {
+        if (IsGun() || traits.Contains("Weapon"))
             return true;
         return false;
     }

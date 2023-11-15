@@ -49,6 +49,7 @@ public class ItemReader : MonoBehaviour
         public int ShortSupPen;
         public int MedSupPen;
         public int LongSupPen;
+        public int CorSupPen;
         public int CQBCovDamage;
         public int ShortCovDamage;
         public int MedCovDamage;

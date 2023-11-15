@@ -72,4 +72,12 @@ public class Stat
 
         return ReadIncrement;
     }
+    public int Decrement()
+    {
+        BaseVal -= ReadIncrement;
+        if (BaseVal < 0)
+            BaseVal = 0;
+
+        return ReadIncrement;
+    }
 }

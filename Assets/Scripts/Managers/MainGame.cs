@@ -25,9 +25,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Terminal terminalPrefab;
     public GoodyBox gbPrefab;
     public ExplosiveBarrel barrelPrefab;
-    public bool gameOver;
+    public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
-    public int currentRound, maxRounds, currentTeam, maxTeams, maxTurnTime;
+    public int currentRound, maxRounds, currentTeam, maxTeams, maxTurnTime, tempTeam;
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
@@ -165,6 +165,43 @@ public class MainGame : MonoBehaviour, IDataPersistence
         menu.roundIndicator.text = "Game Over";
         menu.teamTurnIndicator.text = result;
         soundManager.PlayGameOverMusic();
+    }
+    public void SwitchTeam(int team)
+    {
+        tempTeam = currentTeam;
+        currentTeam = team;
+    }
+    public void StartModaTurn(Soldier modaSoldier)
+    {
+        //change game parameters
+        modaTurn = true;
+        SwitchTeam(modaSoldier.soldierTeam);
+
+        //activate the surviving soldier
+        modaSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu();
+        modaSoldier.GenerateAP();
+        modaSoldier.modaProtect = false;
+    }
+    public void EndModaTurn()
+    {
+        activeSoldier.Kill(null, new() { "Modafinil" });
+        modaTurn = false;
+        SwitchTeam(currentTeam);
+    }
+    public void StartFrozenTurn(Soldier frozenSoldier)
+    {
+        //change game parameters
+        frozenTurn = true;
+        SwitchTeam(frozenSoldier.soldierTeam);
+
+        //activate the surviving soldier
+        frozenSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu();
+        frozenSoldier.GenerateAP();
+    }
+    public void EndFrozenTurn()
+    {
+        frozenTurn = false;
+        SwitchTeam(currentTeam);
     }
     public void EndTurnNonCoroutine()
     {
@@ -593,15 +630,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //break suppression
         movingSoldier.UnsetSuppression();
 
-        //clear planner donated movement
-        movingSoldier.plannerDonatedMove = 0;
-
         //clear e tool dug in
         movingSoldier.UnsetDugIn();
 
         //check for fall damage
         if (fallDistanceInt > 0)
-            movingSoldier.TakeDamage(movingSoldier, CalculateFallDamage(movingSoldier, fallDistanceInt), false, new List<string>() { "Fall" });
+            movingSoldier.TakeDamage(movingSoldier, CalculateFallDamage(movingSoldier, fallDistanceInt), false, new() { "Fall" });
 
         //launch melee if melee toggle is on
         if (meleeToggle)
@@ -686,7 +720,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 targetOptionDataList.Add(targetOptionData);
 
                 //remove option if target is jammer and shooter can't see in own right
-                if (s.IsJammer() && !activeSoldier.CanSeeInOwnRight(s))
+                if (s.IsJammer() && !activeSoldier.CanSeeInOwnRight(s) && !shooter.IsRevoker())
                     targetOptionDataList.Remove(targetOptionData);
 
                 //remove option if soldier is engaged and this soldier is not on the engagement list
@@ -800,12 +834,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
         List<Tuple<float, Soldier>> allFlankingAngles = new();
         List<Tuple<float, Soldier>> confirmedFlankingAngles = new();
 
-        if (shooter.IsTactician())
+        if (shooter.IsTactician() && !target.IsRevoker())
             flankingAngle = 20;
 
         if (target != null)
         {
-            if (!target.IsTactician())
+            if (!target.IsTactician() || shooter.IsRevoker())
             {
                 Vector2 shotLine = new(target.X - shooter.X, target.Y - shooter.Y);
                 shotLine.Normalize();
@@ -899,7 +933,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         weaponHitChance = baseWeaponHitChance;
 
         //apply sharpshooter buff
-        if (baseWeaponHitChance > 0 && shooter.IsSharpshooter())
+        if (baseWeaponHitChance > 0 && shooter.IsSharpshooter() && !((Soldier)target).IsRevoker())
             sharpshooterBonus = 5;
         weaponHitChance += sharpshooterBonus;
 
@@ -1037,11 +1071,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         string rainfall = weather.CurrentRain;
 
-        if (shooter.IsCalculator())
+        if (shooter.IsCalculator() && !((Soldier)target).IsRevoker())
             rainfall = weather.DecreasedRain(rainfall);
-        if (target is Soldier targetSoldier)
-            if (targetSoldier.IsCalculator())
-                rainfall = weather.IncreasedRain(rainfall);
+        if (((Soldier)target).IsCalculator() && !shooter.IsRevoker())
+            rainfall = weather.IncreasedRain(rainfall);
 
         var rainMod = rainfall switch
         {
@@ -1218,7 +1251,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         float overwatchMod;
         if (shooter.IsOnOverwatch())
-            overwatchMod = 0.4f;
+        {
+            if (shooter.IsGuardsman())
+                overwatchMod = 0.2f;
+            else
+                overwatchMod = 0.4f;
+        }
         else
             overwatchMod = 0;
 
@@ -1431,7 +1469,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //standard shot crit hits
                     if (randNum2 <= chances.Item2)
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunTraits.CritDamage, false, new List<string>() { "Critical", "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.CritDamage, false, new() { "Critical", "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
@@ -1445,7 +1483,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else
                     {
-                        targetSoldier.TakeDamage(shooter, gun.gunTraits.Damage, false, new List<string>() { "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.gunTraits.Damage, false, new() { "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
@@ -1466,7 +1504,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                     //show avenger retry if opponent has killed
-                    if (targetSoldier.hasKilled && shooter.EquippedGun.CheckAnyAmmo() && !retry)
+                    if (targetSoldier.hasKilled && shooter.EquippedGun.CheckAnyAmmo() && !retry && !targetSoldier.IsRevoker())
                         menu.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
 
                     //paying xp for dodge
@@ -1476,7 +1514,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.AddXpAlert(targetSoldier, 10, $"Dodged shot with a {chances.Item1}% chance from {shooter.soldierName}!", false);
 
                     //push the no damage attack through for abilities trigger
-                    targetSoldier.TakeDamage(shooter, 0, true, new List<string>() { "Shot" });
+                    targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });
                 }
             }
         }
@@ -1489,7 +1527,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 "Melee" or "CQB" => gun.gunTraits.CQBSupPen,
                 "Short" => gun.gunTraits.ShortSupPen,
                 "Medium" => gun.gunTraits.MedSupPen,
-                "Long" or "Coriolis" => gun.gunTraits.LongSupPen,
+                "Long" => gun.gunTraits.LongSupPen,
+                "Coriolis" => gun.gunTraits.CorSupPen,
                 _ => 0,
             };
             (target as Soldier).SetSuppression(suppressionValue);
@@ -1583,7 +1622,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //clear the flanker ui
         menu.ClearFlankersUI(menu.flankersMeleeDefenderUI);
         int flankersCount = 0;
-        if (!defender.IsTactician())
+        if (!defender.IsTactician() || attacker.IsRevoker())
         {
             foreach (Soldier s in AllSoldiers())
             {
@@ -1870,7 +1909,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             meleeDamage = (AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * KdMod(attacker) * FlankingAgainstAttackerMod() * SuppressionMod(attacker) + AttackerStrengthMod(attacker) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * SuppressionMod(defender) + DefenderStrengthMod(defender));
 
             //check bloodletter damage bonus
-            if (meleeDamage > 0 && attacker.IsBloodRaged())
+            if (meleeDamage > 0 && attacker.IsBloodRaged() && !defender.IsRevoker())
                 bloodrageMultiplier = 2;
 
             meleeParameters.Add(Tuple.Create("bloodrage", $"{bloodrageMultiplier}"));
@@ -2098,7 +2137,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                     damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
                                 else
                                     damageMessage = "<color=green>Successful Attack\n(" + meleeDamage + " Damage)</color>";
-                                defender.TakeDamage(attacker, meleeDamage, false, new List<string>() { "Melee" });
+                                defender.TakeDamage(attacker, meleeDamage, false, new() { "Melee" });
                                 attacker.FighterMeleeHitReward();
                             }
                         }
@@ -2114,7 +2153,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 counterattack = true;
                                 meleeDamage *= -1;
                                 damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
-                                attacker.TakeDamage(defender, meleeDamage, false, new List<string>() { "Melee" });
+                                attacker.TakeDamage(defender, meleeDamage, false, new() { "Melee" });
                             }
                         }
                         else
@@ -2122,7 +2161,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
                             
                             //push the no damage attack through for abilities trigger
-                            defender.TakeDamage(attacker, meleeDamage, true, new List<string>() { "Melee" });
+                            defender.TakeDamage(attacker, meleeDamage, true, new() { "Melee" });
                         }
                     }
 
@@ -2585,7 +2624,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Terminal Disabled!";
                 terminal.terminalEnabled = false;
                 if (activeSoldier.hp > 3)
-                    activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new List<string>() { "Dipelec" });
+                    activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new() { "Dipelec" });
             }
 
             menu.OpenDipelecResultUI();
@@ -2870,7 +2909,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation))
             {
                 if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Fall"))
-                    activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(menu.damageEventUI.transform.Find("FallDistance").Find("FallInputZ").GetComponent<TMP_InputField>().text)), false, new List<string> { "Fall" });
+                    activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(menu.damageEventUI.transform.Find("FallDistance").Find("FallInputZ").GetComponent<TMP_InputField>().text)), false, new() { "Fall" });
                 else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Collapse"))
                 {
                     int structureHeight = int.Parse(menu.damageEventUI.transform.Find("StructureHeight").Find("StructureHeightInputZ").GetComponent<TMP_InputField>().text);
@@ -2937,7 +2976,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         foreach (Soldier friendly in AllSoldiers())
         {
-            if (friendly.IsAbleToSee() && inspirer.IsSameTeamAs(friendly) && friendly.PhysicalObjectWithinMaxRadius(inspirer))
+            if (friendly.IsAbleToSee() && inspirer.IsSameTeamAs(friendly) && friendly.PhysicalObjectWithinMaxRadius(inspirer) && !friendly.IsRevoker())
             {
                 menu.AddInspirerAlert(friendly, "An Inspirer (" + inspirer.soldierName + ") is within SR range of " + friendly.soldierName + ". Is LOS present?");
                 openInspirerUI = true; 

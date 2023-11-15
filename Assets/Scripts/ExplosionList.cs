@@ -52,7 +52,7 @@ public class ExplosionList : MonoBehaviour
                 {
                     //set terminal destroyer to 3 hp
                     if (explodedBy.hp > 3)
-                        explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new List<string>() { "Dipelec" });
+                        explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" });
                     menu.poiManager.DestroyPOI(terminal);
                 }
             }

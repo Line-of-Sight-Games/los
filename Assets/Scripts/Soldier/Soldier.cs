@@ -8,8 +8,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
-using UnityEditor.ShaderKeywordFilter;
-using UnityEditor.Experimental.GraphView;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable
 {
@@ -20,11 +18,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, modaProtect, trenXRayEffect, trenSRShrinkEffect;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, plannerDonatedMove, dugIn, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
-    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting;
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, 
+        plannerDonatedMove, dugIn, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, witnessActiveAbilities, isSpottedBy;
@@ -148,6 +147,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "healthRemovedFromStarve", healthRemovedFromStarve },
             { "poisonedBy", poisonedBy },
             { "dugIn", dugIn },
+            { "glucoState", glucoState },
+            { "modaProtect", modaProtect },
+            { "trenXRayEffect", trenXRayEffect },
+            { "trenSRShrinkEffect", trenSRShrinkEffect },
 
             //save ability details
             { "plannerDonatedMove", plannerDonatedMove },
@@ -238,6 +241,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
         poisonedBy = (string)details["poisonedBy"];
         dugIn = Convert.ToInt32(details["dugIn"]);
+        glucoState = (string)details["glucoState"];
+        modaProtect = (bool)details["modaProtect"];
 
         //load abiltiy details
         plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
@@ -500,8 +505,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (EquippedGun.CheckAnyAmmo())
             {
-                StartCoroutine(menu.CreateOverwatchShotUI(this, ClosestEnemyVisible()));
-                StartCoroutine(menu.OpenOverwatchShotUI());
+                if (!IsMeleeControlled())
+                {
+                    game.StartFrozenTurn(this);
+                }
             }
         }
     }
@@ -712,6 +719,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 //map from BaseVal stats to Val stats using enviro effects etc.
                 ApplyVisMods();
+                ApplyTrenboloneMods();
                 ApplyTerrainMods();
                 ApplyAbilityMods(); 
                 ApplyTraumaMods();
@@ -756,6 +764,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             SRColliderMin.radius = 3;
         }
     }
+    public void ApplyTrenboloneMods()
+    {
+        //trenbolone radius shrink effect
+        if (trenSRShrinkEffect)
+            stats.SR.Val = Mathf.RoundToInt(0.4f * stats.SR.Val);
+    }
     public void ApplyTerrainMods()
     {
         if (IsOnNativeTerrain())
@@ -795,8 +809,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsShadow())
         {
-            System.Tuple<int, string>[] stealthPerceptionCamo = { System.Tuple.Create(stats.F.BaseVal, stats.F.Name), System.Tuple.Create(stats.P.BaseVal, stats.P.Name), System.Tuple.Create(stats.C.BaseVal, stats.C.Name) };
-            System.Array.Sort(stealthPerceptionCamo);
+            Tuple<int, string>[] stealthPerceptionCamo = { Tuple.Create(stats.F.BaseVal, stats.F.Name), Tuple.Create(stats.P.BaseVal, stats.P.Name), Tuple.Create(stats.C.BaseVal, stats.C.Name) };
+            Array.Sort(stealthPerceptionCamo);
 
             stats.GetStat(stealthPerceptionCamo[0].Item2).Val = stealthPerceptionCamo[2].Item1;
         }
@@ -1011,52 +1025,138 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (dugIn == 0)
             SetCover();
     }
-    public void TakeDrug(int drugIndex, Soldier owner)
+    public void TakeDrug(string drugName, Soldier administeredBy)
     {
-        switch (drugIndex)
+        if (administeredBy.IsSameTeamAsIncludingSelf(this) && administeredBy.IsMedic())
         {
-            case 0:
-                SetOnDrug("Amphetamine");
-
+            if (!IsOnDrug(drugName))
+            {
+                TakeSpecificDrug(administeredBy, drugName, true, false);
+                menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It worked with no side-effect.", true, true);
+            }
+        }
+        else
+        {
+            if (IsOnDrug(drugName))
+                InstantKill(administeredBy, new List<string>() { "Overdose" });
+            else if (IsOnAnyDrug())
+                TakePoisoning(administeredBy.Id, false);
+            else
+            {
+                int num = game.RandomNumber(1, 10);
+                if (num == 10)
+                {
+                    TakeSpecificDrug(administeredBy, drugName, false, !IsExperimentalist());
+                    menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It didn't work but conferred a side-effect.", false, true);
+                    if (IsExperimentalist())
+                        menu.AddDamageAlert(this, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", true, true);
+                    else
+                        menu.AddDamageAlert(this, $"{soldierName} suffered a side-effect.", false, true);
+                }
+                else if (num == 1) 
+                    menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It didn't work at all.", false, true);
+                else
+                {
+                    TakeSpecificDrug(administeredBy, drugName, true, !IsExperimentalist());
+                    menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It worked but conferred a side-effect.", true, true);
+                    if (IsExperimentalist())
+                        menu.AddDamageAlert(this, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", true, true);
+                    else
+                        menu.AddDamageAlert(this, $"{soldierName} suffered a side-effect.", false, true);
+                }
+            }
+        }
+    }
+    public void TakeSpecificDrug(Soldier administeredBy, string drugName, bool effect, bool sideEffect)
+    {
+        switch (drugName)
+        {
+            case "Amphetamine":
+                if (effect)
+                    stats.GetStat(soldierSpeciality).BaseVal *= 3;
+                if (sideEffect)
+                {
+                    foreach (Stat stat in stats.AllStats)
+                    {
+                        print(soldierSpeciality);
+                        if (!stat.Name.Equals("H") && !stat.Longname.Equals(soldierSpeciality))
+                        {
+                            print(stat.Longname);
+                            stat.Decrement();
+                            stat.Decrement();
+                        }
+                    }
+                }
                 break;
-            case 1:
-                SetOnDrug("Androstenedione");
-
+            case "Androstenedione":
+                if (effect) { }
+                if (sideEffect)
+                {
+                    stats.GetStat("S").Decrement();
+                    stats.GetStat("S").Decrement();
+                }
                 break;
-            case 2:
-                SetOnDrug("Cannabinoid");
-
+            case "Cannabinoid":
+                if (effect)
+                    stats.GetStat("P").BaseVal *= 2;
+                if (sideEffect)
+                {
+                    stats.GetStat("F").BaseVal = 0;
+                    stats.GetStat("C").BaseVal = 0;
+                }
                 break;
-            case 3:
-                SetOnDrug("Danazol");
-
+            case "Danazol":
+                if (effect)
+                    hp *= 2;
+                if (sideEffect)
+                {
+                    stats.GetStat("L").BaseVal = 0;
+                    stats.GetStat("R").BaseVal = 0;
+                }
                 break;
-            case 4:
-                SetOnDrug("Glucocorticoid");
-
+            case "Glucocorticoid":
+                if (effect)
+                    glucoState += "effect";
+                if (sideEffect)
+                    glucoState += "side";
                 break;
-            case 5:
-                SetOnDrug("Modafinil");
-
+            case "Modafinil":
+                if (effect)
+                    modaProtect = true;
+                if (sideEffect)
+                    TakeDamage(administeredBy, 1, false, new() { "Modafinil" });
                 break;
-            case 6:
-                SetOnDrug("Shard");
-
+            case "Shard":
+                if (effect)
+                {
+                    stats.GetStat("Ri").Increment();
+                    stats.GetStat("AR").Increment();
+                    stats.GetStat("LMG").Increment();
+                    stats.GetStat("Sn").Increment();
+                    stats.GetStat("SMG").Increment();
+                    stats.GetStat("Sh").Increment();
+                    stats.GetStat("M").Increment();
+                }
+                if (sideEffect)
+                    soldierAbilities.Clear();
                 break;
-            case 7:
-                SetOnDrug("Trenbolone");
-
+            case "Trenbolone":
+                if (effect)
+                    trenXRayEffect = true;
+                if (sideEffect)
+                    trenSRShrinkEffect = true;
                 break;
             default:
                 break;
         }
+        SetOnDrug(drugName);
     }
     public IEnumerator TakePoisonDamage()
     {
         //print("take poison damage coroutine");
         yield return new WaitUntil(() => menu.xpResolvedFlag == true);
         //print("take poison damage coroutine melee flag passed");
-        TakeDamage(soldierManager.FindSoldierById(poisonedBy), 2, false, new List<string>() { "Poison" });
+        TakeDamage(soldierManager.FindSoldierById(poisonedBy), 2, false, new() { "Poison" });
     }
 
     public int ApplyDamageMods(Soldier damagedBy, int damage, List<string> damageSource)
@@ -1121,7 +1221,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             menu.AddDamageAlert(this, $"{soldierName} <color=green>Insulated</color> {damage - damage/2} {menu.PrintList(damageSource)} damage.", true, false);
             damage /= 2;
         }
-            
+
+        //apply andro damage reduction
+        if (IsOnDrug("Androstenedione"))
+        {
+            menu.AddDamageAlert(this, $"{soldierName} resisted 1 {menu.PrintList(damageSource)} damage with Androstenedione.", true, false);
+            damage -= 1;
+        }
 
         //apply stim armour damage reduction
         if (IsWearingStimulantArmour())
@@ -1163,7 +1269,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
 
             //informer ability display info
-            if (IsInformer())
+            if (IsInformer() && !damagedBy.IsRevoker())
                 AddSoldierSnapshot(damagedBy);
         }
 
@@ -1251,7 +1357,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (damagedBy != null)
             {
                 //apply stun affect from tranquiliser
-                if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")))
+                if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
                     MakeStunned(1);
             }
         }
@@ -1596,47 +1702,80 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 SetLoudRevealed(vulnerableTurns);
         }
     }
-
-    public void GenerateAP()
+    public List<int> APLoop()
     {
+        List<int> apMp = new();
+        int ap = 3, mp = 1;
         var leadership = stats.L.Val;
         var runLoop = true;
-        var localAp = 3;
-        var localMp = 1;
 
         while (runLoop)
         {
             if (UnityEngine.Random.Range(1, 7) <= leadership)
             {
-                localMp++;
+                mp++;
                 if (UnityEngine.Random.Range(1, 7) <= 3)
-                    localAp++;
+                    ap++;
                 else
-                    localAp += 2;
+                    ap += 2;
 
                 if (leadership > 6)
-                    localAp += 3;
+                    ap += 3;
                 else
-                    localAp += (leadership / 2);
+                    ap += (leadership / 2);
 
                 leadership -= 6;
             }
-            else 
+            else
                 runLoop = false;
         }
 
+        apMp.Add(ap);
+        apMp.Add(mp);
+        return apMp;
+    }
+    public void GenerateAP()
+    {
+        List<int> apMp = APLoop();
+
         //check for wearing logistics belt
         if (IsWearingLogisticsBelt())
-            localAp++;
+            apMp[0]++;
 
         //add inspirer ap bonus to support specialities
-        localAp += InspirerBonusSupport();
+        apMp[0] += InspirerBonusSupport();
 
         //minus dissauder ap
-        localAp += DissuaderPenalty();
+        apMp[0] += DissuaderPenalty();
 
-        ap = localAp;
-        mp = localMp;
+        //check gluco immobilisation
+        if (glucoState == "side")
+            apMp[1] = 0;
+
+        //run gluco rush
+        if (glucoState.Contains("effect"))
+        {
+            apMp = apMp.Zip(APLoop(), (x, y) => x + y).ToList();
+            apMp = apMp.Zip(APLoop(), (x, y) => x + y).ToList();
+            apMp = apMp.Zip(APLoop(), (x, y) => x + y).ToList();
+            apMp = apMp.Zip(APLoop(), (x, y) => x + y).ToList();
+        }
+
+        ap = apMp[0];
+        mp = apMp[1];
+
+        //post check to set gluco to finished state either side or neutral
+        switch (glucoState)
+        {
+            case "effectside":
+                glucoState = "side";
+                break;
+            case "effect":
+                glucoState = "";
+                break;
+            default:
+                break;
+        }
     }
 
     public void Unreveal()
@@ -1979,9 +2118,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
             return false;
     }
-    public void TakePoisoning(string poisonedBy)
+    public void TakePoisoning(string poisonedBy, bool resistable)
     {
-        if (ResilienceCheck())
+        if (resistable && ResilienceCheck())
         {
             menu.AddXpAlert(this, stats.R.Val, "Resisted poisoning.", true);
             menu.AddDamageAlert(this, $"{soldierName} resisted poisoning.", true, true);
@@ -2009,6 +2148,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         UnsetState("Poisoned");
     }
+    public bool IsOnAnyDrug()
+    {
+        if (IsOnDrug("Modafinil") || IsOnDrug("Amphetamine") || IsOnDrug("Androstenedione") || IsOnDrug("Cannabinoid") ||
+            IsOnDrug("Shard") || IsOnDrug("Glucocorticoid") || IsOnDrug("Danazol") || IsOnDrug("Trenbolone"))
+            return true;
+        return false;
+    }
     public bool IsOnDrug(string drugName)
     {
         return CheckState(drugName);
@@ -2035,10 +2181,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         overwatchConeRadius = r;
         overwatchConeArc = a;
         guardsmanRetryUsed = false;
-        if (IsGuardsman())
-            overwatchShotCounter = 2;
-        else
-            overwatchShotCounter = 1;
+        overwatchShotCounter = 1;
         SetState("Overwatch");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
@@ -2136,7 +2279,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void MakeStunned(int stunRounds)
     {
         if (ResilienceCheck())
+        {
             menu.AddDamageAlert(this, $"Resisted a {stunRounds} round stun.", true, true);
+            menu.AddXpAlert(this, 2, "Resisted stunning.", true);
+        }
         else
         {
             menu.AddDamageAlert(this, $"Suffered a {stunRounds} round stun.", false, true);
@@ -2213,59 +2359,68 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsAlive())
         {
-            int tp = 1;
-            bool lastandicide = false;
-
-            //make him dead
-            ClearHealthState();
-            SetState("Dead");
-            menu.AddDamageAlert(this, $"{soldierName} died!", false, true);
-            hp = 0;
-
-            //remove all reveals and revealedby
-            RevealingSoldiers.Clear();
-            RevealedBySoldiers.Clear();
-
-            //remove all instances of anyone else revealing them
-            foreach (Soldier s in game.AllSoldiers())
-                s.RevealingSoldiers.Remove(id);
-
-            //remove all engagements
-            if (IsMeleeEngaged())
-                StartCoroutine(game.DetermineMeleeControllerMultiple(this));
-            //check if critical trauma
-            if (damageSource.Contains("Critical") || damageSource.Contains("Melee") || damageSource.Contains("Explosive") || damageSource.Contains("Deathroll"))
-                tp++;
-            //check if lastandicide
-            if (damageSource.Contains("Lastandicide"))
-                lastandicide = true;
-            //run trauma check
-            StartCoroutine(game.TraumaCheck(this, tp, IsCommander(), lastandicide));
-            //remove all LOS
-            menu.ConfirmDetections();
-            //re-render as dead
-            CheckSpecialityColor(soldierSpeciality);
-
-            if (killedBy != null)
+            if (modaProtect)
             {
-                //pay xp for relevant damage type kill
-                if (damageSource.Contains("Shot"))
-                    menu.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
-                else if (damageSource.Contains("Melee"))
+                menu.AddDamageAlert(this, $"{soldierName} resisted death with Modafinil. He gets an immediate turn.", true, true);
+                game.StartModaTurn(this);
+            }
+            else 
+            {
+                menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}.", false, false);
+                int tp = 1;
+                bool lastandicide = false;
+
+                //make him dead
+                ClearHealthState();
+                SetState("Dead");
+                menu.AddDamageAlert(this, $"{soldierName} died!", false, true);
+                hp = 0;
+
+                //remove all reveals and revealedby
+                RevealingSoldiers.Clear();
+                RevealedBySoldiers.Clear();
+
+                //remove all instances of anyone else revealing them
+                foreach (Soldier s in game.AllSoldiers())
+                    s.RevealingSoldiers.Remove(id);
+
+                //remove all engagements
+                if (IsMeleeEngaged())
+                    StartCoroutine(game.DetermineMeleeControllerMultiple(this));
+                //check if critical trauma
+                if (damageSource.Contains("Critical") || damageSource.Contains("Melee") || damageSource.Contains("Explosive") || damageSource.Contains("Deathroll"))
+                    tp++;
+                //check if lastandicide
+                if (damageSource.Contains("Lastandicide"))
+                    lastandicide = true;
+                //run trauma check
+                StartCoroutine(game.TraumaCheck(this, tp, IsCommander(), lastandicide));
+                //remove all LOS
+                menu.ConfirmDetections();
+                //re-render as dead
+                CheckSpecialityColor(soldierSpeciality);
+
+                if (killedBy != null)
                 {
-                    if (damageSource.Contains("Counter"))
-                        menu.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
-                    else
-                        menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
+                    //pay xp for relevant damage type kill
+                    if (damageSource.Contains("Shot"))
+                        menu.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
+                    else if (damageSource.Contains("Melee"))
+                    {
+                        if (damageSource.Contains("Counter"))
+                            menu.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
+                        else
+                            menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
-                    killedBy.FighterMeleeKillReward();
+                        killedBy.FighterMeleeKillReward();
+                    }
+                    else if (damageSource.Contains("Poison"))
+                        menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
+
+                    //set haskilled flag for avenger
+                    if (killedBy.IsOppositeTeamAs(this))
+                        killedBy.hasKilled = true;
                 }
-                else if (damageSource.Contains("Poison"))
-                    menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
-
-                //set haskilled flag for avenger
-                if (killedBy.IsOppositeTeamAs(this))
-                    killedBy.hasKilled = true;
             }
         }
     }
@@ -2382,12 +2537,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return null;
     }
-    public Soldier ClosestAllyMobile()
+    public Soldier ClosestAllyForPlannerBuff()
     {
         List<Tuple<float, Soldier>> soldierDistances = new();
 
         foreach (Soldier s in game.AllSoldiers())
-            if (s.IsSameTeamAs(this) && s.IsAbleToWalk())
+            if (s.IsSameTeamAs(this) && s.IsAbleToWalk() && !s.IsRevoker())
                 soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
@@ -2462,11 +2617,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (ResilienceCheck())
             {
+                menu.AddDamageAlert(this, $"{soldierName} resisted {suppressionValue} suppression.", true, true);
                 menu.AddXpAlert(this, 2, "Resisted Suppression.", true);
                 return true;
             }
             else
+            {
+                menu.AddDamageAlert(this, $"{soldierName} resisted {suppressionValue} suppression.", true, true);
                 return false;
+            }
         }
             
         return true;
@@ -2501,6 +2660,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool IsCommander()
     {
         if (soldierSpeciality == "Leadership")
+            return true;
+        return false;
+    }
+    public bool IsMedic()
+    {
+        if (soldierSpeciality == "Healing")
             return true;
         return false;
     }
@@ -2568,9 +2733,93 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
 
     //item checks
-    public bool HasAnyItemInHand()
+    public bool HasNothingInBothHands()
     {
-        if (LeftHandItem != null || RightHandItem != null)
+        if (RightHandItem == null && LeftHandItem == null)
+            return true;
+        return false;
+    }
+    public bool HasWeaponInRightHand()
+    {
+        if (RightHandItem != null && RightHandItem.IsWeapon())
+            return true;
+        return false;
+    }
+    public bool HasWeaponInRightHandOnly()
+    {
+        if (HasWeaponInRightHand() && LeftHandItem == null)
+            return true;
+        return false;
+    }
+    public bool HasWeaponInLeftHand()
+    {
+        if (LeftHandItem != null && LeftHandItem.IsWeapon())
+            return true;
+        return false;
+    }
+    public bool HasWeaponInLeftHandOnly()
+    {
+        if (HasWeaponInLeftHand() && RightHandItem == null)
+            return true;
+        return false;
+    }
+    public bool HasNonWeaponInRightHand()
+    {
+        if (RightHandItem != null && !RightHandItem.IsWeapon())
+            return true;
+        return false;
+    }
+    public bool HasNonWeaponInRightHandOnly()
+    {
+        if (HasNonWeaponInRightHand() && LeftHandItem == null)
+            return true;
+        return false;
+    }
+    public bool HasNonWeaponInLeftHand()
+    {
+        if (LeftHandItem != null && !LeftHandItem.IsWeapon())
+            return true;
+        return false;
+    }
+    public bool HasNonWeaponInLeftHandOnly()
+    {
+        if (HasNonWeaponInLeftHand() && RightHandItem == null)
+            return true;
+        return false;
+    }
+    public bool HasWeaponsInBothHands()
+    {
+        if (HasWeaponInLeftHand() && HasWeaponInRightHand())
+            return true;
+        return false;
+    }
+    public bool HasNonWeaponsInBothHands()
+    {
+        if (HasNonWeaponInLeftHand() && HasNonWeaponInRightHand())
+            return true;
+        return false;
+    }
+    public bool HasSingleWeaponInEitherHand()
+    {
+        if (HasWeaponInLeftHandOnly() || HasWeaponInRightHandOnly())
+            return true;
+        return false;
+    }
+    public bool HasSingleNonWeaponInEitherHand()
+    {
+        if (HasNonWeaponInLeftHandOnly() || HasNonWeaponInRightHandOnly())
+            return true;
+        return false;
+    }
+    public bool HasWeaponInLeftHandAndNonWeaponInRightHand()
+    {
+        if (HasWeaponInLeftHand() && HasNonWeaponInRightHand())
+            return true;
+        return false;
+    }
+    public bool HasNonWeaponInLeftHandAndWeaponInRightHand()
+    {
+        if (HasNonWeaponInLeftHand() && HasWeaponInRightHand())
             return true;
         return false;
     }
@@ -2589,7 +2838,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsDualWielding()
     {
-        if (LeftHandItem != null && RightHandItem != null)
+        if (HasWeaponsInBothHands() || HasNonWeaponsInBothHands() || HasNonWeaponInLeftHandAndWeaponInRightHand() || HasWeaponInLeftHandAndNonWeaponInRightHand())
+            return true;
+        return false;
+    }
+    public bool HasActiveRiotShield()
+    {
+        if (HasSingleNonWeaponInEitherHand() && Inventory.HasItemOfType("Riot_Shield"))
             return true;
         return false;
     }
@@ -2823,7 +3078,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             UnsetState("Inspired");
             if (soldierSpeciality == "Health")
-                TakeDamage(null, 1, true, new List<string>() { "Inspirer Debuff" });
+                TakeDamage(null, 1, true, new() { "Inspirer Debuff" });
         }
     }
     public bool IsInspired()
@@ -2945,12 +3200,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool IsRevoker()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Revoker"))
+                return true;
+        return false;
+    }
     public bool IsShadow()
     {
         if (IsConscious())
             if (soldierAbilities.Contains("Shadow"))
                 return true;
-
         return false;
     }
     public bool IsSharpshooter()
@@ -3220,23 +3481,38 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         string drugState = "";
 
         if (IsOnDrug("Modafinil"))
-            drugState += ", <color=purple>Modafinil</color>";
+            drugState += ", <color=purple>Moda</color>";
         if (IsOnDrug("Amphetamine"))
-            drugState += ", <color=purple>Amphetamine</color>";
+            drugState += ", <color=purple>Amph</color>";
         if (IsOnDrug("Androstenedione"))
-            drugState += ", <color=purple>Androstenedione</color>";
+            drugState += ", <color=purple>Andro</color>";
         if (IsOnDrug("Cannabinoid"))
-            drugState += ", <color=purple>Cannabinoid</color>";
+            drugState += ", <color=purple>Canna</color>";
         if (IsOnDrug("Shard"))
             drugState += ", <color=purple>Shard</color>";
         if (IsOnDrug("Glucocorticoid"))
-            drugState += ", <color=purple>Glucocorticoid</color>";
+        {
+            drugState += ", <color=purple>Gluco</color>";
+            if (glucoState == "side")
+            {
+                if (mp == 0)
+                    drugState += "<color=purple>(Immobilised)</color>";
+                else
+                    drugState += "<color=purple>(Rush)</color>";
+            }
+        }
         if (IsOnDrug("Danazol"))
-            drugState += ", <color=purple>Danazol</color>";
+            drugState += ", <color=purple>Dana</color>";
         if (IsOnDrug("Trenbolone"))
-            drugState += ", <color=purple>Trenbolone</color>";
+            drugState += ", <color=purple>Tren</color>";
 
         return drugState;
+    }
+    public string GetPlannerBuffState()
+    {
+        if (plannerDonatedMove > 0)
+            return ", <color=green>Planner Buff</color>";
+        return "";
     }
     public string GetPatriotState()
     {
@@ -3290,6 +3566,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetDugInState();
             status += GetDrugState();
 
+            status += GetPlannerBuffState();
             status += GetPatriotState();
             status += GetInspiredState();
             status += GetDissuadedState();
@@ -3387,8 +3664,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             revealingSoldiersList = value;
 
             if (IsDissuader())
+            {
                 foreach (string id in revealingSoldiersList)
-                    soldierManager.FindSoldierById(id).SetDissuaded();
+                {
+                    Soldier soldier = soldierManager.FindSoldierById(id);
+                    if (soldier != null && !soldier.IsRevoker())
+                        soldier.SetDissuaded();
+                }
+            }
         }
     }
     public Item LeftHandItem
@@ -3423,9 +3706,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 rightMelee = RightHandItem.meleeDamage;
 
             if (rightMelee > leftMelee)
+            {
+                if (LeftHandItem != null)
+                    DropItemFromSlot(LeftHandItem, "LeftHand");
                 return RightHandItem;
+            }
             else
+            {
+                if (RightHandItem != null)
+                    DropItemFromSlot(RightHandItem, "RightHand");
                 return LeftHandItem;
+            }
         }
     }
     public Item EquippedGun
