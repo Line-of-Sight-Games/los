@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System;
 using System.Collections;
+using UnityEngine.Rendering;
 
 public class CreateSoldiers : MonoBehaviour, IDataPersistence
 {
@@ -197,7 +198,11 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	}
 	public void RandomName()
     {
-		soldierName.text = randomNames[UnityEngine.Random.Range(0, randomNames.Length)];
+		string name = "Anubis";
+		while (bannedNames.Contains(name))
+			name = randomNames[UnityEngine.Random.Range(0, randomNames.Length)];
+
+        soldierName.text = name;
     }
 	public int[] CreateRandomIntArray(int length)
 	{
@@ -211,7 +216,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	}
 	public void RandomTerrain()
     {
-		print("random terrain");
 		if (soldierIdentifier.text.Contains("Commander"))
 		{
 			bool checkingValid = true;

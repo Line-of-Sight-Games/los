@@ -2933,8 +2933,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CloseDipelecResultUI()
     {
-        ClearDipelecResultUI();
-        dipelecResultUI.SetActive(false);
+        if (OverrideKey())
+        {
+            ClearDipelecResultUI();
+            dipelecResultUI.SetActive(false);
+        }
     }
     
     

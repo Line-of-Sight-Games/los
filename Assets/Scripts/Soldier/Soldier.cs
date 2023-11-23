@@ -1278,7 +1278,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (damagedBy != null && this.IsOppositeTeamAs(damagedBy))
         {
             //apply witness ability slurp
-            if (IsWitness())
+            if (IsWitness() && !damagedBy.IsRevoker())
             {
                 //apply the fresh abilities
                 soldierAbilities.Clear();

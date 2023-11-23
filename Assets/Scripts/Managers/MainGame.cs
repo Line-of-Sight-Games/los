@@ -2616,6 +2616,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {
         float damagef = 0;
+        int stun = 0;
         //imperceptible delay to allow colliders to be recalculated at new destination
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF : {position.x}, {position.y}, {position.z}").gameObject;
 
@@ -2633,7 +2634,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else if (obj is POI hitPoi)
                     menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, Mathf.RoundToInt(damagef));
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, hitSoldier.RoundByResilience(damagef) - hitSoldier.stats.R.Val, 0);
+                {
+                    if (!hitSoldier.ResilienceCheck())
+                        stun = 1;
+                    menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, hitSoldier.RoundByResilience(damagef) - hitSoldier.stats.R.Val, stun);
+                }
             }
         }
 
