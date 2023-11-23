@@ -11,4 +11,10 @@ public class ExplosiveAlert : MonoBehaviour
         this.explodedBy = explodedBy;
         this.hitByExplosion = hitByExplosion;
     }
+
+    private void Update()
+    {
+        if (hitByExplosion == null)
+            Destroy(gameObject);
+    }
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
 {
@@ -58,31 +60,26 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         data.allPOIDetails.Add(id, details);
     }
 
-    public void CheckExplosion(Soldier explodedBy, GameObject explosionList)
+    public void CheckExplosionBarrel(Soldier explodedBy, GameObject explosionList)
     {
-        foreach (Soldier s in game.AllSoldiers())
+        int damage = 0, stun = 1;
+        foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
         {
-            if (s.IsAlive())
+            if (obj.PhysicalObjectWithinRadius(this, 3))
+                damage = 8;
+            else if (obj.PhysicalObjectWithinRadius(this, 8))
+                damage = 4;
+            else if (obj.PhysicalObjectWithinRadius(this, 15))
+                damage = 2;
+
+            if (damage > 0)
             {
-                if (s.PhysicalObjectWithinRadius(this, 3))
-                    menu.AddExplosionAlert(explosionList, s, explodedBy, 8, true, true);
-                else if (s.PhysicalObjectWithinRadius(this, 8))
-                    menu.AddExplosionAlert(explosionList, s, explodedBy, 4, true, true);
-                else if (s.PhysicalObjectWithinRadius(this, 15))
-                    menu.AddExplosionAlert(explosionList, s, explodedBy, 2, true, true);
-            }
-        }
-        foreach (POI poi in FindObjectsOfType<POI>())
-        {
-            if (poi != this && poi.PhysicalObjectWithinRadius(this, 15))
-            {
-                if (poi is ExplosiveBarrel barrel)
-                {
-                    if (!barrel.triggered)
-                        menu.AddExplosionAlertPOI(explosionList, barrel, explodedBy);
-                }
-                else if (poi is Terminal terminal)
-                    menu.AddExplosionAlertPOI(explosionList, terminal, explodedBy);
+                if (obj is Item hitItem)
+                    menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, damage);
+                else if (obj is POI hitPoi && hitPoi != this)
+                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                else if (obj is Soldier hitSoldier)
+                    menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, damage, stun); 
             }
         }
 

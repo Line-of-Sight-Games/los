@@ -13,6 +13,12 @@ public class ExplosionList : MonoBehaviour
     {
         menu = FindObjectOfType<MainMenu>();
     }
+    public ExplosionList Init(string explosionMessage)
+    {
+        transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text = explosionMessage;
+
+        return this;
+    }
     public void ConfirmExplosion(GameObject explosionList)
     {
         ScrollRect explosionScroller = explosionList.transform.Find("Scroll").GetComponent<ScrollRect>();
@@ -26,22 +32,13 @@ public class ExplosionList : MonoBehaviour
                 PhysicalObject hitByExplosion = child.GetComponent<ExplosiveAlert>().hitByExplosion;
                 Soldier explodedBy = child.GetComponent<ExplosiveAlert>().explodedBy;
 
-                if (hitByExplosion is Soldier hitSoldier)
+                if (hitByExplosion is Item item)
                 {
-                    if (int.TryParse(child.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage))
-                    {
-                        if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
-                            hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
-
-                        if (child.Find("StunToggle").GetComponent<Toggle>().isOn)
-                            hitSoldier.MakeStunned(1);
-                    }
-
-                    //destroy all items
-                    if (damage > 5)
-                        hitSoldier.DestroyAllBreakableItems();
-                    else if (damage > 0)
-                        hitSoldier.DestroyAllFragileItems();
+                    //perform item destruction
+                    if (item.owner is Soldier linkedSoldier)
+                        linkedSoldier.DestroyBreakableItem(explodedBy, item);
+                    else
+                        menu.itemManager.DestroyBreakableItem(explodedBy, item);
                 }
                 else if (hitByExplosion is ExplosiveBarrel hitBarrel) //mark barrels for explosion }
                 {
@@ -55,6 +52,16 @@ public class ExplosionList : MonoBehaviour
                         explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" });
                     menu.poiManager.DestroyPOI(terminal);
                 }
+                else if (hitByExplosion is Soldier hitSoldier)
+                {
+                    if (int.TryParse(child.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage))
+                        if (child.Find("Damage").Find("DamageToggle").GetComponent<Toggle>().isOn)
+                            hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
+
+                    if (int.TryParse(child.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int stun))
+                        if (child.Find("Stun").Find("StunToggle").GetComponent<Toggle>().isOn)
+                            hitSoldier.MakeStunned(stun);
+                }
             }
 
             //actually explode the barrels
@@ -64,7 +71,7 @@ public class ExplosionList : MonoBehaviour
                 Soldier explodedBy = child.GetComponent<ExplosiveAlert>().explodedBy;
                 if (hitByExplosion is ExplosiveBarrel hitBarrel)
                     if (hitBarrel.triggered)
-                        hitBarrel.CheckExplosion(explodedBy, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform));
+                        hitBarrel.CheckExplosionBarrel(explodedBy, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel : {hitBarrel.X},{hitBarrel.Y},{hitBarrel.Z}").gameObject);
             }
 
             Destroy(explosionList);

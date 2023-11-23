@@ -359,20 +359,20 @@ public class Item : PhysicalObject, IDataPersistence
             if (itemName == "Brace")
             {
                 if (slotName == "LeftBrace")
-                    owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc5"), "Misc5");
+                    owningSoldier.Inventory.GetItemInSlot("Misc5").ConsumeItem();
                 else if (slotName == "RightBrace")
-                    owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc4"), "Misc4");
+                    owningSoldier.Inventory.GetItemInSlot("Misc4").ConsumeItem();
             }
 
             //despawn med medkit in bag
             if (itemName == "Bag")
-                owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc3"), "Misc3");
+                owningSoldier.Inventory.GetItemInSlot("Misc3").ConsumeItem();
 
             //despawn small & med medkit in backpack
             if (itemName == "Backpack")
             {
-                owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc1"), "Misc1");
-                owningSoldier.Inventory.ConsumeItemInSlot(owningSoldier.Inventory.GetItemInSlot("Misc2"), "Misc2");
+                owningSoldier.Inventory.GetItemInSlot("Misc2").ConsumeItem();
+                owningSoldier.Inventory.GetItemInSlot("Misc1").ConsumeItem();
             }
         }
     }
@@ -504,7 +504,7 @@ public class Item : PhysicalObject, IDataPersistence
                 menu.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
         }
     }
-    public void UseItemInSlot(string slotName, ItemIcon linkedIcon, Item itemUsedOn, Soldier soldierUsedOn)
+    public void UseItem(ItemIcon linkedIcon, Item itemUsedOn, Soldier soldierUsedOn)
     {
         if (owner is Soldier linkedSoldier)
         {
@@ -618,11 +618,16 @@ public class Item : PhysicalObject, IDataPersistence
                 charges--;
                 if (charges <= 0)
                 {
-                    linkedSoldier.Inventory.ConsumeItemInSlot(this, slotName);
+                    ConsumeItem();
                     Destroy(linkedIcon.gameObject);
                 }
             }
         }
+    }
+    public void ConsumeItem()
+    {
+        owner?.Inventory.RemoveItemFromSlot(this, whereEquipped);
+        itemManager.DestroyItem(this);
     }
     public bool IsBreakable()
     {
@@ -654,6 +659,12 @@ public class Item : PhysicalObject, IDataPersistence
             return true;
         return false;
     }
+    public bool IsTriggered()
+    {
+        if (traits.Contains("Triggered"))
+            return true;
+        return false;
+    }
     public bool IsPoisonable()
     {
         if (traits.Contains("Poisonable"))
@@ -681,6 +692,18 @@ public class Item : PhysicalObject, IDataPersistence
     public bool IsGrenade()
     {
         if (name.Contains("Grenade"))
+            return true;
+        return false;
+    }
+    public bool IsFrag()
+    {
+        if (IsGrenade() && name.Contains("Frag"))
+            return true;
+        return false;
+    }
+    public bool IsFlashbang()
+    {
+        if (IsGrenade() && name.Contains("Flashbang"))
             return true;
         return false;
     }

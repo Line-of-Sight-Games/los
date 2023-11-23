@@ -142,7 +142,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 {
                     if (item.IsUsable())
                     {
-                        if (linkedSoldier.IsWearingJuggernautArmour(false) && (item.IsGun() || item.IsGrenade()))
+                        if (!linkedSoldier.IsWearingJuggernautArmour(false) || (linkedSoldier.IsWearingJuggernautArmour(false) && (item.IsGun() || item.IsGrenade())))
                         {
                             if (linkedSoldier.HasNothingInBothHands() || linkedSoldier.HasSingleWeaponInEitherHand()) //if hands empty or holding single weapon
                                 menu.OpenUseItemUI(item, transform.parent.name, this);

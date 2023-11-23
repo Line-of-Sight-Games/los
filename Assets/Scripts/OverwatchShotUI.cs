@@ -157,7 +157,7 @@ public class OverwatchShotUI : MonoBehaviour
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                     //show guardsman retry if gun has ammo
-                    if (shooter.IsGuardsman() && shooter.EquippedGun.CheckAnyAmmo() && !retry && !((Soldier)target).IsRevoker())
+                    if (shooter.IsGuardsman() && shooter.EquippedGun.CheckAnyAmmo() && !retry && !targetSoldier.IsRevoker())
                         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);

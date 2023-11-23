@@ -287,7 +287,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	{
 		if (CheckValidDetails())
 		{
-			print(soldierName.text + ": " + terrainDropdown.options[terrainDropdown.value].text + " " + GetSpeciality() + " " + abilityDropdown.options[abilityDropdown.value].text);
 			Instantiate(baseSoldier).Init(soldierName.text, currentTeam, terrainDropdown.options[terrainDropdown.value].text, activePortraitDropdown.options[activePortraitDropdown.value].image, activePortraitDropdown.options[activePortraitDropdown.value].text, GetSpeciality(), abilityDropdown.options[abilityDropdown.value].text);
 
 			//refresh input fields and exclude previously chosen options

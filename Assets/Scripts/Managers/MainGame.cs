@@ -10,6 +10,7 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using System.Security.Cryptography;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -347,20 +348,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (s.IsOnturnAndAlive())
             {
-                //activate witness abilities
-                if (s.IsWitness())
-                {
-                    foreach (string ability in s.witnessActiveAbilities)
-                        s.soldierAbilities.Remove(ability);
-                    s.witnessActiveAbilities.Clear();
-
-                    foreach (string ability in s.witnessStoredAbilities)
-                    {
-                        s.witnessActiveAbilities.Add(ability);
-                        s.soldierAbilities.Add(ability);
-                    }
-                }
-
                 //patriot ability
                 s.SetPatriotic();
 
@@ -933,7 +920,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         weaponHitChance = baseWeaponHitChance;
 
         //apply sharpshooter buff
-        if (baseWeaponHitChance > 0 && shooter.IsSharpshooter() && !((Soldier)target).IsRevoker())
+        if (baseWeaponHitChance > 0 && shooter.IsSharpshooter() && target is Soldier targetSoldier && !targetSoldier.IsRevoker())
             sharpshooterBonus = 5;
         weaponHitChance += sharpshooterBonus;
 
@@ -1071,9 +1058,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         string rainfall = weather.CurrentRain;
 
-        if (shooter.IsCalculator() && !((Soldier)target).IsRevoker())
+        if (shooter.IsCalculator() && target is Soldier targetSoldier1 && !targetSoldier1.IsRevoker())
             rainfall = weather.DecreasedRain(rainfall);
-        if (((Soldier)target).IsCalculator() && !shooter.IsRevoker())
+        if (target is Soldier targetSoldier2 && targetSoldier2.IsCalculator() && !shooter.IsRevoker())
             rainfall = weather.IncreasedRain(rainfall);
 
         var rainMod = rainfall switch
@@ -1437,7 +1424,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
-                    targetBarrel.CheckExplosion(shooter, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform));
+                    targetBarrel.CheckExplosionBarrel(shooter, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel : {targetBarrel.X},{targetBarrel.Y},{targetBarrel.Z}").gameObject);
                 }
                 else
                 {
@@ -2078,6 +2065,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CheckAP(ap))
             {
+                //determine if damage is from melee or melee charge
+                List<string> damageType = new() { "Melee"};
+                if (ap == 0)
+                    damageType.Add("Charge");
+
                 menu.SetMeleeResolvedFlagTo(false);
                 DeductAP(ap);
 
@@ -2137,7 +2129,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                     damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
                                 else
                                     damageMessage = "<color=green>Successful Attack\n(" + meleeDamage + " Damage)</color>";
-                                defender.TakeDamage(attacker, meleeDamage, false, new() { "Melee" });
+                                defender.TakeDamage(attacker, meleeDamage, false, damageType);
                                 attacker.FighterMeleeHitReward();
                             }
                         }
@@ -2153,7 +2145,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 counterattack = true;
                                 meleeDamage *= -1;
                                 damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
-                                attacker.TakeDamage(defender, meleeDamage, false, new() { "Melee" });
+                                attacker.TakeDamage(defender, meleeDamage, false, damageType);
                             }
                         }
                         else
@@ -2161,7 +2153,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
                             
                             //push the no damage attack through for abilities trigger
-                            defender.TakeDamage(attacker, meleeDamage, true, new() { "Melee" });
+                            defender.TakeDamage(attacker, meleeDamage, true, damageType);
                         }
                     }
 
@@ -2318,10 +2310,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Item itemUsedOn = useItemUI.itemUsedOn;
         Soldier soldierUsedOn = useItemUI.soldierUsedOn;
         ItemIcon linkedIcon = useItemUI.itemUsedIcon;
-        string slotName = useItemUI.itemUsedFromSlotName;
         int ap = itemUsed.usageAP;
         //adept ability
-        if (activeSoldier.IsAdept())
+        if (activeSoldier.IsAdept() && itemUsed.usageAP > 1)
             ap--;
         //gunner ability
         if (activeSoldier.IsGunner() && itemUsed.IsAmmo())
@@ -2333,7 +2324,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Food_Pack":
             case "Water_Canteen":
             case "ULF_Radio":
-                itemUsed.UseItemInSlot(slotName, linkedIcon, null, null);
+                itemUsed.UseItem(linkedIcon, null, null);
                 menu.CloseUseItemUI();
                 break;
             case "Ammo_AR":
@@ -2344,7 +2335,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Ammo_SMG":
             case "Ammo_Sn":
             case "Poison_Satchel":
-                itemUsed.UseItemInSlot(slotName, linkedIcon, itemUsedOn, null);
+                itemUsed.UseItem(linkedIcon, itemUsedOn, null);
+                menu.CloseUseItemUI();
+                break;
+            case "Grenade_Flashbang":
+            case "Grenade_Frag":
+            case "Grenade_Smoke":
+            case "Grenade_Tabun":
+                menu.OpenGrenadeUI(useItemUI);
                 menu.CloseUseItemUI();
                 break;
             case "Medkit_Small":
@@ -2359,7 +2357,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Syringe_Shard":
             case "Syringe_Trenbolone":
             case "Syringe_Unlabelled":
-                itemUsed.UseItemInSlot(slotName, linkedIcon, null, soldierUsedOn);
+                itemUsed.UseItem(linkedIcon, null, soldierUsedOn);
                 menu.CloseUseItemUI();
                 break;
             case "UHF_Radio":
@@ -2383,16 +2381,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmUHF(UseItemUI useUHFUI)
     {
-        print("confirmUHF");
         TMP_InputField targetX = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField targetZ = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").GetComponent<TMP_InputField>();
-        if (targetX.interactable && !useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy) //first press
+        if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
             if (int.TryParse(useUHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text, out int rolls) && int.TryParse(useUHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text, out int radius) && int.TryParse(useUHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text, out int damage))
             {
                 if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour)
                 {
+
                     int highestRoll = 0, newX, newY;
                     float scatterDistance;
                     int scatterDegree = RandomNumber(0, 360);
@@ -2437,6 +2435,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Total Missfire";
                         useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
                     }
+                    useUHFUI.transform.Find("PressedOnce").gameObject.SetActive(true);
                 }
             }
             
@@ -2448,7 +2447,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
             {
                 menu.CloseUHFUI();
-                useUHFUI.itemUsed.UseItemInSlot(useUHFUI.itemUsedFromSlotName, useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+                useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
             }
             else
             {
@@ -2461,14 +2460,147 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             if (useUHFUI.itemUsed.owner is Soldier linkedSoldier)
                             {
                                 menu.CloseUHFUI();
-                                useUHFUI.itemUsed.UseItemInSlot(useUHFUI.itemUsedFromSlotName, useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
-                                CheckUHFExplosion(linkedSoldier, new Vector3(x, y, z), radius, damage);
+                                useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+                                CheckExplosionUHF(linkedSoldier, new Vector3(x, y, z), radius, damage);
                             }
                         }
                     }
                 }
             }
         }
+    }
+    public void ConfirmGrenade(UseItemUI useGrenade)
+    {
+        TMP_InputField targetX = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetY = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetZ = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        if (!useGrenade.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
+        {
+            if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour && targetZ.textComponent.color == menu.normalTextColour)
+            {
+                int newX, newY;
+                int scatterDegree = RandomNumber(0, 360);
+                int scatterDistance = activeSoldier.StrengthCheck() switch
+                {
+                    false => Mathf.CeilToInt(DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
+                    _ => -1,
+                };
+
+                if (scatterDistance != -1)
+                {
+                    if (int.Parse(targetX.text) == activeSoldier.X && int.Parse(targetY.text) == activeSoldier.Y)
+                        (newX, newY) = (int.Parse(targetX.text), int.Parse(targetY.text));
+                    else
+                        (newX, newY) = CalculateScatteredCoordinates(int.Parse(targetX.text), int.Parse(targetY.text), scatterDegree, scatterDistance);
+
+                    if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
+                    {
+                        targetX.text = $"{newX}";
+                        targetY.text = $"{newY}";
+                    }
+                    else
+                    {
+                        useGrenade.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattered off map";
+                        useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
+                    }
+                }
+                useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(true);
+                useGrenade.transform.Find("PressedOnce").gameObject.SetActive(true);
+            }
+        }
+        else //second press
+        {
+            if (useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
+            {
+                useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
+                menu.CloseGrenadeUI();
+            }
+            else
+            {
+                if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour && targetZ.textComponent.color == menu.normalTextColour)
+                {
+                    if (useGrenade.itemUsed.owner is Soldier linkedSoldier)
+                    {
+                        useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
+                        CheckExplosionGrenade(useGrenade.itemUsed, linkedSoldier, new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)));
+                        menu.CloseGrenadeUI();
+                    }
+                }
+            }
+        }
+    }
+    public void CheckExplosionGrenade(Item grenade, Soldier explodedBy, Vector3 position)
+    {
+        grenade.traits.Add("Triggered");
+        int damage = 0, stun = 0;
+        //imperceptible delay to allow colliders to be recalculated at new destination
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{grenade.itemName} : {grenade.X},{grenade.Y},{grenade.Z}").gameObject;
+
+        if (grenade.IsFrag())
+        {
+            grenade.ConsumeItem();
+            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+            {
+                if (obj.PhysicalObjectWithinRadius(position, 3))
+                    damage = 8;
+                else if (obj.PhysicalObjectWithinRadius(position, 8))
+                    damage = 4;
+                else if (obj.PhysicalObjectWithinRadius(position, 15))
+                    damage = 2;
+
+                if (damage > 0)
+                {
+                    if (obj is Item hitItem)
+                        menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, damage);
+                    else if (obj is POI hitPoi)
+                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                    else if (obj is Soldier hitSoldier)
+                    {
+                        if (!hitSoldier.ResilienceCheck())
+                            stun = 1;
+                        menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, damage, stun);
+                    }
+                }
+            }
+        }
+        else if (grenade.IsFlashbang())
+        {
+            grenade.ConsumeItem();
+            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+            {
+                if (obj.PhysicalObjectWithinRadius(position, 0))
+                {
+                    damage = DiceRoll();
+                    stun = 4;
+                }
+                else if (obj.PhysicalObjectWithinRadius(position, 3))
+                    stun = 4;
+                else if (obj.PhysicalObjectWithinRadius(position, 8))
+                    stun = 3;
+                else if (obj.PhysicalObjectWithinRadius(position, 15))
+                    stun = 2;
+
+                if (stun > 0 || damage > 0)
+                {
+                    if (obj is Soldier hitSoldier)
+                        menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, damage - hitSoldier.stats.R.Val, stun - hitSoldier.stats.R.Val);
+                    else if (obj is POI hitPoi && damage > 0)
+                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                    else if (obj is Item hitItem && damage > 0)
+                        menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, damage);
+                }
+            }
+        }
+        else
+        {
+            grenade.ConsumeItem();
+            print("pretending to detonate smoke or tabun");
+        }
+
+        if (explosionList.transform.Find("Scroll").Find("View").Find("Content").childCount > 0)
+            menu.OpenExplosionUI();
+        else
+            Destroy(explosionList);
     }
     static Tuple<int, int> CalculateScatteredCoordinates(int targetX, int targetY, float scatterDegree, float scatterDistance)
     {
@@ -2481,25 +2613,28 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         return Tuple.Create(newX, newY);
     }
-    public void CheckUHFExplosion(Soldier explodedBy, Vector3 position, int radius, int damage)
+    public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {
+        float damagef = 0;
         //imperceptible delay to allow colliders to be recalculated at new destination
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform);
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF : {position.x}, {position.y}, {position.z}").gameObject;
 
-        foreach (Soldier s in AllSoldiers())
+        foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
         {
-            if (s.IsAlive())
+            if (obj.PhysicalObjectWithinRadius(position, radius / 2))
+                damagef = damage;
+            else if (obj.PhysicalObjectWithinRadius(position, radius))
+                damagef = damage / 2.0f;
+
+            if (damagef > 0)
             {
-                if (s.PhysicalObjectWithinRadius(position, radius/2))
-                    menu.AddExplosionAlert(explosionList, s, explodedBy, damage - s.stats.R.Val, true, false);
-                else if (s.PhysicalObjectWithinRadius(position, radius))
-                    menu.AddExplosionAlert(explosionList, s, explodedBy, s.RoundByResilience(damage/2.0f) - s.stats.R.Val, true, false);
+                if (obj is Item hitItem)
+                    menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, Mathf.RoundToInt(damagef));
+                else if (obj is POI hitPoi)
+                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, Mathf.RoundToInt(damagef));
+                else if (obj is Soldier hitSoldier)
+                    menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, hitSoldier.RoundByResilience(damagef) - hitSoldier.stats.R.Val, 0);
             }
-        }
-        foreach (POI poi in FindObjectsOfType<POI>())
-        {
-            if (poi.PhysicalObjectWithinRadius(position, radius))
-                menu.AddExplosionAlertPOI(explosionList, poi, explodedBy);
         }
 
         if (explosionList.transform.Find("Scroll").Find("View").Find("Content").childCount > 0)
@@ -2507,7 +2642,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             Destroy(explosionList);
     }
-
 
 
 

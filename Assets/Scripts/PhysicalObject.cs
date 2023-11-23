@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PhysicalObject : MonoBehaviour
 {
+    public string objectName;
     public string id, terrainOn;
     public int x, y, z;
     public MainGame game;

@@ -32,6 +32,7 @@ public class Inventory
         {
             AddItem(item);
             linkedSoldier.inventorySlots[slotName] = item.id;
+            item.whereEquipped = slotName;
         }
     }
     public void RemoveItemFromSlot(Item item, string slotName)
@@ -40,7 +41,10 @@ public class Inventory
         {
             RemoveItem(item);
             if (linkedSoldier.inventorySlots[slotName] == item.id)
+            {
                 linkedSoldier.inventorySlots[slotName] = "";
+                item.whereEquipped = "";
+            }
         }
     }
     public void ConsumeItemInSlot(Item item, string slotName)

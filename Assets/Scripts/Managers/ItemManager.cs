@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class ItemManager : MonoBehaviour, IDataPersistence
@@ -11,6 +12,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     public Item itemPrefab;
     public ItemReader reader;
     public GameObject battlefield;
+    public MainGame game;
 
     public int[,] scoreTable = new int[,]
     {
@@ -141,6 +143,16 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     {
         Destroy(item.gameObject);
         RefreshItemList();
+    }
+    public void DestroyBreakableItem(Soldier destroyedBy, Item item)
+    {
+        if (item.IsBreakable())
+        {
+            if (item.IsGrenade())
+                game.CheckExplosionGrenade(item, destroyedBy, new(item.X, item.Y, item.Z));
+            else
+                DestroyItem(item);
+        }
     }
     public void RefreshItemList()
     {

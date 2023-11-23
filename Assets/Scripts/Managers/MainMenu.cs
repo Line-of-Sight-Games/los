@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -30,8 +31,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, 
         lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
         allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
-        meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, ULFResultUI, UHFUI;
+        meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
+        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI, ULFResultUI, UHFUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -2012,42 +2013,68 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (explosionUI.transform.childCount == 0)
             explosionUI.SetActive(false);
     }
-    public void AddExplosionAlert(GameObject explosionList, Soldier hitByExplosion, Soldier explodedBy, int damage, bool causesDamage, bool causesStun)
+    public void AddExplosionAlert(GameObject explosionList, Soldier hitByExplosion, Soldier explodedBy, int damage, int stunRounds)
     {
-        GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
-        explosionAlert.transform.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
-        explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, hitByExplosion);
+        if (hitByExplosion.IsAlive())
+        {
+            GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
+            explosionAlert.transform.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
+            explosionAlert.transform.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{stunRounds}";
+            explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, hitByExplosion);
 
-        explosionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(hitByExplosion);
-        if (damage > 5)
-        {
-            explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
-            explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Breakable Items Destroyed";
-        }
-        else if (damage > 0)
-        {
-            explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
-            explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Fragile Items Destroyed";
-        }
-        if (causesDamage)
-        {
-            explosionAlert.transform.Find("DamageQuestion").gameObject.SetActive(true);
-            explosionAlert.transform.Find("DamageToggle").gameObject.SetActive(true);
-        }
-        if (causesStun)
-        {
-            explosionAlert.transform.Find("StunQuestion").gameObject.SetActive(true);
-            explosionAlert.transform.Find("StunToggle").gameObject.SetActive(true);
+            explosionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(hitByExplosion);
+            if (damage > 5)
+            {
+                explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
+                explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Breakable Items Destroyed";
+            }
+            else if (damage > 0)
+            {
+                explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
+                explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Fragile Items Destroyed";
+            }
+
+            if (damage > 0)
+                explosionAlert.transform.Find("Damage").gameObject.SetActive(true);
+            if (stunRounds > 0)
+                explosionAlert.transform.Find("Stun").gameObject.SetActive(true);
+
+            //delete the alert if no damage and no stun
+            if (damage <= 0 && stunRounds <= 0)
+                Destroy(explosionAlert);
         }
     }
-    public void AddExplosionAlertPOI(GameObject explosionList, POI poiHit, Soldier explodedBy)
+    public void AddExplosionAlertPOI(GameObject explosionList, POI poiHit, Soldier explodedBy, int damage)
     {
-        GameObject explosionAlert = Instantiate(explosionAlertPOIPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
-        explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, poiHit);
+        if (poiHit is not GoodyBox)
+        {
+            if ((poiHit is ExplosiveBarrel barrel && !barrel.triggered) || poiHit is Terminal)
+            {
+                GameObject explosionAlert = Instantiate(explosionAlertPOIPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
+                explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, poiHit);
 
-        explosionAlert.transform.Find("POIPortrait").GetComponent<POIPortrait>().Init(poiHit);
+                explosionAlert.transform.Find("POIPortrait").GetComponent<POIPortrait>().Init(poiHit);
+                explosionAlert.transform.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
+            }
+        }
     }
+    public void AddExplosionAlertItem(GameObject explosionList, Item itemHit, Soldier explodedBy, int damage)
+    {
+        if (itemHit.owner is not GoodyBox)
+        {
+            if (itemHit.IsBreakable() && damage >= 5 || itemHit.IsFragile() && damage > 0)
+            {
+                if (!itemHit.IsTriggered())
+                {
+                    GameObject explosionAlert = Instantiate(explosionAlertItemPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
+                    explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, itemHit);
 
+                    explosionAlert.transform.Find("ItemPortrait").GetComponent<ItemPortrait>().Init(itemHit);
+                    explosionAlert.transform.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
+                }
+            }
+        }
+    }
 
 
 
@@ -3335,6 +3362,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_SMG" => "Reload Sub-Machine Gun?",
             "Ammo_Sn" => "Reload Sniper?",
             "Food_Pack" => "Consume food pack?",
+            "Grenade_Flashbang" => "Throw flashbang?",
+            "Grenade_Frag" => "Throw frag?",
+            "Grenade_Smoke" => "Throw smoke?",
+            "Grenade_Tabun" => "Throw tabun?",
             "Medkit_Large" => "Use Large Medkit?",
             "Medkit_Medium" => "Use Medium Medkit?",
             "Medkit_Small" => "Use Small Medkit?",
@@ -3572,20 +3603,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         ULFResultUI.SetActive(false);
     }
-    public void OpenUHFUI(UseItemUI useItemUI)
-    {
-        UHFUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
-        UHFUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
-        UHFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
-
-        Tuple<int, string, int, int, int> strike = useItemUI.itemUsed.GetUHFStrike();
-        UHFUI.transform.Find("OptionPanel").Find("StrikeName").Find("Text").GetComponent<TextMeshProUGUI>().text = strike.Item2;
-        UHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text = $"{strike.Item3}";
-        UHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = $"{strike.Item4}";
-        UHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text = $"{strike.Item5}";
-
-        UHFUI.SetActive(true);
-    }
     public void CloseUHFUI()
     {
         ClearUHFUI();
@@ -3602,6 +3619,43 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZLabel").gameObject.SetActive(false);
         UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").gameObject.SetActive(false);
         UHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
+        UHFUI.transform.Find("PressedOnce").gameObject.SetActive(false);
+    }
+    public void OpenUHFUI(UseItemUI useItemUI)
+    {
+        UHFUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        UHFUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        UHFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        Tuple<int, string, int, int, int> strike = useItemUI.itemUsed.GetUHFStrike();
+        UHFUI.transform.Find("OptionPanel").Find("StrikeName").Find("Text").GetComponent<TextMeshProUGUI>().text = strike.Item2;
+        UHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text = $"{strike.Item3}";
+        UHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = $"{strike.Item4}";
+        UHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text = $"{strike.Item5}";
+
+        UHFUI.SetActive(true);
+    }
+    public void CloseGrenadeUI()
+    {
+        ClearGrenadeUI();
+        grenadeUI.SetActive(false);
+    }
+    public void ClearGrenadeUI()
+    {
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        grenadeUI.transform.Find("PressedOnce").gameObject.SetActive(false);
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(false);
+    }
+    public void OpenGrenadeUI(UseItemUI useItemUI)
+    {
+        grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        grenadeUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        grenadeUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text = useItemUI.itemUsed.itemName;
+        grenadeUI.SetActive(true);
     }
 
 

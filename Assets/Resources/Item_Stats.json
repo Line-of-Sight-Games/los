@@ -266,7 +266,7 @@
     },
     {
       "Name": "Brace",
-      "Traits": [ "Storage" ],
+      "Traits": [ "Storage", "Throwable" ],
       "Weight": 1,
       "GunTraits": {},
       "EquippableSlots": [ "Leg" ],
@@ -285,7 +285,7 @@
     },
     {
       "Name": "Deployment_Beacon",
-      "Traits": [ "Usable", "Fragile", "Placeable" ],
+      "Traits": [ "Usable", "Fragile", "Placeable", "Throwable" ],
       "UsageAP": 3,
       "Weight": 2,
       "LoudRadius": 10,
@@ -307,7 +307,7 @@
     },
     {
       "Name": "Food_Pack",
-      "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Poisonable", "Throwable" ],
       "UsageAP": 3,
       "Weight": 1,
       "LoudRadius": 8,
@@ -320,7 +320,7 @@
     },
     {
       "Name": "Grenade_Flashbang",
-      "Traits": [ "Usable", "Consumable" ],
+      "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
@@ -331,7 +331,7 @@
     },
     {
       "Name": "Grenade_Frag",
-      "Traits": [ "Usable", "Consumable" ],
+      "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
@@ -342,7 +342,7 @@
     },
     {
       "Name": "Grenade_Smoke",
-      "Traits": [ "Usable", "Consumable" ],
+      "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
@@ -353,7 +353,7 @@
     },
     {
       "Name": "Grenade_Tabun",
-      "Traits": [ "Usable", "Consumable" ],
+      "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
@@ -364,7 +364,7 @@
     },
     {
       "Name": "Knife",
-      "Traits": [ "Weapon" ],
+      "Traits": [ "Weapon", "Throwable" ],
       "Weight": 1,
       "MeleeDamage": 5,
       "GunTraits": {},
@@ -629,7 +629,7 @@
     },
     {
       "Name": "Poison_Satchel",
-      "Traits": [ "Usable", "Consumable" ],
+      "Traits": [ "Usable", "Consumable", "Throwable" ],
       "UsageAP": 1,
       "Weight": 1,
       "LoudRadius": 6,
@@ -1070,7 +1070,7 @@
     },
     {
       "Name": "Suppressor",
-      "Traits": [],
+      "Traits": [ "Throwable" ],
       "Weight": 1,
       "GunTraits": {},
       "EquippableSlots": [ "Misc" ],
@@ -1220,7 +1220,7 @@
     },
     {
       "Name": "Water_Canteen",
-      "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "Traits": [ "Usable", "Consumable", "Poisonable", "Throwable" ],
       "UsageAP": 2,
       "Weight": 4,
       "LoudRadius": 8,

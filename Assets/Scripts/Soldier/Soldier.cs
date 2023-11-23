@@ -26,7 +26,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
-    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, witnessActiveAbilities, isSpottedBy;
+    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, isSpottedBy;
     public Item itemPrefab;
     private JArray statsJArray;
     public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
@@ -162,7 +162,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "isSpotting", isSpotting },
             { "isSpottedBy", isSpottedBy },
             { "overwatchFirstShotUsed", overwatchFirstShotUsed },
-            { "witnessActiveAbilities", witnessActiveAbilities },
             { "witnessStoredAbilities", witnessStoredAbilities }
         };
 
@@ -254,7 +253,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         guardsmanRetryUsed = (bool)details["guardsmanRetryUsed"];
         isSpotting = (string)details["isSpotting"];
         isSpottedBy = (details["isSpottedBy"] as JArray).Select(token => token.ToString()).ToList();
-        witnessActiveAbilities = (details["witnessActiveAbilities"] as JArray).Select(token => token.ToString()).ToList();
         witnessStoredAbilities = (details["witnessStoredAbilities"] as JArray).Select(token => token.ToString()).ToList();
 
         //link to maingame object
@@ -490,10 +488,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void DropItemFromSlot(Item item, string slotName)
     {
-        print("running dropitemfromslot");
         if (Inventory.HasItem(item.id))
         {
-            print("found the item for drop");
             item.RunDropEffect(slotName);
             Inventory.RemoveItemFromSlot(item, slotName);
             
@@ -512,37 +508,60 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
     }
-    public void DestroyAllFragileItems()
+    public void DestroyFragileItem(Soldier destroyedBy, Item itemToBeDestroyed)
     {
-        List<Item> itemList = new();
         Dictionary<string, string> itemSlots = new();
-        foreach (Item item in Inventory.AllItems)
-            itemList.Add(item);
+
         foreach (KeyValuePair<string, string> kvp in inventorySlots)
             itemSlots.Add(kvp.Key, kvp.Value);
 
-        foreach (Item item in itemList)
-            if (item.IsFragile())
-                foreach (KeyValuePair<string, string> kvp in itemSlots)
-                    if (kvp.Value == item.id)
-                        Inventory.ConsumeItemInSlot(Inventory.GetItemInSlot(kvp.Key), kvp.Key);
+        if (itemToBeDestroyed.IsFragile())
+        {
+            foreach (KeyValuePair<string, string> kvp in itemSlots)
+            {
+                if (kvp.Value == itemToBeDestroyed.id)
+                {
+                    if (itemToBeDestroyed.IsGrenade())
+                        game.CheckExplosionGrenade(Inventory.GetItemInSlot(kvp.Key), destroyedBy, new(X, Y, Z));
+                    else
+                        Inventory.GetItemInSlot(kvp.Key).ConsumeItem();
+                }
+            }
+        }
+            
         menu.AddDamageAlert(this, $"{soldierName} had all fragile items destroyed.", false, true);
     }
-    public void DestroyAllBreakableItems()
+    public void DestroyBreakableItem(Soldier destroyedBy, Item itemToBeDestroyed)
     {
-        List<Item> itemList = new();
         Dictionary<string, string> itemSlots = new();
-        foreach (Item item in Inventory.AllItems)
-            itemList.Add(item);
+
         foreach (KeyValuePair<string, string> kvp in inventorySlots)
             itemSlots.Add(kvp.Key, kvp.Value);
 
-        foreach (Item item in itemList)
-            if (item.IsBreakable())
-                foreach (KeyValuePair<string, string> kvp in itemSlots)
-                    if (kvp.Value == item.id)
+        if (itemToBeDestroyed.IsBreakable())
+        {
+            foreach (KeyValuePair<string, string> kvp in itemSlots)
+            {
+                if (kvp.Value == itemToBeDestroyed.id)
+                {
+                    if (itemToBeDestroyed.IsGrenade() && !itemToBeDestroyed.IsTriggered())
+                        game.CheckExplosionGrenade(Inventory.GetItemInSlot(kvp.Key), destroyedBy, new(X, Y, Z));
+                    else
                         Inventory.ConsumeItemInSlot(Inventory.GetItemInSlot(kvp.Key), kvp.Key);
+                }
+            }
+        }
+                
         menu.AddDamageAlert(this, $"{soldierName} had all breakable items destroyed.", false, true);
+    }
+    public void DestroyAllBreakableItems(Soldier destroyedBy)
+    {
+        List<Item> itemList = new();
+        foreach (Item item in Inventory.AllItems)
+            itemList.Add(item);
+
+        foreach (Item item in itemList)
+            DestroyBreakableItem(destroyedBy, item);
     }
     public void BrokenDropAllItemsExceptArmour()
     {
@@ -797,7 +816,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void ApplyWitnessMods()
     {
-        if (IsWitness() && witnessStoredAbilities.Count == 0 && witnessActiveAbilities.Count == 0)
+        if (IsWitness() && witnessStoredAbilities.Count == 0)
             stats.P.Val += 2;
     }
     public void ApplyPatriotMods()
@@ -1153,9 +1172,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public IEnumerator TakePoisonDamage()
     {
-        //print("take poison damage coroutine");
         yield return new WaitUntil(() => menu.xpResolvedFlag == true);
-        //print("take poison damage coroutine melee flag passed");
         TakeDamage(soldierManager.FindSoldierById(poisonedBy), 2, false, new() { "Poison" });
     }
 
@@ -1263,9 +1280,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             //apply witness ability slurp
             if (IsWitness())
             {
-                witnessStoredAbilities.Clear();
-                foreach (string ability in damagedBy.soldierAbilities)
-                    witnessStoredAbilities.Add(ability);
+                //apply the fresh abilities
+                soldierAbilities.Clear();
+                soldierAbilities.Add("Witness");
+                soldierAbilities.AddRange(damagedBy.soldierAbilities);
+
+                //store fresh abilities
+                witnessStoredAbilities.AddRange(damagedBy.soldierAbilities);
+                witnessStoredAbilities = witnessStoredAbilities.Distinct().ToList(); //make sure only unique abilities are represented
             }
 
             //informer ability display info
@@ -2249,7 +2271,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsInteractable())
         {
             SetState("Crushed");
-            DestroyAllBreakableItems();
+            DestroyAllBreakableItems(null);
         }
     }
     public void UnsetCrushed()
@@ -2412,7 +2434,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         else
                             menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
-                        killedBy.FighterMeleeKillReward();
+                        killedBy.FighterMeleeKillReward(damageSource);
                     }
                     else if (damageSource.Contains("Poison"))
                         menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
@@ -2607,6 +2629,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool ResilienceCheck()
     {
         if (game.DiceRoll() <= stats.R.Val)
+            return true;
+        else
+            return false;
+    }
+    public bool StrengthCheck()
+    {
+        if (game.DiceRoll() <= stats.Str.Val)
             return true;
         else
             return false;
@@ -3014,16 +3043,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             stats.S.BaseVal += 3;
         }
     }
-    public void FighterMeleeKillReward()
+    public void FighterMeleeKillReward(List<string> damageSource)
     {
         if (IsFighter())
         {
             ap += 3;
-            if (usedMP)
-            {
+            if (damageSource.Contains("Charge"))
                 mp += 1;
-                usedMP = false;
-            }
         }
     }
     public bool IsGuardsman()
@@ -3445,8 +3471,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string GetLoudDetectedState()
     {
-        if (loudActionRoundsVulnerable > 0)
-            return $", <color=red>Vulnerable({loudActionRoundsVulnerable})</color>";
+        //if (loudActionRoundsVulnerable > 0)
+        //    return $", <color=red>Vulnerable({loudActionRoundsVulnerable})</color>";
         return "";
     }
 
@@ -3544,6 +3570,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return $", <color=green>Spotting ({soldierManager.FindSoldierById(isSpotting).soldierName})</color>";
         return "";
     }
+    public string GetWitnessState()
+    {
+        if (IsWitness())
+            return $", <color=green>Witnessing ({menu.PrintList(soldierAbilities.Where(e => e != "Witness").ToList())})</color>";
+        return "";
+    }
     public string GetStatus()
     {
         string status = "";
@@ -3572,6 +3604,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetDissuadedState();
             status += GetBloodRageState();
             status += GetSpottingState();
+            status += GetWitnessState();
         }
         return status;
     }
