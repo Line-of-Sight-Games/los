@@ -3,17 +3,23 @@ using UnityEngine;
 
 public static class FileUtility
 {
-    public static void WriteToReport(string content)
+    private static readonly string fileName = "BattleReport.txt";
+
+    public static void WriteToReport(string message)
     {
-        string path = "Assets/Resources/Report.txt";
+        string path = Path.Combine(Application.persistentDataPath, fileName);
 
         // Check if the file exists, and create it if not
         if (!File.Exists(path))
-            File.WriteAllText(path, content);
+        {
+            using StreamWriter sw = File.CreateText(path);
+            sw.WriteLine(message);
+        }
         else
-            File.AppendAllText(path, "\n" + content);
-
-        // Refresh the asset database (important for the Editor)
-        UnityEditor.AssetDatabase.Refresh();
+        {
+            // Append a new line and the content to the existing file
+            using StreamWriter sw = File.AppendText(path);
+            sw.WriteLine(message);
+        }
     }
 }

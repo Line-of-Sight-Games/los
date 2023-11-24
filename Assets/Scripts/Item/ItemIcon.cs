@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {

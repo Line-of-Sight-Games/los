@@ -1,6 +1,5 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using UnityEngine;
 
 public class ItemReader : MonoBehaviour

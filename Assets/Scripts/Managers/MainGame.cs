@@ -7,10 +7,6 @@ using UnityEngine.UI;
 using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
-using Newtonsoft.Json.Linq;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
-using System.Security.Cryptography;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {

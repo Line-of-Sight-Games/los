@@ -1,9 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static ItemReader;
 
 public class GoodyBox : POI, IDataPersistence, IHaveInventory
 {
