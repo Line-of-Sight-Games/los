@@ -2303,7 +2303,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public IEnumerator OpenMeleeUI(string meleeCharge)
     {
         yield return new WaitForSeconds(0.05f);
-        
+        FileUtility.WriteToReport("Starting melee attack");
         //set attacker
         Soldier attacker = activeSoldier;
         meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text = attacker.id;
