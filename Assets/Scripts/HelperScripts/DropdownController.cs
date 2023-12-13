@@ -23,7 +23,7 @@ public class DropdownController : MonoBehaviour
                 {
                     if (option == dropdown.options[i].text || (int.TryParse(option, out int temp) && temp == i))
                     {
-                        print($"Item {i}: {dropdown.options[i].text}");
+                        //print($"Item {i}: {dropdown.options[i].text}");
                         dropdown.transform.Find("Dropdown List").Find("Viewport").Find("Content").GetChild(i + 1).GetComponent<Toggle>().interactable = false;
                     }
                 }

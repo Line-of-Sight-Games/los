@@ -16,6 +16,8 @@ public class SoldierUI : MonoBehaviour
     private void Start()
     {
         noisePlayerSoldierUI = FindObjectOfType<AudioSource>();
+        menu = FindObjectOfType<MainMenu>();
+        game = FindObjectOfType<MainGame>();
     }
 
     public void PlayButtonPress()
@@ -41,30 +43,27 @@ public class SoldierUI : MonoBehaviour
             //print(x + ":" + linkedSoldier.game.maxX + " " + y + ":" + linkedSoldier.game.maxY + " " + z + ":" + linkedSoldier.game.maxZ);
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
-                linkedSoldier.TerrainOn = terrainDropdown.options[terrainDropdown.value].text;
-                linkedSoldier.X = x;
-                linkedSoldier.Y = y;
-                linkedSoldier.Z = z;
+                
                 linkedSoldier.startX = x;
                 linkedSoldier.startY = y;
                 linkedSoldier.startZ = z;
                 linkedSoldier.fielded = true;
                 linkedSoldier.CheckSpecialityColor(linkedSoldier.soldierSpeciality);
                 transform.Find("PopupBox").gameObject.SetActive(false);
-                StartCoroutine(linkedSoldier.game.DetectionAlertSingle(linkedSoldier, "losChange", Vector3.zero, string.Empty, true));
+                game.PerformMove(linkedSoldier, 0, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.options[terrainDropdown.value].text), false, false, string.Empty, true);
             }
         }
     }
 
     public void OpenSoldierMenu()
     {
-        menu = FindObjectOfType<MainMenu>();
-        game = FindObjectOfType<MainGame>();
         linkedSoldier.selected = true;
         menu.activeSoldier = linkedSoldier;
         game.activeSoldier = linkedSoldier;
+        print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
         menu.menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(false);
         menu.menuUI.transform.Find("Options Panel").Find("SoldierOptions").gameObject.SetActive(true);
+        menu.turnTitle.text = "N O R M A L    T U R N";
 
         //populate soldier loadout
         Transform soldierBanner = menu.soldierOptionsUI.transform.Find("SoldierBanner");

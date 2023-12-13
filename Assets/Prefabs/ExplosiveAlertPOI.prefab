@@ -552,7 +552,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8771391907771433524}
+  - {fileID: 8791790092596943122}
   - {fileID: 2393648795192371403}
   - {fileID: 180135370379909104}
   - {fileID: 2589107836838524535}
@@ -752,7 +752,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1001 &2540047406829146470
+--- !u!1001 &2375797637573888576
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -865,8 +865,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f74c6ee3bdb027149941cdc860c537f7, type: 3}
---- !u!224 &8771391907771433524 stripped
+--- !u!224 &8791790092596943122 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6555607041518850898, guid: f74c6ee3bdb027149941cdc860c537f7, type: 3}
-  m_PrefabInstance: {fileID: 2540047406829146470}
+  m_PrefabInstance: {fileID: 2375797637573888576}
   m_PrefabAsset: {fileID: 0}

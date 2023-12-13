@@ -10,6 +10,9 @@ public class POIManager : MonoBehaviour, IDataPersistence
     public GoodyBox gbPrefab;
     public Terminal terminalPrefab;
     public ExplosiveBarrel barrelPrefab;
+    public Claymore claymorePrefab;
+    public SmokeCloud smokeCloudPrefab;
+    public TabunCloud tabunCloudPrefab;
 
     public void LoadData(GameData data)
     {
@@ -40,6 +43,21 @@ public class POIManager : MonoBehaviour, IDataPersistence
             {
                 Destroy(newPOI.gameObject);
                 newPOI = Instantiate(barrelPrefab);
+            }
+            else if (newPOI.poiType == "claymore")
+            {
+                Destroy(newPOI.gameObject);
+                newPOI = Instantiate(claymorePrefab);
+            }
+            else if (newPOI.poiType == "smoke")
+            {
+                Destroy(newPOI.gameObject);
+                newPOI = Instantiate(smokeCloudPrefab);
+            }
+            else if (newPOI.poiType == "tabun")
+            {
+                Destroy(newPOI.gameObject);
+                newPOI = Instantiate(tabunCloudPrefab);
             }
             //print($"{newPOI.GetType()}");
             newPOI.id = id;

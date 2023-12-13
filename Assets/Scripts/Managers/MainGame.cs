@@ -19,9 +19,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public SoundManager soundManager;
     public SetBattlefieldParameters setBattlefieldParameters;
 
-    public Terminal terminalPrefab;
-    public GoodyBox gbPrefab;
-    public ExplosiveBarrel barrelPrefab;
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
     public int currentRound, maxRounds, currentTeam, maxTeams, maxTurnTime, tempTeam;
@@ -170,6 +167,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartModaTurn(Soldier modaSoldier)
     {
+        menu.turnTitle.text = "<color=purple>M O D A F I N I L    T U R N</color>";
+
         //change game parameters
         modaTurn = true;
         SwitchTeam(modaSoldier.soldierTeam);
@@ -187,6 +186,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartFrozenTurn(Soldier frozenSoldier)
     {
+        menu.turnTitle.text = "<color=red>F R O Z E N    T U R N</color>";
+
         //change game parameters
         frozenTurn = true;
         SwitchTeam(frozenSoldier.soldierTeam);
@@ -232,6 +233,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                 }
 
+                //run los lost for intra-turn changes
                 if (menu.lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
                     StartCoroutine(menu.OpenLostLOSList());
 
@@ -332,6 +334,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (currentTeam == 1)
                 StartRound();
 
+            IncreaseRoundsActiveSmokeClouds();
             StartCoroutine(StartTeamTurn());
         }
     }
@@ -354,15 +357,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 yield return new WaitUntil(() => menu.inspirerResolvedFlag == true);
 
                 s.GenerateAP();
-                StartCoroutine(DetectionAlertAll("statChange", false));
             }
             else
             {
                 //run things that trigger at the start of another team's turn
             }
         }
-
         menu.CheckXP();
+        StartCoroutine(DetectionAlertAll("statChange", false));
         DataPersistenceManager.Instance.SaveGame();
     }
     public void StartRound()
@@ -533,8 +535,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (CheckAP(ap))
                         {
-                            PerformMove(activeSoldier, ap, moveToLocation, meleeToggle.isOn, coverToggle.isOn, fallInput.text);
-                            activeSoldier.mp += 1; //refund ma to make it cost 0 MA
+                            PerformMove(activeSoldier, ap, moveToLocation, meleeToggle.isOn, coverToggle.isOn, fallInput.text, true);
                             //trigger loud action
                             activeSoldier.PerformLoudAction(10);
                         }
@@ -569,7 +570,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (force || distance <= maxMove)
                         {
                             if (CheckMP(1) && CheckAP(ap))
-                                PerformMove(activeSoldier, ap, moveToLocation, meleeToggle.isOn, coverToggle.isOn, fallInput.text);
+                                PerformMove(activeSoldier, ap, moveToLocation, meleeToggle.isOn, coverToggle.isOn, fallInput.text, false);
                             menu.CloseMoveUI();
                         }
                         else
@@ -585,12 +586,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 print("Invalid Input");
         }
     }
-    public void PerformMove(Soldier movingSoldier, int ap, Tuple<Vector3, string> moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance)
+    public void PerformMove(Soldier movingSoldier, int ap, Tuple<Vector3, string> moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance, bool freeMove)
     {
         int.TryParse(fallDistance, out int fallDistanceInt); 
         string launchMelee = string.Empty;
         DeductAP(ap);
-        DeductMP(1);
+        if (!freeMove)
+            DeductMP(1);
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
         movingSoldier.X = (int)moveToLocation.Item1.x;
@@ -615,6 +617,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //clear e tool dug in
         movingSoldier.UnsetDugIn();
+
+        //blow up claymores
+        foreach (Claymore claymore in FindObjectsOfType<Claymore>())
+            claymore.CheckClaymoreTriggeredBy(movingSoldier);
+
+        //check for smoke clouds
+        CheckSmokeClouds();
 
         //check for fall damage
         if (fallDistanceInt > 0)
@@ -2321,7 +2330,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Water_Canteen":
             case "ULF_Radio":
                 itemUsed.UseItem(linkedIcon, null, null);
-                menu.CloseUseItemUI();
                 break;
             case "Ammo_AR":
             case "Ammo_LMG":
@@ -2330,16 +2338,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Ammo_Sh":
             case "Ammo_SMG":
             case "Ammo_Sn":
+            case "Claymore":
+                menu.OpenClaymoreUI(useItemUI);
+                break;
             case "Poison_Satchel":
                 itemUsed.UseItem(linkedIcon, itemUsedOn, null);
-                menu.CloseUseItemUI();
                 break;
             case "Grenade_Flashbang":
             case "Grenade_Frag":
             case "Grenade_Smoke":
             case "Grenade_Tabun":
                 menu.OpenGrenadeUI(useItemUI);
-                menu.CloseUseItemUI();
                 break;
             case "Medkit_Small":
             case "Medkit_Medium":
@@ -2354,11 +2363,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Syringe_Trenbolone":
             case "Syringe_Unlabelled":
                 itemUsed.UseItem(linkedIcon, null, soldierUsedOn);
-                menu.CloseUseItemUI();
                 break;
             case "UHF_Radio":
                 menu.OpenUHFUI(useItemUI);
-                menu.CloseUseItemUI();
                 break;
             default:
                 break;
@@ -2467,6 +2474,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmGrenade(UseItemUI useGrenade)
     {
+        string grenadeName = useGrenade.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text;
         TMP_InputField targetX = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField targetZ = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>();
@@ -2518,10 +2526,39 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (useGrenade.itemUsed.owner is Soldier linkedSoldier)
                     {
                         useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
-                        CheckExplosionGrenade(useGrenade.itemUsed, linkedSoldier, new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)));
+                        if (grenadeName.Contains("Frag") || grenadeName.Contains("Flashbang"))
+                            CheckExplosionGrenade(useGrenade.itemUsed, linkedSoldier, new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)));
+                        else if (grenadeName.Contains("Smoke"))
+                            Instantiate(poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)), string.Empty), activeSoldier.Id);
+                        else if (grenadeName.Contains("Tabun"))
+                            Instantiate(poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)), string.Empty), activeSoldier.Id);
+
                         menu.CloseGrenadeUI();
                     }
                 }
+            }
+        }
+    }
+    public void ConfirmClaymore(UseItemUI useClaymore)
+    {
+        TMP_InputField placedX = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField placedY = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField placedZ = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("ZPos").GetComponent<TMP_InputField>();
+        TMP_InputField facingX = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField facingY = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_Dropdown terrainOn = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
+
+        if (placedX.textComponent.color == menu.normalTextColour && placedY.textComponent.color == menu.normalTextColour && placedZ.textComponent.color == menu.normalTextColour
+        && facingX.textComponent.color == menu.normalTextColour && facingY.textComponent.color == menu.normalTextColour && terrainOn.value != 0)
+        {
+            if (int.TryParse(placedX.text, out int placedXInt) && int.TryParse(placedY.text, out int placedYInt) && int.TryParse(placedZ.text, out int placedZInt) 
+            && int.TryParse(facingX.text, out int facingXInt) && int.TryParse(facingY.text, out int facingYInt))
+            {
+                useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
+                Claymore claymore = Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id));
+                foreach (Soldier s in AllSoldiers())
+                    claymore.CheckClaymoreTriggeredBy(s);
+                menu.CloseClaymoreUI();
             }
         }
     }
@@ -2643,7 +2680,34 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             Destroy(explosionList);
     }
+    public void CheckSmokeClouds()
+    {
+        foreach (Soldier s in AllSoldiers())
+        {
+            s.UnsetSmoked();
+            foreach (SmokeCloud cloud in FindObjectsOfType<SmokeCloud>())
+            {
+                if (s.PhysicalObjectWithinRadius(cloud, 5))
+                    s.SetSmokeBlinded();
+                else if (s.PhysicalObjectWithinRadius(cloud, 20))
+                    s.SetSmokeCovered();
 
+                //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
+                if (s.IsInSmoke())
+                {
+                    if (s.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(s.Id))
+                        cloud.alliesAffected.Add(s.Id);
+                    else if (s.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(s.Id))
+                        cloud.enemiesAffected.Add(s.Id);
+                }
+            }
+        } 
+    }
+    public void IncreaseRoundsActiveSmokeClouds()
+    {
+        foreach (SmokeCloud cloud in FindObjectsOfType<SmokeCloud>())
+            cloud.TurnsActive--;
+    }
 
 
 
@@ -2827,7 +2891,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void DeductMP(int mp)
     {
-        if (!menu.overrideView)
+        if (!menu.overrideView && mp > 0)
         {
             activeSoldier.mp -= mp;
             activeSoldier.usedMP = true;
@@ -3070,7 +3134,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
 
                 //move actually proceeds
-                PerformMove(activeSoldier, 0, fallCollapseLocation, false, false, string.Empty);
+                PerformMove(activeSoldier, 0, fallCollapseLocation, false, false, string.Empty, true);
 
                 menu.CloseDamageEventUI();
 
@@ -3929,7 +3993,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (spawnedObject == 1)
             {
-                GoodyBox gb = Instantiate(gbPrefab).Init(spawnLocation);
+                GoodyBox gb = Instantiate(poiManager.gbPrefab).Init(spawnLocation);
                 //fill gb with items
                 foreach (Transform child in gbItemsPanel)
                 {
@@ -3940,9 +4004,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
             else if (spawnedObject == 2)
-                Instantiate(terminalPrefab).Init(spawnLocation, terminalTypeDropdown.options[terminalTypeDropdown.value].text);
+                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, terminalTypeDropdown.options[terminalTypeDropdown.value].text);
             else if (spawnedObject == 3)
-                Instantiate(barrelPrefab).Init(spawnLocation);
+                Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
 
             menu.CloseOverrideInsertObjectsUI();
         }

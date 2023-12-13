@@ -18,7 +18,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, modaProtect, trenXRayEffect, trenSRShrinkEffect;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect;
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, 
@@ -148,6 +148,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "poisonedBy", poisonedBy },
             { "dugIn", dugIn },
             { "glucoState", glucoState },
+            { "amphStatReduction", amphStatReduction },
             { "modaProtect", modaProtect },
             { "trenXRayEffect", trenXRayEffect },
             { "trenSRShrinkEffect", trenSRShrinkEffect },
@@ -241,7 +242,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         poisonedBy = (string)details["poisonedBy"];
         dugIn = Convert.ToInt32(details["dugIn"]);
         glucoState = (string)details["glucoState"];
+        amphStatReduction = (bool)details["amphStatReduction"];
         modaProtect = (bool)details["modaProtect"];
+        trenXRayEffect = (bool)details["trenXRayEffect"];
+        trenSRShrinkEffect = (bool)details["trenSRShrinkEffect"];
 
         //load abiltiy details
         plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
@@ -472,6 +476,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
             return false;
     }
+    
     public int RoundByResilience(float numberToRound)
     {
         if (ResilienceCheck())
@@ -739,6 +744,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 //map from BaseVal stats to Val stats using enviro effects etc.
                 ApplyVisMods();
                 ApplyTrenboloneMods();
+                ApplyAmphetamineMods();
                 ApplyTerrainMods();
                 ApplyAbilityMods(); 
                 ApplyTraumaMods();
@@ -788,6 +794,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //trenbolone radius shrink effect
         if (trenSRShrinkEffect)
             stats.SR.Val = Mathf.RoundToInt(0.4f * stats.SR.Val);
+    }
+    public void ApplyAmphetamineMods()
+    {
+        if (amphStatReduction)
+            foreach (Stat stat in stats.AllStats)
+                if (!stat.Name.Equals("H") && !stat.Longname.Equals(soldierSpeciality))
+                    stat.Val -= stat.ReadIncrement*2;
     }
     public void ApplyTerrainMods()
     {
@@ -912,7 +925,25 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             stats.M.Val = 0;
         }
     }
-
+    public void ApplySmokeMods()
+    {
+        if (IsInSmoke())
+        {
+            if (IsCommander())
+                stats.E.Val += 4;
+            else if (IsSmokeBlinded())
+            {
+                stats.E.Val = 0;
+                stats.SR.Val = 0;
+            }
+            else if (IsSmokeCovered())
+            {
+                stats.E.Val += 4;
+                stats.SR.Val -= 70;
+                stats.P.Val -= 2;
+            }
+        }
+    }
     public void ApplyItemMods()
     {
         if (IsWearingBodyArmour(false))
@@ -1094,34 +1125,23 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (effect)
                     stats.GetStat(soldierSpeciality).BaseVal *= 3;
                 if (sideEffect)
-                {
-                    foreach (Stat stat in stats.AllStats)
-                    {
-                        print(soldierSpeciality);
-                        if (!stat.Name.Equals("H") && !stat.Longname.Equals(soldierSpeciality))
-                        {
-                            print(stat.Longname);
-                            stat.Decrement();
-                            stat.Decrement();
-                        }
-                    }
-                }
+                    amphStatReduction = true;
                 break;
             case "Androstenedione":
                 if (effect) { }
                 if (sideEffect)
                 {
-                    stats.GetStat("S").Decrement();
-                    stats.GetStat("S").Decrement();
+                    stats.S.Decrement();
+                    stats.S.Decrement();
                 }
                 break;
             case "Cannabinoid":
                 if (effect)
-                    stats.GetStat("P").BaseVal *= 2;
+                    stats.P.BaseVal *= 2;
                 if (sideEffect)
                 {
-                    stats.GetStat("F").BaseVal = 0;
-                    stats.GetStat("C").BaseVal = 0;
+                    stats.F.BaseVal = 0;
+                    stats.C.BaseVal = 0;
                 }
                 break;
             case "Danazol":
@@ -1129,8 +1149,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     hp *= 2;
                 if (sideEffect)
                 {
-                    stats.GetStat("L").BaseVal = 0;
-                    stats.GetStat("R").BaseVal = 0;
+                    stats.L.BaseVal = 0;
+                    stats.R.BaseVal = 0;
                 }
                 break;
             case "Glucocorticoid":
@@ -1148,13 +1168,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             case "Shard":
                 if (effect)
                 {
-                    stats.GetStat("Ri").Increment();
-                    stats.GetStat("AR").Increment();
-                    stats.GetStat("LMG").Increment();
-                    stats.GetStat("Sn").Increment();
-                    stats.GetStat("SMG").Increment();
-                    stats.GetStat("Sh").Increment();
-                    stats.GetStat("M").Increment();
+                    stats.Ri.Increment();
+                    stats.AR.Increment();
+                    stats.LMG.Increment();
+                    stats.Sn.Increment();
+                    stats.SMG.Increment();
+                    stats.Sh.Increment();
+                    stats.M.Increment();
                 }
                 if (sideEffect)
                     soldierAbilities.Clear();
@@ -2187,14 +2207,72 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void UnsetOnDrug(string drugName)
     {
+        switch (drugName)
+        {
+            case "Amphetamine":
+                amphStatReduction = false;
+                break;
+            case "Androstenedione":
+                break;
+            case "Cannabinoid":
+                break;
+            case "Danazol":
+                break;
+            case "Glucocorticoid":
+                glucoState = "";
+                break;
+            case "Modafinil":
+                modaProtect = false;
+                break;
+            case "Shard":
+                break;
+            case "Trenbolone":
+                trenXRayEffect = false;
+                trenSRShrinkEffect = false;
+                break;
+            default:
+                break;
+        }
         UnsetState(drugName);
     }
     public bool IsOnOverwatch()
     {
         if (CheckState("Overwatch"))
             return true;
-        else
-            return false;
+        return false;
+    }
+    public bool IsInSmoke()
+    {
+        if (IsSmokeBlinded() || IsSmokeCovered())
+            return true;
+        return false;
+    }
+    public bool IsSmokeBlinded()
+    {
+        if (CheckState("SmokeBlinded"))
+            return true;
+        return false;
+    }
+    public bool IsSmokeCovered()
+    {
+        if (CheckState("SmokeCovered"))
+            return true;
+        return false;
+    }
+    public void SetSmokeCovered()
+    {
+        UnsetState("SmokeBlinded");
+        SetState("SmokeCovered");
+    }
+    public void SetSmokeBlinded()
+    {
+        UnsetState("SmokeCovered");
+        SetState("SmokeBlinded");
+    }
+    public void UnsetSmoked()
+    {
+        UnsetState("SmokeCovered");
+        UnsetState("SmokeBlinded");
     }
     public void SetOverwatch(int x, int y, int r, int a)
     {
@@ -2359,7 +2437,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
-        print(soldierName + " is Unconscious.");
+        //print(soldierName + " is Unconscious.");
     }
     public void Resurrect(int hp)
     {
@@ -2367,6 +2445,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         SetState("Active");
         CheckSpecialityColor(soldierSpeciality);
         TakeHeal(null, hp, 0, true, false);
+
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
 
     public void InstantKill(Soldier killedBy, List<string> damageSource)
@@ -3502,6 +3582,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return $", <color=green>Dug In({dugIn})</color>";
         return "";
     }
+    public string GetSmokedState()
+    {
+        if (IsSmokeBlinded())
+            return $", <color=red>Smoke - Blind Zone</color>";
+        else if (IsSmokeCovered())
+            return $", <color=red>Smoke - Defence Zone</color>";
+        return "";
+    }
     public string GetDrugState()
     {
         string drugState = "";
@@ -3596,6 +3684,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetSuppressionState();
             status += GetPlaydeadState();
             status += GetDugInState();
+            status += GetSmokedState();
             status += GetDrugState();
 
             status += GetPlannerBuffState();

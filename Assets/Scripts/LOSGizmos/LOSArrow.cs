@@ -21,9 +21,16 @@ public class LOSArrow : LOSGizmo
             lineRenderer.material.color = Color.green;
         else if (!from.CanSeeInOwnRight(to) && !to.CanSeeInOwnRight(from))
             lineRenderer.material.color = Color.grey;
-        else
+        else if (from.CanSeeInOwnRight(to))
         {
             if (from.soldierTeam == 1)
+                lineRenderer.material.color = Color.red;
+            else
+                lineRenderer.material.color = Color.blue;
+        }
+        else if (to.CanSeeInOwnRight(from))
+        {
+            if (to.soldierTeam == 1)
                 lineRenderer.material.color = Color.red;
             else
                 lineRenderer.material.color = Color.blue;

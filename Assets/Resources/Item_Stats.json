@@ -274,7 +274,7 @@
     },
     {
       "Name": "Claymore",
-      "Traits": [ "Usable", "Fragile", "Placeable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Placeable" ],
       "UsageAP": 2,
       "Weight": 2,
       "LoudRadius": 10,

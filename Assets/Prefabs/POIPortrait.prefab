@@ -91,8 +91,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosiveBarrelSprite: {fileID: 21300000, guid: 214604b1ccf62984d921794af7353b9f, type: 3}
-  goodyBoxSprite: {fileID: 21300000, guid: 76bc4d9fc7a9b1c42aa5579b1be8a5fc, type: 3}
-  terminalSprite: {fileID: 21300000, guid: 23c0e91fab4264e418b22bce512acbfe, type: 3}
+  goodyBoxSprite: {fileID: 21300000, guid: 249339a2d2546af47aadb88e5b6c89fd, type: 3}
+  terminalSprite: {fileID: 21300000, guid: b5a0715b4ec69674c94ca4d8949a823e, type: 3}
+  claymoreSprite: {fileID: 21300000, guid: 60aebaf83f3d29942af77bd121c2f74f, type: 3}
 --- !u!1 &8471546288538956594
 GameObject:
   m_ObjectHideFlags: 0

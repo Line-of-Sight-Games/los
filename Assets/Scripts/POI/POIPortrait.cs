@@ -4,15 +4,16 @@ using UnityEngine.UI;
 
 public class POIPortrait : MonoBehaviour
 {
-    public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite;
+    public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite, claymoreSprite;
     public void Init(POI poi)
     {
-        print(poi.poiType);
+        //print(poi.poiType);
         GetComponent<Image>().sprite = poi.poiType switch
         {
             "barrel" => explosiveBarrelSprite,
             "gb" => goodyBoxSprite,
             "terminal" => terminalSprite,
+            "claymore" => claymoreSprite,
             _ => null,
         };
         transform.Find("POILocation").GetComponent<TextMeshProUGUI>().text = $"X:{poi.X} Y:{poi.Y} Z:{poi.Z}";

@@ -6,6 +6,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -23,20 +24,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public DipelecGen dipelec;
     public POIManager poiManager;
     public SoundManager soundManager;
-    public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator;
+    public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
     public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI,
         shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,
         configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
         traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
         coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, 
         lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
-        allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
+        allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
         meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI, ULFResultUI, UHFUI;
+        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI,
+        claymoreUI, ULFResultUI, UHFUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
-    public OverwatchArc overwatchArcPrefab;
     public SightRadiusCircle sightRadiusCirclePrefab;
     public List<Button> actionButtons;
     public List<Sprite> insignia;
@@ -265,7 +266,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 if (activeSoldier != null)
                 {
                     CreateSightRadiusCircle();
-                    CreateOverwatchArc();
                 }
             }
 
@@ -284,7 +284,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 DestroySightRadiusCircle();
                 DestroyLOSArrows();
-                DestroyOverwatchArc();
             }
         }
     }
@@ -330,20 +329,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         var LOSArrows = FindObjectsOfType<LOSArrow>(true);
         foreach (LOSArrow arrow in LOSArrows)
             Destroy(arrow.gameObject);
-    }
-    public void CreateOverwatchArc()
-    {
-        if (activeSoldier.IsOnOverwatch())
-        {
-            OverwatchArc overwatchArc = Instantiate(overwatchArcPrefab).Init(activeSoldier);
-            overwatchArc.transform.SetAsLastSibling();
-        }
-    }
-    public void DestroyOverwatchArc()
-    {
-        var overwatchArcs = FindObjectsOfType<OverwatchArc>(true);
-        foreach (OverwatchArc overwatchArc in overwatchArcs)
-            Destroy(overwatchArc.gameObject);
     }
     public void CreateSightRadiusCircle()
     {
@@ -1117,7 +1102,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MA: " + activeSoldier.mp.ToString();
         soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Max Move: " + activeSoldier.InstantSpeed.ToString();
         soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = "XP: " + activeSoldier.xp.ToString();
-        soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = "Status: " + activeSoldier.GetStatus();
+        soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = activeSoldier.GetStatus();
 
         if (overrideView)
         {
@@ -1313,16 +1298,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (game.frozenTurn)
                 game.EndFrozenTurn();
             activeSoldier.selected = false;
-            activeSoldier = null;
             soldierOptionsUI.SetActive(false);
             menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(true);
+            turnTitle.text = "L I N E    O F    S I G H T";
         }
     }
     public void CloseSoldierMenuUndo()
     {
         activeSoldier.usedAP = false;
         activeSoldier.selected = false;
-        activeSoldier = null;
         soldierOptionsUI.SetActive(false);
         menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(true);
     }
@@ -1471,7 +1455,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddDetectionAlert(Soldier detector, Soldier counter, string detectorLabel, string counterLabel, string arrowType)
     {
-        print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
+        //print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
         //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
             if ((child.GetComponent<SoldierAlertLOS>().s1 == detector && child.GetComponent<SoldierAlertLOS>().s2 == counter) || (child.GetComponent<SoldierAlertLOS>().s1 == counter && child.GetComponent<SoldierAlertLOS>().s2 == detector))
@@ -2048,7 +2032,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (poiHit is not GoodyBox)
         {
-            if ((poiHit is ExplosiveBarrel barrel && !barrel.triggered) || poiHit is Terminal)
+            if ((poiHit is ExplosiveBarrel barrel && !barrel.triggered) || (poiHit is Claymore claymore && !claymore.triggered) || poiHit is Terminal)
             {
                 GameObject explosionAlert = Instantiate(explosionAlertPOIPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
                 explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, poiHit);
@@ -2365,9 +2349,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             Soldier defender = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
 
             if (defender.controlledBySoldiersList.Contains(activeSoldier.id))
-                meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new TMP_Dropdown.OptionData("<color=green>Disengage</color>") });
+                meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=green>Disengage</color>") });
             else if (defender.controllingSoldiersList.Contains(activeSoldier.id))
-                meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new TMP_Dropdown.OptionData("<color=red>Request Disengage</color>") });
+                meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=red>Request Disengage</color>") });
 
             //show defender weapon
             if (defender.BestMeleeWeapon != null)
@@ -2819,10 +2803,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (activeSoldier.PhysicalObjectWithinItemRadius(gb))
                 Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
     }
+    public void AddGlobalInventorySourceButton()
+    {
+        Instantiate(globalInventoryIconPrefab, inventorySourceIconsUI.transform).GetComponent<InventorySourceIcon>().Init(configureUI.transform.Find("AllItemsPanel").gameObject);
+    }
     public void OpenConfigureUI()
     {
         //populate active soldier inventory
         configureUI.transform.Find("SoldierInventory").Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(activeSoldier);
+
+        //add global button
+        //AddGlobalInventorySourceButton();
 
         //populate ground item icons
         AddGroundInventorySourceButton();
@@ -2852,7 +2843,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenInventoryPanel(GameObject itemPanel)
     {
         itemPanel.SetActive(true);
-
     }
     public void ClearInventoryPanel(GameObject itemPanel)
     {
@@ -3364,6 +3354,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_Sh" => "Reload Shotgun?",
             "Ammo_SMG" => "Reload Sub-Machine Gun?",
             "Ammo_Sn" => "Reload Sniper?",
+            "Claymore" => "Place Claymore?",
             "Food_Pack" => "Consume food pack?",
             "Grenade_Flashbang" => "Throw flashbang?",
             "Grenade_Frag" => "Throw frag?",
@@ -3638,10 +3629,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         UHFUI.SetActive(true);
     }
-    public void CloseGrenadeUI()
+    public void OpenGrenadeUI(UseItemUI useItemUI)
     {
-        ClearGrenadeUI();
-        grenadeUI.SetActive(false);
+        grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        grenadeUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        grenadeUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text = useItemUI.itemUsed.itemName;
+        grenadeUI.SetActive(true);
     }
     public void ClearGrenadeUI()
     {
@@ -3651,14 +3646,31 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         grenadeUI.transform.Find("PressedOnce").gameObject.SetActive(false);
         grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(false);
     }
-    public void OpenGrenadeUI(UseItemUI useItemUI)
+    public void CloseGrenadeUI()
     {
-        grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
-        grenadeUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
-        grenadeUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+        ClearGrenadeUI();
+        grenadeUI.SetActive(false);
+    }
+    public void OpenClaymoreUI(UseItemUI useItemUI)
+    {
+        claymoreUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        claymoreUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        claymoreUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
 
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text = useItemUI.itemUsed.itemName;
-        grenadeUI.SetActive(true);
+        claymoreUI.SetActive(true);
+    }
+    public void ClearClaymoreUI()
+    {
+        claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        claymoreUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        claymoreUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
+    }
+    public void CloseClaymoreUI()
+    {
+        ClearClaymoreUI();
+        claymoreUI.SetActive(false);
     }
 
 
