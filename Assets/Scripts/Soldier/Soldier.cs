@@ -22,7 +22,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, 
-        plannerDonatedMove, dugIn, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ;
+        plannerDonatedMove, dugIn, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
@@ -152,6 +152,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "modaProtect", modaProtect },
             { "trenXRayEffect", trenXRayEffect },
             { "trenSRShrinkEffect", trenSRShrinkEffect },
+            { "riotXPoint", riotXPoint },
+            { "riotYPoint", riotYPoint },
 
             //save ability details
             { "plannerDonatedMove", plannerDonatedMove },
@@ -246,6 +248,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         modaProtect = (bool)details["modaProtect"];
         trenXRayEffect = (bool)details["trenXRayEffect"];
         trenSRShrinkEffect = (bool)details["trenSRShrinkEffect"];
+        riotXPoint = Convert.ToInt32(details["riotXPoint"]);
+        riotYPoint = Convert.ToInt32(details["riotYPoint"]);
 
         //load abiltiy details
         plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
@@ -513,52 +517,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
     }
-    public void DestroyFragileItem(Soldier destroyedBy, Item itemToBeDestroyed)
-    {
-        Dictionary<string, string> itemSlots = new();
 
-        foreach (KeyValuePair<string, string> kvp in inventorySlots)
-            itemSlots.Add(kvp.Key, kvp.Value);
-
-        if (itemToBeDestroyed.IsFragile())
-        {
-            foreach (KeyValuePair<string, string> kvp in itemSlots)
-            {
-                if (kvp.Value == itemToBeDestroyed.id)
-                {
-                    if (itemToBeDestroyed.IsGrenade())
-                        game.CheckExplosionGrenade(Inventory.GetItemInSlot(kvp.Key), destroyedBy, new(X, Y, Z));
-                    else
-                        Inventory.GetItemInSlot(kvp.Key).ConsumeItem();
-                }
-            }
-        }
-            
-        menu.AddDamageAlert(this, $"{soldierName} had all fragile items destroyed.", false, true);
-    }
-    public void DestroyBreakableItem(Soldier destroyedBy, Item itemToBeDestroyed)
-    {
-        Dictionary<string, string> itemSlots = new();
-
-        foreach (KeyValuePair<string, string> kvp in inventorySlots)
-            itemSlots.Add(kvp.Key, kvp.Value);
-
-        if (itemToBeDestroyed.IsBreakable())
-        {
-            foreach (KeyValuePair<string, string> kvp in itemSlots)
-            {
-                if (kvp.Value == itemToBeDestroyed.id)
-                {
-                    if (itemToBeDestroyed.IsGrenade() && !itemToBeDestroyed.IsTriggered())
-                        game.CheckExplosionGrenade(Inventory.GetItemInSlot(kvp.Key), destroyedBy, new(X, Y, Z));
-                    else
-                        Inventory.ConsumeItemInSlot(Inventory.GetItemInSlot(kvp.Key), kvp.Key);
-                }
-            }
-        }
-                
-        menu.AddDamageAlert(this, $"{soldierName} had all breakable items destroyed.", false, true);
-    }
     public void DestroyAllBreakableItems(Soldier destroyedBy)
     {
         List<Item> itemList = new();
@@ -566,7 +525,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             itemList.Add(item);
 
         foreach (Item item in itemList)
-            DestroyBreakableItem(destroyedBy, item);
+            item.DestroyItem(destroyedBy);
     }
     public void BrokenDropAllItemsExceptArmour()
     {
@@ -749,10 +708,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 ApplyAbilityMods(); 
                 ApplyTraumaMods();
                 ApplyHealthStateMods();
-                ApplyPlaydeadMods();
-                ApplyStunnedMods();
                 ApplyItemMods();
+                ApplySmokeMods();
+                ApplyTabunMods();
                 ApplyLoudActionMods();
+
                 CorrectNegatives();
 
                 //get actual speed including enviro effects
@@ -769,18 +729,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void ApplyVisMods()
     {
-        if (game.weather.CurrentWeather.Contains("Zero visibility"))
-            stats.SR.Val -= 100;
-        else if (game.weather.CurrentWeather.Contains("Poor visibility"))
-            stats.SR.Val -= 90;
-        else if (game.weather.CurrentWeather.Contains("Moderate visibility"))
-            stats.SR.Val -= 70;
-        else if (game.weather.CurrentWeather.Contains("Good visibility"))
-            stats.SR.Val -= 40;
-
-        //commander always has full visibility due to thermal goggles
-        if (IsCommander())
-            stats.SR.Val = stats.SR.BaseVal;
+        if (!IsCommander())
+        {
+            if (game.weather.CurrentWeather.Contains("Zero visibility"))
+                stats.SR.Val -= 100;
+            else if (game.weather.CurrentWeather.Contains("Poor visibility"))
+                stats.SR.Val -= 90;
+            else if (game.weather.CurrentWeather.Contains("Moderate visibility"))
+                stats.SR.Val -= 70;
+            else if (game.weather.CurrentWeather.Contains("Good visibility"))
+                stats.SR.Val -= 40;
+        }
 
         if (SRColliderMax != null)
         {
@@ -892,7 +851,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void ApplyHealthStateMods()
     {
-        if (CheckState("Unconscious") || CheckState("Playdead"))
+        if (IsUnconscious() || IsPlayingDead() || IsStunned())
         {
             stats.SR.Val = 0;
             stats.E.Val = 0;
@@ -901,46 +860,51 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             stats.M.Val = 0;
         }
     }
-
     public void ApplyTraumaMods()
     {
         if (tp >= 3 && tp < 5)
             stats.L.Val = 0;
     }
-
-    public void ApplyPlaydeadMods()
-    {
-        if (CheckState("Playdead"))
-            stats.SR.Val = 0;
-    }
-
-    public void ApplyStunnedMods()
-    {
-        if (IsStunned())
-        {
-            stats.SR.Val = 0;
-            stats.E.Val = 0;
-            stats.F.Val = 0;
-            stats.C.Val = 0;
-            stats.M.Val = 0;
-        }
-    }
     public void ApplySmokeMods()
     {
         if (IsInSmoke())
         {
-            if (IsCommander())
-                stats.E.Val += 4;
-            else if (IsSmokeBlinded())
+            if (IsSmokeBlinded())
             {
-                stats.E.Val = 0;
-                stats.SR.Val = 0;
+                stats.E.Val += 6;
+                if (!IsCommander())
+                    stats.SR.Val = 0;
             }
             else if (IsSmokeCovered())
             {
-                stats.E.Val += 4;
-                stats.SR.Val -= 70;
+                stats.E.Val += 3;
+                if (!IsCommander())
+                    stats.SR.Val -= 70;
                 stats.P.Val -= 2;
+            }
+        }
+    }
+    public void ApplyTabunMods()
+    {
+        if (IsInTabun())
+        {
+            stats.C.Val = 0;
+            stats.F.Val = 0;
+
+            if (CheckTabunEffectLevel(100))
+            {
+                stats.E.Val -= 4;
+                stats.SR.Val -= 80;
+            }
+            else if (CheckTabunEffectLevel(50))
+            {
+                stats.E.Val -= 2;
+                stats.SR.Val -= 40;
+            }
+            else if (CheckTabunEffectLevel(25))
+            {
+                stats.E.Val -= 1;
+                stats.SR.Val -= 20;
             }
         }
     }
@@ -1077,42 +1041,47 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void TakeDrug(string drugName, Soldier administeredBy)
     {
-        if (administeredBy.IsSameTeamAsIncludingSelf(this) && administeredBy.IsMedic())
-        {
-            if (!IsOnDrug(drugName))
-            {
-                TakeSpecificDrug(administeredBy, drugName, true, false);
-                menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It worked with no side-effect.", true, true);
-            }
-        }
+        if (IsWearingStimulantArmour())
+            menu.AddDamageAlert(this, $"{soldierName} is wearing Stim Armour, {drugName} had no effect.", true, true);
         else
         {
-            if (IsOnDrug(drugName))
-                InstantKill(administeredBy, new List<string>() { "Overdose" });
-            else if (IsOnAnyDrug())
-                TakePoisoning(administeredBy.Id, false);
+            if (administeredBy.IsSameTeamAsIncludingSelf(this) && administeredBy.IsMedic())
+            {
+                if (!IsOnDrug(drugName))
+                {
+                    TakeSpecificDrug(administeredBy, drugName, true, false);
+                    menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It worked with no side-effect.", true, true);
+                }
+            }
             else
             {
-                int num = game.RandomNumber(1, 10);
-                if (num == 10)
-                {
-                    TakeSpecificDrug(administeredBy, drugName, false, !IsExperimentalist());
-                    menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It didn't work but conferred a side-effect.", false, true);
-                    if (IsExperimentalist())
-                        menu.AddDamageAlert(this, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", true, true);
-                    else
-                        menu.AddDamageAlert(this, $"{soldierName} suffered a side-effect.", false, true);
-                }
-                else if (num == 1) 
-                    menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It didn't work at all.", false, true);
+                if (IsOnDrug(drugName))
+                    InstantKill(administeredBy, new List<string>() { "Overdose" });
+                else if (IsOnAnyDrug())
+                    TakePoisoning(administeredBy.Id, false);
                 else
                 {
-                    TakeSpecificDrug(administeredBy, drugName, true, !IsExperimentalist());
-                    menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It worked but conferred a side-effect.", true, true);
-                    if (IsExperimentalist())
-                        menu.AddDamageAlert(this, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", true, true);
+                    int num = game.RandomNumber(1, 10);
+                    if (num == 10)
+                    {
+                        TakeSpecificDrug(administeredBy, drugName, false, !IsExperimentalist());
+                        menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It didn't work but conferred a side-effect.", false, true);
+                        if (IsExperimentalist())
+                            menu.AddDamageAlert(this, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", true, true);
+                        else
+                            menu.AddDamageAlert(this, $"{soldierName} suffered a side-effect.", false, true);
+                    }
+                    else if (num == 1)
+                        menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It didn't work at all.", false, true);
                     else
-                        menu.AddDamageAlert(this, $"{soldierName} suffered a side-effect.", false, true);
+                    {
+                        TakeSpecificDrug(administeredBy, drugName, true, !IsExperimentalist());
+                        menu.AddDamageAlert(this, $"{soldierName} took {drugName}. It worked but conferred a side-effect.", true, true);
+                        if (IsExperimentalist())
+                            menu.AddDamageAlert(this, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", true, true);
+                        else
+                            menu.AddDamageAlert(this, $"{soldierName} suffered a side-effect.", false, true);
+                    }
                 }
             }
         }
@@ -1201,6 +1170,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to shot damage
         if (damageSource.Contains("Shot"))
         {
+            if (HasActiveRiotShield(new(riotXPoint, riotYPoint), new(X, Y), new(damagedBy.X, damagedBy.Y), new(X, Y)))
+            {
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Riot Shield.", true, false);
+                damage = 0;
+            }
             if (IsWearingExoArmour() && game.CoinFlip())
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Exo Armour.", true, false);
@@ -1418,7 +1392,26 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
 
 
+    public void TabunTraumaCheck()
+    {
+        bool safe = false;
+        int attempts = stats.R.Val + stats.Heal.Val;
 
+        for (int i = 0; i < attempts; i++)
+        {
+            if (ResilienceCheck())
+            {
+                safe = true;
+                break;
+            }
+        }
+
+        if (!safe)
+        {
+            menu.AddTraumaAlert(this, 1, "Exposed to tabun gas and failed check, automatic trauma point has been accrued.", 0, 0, "");
+            menu.OpenTraumaAlertUI();
+        }
+    }
     public void TakeTrauma(int trauma)
     {
         if (tp < 5)
@@ -1456,8 +1449,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 if (healedBy != null)
                 {
-                    menu.AddDamageAlert(this, $"{soldierName} was stabilised by {healedBy.soldierName} (Uncon -> LS).", true, true);
-                    menu.AddXpAlert(healedBy, 2, $"Stabilised {soldierName}.", true);
+                    menu.AddDamageAlert(this, $"{soldierName} was revived by {healedBy.soldierName} (Uncon -> LS).", true, true);
+                    menu.AddXpAlert(healedBy, 2, $"Revived {soldierName}.", true);
                 }
                 MakeLastStand();
             }
@@ -1523,7 +1516,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsAbleToWalk())
         {
-            instantSpeed = (int)((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove()) + stats.Str.Val;
+            instantSpeed = (int)((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove() * ApplySmokeModsMove() * ApplyTabunModsMove()) + stats.Str.Val;
 
             //halve movement for team 1 on first turn
             if (soldierTeam == 1 && game.currentRound == 1)
@@ -1538,7 +1531,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public float CalculateInstantSpeedSuppressed()
     {
-        if (IsAbleToSee())
+        if (IsAbleToWalk())
             return (instantSpeed - stats.Str.Val)*ApplySuppressionModsMove() + stats.Str.Val;
 
         return 0;
@@ -1652,7 +1645,31 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //print("Kd Mod Move: " + kdModMove);
         return 1 - kdModMove;
     }
+    public float ApplySmokeModsMove()
+    {
+        float smokeModMove = 0;
 
+        if (IsSmokeCovered())
+            smokeModMove = 0.4f;
+
+        return 1 - smokeModMove;
+    }
+    public float ApplyTabunModsMove()
+    {
+        float tabunModMove = 0;
+
+        if (IsInTabun())
+        {
+            if (CheckTabunEffectLevel(100))
+                tabunModMove = 0.8f;
+            else if (CheckTabunEffectLevel(50))
+                tabunModMove = 0.4f;
+            else if (CheckTabunEffectLevel(25))
+                tabunModMove = 0.2f;
+        }
+
+        return 1 - tabunModMove;
+    }
     public float ApplySuppressionModsMove()
     {
         float suppressionModMove = (suppressionValue / 100f);
@@ -2274,6 +2291,57 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         UnsetState("SmokeCovered");
         UnsetState("SmokeBlinded");
     }
+    public bool IsInTabun()
+    {
+        if (CheckTabunEffectLevel(100) || CheckTabunEffectLevel(50) || CheckTabunEffectLevel(25))
+            return true;
+        return false;
+    }
+    public bool CheckTabunEffectLevel(int level)
+    {
+        if (CheckState($"Tabun{level}"))
+            return true;
+        return false;
+    }
+    public void SetTabunEffectLevel(int level)
+    {
+        state.RemoveAll(e => e.Contains("Tabun"));
+        SetState($"Tabun{level}");
+    }
+    public void SetTabunOuterAffected()
+    {
+        bool rCheck = ResilienceCheck(), healCheck = HealCheck();
+
+        //experimentalist ability
+        if (IsExperimentalist())
+            rCheck = true;
+
+        if (rCheck && healCheck)
+            menu.AddXpAlert(this, 1, $"{soldierName} resisted tabun gas.", false);
+        else if (rCheck ^ healCheck)
+            SetTabunEffectLevel(25);
+        else
+            SetTabunEffectLevel(50);
+    }
+    public void SetTabunInnerAffected()
+    {
+        bool rCheck = ResilienceCheck(), healCheck = HealCheck();
+
+        //experimentalist ability
+        if (IsExperimentalist())
+            rCheck = true;
+
+        if (rCheck && healCheck)
+            menu.AddXpAlert(this, 1, $"{soldierName} resisted tabun gas.", false);
+        else if (rCheck ^ healCheck)
+            SetTabunEffectLevel(50);
+        else
+            SetTabunEffectLevel(100);
+    }
+    public void UnsetTabun()
+    {
+        state.RemoveAll(e => e.Contains("Tabun"));
+    }
     public void SetOverwatch(int x, int y, int r, int a)
     {
         overwatchXPoint = x;
@@ -2451,11 +2519,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void InstantKill(Soldier killedBy, List<string> damageSource)
     {
-        if (this.IsAlive())
-        {
-            menu.AddDamageAlert(this, $"{soldierName} was killed instantly by {menu.PrintList(damageSource)}.", false, false);
+        if (IsAlive())
             Kill(killedBy, damageSource);
-        }
     }
     public void Kill(Soldier killedBy, List<string> damageSource)
     {
@@ -2475,7 +2540,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 //make him dead
                 ClearHealthState();
                 SetState("Dead");
-                menu.AddDamageAlert(this, $"{soldierName} died!", false, true);
                 hp = 0;
 
                 //remove all reveals and revealedby
@@ -2693,7 +2757,61 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     objectIsRevealed = true;
         return objectIsRevealed;
     }
+    public void CheckSmokeClouds()
+    {
+        if (IsAlive())
+        {
+            foreach (SmokeCloud cloud in FindObjectsOfType<SmokeCloud>())
+            {
+                if (PhysicalObjectWithinRadius(cloud, 5))
+                    SetSmokeBlinded();
+                else if (PhysicalObjectWithinRadius(cloud, 20))
+                    SetSmokeCovered();
 
+                //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
+                if (IsInSmoke())
+                {
+                    if (IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
+                        cloud.alliesAffected.Add(Id);
+                    else if (IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
+                        cloud.enemiesAffected.Add(Id);
+                }
+            }
+        }
+    }
+    public void CheckTabunClouds()
+    {
+        bool wasInTabun = false;
+
+        if (IsAlive() && !IsWearingStimulantArmour())
+        {
+            //check if soldier already in tabun
+            if (IsInTabun())
+                wasInTabun = true;
+            else
+            {
+                foreach (TabunCloud cloud in FindObjectsOfType<TabunCloud>())
+                {
+                    if (PhysicalObjectWithinRadius(cloud, 5))
+                        SetTabunInnerAffected();
+                    else if (PhysicalObjectWithinRadius(cloud, 20))
+                        SetTabunOuterAffected();
+
+                    //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
+                    if (IsInTabun())
+                    {
+                        if (IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
+                            cloud.alliesAffected.Add(Id);
+                        else if (IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
+                            cloud.enemiesAffected.Add(Id);
+                    }
+                }
+            }
+
+            if (!IsInTabun() && wasInTabun)
+                TabunTraumaCheck();
+        }
+    }
 
 
 
@@ -2710,15 +2828,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (game.DiceRoll() <= stats.R.Val)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool StrengthCheck()
     {
         if (game.DiceRoll() <= stats.Str.Val)
             return true;
-        else
-            return false;
+        return false;
+    }
+    public bool HealCheck()
+    {
+        if (game.DiceRoll() <= stats.Heal.Val)
+            return true;
+        return false;
     }
     public bool SuppressionCheck()
     {
@@ -2945,6 +3067,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 return true;
         return false;
     }
+    public bool HasSMGOrPistolInBothHands()
+    {
+        if (HasWeaponsInBothHands() && (LeftHandItem.IsSMG() || LeftHandItem.IsPistol()) && (RightHandItem.IsSMG() || RightHandItem.IsPistol()))
+            return true;
+        return false;
+    }
     public bool IsDualWielding()
     {
         if (HasWeaponsInBothHands() || HasNonWeaponsInBothHands() || HasNonWeaponInLeftHandAndWeaponInRightHand() || HasWeaponInLeftHandAndNonWeaponInRightHand())
@@ -2996,6 +3124,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool IsCarryingRiotShield()
     {
         if (Inventory.HasItemOfType("Riot_Shield"))
+            return true;
+        return false;
+    }
+    public bool HasActiveRiotShield(Vector3 fromA, Vector3 toA, Vector3 fromB, Vector3 toB)
+    {
+        if (IsCarryingRiotShield() && !IsDualWielding() && HelperFunctions.IsWithinAngle(fromA, toA, fromB, toB, 67.5f))
             return true;
         return false;
     }
@@ -3590,6 +3724,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return $", <color=red>Smoke - Defence Zone</color>";
         return "";
     }
+    public string GetTabunedState()
+    {
+        if (IsInTabun())
+        {
+            if (CheckTabunEffectLevel(100))
+                return $", <color=red>Tabun - Severe</color>";
+            else if (CheckTabunEffectLevel(50))
+                return $", <color=red>Tabun - Moderate</color>";
+            else if (CheckTabunEffectLevel(25))
+                return $", <color=red>Tabun - Light</color>";
+        }
+        
+        return "";
+    }
     public string GetDrugState()
     {
         string drugState = "";
@@ -3685,6 +3833,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetPlaydeadState();
             status += GetDugInState();
             status += GetSmokedState();
+            status += GetTabunedState();
             status += GetDrugState();
 
             status += GetPlannerBuffState();

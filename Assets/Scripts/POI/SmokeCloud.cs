@@ -32,18 +32,21 @@ public class SmokeCloud : POI, IDataPersistence
         y = (int)location.Item1.y;
         z = (int)location.Item1.z;
         terrainOn = location.Item2;
-        MapPhysicalPosition(x, y, z);
         GenerateCircleMesh(smokeRadius);
+        transform.position = new Vector3(x - 0.5f, z + 0.2f, y - 0.5f);
 
         turnsUntilDissipation = 3;
         placedById = thrownBy;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
-        game.CheckSmokeClouds();
+        SpawnCloud();
 
         return this;
     }
-
+    private void Update()
+    {
+        placedBy = menu.soldierManager.FindSoldierById(placedById);
+    }
     void GenerateCircleMesh(int radius)
     {
         MeshFilter meshFilter = GetComponent<MeshFilter>();
@@ -96,14 +99,13 @@ public class SmokeCloud : POI, IDataPersistence
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
             terrainOn = (string)details["terrainOn"];
-            MapPhysicalPosition(x, y, z);
             GenerateCircleMesh(smokeRadius);
+            transform.position = new Vector3(x - 0.5f, z + 0.2f, y - 0.5f);
 
             turnsUntilDissipation = Convert.ToInt32(details["turnsUntilDissipation"]);
             alliesAffected = (details["alliesAffected"] as JArray).Select(token => token.ToString()).ToList();
             enemiesAffected = (details["enemiesAffected"] as JArray).Select(token => token.ToString()).ToList();
             placedById = (string)details["placedById"];
-            placedBy = menu.soldierManager.FindSoldierById(placedById);
         }
     }
 
@@ -128,8 +130,14 @@ public class SmokeCloud : POI, IDataPersistence
 
         data.allPOIDetails.Add(id, details);
     }
+    public void SpawnCloud()
+    {
+        game.CheckAllSmokeClouds();
+    }
     public void DissipateCloud()
     {
+        game.CheckAllSmokeClouds();
+
         //pay xp
         int xp = alliesAffected.Count - enemiesAffected.Count;
         if (xp > 0)
@@ -142,7 +150,7 @@ public class SmokeCloud : POI, IDataPersistence
         get { return id; } 
     }
 
-    public int TurnsActive
+    public int TurnsUntilDissipation
     {
         get { return turnsUntilDissipation; }
         set

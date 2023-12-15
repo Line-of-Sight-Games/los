@@ -334,7 +334,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (currentTeam == 1)
                 StartRound();
 
-            IncreaseRoundsActiveSmokeClouds();
+            IncreaseRoundsActiveAllClouds();
             StartCoroutine(StartTeamTurn());
         }
     }
@@ -623,7 +623,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
             claymore.CheckClaymoreTriggeredBy(movingSoldier);
 
         //check for smoke clouds
-        CheckSmokeClouds();
+        movingSoldier.CheckSmokeClouds();
+
+        //check for tabun clouds
+        movingSoldier.CheckTabunClouds();
 
         //check for fall damage
         if (fallDistanceInt > 0)
@@ -946,7 +949,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public float ShooterTraumaMod(Soldier shooter)
     {
-        var traumaMod = shooter.tp switch
+        float traumaMod = shooter.tp switch
         {
             1 => 0.1f,
             2 => 0.2f,
@@ -970,6 +973,37 @@ public class MainGame : MonoBehaviour, IDataPersistence
         shotParameters.Add(Tuple.Create("sustenance", $"{1 - sustenanceMod}"));
 
         return 1 - sustenanceMod;
+    }
+    public float ShooterSmokeMod(Soldier shooter)
+    {
+        float smokeMod = 0;
+
+        if (shooter.IsSmokeBlinded())
+            smokeMod = 0.4f;
+
+        //report parameters
+        shotParameters.Add(Tuple.Create("smoke", $"{1 - smokeMod}"));
+
+        return 1 - smokeMod;
+    }
+    public float ShooterTabunMod(Soldier shooter)
+    {
+        float tabunMod = 0;
+
+        if (shooter.IsInTabun())
+        {
+            if (shooter.CheckTabunEffectLevel(100))
+                tabunMod = 0.8f;
+            else if (shooter.CheckTabunEffectLevel(50))
+                tabunMod = 0.4f;
+            else if (shooter.CheckTabunEffectLevel(25))
+                tabunMod = 0.2f;
+        }
+
+        //report parameters
+        shotParameters.Add(Tuple.Create("tabun", $"{1 - tabunMod}"));
+
+        return 1 - tabunMod;
     }
     public float RelevantWeaponSkill(Soldier shooter, Item gun)
     {
@@ -1068,7 +1102,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (target is Soldier targetSoldier2 && targetSoldier2.IsCalculator() && !shooter.IsRevoker())
             rainfall = weather.IncreasedRain(rainfall);
 
-        var rainMod = rainfall switch
+        float rainMod = rainfall switch
         {
             "Zero" or "Light" => 0.0f,
             "Moderate" => 0.02f,
@@ -1308,7 +1342,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         int suppressedHitChance, hitChance, critChance;
 
         //calculate normal shot chance
-        hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * TargetHealthMod(target) * ShooterTerrainMod(shooter) * TargetTerrainMod(target) * ElevationMod(shooter, target) * KdMod(shooter) * OverwatchMod(shooter) * FlankingMod(target) * StealthMod(shooter));
+        hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * TargetHealthMod(target) * ShooterTerrainMod(shooter) * TargetTerrainMod(target) * ElevationMod(shooter, target) * KdMod(shooter) * OverwatchMod(shooter) * FlankingMod(target) * StealthMod(shooter) * ShooterSmokeMod(shooter) * ShooterTabunMod(shooter));
 
         //declare suppression shot chance
         suppressedHitChance = hitChance - ShooterSuppressionMod(shooter);
@@ -1429,7 +1463,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
-                    targetBarrel.CheckExplosionBarrel(shooter, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel : {targetBarrel.X},{targetBarrel.Y},{targetBarrel.Z}").gameObject);
+                    targetBarrel.CheckExplosionBarrel(shooter);
                 }
                 else
                 {
@@ -1758,16 +1792,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public float DefenderMeleeSkill(Soldier defender)
     {
         int juggernautBonus = 0;
-        float inspirerBonus, defenderMeleeSkill = defender.stats.M.Val;
+        float defenderMeleeSkill = defender.stats.M.Val;
 
         //apply JA debuff
         if (defender.IsWearingJuggernautArmour(false))
             juggernautBonus = -1;
         defenderMeleeSkill += juggernautBonus;
-
-        //check for inspirer
-        inspirerBonus = defender.InspirerBonusWeaponMelee();
-        defenderMeleeSkill += inspirerBonus;
 
         //apply sustenance debuff
         defenderMeleeSkill *= DefenderSustenanceMod(defender);
@@ -1778,7 +1808,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         meleeParameters.Add(Tuple.Create("dM", $"{defender.stats.M.Val}"));
         meleeParameters.Add(Tuple.Create("dJuggernaut", $"{juggernautBonus}"));
-        meleeParameters.Add(Tuple.Create("dInspirer", $"{inspirerBonus}"));
         return defenderMeleeSkill;
     }
     public float DefenderSustenanceMod(Soldier defender)
@@ -2353,6 +2382,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Medkit_Small":
             case "Medkit_Medium":
             case "Medkit_Large":
+            case "Riot_Shield":
+                menu.OpenRiotShieldUI(useItemUI);
+                break;
             case "Syringe_Amphetamine":
             case "Syringe_Androstenedione":
             case "Syringe_Cannabinoid":
@@ -2472,6 +2504,21 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
     }
+    public void ConfirmRiotShield(UseItemUI useRiotShield)
+    {
+        TMP_InputField targetX = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetY = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("YPos").GetComponent<TMP_InputField>();
+
+        if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour)
+        {
+            //set riot shield facing
+            activeSoldier.riotXPoint = int.Parse(targetX.text);
+            activeSoldier.riotYPoint = int.Parse(targetY.text);
+
+            menu.CloseRiotShieldUI();
+            useRiotShield.itemUsed.UseItem(useRiotShield.itemUsedIcon, useRiotShield.itemUsedOn, useRiotShield.soldierUsedOn);
+        }
+    }
     public void ConfirmGrenade(UseItemUI useGrenade)
     {
         string grenadeName = useGrenade.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text;
@@ -2527,7 +2574,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
                         if (grenadeName.Contains("Frag") || grenadeName.Contains("Flashbang"))
-                            CheckExplosionGrenade(useGrenade.itemUsed, linkedSoldier, new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)));
+                            useGrenade.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)));
                         else if (grenadeName.Contains("Smoke"))
                             Instantiate(poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)), string.Empty), activeSoldier.Id);
                         else if (grenadeName.Contains("Tabun"))
@@ -2562,79 +2609,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
     }
-    public void CheckExplosionGrenade(Item grenade, Soldier explodedBy, Vector3 position)
-    {
-        grenade.traits.Add("Triggered");
-        int damage = 0, stun = 0;
-        //imperceptible delay to allow colliders to be recalculated at new destination
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{grenade.itemName} : {grenade.X},{grenade.Y},{grenade.Z}").gameObject;
-
-        if (grenade.IsFrag())
-        {
-            grenade.ConsumeItem();
-            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
-            {
-                if (obj.PhysicalObjectWithinRadius(position, 3))
-                    damage = 8;
-                else if (obj.PhysicalObjectWithinRadius(position, 8))
-                    damage = 4;
-                else if (obj.PhysicalObjectWithinRadius(position, 15))
-                    damage = 2;
-
-                if (damage > 0)
-                {
-                    if (obj is Item hitItem)
-                        menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, damage);
-                    else if (obj is POI hitPoi)
-                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
-                    else if (obj is Soldier hitSoldier)
-                    {
-                        if (!hitSoldier.ResilienceCheck())
-                            stun = 1;
-                        menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, damage, stun);
-                    }
-                }
-            }
-        }
-        else if (grenade.IsFlashbang())
-        {
-            grenade.ConsumeItem();
-            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
-            {
-                if (obj.PhysicalObjectWithinRadius(position, 0))
-                {
-                    damage = DiceRoll();
-                    stun = 4;
-                }
-                else if (obj.PhysicalObjectWithinRadius(position, 3))
-                    stun = 4;
-                else if (obj.PhysicalObjectWithinRadius(position, 8))
-                    stun = 3;
-                else if (obj.PhysicalObjectWithinRadius(position, 15))
-                    stun = 2;
-
-                if (stun > 0 || damage > 0)
-                {
-                    if (obj is Soldier hitSoldier)
-                        menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, damage - hitSoldier.stats.R.Val, stun - hitSoldier.stats.R.Val);
-                    else if (obj is POI hitPoi && damage > 0)
-                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
-                    else if (obj is Item hitItem && damage > 0)
-                        menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, damage);
-                }
-            }
-        }
-        else
-        {
-            grenade.ConsumeItem();
-            print("pretending to detonate smoke or tabun");
-        }
-
-        if (explosionList.transform.Find("Scroll").Find("View").Find("Content").childCount > 0)
-            menu.OpenExplosionUI();
-        else
-            Destroy(explosionList);
-    }
     static Tuple<int, int> CalculateScatteredCoordinates(int targetX, int targetY, float scatterDegree, float scatterDistance)
     {
         // Convert degree to radians
@@ -2649,7 +2623,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {
         float damagef = 0;
-        int stun = 0;
         //imperceptible delay to allow colliders to be recalculated at new destination
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF : {position.x}, {position.y}, {position.z}").gameObject;
 
@@ -2663,15 +2636,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (damagef > 0)
             {
                 if (obj is Item hitItem)
-                    menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, Mathf.RoundToInt(damagef));
+                    menu.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, Mathf.RoundToInt(damagef));
                 else if (obj is POI hitPoi)
                     menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, Mathf.RoundToInt(damagef));
                 else if (obj is Soldier hitSoldier)
-                {
-                    if (!hitSoldier.ResilienceCheck())
-                        stun = 1;
-                    menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, hitSoldier.RoundByResilience(damagef) - hitSoldier.stats.R.Val, stun);
-                }
+                    menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, hitSoldier.RoundByResilience(damagef) - hitSoldier.stats.R.Val, 1);
             }
         }
 
@@ -2680,33 +2649,22 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             Destroy(explosionList);
     }
-    public void CheckSmokeClouds()
+    public void CheckAllSmokeClouds()
     {
         foreach (Soldier s in AllSoldiers())
-        {
-            s.UnsetSmoked();
-            foreach (SmokeCloud cloud in FindObjectsOfType<SmokeCloud>())
-            {
-                if (s.PhysicalObjectWithinRadius(cloud, 5))
-                    s.SetSmokeBlinded();
-                else if (s.PhysicalObjectWithinRadius(cloud, 20))
-                    s.SetSmokeCovered();
-
-                //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
-                if (s.IsInSmoke())
-                {
-                    if (s.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(s.Id))
-                        cloud.alliesAffected.Add(s.Id);
-                    else if (s.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(s.Id))
-                        cloud.enemiesAffected.Add(s.Id);
-                }
-            }
-        } 
+            s.CheckSmokeClouds();
     }
-    public void IncreaseRoundsActiveSmokeClouds()
+    public void CheckAllTabunClouds()
+    {
+        foreach (Soldier s in AllSoldiers())
+            s.CheckTabunClouds();
+    }
+    public void IncreaseRoundsActiveAllClouds()
     {
         foreach (SmokeCloud cloud in FindObjectsOfType<SmokeCloud>())
-            cloud.TurnsActive--;
+            cloud.TurnsUntilDissipation--;
+        foreach (TabunCloud cloud in FindObjectsOfType<TabunCloud>())
+            cloud.TurnsUntilDissipation--;
     }
 
 
@@ -3465,9 +3423,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee, bool triggersOverwatch)
     {
-        //print(GetCallingFunctionName());
+        print(GetCallingFunctionName());
         yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true && menu.overrideView == false);
-
         string movingSoldierActiveStat = "F";
         string detecteeActiveStat = "C";
         int[] movingSoldierMultipliers = { 3, 2, 1 };

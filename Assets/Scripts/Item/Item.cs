@@ -624,10 +624,93 @@ public class Item : PhysicalObject, IDataPersistence
             }
         }
     }
+    public void CheckExplosionGrenade(Soldier explodedBy, Vector3 position)
+    {
+        //grenade.traits.Add("Triggered");
+        //imperceptible delay to allow colliders to be recalculated at new destination
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} : {position.x},{position.y},{position.z}").gameObject;
+
+        if (IsFrag())
+        {
+            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+            {
+                int damage = 0;
+                if (obj.PhysicalObjectWithinRadius(position, 3))
+                    damage = 8;
+                else if (obj.PhysicalObjectWithinRadius(position, 8))
+                    damage = 4;
+                else if (obj.PhysicalObjectWithinRadius(position, 15))
+                    damage = 2;
+
+                if (damage > 0)
+                {
+                    if (obj is Item hitItem)
+                        menu.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, damage);
+                    else if (obj is POI hitPoi)
+                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                    else if (obj is Soldier hitSoldier)
+                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage, 1);
+                }
+            }
+        }
+        else if (IsFlashbang())
+        {
+            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+            {
+                int damage = 0, stun = 0;
+                if (obj.PhysicalObjectWithinRadius(position, 0))
+                {
+                    damage = game.DiceRoll();
+                    stun = 4;
+                }
+                else if (obj.PhysicalObjectWithinRadius(position, 3))
+                    stun = 4;
+                else if (obj.PhysicalObjectWithinRadius(position, 8))
+                    stun = 3;
+                else if (obj.PhysicalObjectWithinRadius(position, 15))
+                    stun = 2;
+
+                if (stun > 0 || damage > 0)
+                {
+                    if (obj is Soldier hitSoldier)
+                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage - hitSoldier.stats.R.Val, stun - hitSoldier.stats.R.Val);
+                    else if (obj is POI hitPoi && damage > 0)
+                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                    else if (obj is Item hitItem && damage > 0)
+                        menu.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, damage);
+                }
+            }
+        }
+        else if (IsSmoke())
+            Instantiate(game.poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
+        else if (IsTabun())
+            Instantiate(game.poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
+
+        //show explosion list
+        if (explosionList.transform.Find("Scroll").Find("View").Find("Content").childCount > 0)
+            menu.OpenExplosionUI();
+        else
+            Destroy(explosionList);
+    }
     public void ConsumeItem()
     {
         owner?.Inventory.RemoveItemFromSlot(this, whereEquipped);
         itemManager.DestroyItem(this);
+    }
+    public void DamageItem(Soldier damagedBy, int damage)
+    {
+        if ((damage >= 5 && IsBreakable()) || (damage > 0 && IsFragile()))
+            DestroyItem(damagedBy);
+    }
+    public void DestroyItem(Soldier destroyedBy)
+    {
+            if (IsGrenade() && !IsTriggered())
+                CheckExplosionGrenade(destroyedBy, new(X, Y, Z));
+            else
+                ConsumeItem();
+
+            if (owner is Soldier linkedSoldier)
+                menu.AddDamageAlert(linkedSoldier, $"{linkedSoldier.soldierName} had {this.itemName} destroyed.", false, true);
     }
     public bool IsBreakable()
     {
@@ -704,6 +787,18 @@ public class Item : PhysicalObject, IDataPersistence
     public bool IsFlashbang()
     {
         if (IsGrenade() && name.Contains("Flashbang"))
+            return true;
+        return false;
+    }
+    public bool IsSmoke()
+    {
+        if (IsGrenade() && name.Contains("Smoke"))
+            return true;
+        return false;
+    }
+    public bool IsTabun()
+    {
+        if (IsGrenade() && name.Contains("Tabun"))
             return true;
         return false;
     }

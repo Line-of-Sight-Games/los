@@ -24,7 +24,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "The Player may remove one of their soldiers from the field. The soldier will return from where they were taken at start of their next turn. This ability may be used once anytime",
         "Reorganise all equipment between fielded soldiers to the Player's liking",
         "Cancel the ability of the furthest revealed enemy from the negotiator. If all enemies are currently hidden, this effect will apply to the next revealed enemy (Opponent informed)",
-        "Relocate any friendly or revealed enemy soldier along a straight line between their current position and where they fielded from (Opponent informed of enemy soldier)",
+        "Relocate any friendly or revealed enemy soldier along a straight line between their current position and where they fielded from (Opponent informed if enemy soldier)",
         "Next two enemy shots will miss (XP given) (Opponent informed of reason after miss)",
         "At the beginning of the Opponent's next turn, their overwatch will be disabled for 6 turns (Opponent informed)",
         "Poison the first soldier (friendly or enemy, no XP) encountered in a wind direction (8 options) chosen by the Player. Player may also poison closest soldier to centre if desired (Opposed informed if enemy poisoined)",
@@ -35,23 +35,23 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "Place 3 thermal cameras anywhere on the map (negotiator to receive XP for detections)",
         "Move and rotate a reasonable terrain feature to any location where there is room (will carry everything)",
         "All equipped enemy grenades, radios and claymores will be confiscated by the GM (Opponent informed)",
-        "Place six claymores anywhere on the field (XP given) that is not within 6cm of a known enemy location (will use the Negotiator's F and C values and the Negotiator's L cannot decrease for the rest of the game)",
-        "In situations where the Player believes there is a mutual LOS between friendly and enemy soldiers, they may render their soldier unshootable until the end of their Opponent's turn. Can be used twice at anytime. (Opponent informed of reason after miss)",
-        "All enemy soldiers accrue an additional trauma level (Opponent infromed)",
+        "Place six claymores anywhere on the field (XP given) that is not within 6cm of a known enemy location (will use the Negotiator's F and C values)",
+        "In situations where the Player reasonably believes there is a mutual LOS between friendly and enemy soldiers, they may render their soldier unshootable until the end of their Opponent's turn. Can be used twice at anytime. (Opponent informed of reason after miss)",
+        "All enemy soldiers accrue an additional trauma level (Opponent informed)",
         "One fielded soldier must call a free UHF strike (XP given)",
-        "Choose a soldier. Completely rebuild (choose) their specialty, ability and skill point distribution (duplicates only permitted for deceased soldiers). Their XP, body and equipment will be conserved. They may equip a gun or swap if one is already equipped.",
+        "Choose a soldier. Completely rebuild (choose) their specialty, ability and skill point distribution (duplicates only permitted for deceased soldiers). Their XP, body and equipment will be conserved. They may equip a gun or swap if one is already equipped",
         "Enemy Corporals (and above) will be unable to take cover, equip new Specialty Armours or control engagements (Opponent informed)",
     };
     private readonly string[] l4Dip =
     {
         "After any attempted shot (either to or from the enemy), teleport the relevant enemy anywhere along the bullet's trajectory (Can be mid-air...enemy will fall). Can be used twice (Opponent informed after each use)",
         "Administer any one drug to any one soldier without a side effect",
-        "Set all enemy Support skills to 0. -1 to enemy Weapon skills (Opponent informed)",
+        "All enemy Support skills set to 0. -1 to enemy Weapon skills (Opponent informed)",
         "Teleport entire fielded team to a single location (3cm distancing kept). Can be used anytime (only once) (Opponent informed if used but not the location)",
         "Reset all starvation and trauma for fielded soldiers to 0. Remove any active poison",
         "Remove 10 items of indestructible cover. Any enemies currently in cover will be poisoned and receive 1 trauma point. (Opponent informed)",
         "Choose a terrain. All soldiers of that terrain will receive a UHF radio",
-        "All fielded enemies except the most experience enemy (unless he is the sole survivor) will be poisoned (no XP) (Opponent informed)",
+        "All fielded enemies except the most experienced enemy (unless he is the sole survivor) will be poisoned (no XP) (Opponent informed)",
         "+2 increments to all soldiers' Support and Weapon skills",
         "Any enemies including and above the rank of Captain are executed. If none exist, one random unfielded soldier will be executed, if none exist, the most experienced enemy will have his HP halved (round down) (Opponent informed)",
     };
@@ -60,7 +60,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "All fielded enemies become Frozen. Unfielded enemies are executed (Opponent informed)",
         "Entire team's Dip and Elec skills are added together to deliver a UHF strike. If Negotiator is sole survivor, his skill points will be doubled. If no enemies are killed by this strike, it may be redone (once, XP given)",
         "Player never leaves the Command Zone and all enemy radio communications are permanently disabled. (Opponent informed)",
-        "All enemies must pass a deathroll to survive (no XP). If they all survive, all except the lowest ranked (Opponent chooses sole survivor if there are ties) will all be executed (Opponent informed)",
+        "All enemies must pass a deathroll to survive (no XP). If they all survive, all except the lowest ranked (Opponent chooses sole survivor if there are ties) will be executed (Opponent informed)",
         "Disable two of either shooting, melee or explosives for the enemy (Oppponent informed)",
     };
     private readonly string[] l6Dip =
@@ -97,28 +97,28 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
     private readonly string[] l3Elec =
     {
         "Distribute 8AP amongst fielded soldiers",
-        "Soldiers will be fully healed (no XP). Soldiers already on full health receive 1H",
+        "All soldiers will be fully healed (no XP). Soldiers already on full health receive 1H",
         "Neither shots nor suppression consume ammunition. Remove any spare ammo equipped on enemy soldiers.",
         "All fielded enemy soldiers accrue an additional 10 turns of starvation (Opponent informed)",
-        "Select a revealed enemy soldier who will spend 3AP each turn traversing the quickest route to a spawn of your choice (choose once). The enemy soldier may use additional AP as they wish. When (if) they arrive, the Opponent will then resume regular control (Opponent informed).",
+        "Select a revealed enemy soldier who will spend 3AP each turn traversing the quickest route (with no regard for their safety) to a spawn of your choice as the first action of the Opponent's turn. (choose once). The enemy soldier may use additional AP as they wish and will lose 2HP for every turn they cannot move. When (if) they arrive, the Opponent will resume regular control (Opponent informed) (If no enemy soldiers are visible, this will apply to the next revealed soldier)",
         "Enemy soldiers will receive an unresistable suppression penalty of 80 on their next turn. Can be used anytime (Opponent informed)",
         "Engine will randomly generate 5 abilities, choose one of these to award to all fielded allies (same ability for all)",
         "Squadsight disabled for the enemy (Opponent informed)",
         "-12S to all fielded enemies (Opponent informed)",
-        "Soldiers can permanently retry failed rolls involving R",
+        "Soldiers can permanently retry failed R rolls once per roll",
     };
     private readonly string[] l4Elec =
     {
-        "All fielded soldiers (except the hacker…unless he is the sole survivor) shall have their first ability upgraded",
+        "All fielded soldiers (except the hacker, unless he is the sole survivor) shall have their first ability upgraded",
         "Permanently remove all current and future appearances of a list of items specified by the Player (Opponent informed)",
         "The player's last surviving soldier will have his H tripled and his HP restored to maximum. He may also choose an additional unupgraded ability",
         "Structurally collapse up to 6 structures (Opponent informed)",
-        "Choose one primary, weapon and support skill (Not H, U, P or SR). All soldiers will have these skills doubled while all fielded enemies will have them zeroed (Opponent informed)",
-        "Enemy soldiers can never control engagements. Any melee damage dealt to enemies will cause immediate death. (Opponent informed)",
+        "Choose one primary, weapon and support skill (Not H, S, P or SR). All soldiers will have these skills doubled while all fielded enemies will have them zeroed (Opponent informed)",
+        "Enemy soldiers will always be melee-controlled in engagements. Any damage-dealing melee attack will cause immediate death. (Opponent informed)",
         "All soldiers will receive thermal goggles and a smoke grenade (if desired)",
         "Immediately resurrect a fallen soldier at his grave on full HP. He may commence his turn (Opponent informed)",
-        "All fielded soldiers shall earn a 'life'. Completely ignore the event that would have killed them(once each)",
-        "All actions now cost 1 less AP",
+        "All fielded soldiers shall earn a 'life'. Completely ignore the event that would have killed them (once each)",
+        "All actions now cost 1 less AP (min 0)",
     };
     private readonly string[] l5Elec =
     {
@@ -150,18 +150,18 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
 
     public void GenerateDipelec()
     {
-        savedDip.Add(l1Dip[Random.Range(0, 10)]);
-        savedDip.Add(l2Dip[Random.Range(0, 10)]);
-        savedDip.Add(l3Dip[Random.Range(0, 10)]);
-        savedDip.Add(l4Dip[Random.Range(0, 10)]);
-        savedDip.Add(l5Dip[Random.Range(0, 5)]);
+        savedDip.Add(l1Dip[Random.Range(0, l1Dip.Length)]);
+        savedDip.Add(l2Dip[Random.Range(0, l2Dip.Length)]);
+        savedDip.Add(l3Dip[Random.Range(0, l3Dip.Length)]);
+        savedDip.Add(l4Dip[Random.Range(0, l4Dip.Length)]);
+        savedDip.Add(l5Dip[Random.Range(0, l5Dip.Length)]);
         savedDip.Add(l6Dip[0]);
 
-        savedElec.Add(l1Elec[Random.Range(0, 10)]);
-        savedElec.Add(l2Elec[Random.Range(0, 10)]);
-        savedElec.Add(l3Elec[Random.Range(0, 10)]);
-        savedElec.Add(l4Elec[Random.Range(0, 10)]);
-        savedElec.Add(l5Elec[Random.Range(0, 5)]);
+        savedElec.Add(l1Elec[Random.Range(0, l1Elec.Length)]);
+        savedElec.Add(l2Elec[Random.Range(0, l2Elec.Length)]);
+        savedElec.Add(l3Elec[Random.Range(0, l3Elec.Length)]);
+        savedElec.Add(l4Elec[Random.Range(0, l4Elec.Length)]);
+        savedElec.Add(l5Elec[Random.Range(0, l5Elec.Length)]);
         savedElec.Add(l6Elec[0]);
     }
 

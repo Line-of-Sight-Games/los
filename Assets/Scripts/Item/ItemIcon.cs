@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEditor.VersionControl;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -127,7 +128,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.overrideView)
         {
-            if (item.owner is Soldier linkedSoldier)
+            if (item.owner is Soldier linkedSoldier && linkedSoldier.IsAbleToSee())
             {
                 int ap = item.usageAP;
                 //adept ability
@@ -141,7 +142,15 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 {
                     if (item.IsUsable())
                     {
-                        if (!linkedSoldier.IsWearingJuggernautArmour(false) || (linkedSoldier.IsWearingJuggernautArmour(false) && (item.IsGun() || item.IsGrenade())))
+                        string message = "";
+                        if (linkedSoldier.HasNonWeaponsInBothHands())
+                            message = "Hands Full";
+                        else if (linkedSoldier.IsCarryingRiotShield() && !item.IsRiotShield())
+                            message = "Riot Shield Blocking";
+                        else if (linkedSoldier.IsWearingJuggernautArmour(false) && !(item.IsGun() || item.IsGrenade() || item.IsRiotShield()))
+                            message = "Juggernaut Armour Blocking";
+
+                        if (message == "")
                         {
                             if (linkedSoldier.HasNothingInBothHands() || linkedSoldier.HasSingleWeaponInEitherHand()) //if hands empty or holding single weapon
                                 menu.OpenUseItemUI(item, transform.parent.name, this);
@@ -151,7 +160,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                                 menu.OpenCannotUseItemUI("Hands Full");
                         }
                         else
-                            menu.OpenCannotUseItemUI("Juggernaut Armour Blocking");
+                            menu.OpenCannotUseItemUI(message);
                     }
                 }
             }

@@ -34,11 +34,16 @@ public class ExplosionList : MonoBehaviour
 
                 if (hitByExplosion is Item item)
                 {
-                    //perform item destruction
-                    if (item.owner is Soldier linkedSoldier)
-                        linkedSoldier.DestroyBreakableItem(explodedBy, item);
-                    else
-                        menu.itemManager.DestroyBreakableItem(explodedBy, item);
+                    if (int.TryParse(child.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage))
+                    {
+                        if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
+                        {
+                            if (item.IsGrenade())
+                                item.traits.Add("Triggered");
+                            else
+                                item.DamageItem(explodedBy, damage);
+                        }
+                    }
                 }
                 else if (hitByExplosion is ExplosiveBarrel hitBarrel) //mark barrels for explosion
                 {
@@ -63,7 +68,7 @@ public class ExplosionList : MonoBehaviour
                     {
                         if (child.Find("Damage").Find("DamageToggle").GetComponent<Toggle>().isOn)
                         {
-                            if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Claymore"))
+                            if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Claymore")) //if it's a claymore
                             {
                                 if (hitSoldier.IsUnconscious() || hitSoldier.IsLastStand() || hitSoldier.IsWearingExoArmour() || hitSoldier.IsWearingGhillieArmour() || hitSoldier.IsWearingStimulantArmour())
                                 {
@@ -96,11 +101,20 @@ public class ExplosionList : MonoBehaviour
                 PhysicalObject hitByExplosion = child.GetComponent<ExplosiveAlert>().hitByExplosion;
                 Soldier explodedBy = child.GetComponent<ExplosiveAlert>().explodedBy;
                 if (hitByExplosion is ExplosiveBarrel hitBarrel)
+                {
                     if (hitBarrel.triggered)
-                        hitBarrel.CheckExplosionBarrel(explodedBy, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel : {hitBarrel.X},{hitBarrel.Y},{hitBarrel.Z}").gameObject);
+                        hitBarrel.CheckExplosionBarrel(explodedBy);
+                }
                 else if (hitByExplosion is Claymore hitClaymore)
+                {
                     if (hitClaymore.triggered)
-                        hitClaymore.CheckExplosionClaymore(explodedBy, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {hitClaymore.X},{hitClaymore.Y},{hitClaymore.Z}").gameObject, true);
+                        hitClaymore.CheckExplosionClaymore(explodedBy, true);
+                }
+                else if (hitByExplosion is Item hitItem)
+                {
+                    if (hitItem.IsGrenade() && hitItem.IsTriggered())
+                        hitItem.CheckExplosionGrenade(explodedBy, new(hitItem.X, hitItem.Y, hitItem.Z));
+                } 
             }
 
             Destroy(explosionList);

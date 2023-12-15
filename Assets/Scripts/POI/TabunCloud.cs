@@ -28,18 +28,21 @@ public class TabunCloud : POI, IDataPersistence
         y = (int)location.Item1.y;
         z = (int)location.Item1.z;
         terrainOn = location.Item2;
-        MapPhysicalPosition(x, y, z);
         GenerateCircleMesh(tabunRadius);
+        transform.position = new Vector3(x - 0.5f, z + 0.2f, y - 0.5f);
 
         turnsUntilDissipation = 3;
         placedById = thrownBy;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
-        game.CheckSmokeClouds();
+        SpawnCloud();
 
         return this;
     }
-
+    private void Update()
+    {
+        placedBy = menu.soldierManager.FindSoldierById(placedById);
+    }
     void GenerateCircleMesh(int radius)
     {
         MeshFilter meshFilter = GetComponent<MeshFilter>();
@@ -59,7 +62,7 @@ public class TabunCloud : POI, IDataPersistence
         {
             float x = Mathf.Cos(angleStep * (i - 1)) * radius;
             float z = Mathf.Sin(angleStep * (i - 1)) * radius;
-            vertices[i] = new Vector3(x, 0f, z);
+            vertices[i] = new Vector3(x, 0.1f, z);
         }
 
         // Create triangles
@@ -92,14 +95,13 @@ public class TabunCloud : POI, IDataPersistence
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
             terrainOn = (string)details["terrainOn"];
-            MapPhysicalPosition(x, y, z);
             GenerateCircleMesh(tabunRadius);
+            transform.position = new Vector3(x - 0.5f, z + 0.2f, y - 0.5f);
 
             turnsUntilDissipation = Convert.ToInt32(details["turnsUntilDissipation"]);
             alliesAffected = (details["alliesAffected"] as JArray).Select(token => token.ToString()).ToList();
             enemiesAffected = (details["enemiesAffected"] as JArray).Select(token => token.ToString()).ToList();
             placedById = (string)details["placedById"];
-            placedBy = menu.soldierManager.FindSoldierById(placedById);
         }
     }
 
@@ -124,8 +126,14 @@ public class TabunCloud : POI, IDataPersistence
 
         data.allPOIDetails.Add(id, details);
     }
+    public void SpawnCloud()
+    {
+        game.CheckAllTabunClouds();
+    }
     public void DissipateCloud()
     {
+        game.CheckAllTabunClouds();
+
         //pay xp
         int xp = alliesAffected.Count - enemiesAffected.Count;
         if (xp > 0)
@@ -138,7 +146,7 @@ public class TabunCloud : POI, IDataPersistence
         get { return id; } 
     }
 
-    public int TurnsActive
+    public int TurnsUntilDissipation
     {
         get { return turnsUntilDissipation; }
         set

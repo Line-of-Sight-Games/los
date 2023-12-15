@@ -144,16 +144,6 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         Destroy(item.gameObject);
         RefreshItemList();
     }
-    public void DestroyBreakableItem(Soldier destroyedBy, Item item)
-    {
-        if (item.IsBreakable())
-        {
-            if (item.IsGrenade())
-                game.CheckExplosionGrenade(item, destroyedBy, new(item.X, item.Y, item.Z));
-            else
-                DestroyItem(item);
-        }
-    }
     public void RefreshItemList()
     {
         allItems = FindObjectsOfType<Item>().ToList();

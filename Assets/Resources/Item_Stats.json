@@ -746,7 +746,7 @@
     },
     {
       "Name": "Riot_Shield",
-      "Traits": [ "Unbreakable" ],
+      "Traits": [ "Usable", "Unbreakable" ],
       "Weight": 8,
       "MeleeDamage": 0,
       "GunTraits": {},

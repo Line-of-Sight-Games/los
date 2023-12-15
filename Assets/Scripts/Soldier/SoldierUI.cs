@@ -43,7 +43,6 @@ public class SoldierUI : MonoBehaviour
             //print(x + ":" + linkedSoldier.game.maxX + " " + y + ":" + linkedSoldier.game.maxY + " " + z + ":" + linkedSoldier.game.maxZ);
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
-                
                 linkedSoldier.startX = x;
                 linkedSoldier.startY = y;
                 linkedSoldier.startZ = z;
@@ -60,7 +59,7 @@ public class SoldierUI : MonoBehaviour
         linkedSoldier.selected = true;
         menu.activeSoldier = linkedSoldier;
         game.activeSoldier = linkedSoldier;
-        print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
+        //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
         menu.menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(false);
         menu.menuUI.transform.Find("Options Panel").Find("SoldierOptions").gameObject.SetActive(true);
         menu.turnTitle.text = "N O R M A L    T U R N";

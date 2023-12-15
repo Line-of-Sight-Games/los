@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 550715376541386016}
   - component: {fileID: 3275206233532497457}
   - component: {fileID: 7792209000384002062}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: SightRadiusCircle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4380717690802720389}
   m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []

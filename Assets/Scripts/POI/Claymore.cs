@@ -38,7 +38,10 @@ public class Claymore : POI, IDataPersistence, IExplosive
 
         return this;
     }
-
+    private void Update()
+    {
+        placedBy = menu.soldierManager.FindSoldierById(placedById);
+    }
     public override void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
@@ -57,7 +60,6 @@ public class Claymore : POI, IDataPersistence, IExplosive
             facingY = Convert.ToInt32(details["facingY"]);
             revealed = (bool)details["revealed"];
             placedById = (string)details["placedById"];
-            placedBy = menu.soldierManager.FindSoldierById(placedById);
         }
     }
 
@@ -94,11 +96,12 @@ public class Claymore : POI, IDataPersistence, IExplosive
             targetLine.Normalize();
 
             if (Vector2.Angle(centreLine, targetLine) <= 30f)
-                CheckExplosionClaymore(placedBy, Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {this.X},{this.Y},{this.Z}").gameObject, false);
+                CheckExplosionClaymore(placedBy, false);
         }
     }
-    public void CheckExplosionClaymore(Soldier explodedBy, GameObject explosionList, bool exploded)
+    public void CheckExplosionClaymore(Soldier explodedBy, bool exploded)
     {
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {this.X},{this.Y},{this.Z}").gameObject;
         float arc;
         if (exploded)
             arc = 360f;
@@ -110,11 +113,11 @@ public class Claymore : POI, IDataPersistence, IExplosive
             if (PhysicalObjectWithinClaymoreCone(obj, arc))
             {
                 if (obj is Item hitItem)
-                    menu.AddExplosionAlertItem(explosionList, hitItem, explodedBy, 10);
+                    menu.AddExplosionAlertItem(explosionList, hitItem, new(X, Y, Z), explodedBy, 10);
                 else if (obj is POI hitPoi && hitPoi != this)
                     menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, 10);
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, explodedBy, hitSoldier.hp, 0);
+                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y, Z), explodedBy, hitSoldier.hp, 0);
             }
         }
 

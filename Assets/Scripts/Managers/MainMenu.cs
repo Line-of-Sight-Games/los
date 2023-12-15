@@ -1,12 +1,9 @@
 using System;
-using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -34,7 +31,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
         meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
         overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI,
-        claymoreUI, ULFResultUI, UHFUI;
+        claymoreUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -1940,7 +1937,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
         else
         {
-            if (reason.Contains("Commander") || reason.Contains("Lastandicide"))
+            if (reason.Contains("automatic"))
             {
                 traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().isOn = true;
                 traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
@@ -1997,17 +1994,27 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (explosionUI.transform.childCount == 0)
             explosionUI.SetActive(false);
     }
-    public void AddExplosionAlert(GameObject explosionList, Soldier hitByExplosion, Soldier explodedBy, int damage, int stunRounds)
+    public void AddExplosionAlert(GameObject explosionList, Soldier hitByExplosion, Vector3 explosionLocation, Soldier explodedBy, int damage, int stunRounds)
     {
         if (hitByExplosion.IsAlive())
         {
             GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
+
+            //riot shield block
+            if (hitByExplosion.HasActiveRiotShield(new(hitByExplosion.X, hitByExplosion.Y), new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), new(hitByExplosion.X, hitByExplosion.Y), explosionLocation))
+            {
+                damage /= 2;
+                stunRounds = 0;
+                explosionAlert.transform.Find("RiotShield").gameObject.SetActive(true);
+            }
+
             explosionAlert.transform.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
             explosionAlert.transform.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{stunRounds}";
             explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, hitByExplosion);
-
             explosionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(hitByExplosion);
-            if (damage > 5)
+
+            //display item destroyed indicators
+            if (damage >= 5)
             {
                 explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
                 explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Breakable Items Destroyed";
@@ -2042,14 +2049,23 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
         }
     }
-    public void AddExplosionAlertItem(GameObject explosionList, Item itemHit, Soldier explodedBy, int damage)
+    public void AddExplosionAlertItem(GameObject explosionList, Item itemHit, Vector3 explosionLocation, Soldier explodedBy, int damage)
     {
         if (itemHit.owner is not GoodyBox)
         {
-            if (itemHit.IsBreakable() && damage >= 5 || itemHit.IsFragile() && damage > 0)
+            //riot shield block
+            if (itemHit.owner is Soldier hitByExplosion && hitByExplosion.HasActiveRiotShield(new(hitByExplosion.X, hitByExplosion.Y), new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), new(hitByExplosion.X, hitByExplosion.Y), explosionLocation))
+            { 
+                damage /= 2;
+                print($"{itemHit.itemName} item damage = {damage}");
+            }
+
+            if ((itemHit.IsBreakable() && damage >= 5) || (itemHit.IsFragile() && damage > 0))
             {
+                print($"{itemHit.itemName} item damage = {damage}");
                 if (!itemHit.IsTriggered())
                 {
+                    print($"{itemHit.itemName} item damage = {damage}");
                     GameObject explosionAlert = Instantiate(explosionAlertItemPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
                     explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, itemHit);
 
@@ -2653,16 +2669,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Exo Jump</color>"));
         moveTypeDropdown.AddOptions(moveTypeDetails);
 
-        //grey options according to AP
-        if (activeSoldier.ap < 3)
+        if (activeSoldier.IsSmokeBlinded())
         {
             moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
-            moveTypeDropdown.value = 1;
-        }
-        if (activeSoldier.ap < 2)
-        {
             moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");
             moveTypeDropdown.value = 2;
+        }
+        else
+        {
+            //grey options according to AP
+            if (activeSoldier.ap < 3)
+            {
+                moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
+                moveTypeDropdown.value = 1;
+            }
+            if (activeSoldier.ap < 2)
+            {
+                moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");
+                moveTypeDropdown.value = 2;
+            }
         }
 
         //block cover for JA
@@ -3364,6 +3389,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Medkit_Medium" => "Use Medium Medkit?",
             "Medkit_Small" => "Use Small Medkit?",
             "Poison_Satchel" => "Administer Posion?",
+            "Riot_Shield" => "Orient riot shield?",
             "Syringe_Amphetamine" => "Administer Amphetamine?",
             "Syringe_Androstenedione" => "Administer Androstenedione?",
             "Syringe_Cannabinoid" => "Administer Cannabinoid?",
@@ -3628,6 +3654,24 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         UHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text = $"{strike.Item5}";
 
         UHFUI.SetActive(true);
+    }
+    public void CloseRiotShieldUI()
+    {
+        ClearRiotShieldUI();
+        riotShieldUI.SetActive(false);
+    }
+    public void ClearRiotShieldUI()
+    {
+        riotShieldUI.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        riotShieldUI.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
+    }
+    public void OpenRiotShieldUI(UseItemUI useItemUI)
+    {
+        riotShieldUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        riotShieldUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        riotShieldUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        riotShieldUI.SetActive(true);
     }
     public void OpenGrenadeUI(UseItemUI useItemUI)
     {
