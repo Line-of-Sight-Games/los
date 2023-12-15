@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PauseMenu : MonoBehaviour
 {
-    public static bool GameIsPaused = false;
+    public bool gameIsPaused = false;
     public GameObject pauseMenuUI, timeStopIndicator;
     public MainMenu menu;
 
@@ -13,7 +13,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameIsPaused)
+            if (gameIsPaused)
             {
                 Resume();
             }
@@ -27,7 +27,7 @@ public class PauseMenu : MonoBehaviour
     public void Resume()
     {
         pauseMenuUI.SetActive(false);
-        GameIsPaused = false;
+        gameIsPaused = false;
         if (!menu.overrideView)
         {
             timeStopIndicator.SetActive(false);
@@ -38,7 +38,7 @@ public class PauseMenu : MonoBehaviour
     public void Pause()
     {
         pauseMenuUI.SetActive(true);
-        GameIsPaused = true;
+        gameIsPaused = true;
         if (!menu.overrideView)
         {
             timeStopIndicator.SetActive(true);

@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
     //secret override key
-    public KeyCode overrideKey = KeyCode.LeftShift;
+    public KeyCode overrideKey = KeyCode.F4;
     public KeyCode secondOverrideKey = KeyCode.Space;
 
     public SoldierManager soldierManager;
@@ -228,29 +228,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (Input.GetKey(overrideKey))
             return true;
-        else
-            return false;
+        return false;
     }
     public bool SecondOverrideKey()
     {
         if (Input.GetKey(secondOverrideKey))
             return true;
-        else
-            return false;
+        return false;
     }
     public bool SecondOverrideKeyDown()
     {
         if (Input.GetKeyDown(secondOverrideKey))
             return true;
-        else
-            return false;
+        return false;
     }
     public bool SecondOverrideKeyUp()
     {
         if (Input.GetKeyUp(secondOverrideKey))
             return true;
-        else
-            return false;
+        return false;
     }
     public void DisplayLOSGizmos()
     {
@@ -1798,7 +1794,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         damageAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
         damageAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         damageAlert.transform.Find("DamageDescription").GetComponent<TextMeshProUGUI>().text = description;
-
+        FileUtility.WriteToReport($"{soldier.soldierName} damage alert: {description}, resisted: {resisted}, nonDamage: {nonDamage}");
         //try and open damagealert
         StartCoroutine(OpenDamageList());
     }
@@ -2303,7 +2299,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public IEnumerator OpenMeleeUI(string meleeCharge)
     {
         yield return new WaitForSeconds(0.05f);
-        FileUtility.WriteToReport("Starting melee attack");
         //set attacker
         Soldier attacker = activeSoldier;
         meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text = attacker.id;
@@ -3235,6 +3230,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     if (child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Override"))
                         soldier.xp -= xp;
                     soldier.IncrementXP(xp, learnerEnabled);
+                    FileUtility.WriteToReport($"{soldier.soldierName} got {xp} xp for: {child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text}");
                 }
                 xpAlertsList.Add(child);
             }
@@ -3331,6 +3327,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 confirm = false;
 
             promotionAlertsList.Add(child);
+            FileUtility.WriteToReport($"{child.GetComponent<SoldierAlert>().soldier.soldierName} promotion: {child.GetComponent<SoldierAlert>().soldier.rank}");
         }
 
         if (confirm)

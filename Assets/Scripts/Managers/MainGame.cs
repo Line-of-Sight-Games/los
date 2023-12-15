@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
+using UnityEditor.Experimental.GraphView;
+using static UnityEngine.GraphicsBuffer;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -331,6 +333,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (currentRound <= maxRounds)
         {
+            FileUtility.WriteToReport($"\nRound {currentRound} | Team: {currentTeam}");
             if (currentTeam == 1)
                 StartRound();
 
@@ -588,6 +591,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void PerformMove(Soldier movingSoldier, int ap, Tuple<Vector3, string> moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance, bool freeMove)
     {
+        FileUtility.WriteToReport($"{movingSoldier.soldierName} moved to {moveToLocation}");
+
         int.TryParse(fallDistance, out int fallDistanceInt); 
         string launchMelee = string.Empty;
         DeductAP(ap);
@@ -1386,6 +1391,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (shotTypeDropdown.value == 0) //standard shot
         {
+            FileUtility.WriteToReport($"{shooter.soldierName} shooting at {target}");
+
             resistSuppression = shooter.SuppressionCheck();
             gun.SpendSingleAmmo();
 
@@ -1543,6 +1550,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (shotTypeDropdown.value == 1) //supression shot
         {
+            FileUtility.WriteToReport($"{shooter.soldierName} suppressing {target}");
+
             gun.SpendSpecificAmmo(gun.gunTraits.SuppressDrain, true);
 
             int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
@@ -2096,6 +2105,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CheckAP(ap))
             {
+                FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}");
+
                 //determine if damage is from melee or melee charge
                 List<string> damageType = new() { "Melee"};
                 if (ap == 0)
