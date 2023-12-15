@@ -1170,7 +1170,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to shot damage
         if (damageSource.Contains("Shot"))
         {
-            if (HasActiveRiotShield(new(riotXPoint, riotYPoint), new(X, Y), new(damagedBy.X, damagedBy.Y), new(X, Y)))
+            if (HasActiveRiotShield(new(riotXPoint, riotYPoint), new(damagedBy.X, damagedBy.Y), new(X, Y)))
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Riot Shield.", true, false);
                 damage = 0;
@@ -3079,12 +3079,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
-    public bool HasActiveRiotShield()
-    {
-        if (HasSingleNonWeaponInEitherHand() && Inventory.HasItemOfType("Riot_Shield"))
-            return true;
-        return false;
-    }
     public bool HasArmourIntegrity()
     {
         if (IsWearingJuggernautArmour(true) || IsWearingBodyArmour(true))
@@ -3127,9 +3121,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
-    public bool HasActiveRiotShield(Vector3 fromA, Vector3 toA, Vector3 fromB, Vector3 toB)
+    public bool HasActiveRiotShield(Vector3 riotShieldOrientation, Vector3 pointB, Vector3 riotShieldBearerLocation)
     {
-        if (IsCarryingRiotShield() && !IsDualWielding() && HelperFunctions.IsWithinAngle(fromA, toA, fromB, toB, 67.5f))
+        if (IsCarryingRiotShield() && !IsDualWielding() && HelperFunctions.IsWithinAngle(riotShieldOrientation, pointB, riotShieldBearerLocation, 67.5f))
             return true;
         return false;
     }

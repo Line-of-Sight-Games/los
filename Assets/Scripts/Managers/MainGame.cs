@@ -836,35 +836,32 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (!target.IsTactician() || shooter.IsRevoker())
             {
-                Vector2 shotLine = new(target.X - shooter.X, target.Y - shooter.Y);
-                shotLine.Normalize();
-
                 //find all soldiers who could be considered for flanking and their flanking angles
                 foreach (Soldier s in AllSoldiers())
-                {
-                    if (s.IsAbleToSee() && s.IsSameTeamAs(shooter) && s.CanSeeInOwnRight(target))
-                    {
-                        Vector2 flankLine = new(target.X - s.X, target.Y - s.Y);
-                        flankLine.Normalize();
-                        float flankAngle = Vector2.SignedAngle(shotLine, flankLine);
-                        if (flankAngle < 0)
-                            flankAngle += 360;
-                        allFlankingAngles.Add(Tuple.Create(flankAngle, s));
-                    }
-                }
+                    if (s.IsAbleToSee() && s.IsSameTeamAs(shooter) && s.CanSeeInOwnRight(target) && !HelperFunctions.IsWithinAngle(new(shooter.X, shooter.Y), new(s.X, s.Y), new(target.X, target.Y), 80f))
+                        allFlankingAngles.Add(Tuple.Create(HelperFunctions.CalculateAngle360(new(shooter.X, shooter.Y), new(s.X, s.Y), new(target.X, target.Y)), s));
 
                 //order smallest angle to largest angle
                 allFlankingAngles = allFlankingAngles.OrderBy(t => t.Item1).ToList();
-                confirmedFlankingAngles.Add(Tuple.Create(0f, null as Soldier));
-                while (allFlankingAngles.Count > 0)
-                {
-                    if (allFlankingAngles[0].Item1 > flankingAngle && allFlankingAngles[0].Item1 - confirmedFlankingAngles[^1].Item1 > flankingAngle)
-                        confirmedFlankingAngles.Add(allFlankingAngles[0]);
 
-                    allFlankingAngles.RemoveAt(0);
+                /*string msg = "";
+                foreach (var item in allFlankingAngles)
+                    msg += $"({item.Item1}, {item.Item2.soldierName})";
+                print(msg);*/
+
+                // Iterate through both lists to find out which gives more flanking options
+                for (int i = 0; i < allFlankingAngles.Count; i++)
+                {
+                    Tuple<float, Soldier> currentItem = allFlankingAngles[i];
+                    print($"current item {currentItem}");
+                    // Check if Item1 is greater than flankingAngle
+                    if (currentItem.Item1 > flankingAngle)
+                    {
+                        confirmedFlankingAngles.Add(currentItem);
+                        allFlankingAngles = allFlankingAngles.Select(t => Tuple.Create(Math.Abs(t.Item1 - currentItem.Item1), t.Item2)).ToList();
+                    }
                 }
 
-                confirmedFlankingAngles.RemoveAt(0);
                 foreach (Tuple<float, Soldier> confirmedFlankAngle in confirmedFlankingAngles)
                 {
                     if (flankersCount < 3)
@@ -3403,27 +3400,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return Mathf.RoundToInt(Vector3.Distance(new Vector3(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), moveToLocation));
     }
-    string GetCallingFunctionName()
-    {
-        // Create a stack trace
-        StackTrace stackTrace = new();
-
-        // Check if there are at least two frames (current frame and the calling frame)
-        if (stackTrace.FrameCount >= 2)
-        {
-            // Get the calling method's name
-            StackFrame callingFrame = stackTrace.GetFrame(1);
-            MethodBase callingMethod = callingFrame.GetMethod();
-
-            return callingMethod.Name;
-        }
-
-        // Return a message if the stack trace is not deep enough
-        return "Unknown calling function";
-    }
     public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee, bool triggersOverwatch)
     {
-        print(GetCallingFunctionName());
         yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true && menu.overrideView == false);
         string movingSoldierActiveStat = "F";
         string detecteeActiveStat = "C";

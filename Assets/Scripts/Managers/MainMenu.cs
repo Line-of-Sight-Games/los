@@ -2001,7 +2001,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
 
             //riot shield block
-            if (hitByExplosion.HasActiveRiotShield(new(hitByExplosion.X, hitByExplosion.Y), new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), new(hitByExplosion.X, hitByExplosion.Y), explosionLocation))
+            if (hitByExplosion.HasActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
             {
                 damage /= 2;
                 stunRounds = 0;
@@ -2054,7 +2054,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (itemHit.owner is not GoodyBox)
         {
             //riot shield block
-            if (itemHit.owner is Soldier hitByExplosion && hitByExplosion.HasActiveRiotShield(new(hitByExplosion.X, hitByExplosion.Y), new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), new(hitByExplosion.X, hitByExplosion.Y), explosionLocation))
+            if (itemHit.owner is Soldier hitByExplosion && hitByExplosion.HasActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
             { 
                 damage /= 2;
                 print($"{itemHit.itemName} item damage = {damage}");
