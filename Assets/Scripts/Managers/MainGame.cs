@@ -2390,6 +2390,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Medkit_Small":
             case "Medkit_Medium":
             case "Medkit_Large":
+                itemUsed.UseItem(linkedIcon, null, soldierUsedOn);
+                break;
             case "Riot_Shield":
                 menu.OpenRiotShieldUI(useItemUI);
                 break;

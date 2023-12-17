@@ -128,7 +128,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.overrideView)
         {
-            if (item.owner is Soldier linkedSoldier && linkedSoldier.IsAbleToSee())
+            if (item.owner is Soldier linkedSoldier /*&& linkedSoldier.IsAbleToSee()*/)
             {
                 int ap = item.usageAP;
                 //adept ability
@@ -161,6 +161,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                         }
                         else
                             menu.OpenCannotUseItemUI(message);
+                        print(message);
                     }
                 }
             }

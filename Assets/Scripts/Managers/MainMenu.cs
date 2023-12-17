@@ -1007,9 +1007,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(meleeButton, "Blind");
 
             //block dipelec button
-            if (activeSoldier.stats.SR.Val == 0)
-                buttonStates.Add(dipElecButton, "Blind");
-            else if (!activeSoldier.TerminalInRange())
+            //if (activeSoldier.stats.SR.Val == 0) { }
+                //buttonStates.Add(dipElecButton, "Blind");
+            /*else*/ if (!activeSoldier.TerminalInRange())
                 buttonStates.Add(dipElecButton, "No Terminal");
             else if (!activeSoldier.ClosestTerminal().terminalEnabled)
                 buttonStates.Add(dipElecButton, "Terminal Disabled");
@@ -2213,7 +2213,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
 
                         //enable back button only if shot is aimed and under 25%
-                        if (game.aimTypeDropdown.value != 1 && chances.Item1 <= 2)
+                        if (game.aimTypeDropdown.value != 1 && chances.Item1 <= 25)
                             shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = true;
                         else
                             shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;

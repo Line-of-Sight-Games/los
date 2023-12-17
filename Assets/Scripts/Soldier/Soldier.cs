@@ -1170,7 +1170,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to shot damage
         if (damageSource.Contains("Shot"))
         {
-            if (HasActiveRiotShield(new(riotXPoint, riotYPoint), new(damagedBy.X, damagedBy.Y), new(X, Y)))
+            if (damagedBy != null && HasActiveRiotShield(new(riotXPoint, riotYPoint), new(damagedBy.X, damagedBy.Y), new(X, Y)))
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Riot Shield.", true, false);
                 damage = 0;
@@ -1185,7 +1185,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to melee damage
         if (damageSource.Contains("Melee"))
         {
-            if (IsWearingJuggernautArmour(false) && !damagedBy.IsWearingExoArmour())
+            if (IsWearingJuggernautArmour(false) && damagedBy != null && !damagedBy.IsWearingExoArmour())
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
@@ -3088,13 +3088,23 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool IsWearingBodyArmour(bool hasIntegrity)
     {
         if (Inventory.HasItemOfType("Armour_Body"))
-            return hasIntegrity && Inventory.GetItem("Armour_Body").ablativeHealth > 0;
+        {
+            if (hasIntegrity && Inventory.GetItem("Armour_Body").ablativeHealth > 0)
+                return true;
+            else
+                return true;
+        }
         return false;
     }
     public bool IsWearingJuggernautArmour(bool hasIntegrity)
     {
         if (Inventory.HasItemOfType("Armour_Juggernaut"))
-            return hasIntegrity && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0;
+        {
+            if (hasIntegrity && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0)
+                return true;
+            else
+                return true;
+        }
         return false;
     }
     public bool IsWearingExoArmour()

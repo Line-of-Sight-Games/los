@@ -358,21 +358,24 @@ public class Item : PhysicalObject, IDataPersistence
             //despawn small medkit inside brace
             if (itemName == "Brace")
             {
-                if (slotName == "LeftBrace")
+                if (slotName == "LeftBrace" && owningSoldier.Inventory.GetItemInSlot("LeftBrace") != null)
                     owningSoldier.Inventory.GetItemInSlot("Misc5").ConsumeItem();
-                else if (slotName == "RightBrace")
+                else if (slotName == "RightBrace" && owningSoldier.Inventory.GetItemInSlot("RightBrace") != null)
                     owningSoldier.Inventory.GetItemInSlot("Misc4").ConsumeItem();
             }
 
             //despawn med medkit in bag
-            if (itemName == "Bag")
+            if (itemName == "Bag" && owningSoldier.Inventory.GetItemInSlot("Misc3") != null)
                 owningSoldier.Inventory.GetItemInSlot("Misc3").ConsumeItem();
 
             //despawn small & med medkit in backpack
             if (itemName == "Backpack")
             {
-                owningSoldier.Inventory.GetItemInSlot("Misc2").ConsumeItem();
-                owningSoldier.Inventory.GetItemInSlot("Misc1").ConsumeItem();
+                if (owningSoldier.Inventory.GetItemInSlot("Misc2") != null)
+                    owningSoldier.Inventory.GetItemInSlot("Misc2").ConsumeItem();
+                
+                if (owningSoldier.Inventory.GetItemInSlot("Misc1") != null)
+                    owningSoldier.Inventory.GetItemInSlot("Misc1").ConsumeItem();
             }
         }
     }
