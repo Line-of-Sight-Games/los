@@ -468,7 +468,7 @@ public class Item : PhysicalObject, IDataPersistence
 
         markedForAction = string.Empty;
     }
-    public Tuple<int, string, int, int, int> GetUHFStrike()
+    public List<string> GetUHFStrikes()
     {
         if (owner is Soldier linkedSoldier)
         {
@@ -486,7 +486,7 @@ public class Item : PhysicalObject, IDataPersistence
                 elec = 9;
             
             int dipelecScore = itemManager.scoreTable[dip, elec];
-            Tuple<int, string, int, int, int> strike = itemManager.GetStrike(dipelecScore);
+            List<string> strike = itemManager.GetStrikeAndLowerNames(dipelecScore);
             return strike;
         }
         return null;

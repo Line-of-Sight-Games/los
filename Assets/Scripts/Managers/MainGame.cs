@@ -2439,10 +2439,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetX = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField targetZ = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").GetComponent<TMP_InputField>();
-        if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
+        TMP_Dropdown strikeOption = useUHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>();
+
+        if (int.TryParse(strikeOption.options[strikeOption.value].text.Split('(', ')')[1], out int dipelecScore))
         {
-            if (int.TryParse(useUHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text, out int rolls) && int.TryParse(useUHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text, out int radius) && int.TryParse(useUHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text, out int damage))
+            Tuple<int, string, int, int, int> strike = itemManager.GetStrike(dipelecScore);
+            int rolls = strike.Item4;
+            int radius = strike.Item3;
+            int damage = strike.Item5;
+
+            if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
             {
+                
                 if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour)
                 {
 
@@ -2493,20 +2501,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     useUHFUI.transform.Find("PressedOnce").gameObject.SetActive(true);
                 }
             }
-            
-        }
-        else //second press
-        {
-            print("second press");
+            else //second press
+            {
+                print("second press");
 
-            if (useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
-            {
-                menu.CloseUHFUI();
-                useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
-            }
-            else
-            {
-                if (int.TryParse(useUHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text, out int rolls) && int.TryParse(useUHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text, out int radius) && int.TryParse(useUHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text, out int damage))
+                if (useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
+                {
+                    menu.CloseUHFUI();
+                    useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+                }
+                else
                 {
                     if (float.TryParse(targetX.text, out float x) && float.TryParse(targetY.text, out float y) && float.TryParse(targetZ.text, out float z))
                     {

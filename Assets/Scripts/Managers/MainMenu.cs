@@ -3587,11 +3587,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         UHFUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
         UHFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
 
-        Tuple<int, string, int, int, int> strike = useItemUI.itemUsed.GetUHFStrike();
-        UHFUI.transform.Find("OptionPanel").Find("StrikeName").Find("Text").GetComponent<TextMeshProUGUI>().text = strike.Item2;
-        UHFUI.transform.Find("Radius").GetComponent<TextMeshProUGUI>().text = $"{strike.Item3}";
-        UHFUI.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = $"{strike.Item4}";
-        UHFUI.transform.Find("Damage").GetComponent<TextMeshProUGUI>().text = $"{strike.Item5}";
+        //Get strike options on and below dipelec score
+        List<TMP_Dropdown.OptionData> strikeOptions = new();
+        foreach (string strikeName in useItemUI.itemUsed.GetUHFStrikes())
+        {
+            TMP_Dropdown.OptionData optionData = new(strikeName);
+            strikeOptions.Add(optionData);
+        }
+        UHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>().AddOptions(strikeOptions);
 
         UHFUI.SetActive(true);
     }

@@ -132,6 +132,15 @@ public class ItemManager : MonoBehaviour, IDataPersistence
                 return strikeTable[i];
         return null;
     }
+    public List<string> GetStrikeAndLowerNames(int score)
+    {
+        List<string> strikeOptions = new();
+        for (int i = strikeTable.Length - 1; i >= 0; i--)
+            if (strikeTable[i].Item1 <= score)
+                strikeOptions.Add($"{strikeTable[i].Item2} ({strikeTable[i].Item1})");
+        
+        return strikeOptions;
+    }
     public Item SpawnItem(string itemName)
     {
         var item = Instantiate(itemPrefab).Init(itemName);
