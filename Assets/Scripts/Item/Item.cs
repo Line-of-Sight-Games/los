@@ -437,6 +437,12 @@ public class Item : PhysicalObject, IDataPersistence
             damage = 0;
         }
 
+        //uncon check if wearer in LS 
+        if (damage == 0)
+            if (owner is Soldier owningSoldier && owningSoldier.IsLastStand())
+                if (!owningSoldier.ResilienceCheck())
+                    owningSoldier.MakeUnconscious();
+
         return damage;
     }
     public string DisplayGunCoverDamage()

@@ -4,11 +4,12 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Claymore : POI, IDataPersistence, IExplosive
+public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
 {
     public POIManager poiManager;
     public bool triggered;
     public bool revealed;
+    public bool exploded;
     public int f, c, facingX, facingY;
     public string placedById;
     public Soldier placedBy;
@@ -19,7 +20,12 @@ public class Claymore : POI, IDataPersistence, IExplosive
         game = FindObjectOfType<MainGame>();
         poiManager = FindObjectOfType<POIManager>();
     }
-
+    private void Update()
+    {
+        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        if (Exploded)
+            poiManager.DestroyPOI(this);
+    }
     public Claymore Init(Tuple<Vector3, string> location, Tuple<int, int, int, int, string> otherDetails)
     {
         id = GenerateGuid();
@@ -37,10 +43,6 @@ public class Claymore : POI, IDataPersistence, IExplosive
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
         return this;
-    }
-    private void Update()
-    {
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
     }
     public override void LoadData(GameData data)
     {
@@ -86,18 +88,42 @@ public class Claymore : POI, IDataPersistence, IExplosive
 
         data.allPOIDetails.Add(id, details);
     }
-    public void CheckClaymoreTriggeredBy(Soldier movingSoldier)
+    public bool CheckClaymoreTriggered(Soldier triggeringSoldier)
     {
-        if (movingSoldier.IsFielded() && movingSoldier.PhysicalObjectWithinRadius(this, 3))
+        if (triggeringSoldier.IsFielded() && triggeringSoldier.PhysicalObjectWithinRadius(this, 3))
         {
             Vector2 centreLine = new(facingX - X, facingY - Y);
-            Vector2 targetLine = new(movingSoldier.X - X, movingSoldier.Y - Y);
+            Vector2 targetLine = new(triggeringSoldier.X - X, triggeringSoldier.Y - Y);
             centreLine.Normalize();
             targetLine.Normalize();
 
             if (Vector2.Angle(centreLine, targetLine) <= 30f)
-                CheckExplosionClaymore(placedBy, false);
+            {
+                triggered = true;
+                return true;
+            }
         }
+
+        return false;
+    }
+    public void MoveOverClaymore(Soldier movingSoldier)
+    {
+        if (CheckClaymoreTriggered(movingSoldier))
+            CheckExplosionClaymore(movingSoldier, false);
+    }
+    public void PlaceClaymore()
+    {
+        Soldier triggeringSoldier = null;
+        foreach (Soldier s in game.AllSoldiers())
+        {
+            if (CheckClaymoreTriggered(s))
+            {
+                triggeringSoldier = s;
+                break;
+            }
+        }
+        if (triggered && triggeringSoldier != null)
+            CheckExplosionClaymore(triggeringSoldier, false);
     }
     public void CheckExplosionClaymore(Soldier explodedBy, bool exploded)
     {
@@ -124,8 +150,8 @@ public class Claymore : POI, IDataPersistence, IExplosive
         //if any exploded candidates
         if (explosionList.transform.childCount > 0)
             menu.OpenExplosionUI();
-        
-        poiManager.DestroyPOI(this);
+
+        Exploded = true;
     }
     public bool PhysicalObjectWithinClaymoreCone(PhysicalObject obj, float radius)
     {
@@ -145,4 +171,14 @@ public class Claymore : POI, IDataPersistence, IExplosive
     { 
         get { return id; } 
     }
+
+    public int ActiveC
+    { get { return c; } }
+    public int ActiveF
+    { get { return f; } }
+
+    public bool Triggered 
+    { get { return triggered; } set { triggered = value; } }
+    public bool Exploded
+    { get { return exploded; } set { exploded = value; } }
 }

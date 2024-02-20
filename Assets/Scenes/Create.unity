@@ -8184,7 +8184,7 @@ MonoBehaviour:
       m_Image: {fileID: 21300000, guid: 78bca733e0556bf46a6b0bbc0827ca79, type: 3}
     - m_Text: Jungle_BeardWWII
       m_Image: {fileID: 21300000, guid: 2eec8d14d8eb6084ab27387119ba33fa, type: 3}
-    - m_Text: Jungle_Beret
+    - m_Text: Jungle_Mewham
       m_Image: {fileID: 21300000, guid: 8d7cc58003e397c49a5be2d763361fe1, type: 3}
     - m_Text: Jungle_DarkWWII
       m_Image: {fileID: 21300000, guid: 4c0c820fd9ff1b441bd2b6c9b12436f4, type: 3}
@@ -25993,6 +25993,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a0d74a0084e3bc4ebff8e7b92ebdbd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameIsPaused: 0
   pauseMenuUI: {fileID: 0}
   timeStopIndicator: {fileID: 0}
   menu: {fileID: 0}
@@ -26022,6 +26023,7 @@ MonoBehaviour:
   roundIndicator: {fileID: 0}
   teamTurnIndicator: {fileID: 0}
   weatherIndicator: {fileID: 0}
+  turnTitle: {fileID: 0}
   menuUI: {fileID: 0}
   teamTurnOverUI: {fileID: 0}
   teamTurnStartUI: {fileID: 0}
@@ -26033,7 +26035,6 @@ MonoBehaviour:
   shotUI: {fileID: 0}
   flankersShotUI: {fileID: 0}
   shotConfirmUI: {fileID: 0}
-  overwatchShotUI: {fileID: 0}
   shotResultUI: {fileID: 0}
   moveUI: {fileID: 0}
   overmoveUI: {fileID: 0}
@@ -26082,6 +26083,7 @@ MonoBehaviour:
   allyInventoryIconPrefab: {fileID: 0}
   groundInventoryIconPrefab: {fileID: 0}
   gbInventoryIconPrefab: {fileID: 0}
+  globalInventoryIconPrefab: {fileID: 0}
   inventoryPanelGroundPrefab: {fileID: 0}
   inventoryPanelAllyPrefab: {fileID: 0}
   inventoryPanelGoodyBoxPrefab: {fileID: 0}
@@ -26091,7 +26093,10 @@ MonoBehaviour:
   meleeAlertPrefab: {fileID: 0}
   overwatchShotUIPrefab: {fileID: 0}
   dipelecRewardPrefab: {fileID: 0}
+  explosionListPrefab: {fileID: 0}
   explosionAlertPrefab: {fileID: 0}
+  explosionAlertPOIPrefab: {fileID: 0}
+  explosionAlertItemPrefab: {fileID: 0}
   endTurnButton: {fileID: 0}
   overrideButton: {fileID: 0}
   overrideTimeStopIndicator: {fileID: 0}
@@ -26104,9 +26109,16 @@ MonoBehaviour:
   blockingScreen: {fileID: 0}
   itemSlotPrefab: {fileID: 0}
   itemIconPrefab: {fileID: 0}
+  cannotUseItemUI: {fileID: 0}
+  useItemUI: {fileID: 0}
+  grenadeUI: {fileID: 0}
+  claymoreUI: {fileID: 0}
+  ULFResultUI: {fileID: 0}
+  UHFUI: {fileID: 0}
+  riotShieldUI: {fileID: 0}
+  overwatchShotUI: {fileID: 0}
   gbItemIconPrefab: {fileID: 0}
   LOSArrowPrefab: {fileID: 0}
-  overwatchArcPrefab: {fileID: 0}
   sightRadiusCirclePrefab: {fileID: 0}
   actionButtons: []
   insignia: []
@@ -26124,7 +26136,6 @@ MonoBehaviour:
   meleeChargeIndicator: 
   activeSoldier: {fileID: 0}
   overrideView: 0
-  displayLOSArrows: 0
   clearShotFlag: 0
   clearMeleeFlag: 0
   clearDipelecFlag: 0
@@ -26137,6 +26148,7 @@ MonoBehaviour:
   xpResolvedFlag: 0
   teamTurnOverFlag: 0
   teamTurnStartFlag: 0
+  onItemUseScreen: 0
   LInput: {fileID: 0}
   HInput: {fileID: 0}
   RInput: {fileID: 0}
@@ -26173,7 +26185,10 @@ MonoBehaviour:
   overwatch1WayRight: {fileID: 0}
   noDetect2Way: {fileID: 0}
   fist: {fileID: 0}
-  explosiveBarrel: {fileID: 0}
+  explosiveBarrelSprite: {fileID: 0}
+  goodyBoxSprite: {fileID: 0}
+  terminalSprite: {fileID: 0}
+  drugCabinetSprite: {fileID: 0}
   covermanSprite: {fileID: 0}
   normalTextColour: {r: 0.196, g: 0.196, b: 0.196, a: 1}
   terrainList:

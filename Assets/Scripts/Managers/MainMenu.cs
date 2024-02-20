@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
     //secret override key
-    public KeyCode overrideKey = KeyCode.F4;
+    public KeyCode overrideKey = KeyCode.LeftShift;
     public KeyCode secondOverrideKey = KeyCode.Space;
 
     public SoldierManager soldierManager;
@@ -22,16 +22,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI,
-        shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,
-        configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, 
-        traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, 
-        coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, 
-        lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, 
-        allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, 
-        meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, 
-        overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI,
-        claymoreUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI, claymoreUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -310,11 +301,23 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s1, s2);
         arrow.transform.SetAsLastSibling();
     }
+    public void CreateLOSArrowPair(Soldier s1, POI p1)
+    {
+        LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s1, p1);
+        arrow.transform.SetAsLastSibling();
+    }
     public void DestroyLOSArrowPair(Soldier s1, Soldier s2)
     {
         var LOSArrows = FindObjectsOfType<LOSArrow>(true);
         foreach (LOSArrow arrow in LOSArrows)
             if (arrow.from == s1 && arrow.to == s2)
+                Destroy(arrow.gameObject);
+    }
+    public void DestroyLOSArrowPair(Soldier s1, POI p1)
+    {
+        var LOSArrows = FindObjectsOfType<LOSArrow>(true);
+        foreach (LOSArrow arrow in LOSArrows)
+            if (arrow.from == s1 && arrow.to == p1)
                 Destroy(arrow.gameObject);
     }
     public void DestroyLOSArrows()
@@ -778,6 +781,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
             s.PaintColor();
         }
+        foreach (Claymore c in FindObjectsOfType<Claymore>())
+        {
+            if (overrideView)
+                c.GetComponent<Renderer>().enabled = true;
+            else
+            {
+                if (c.revealed || (c.placedBy != null && c.placedBy.soldierTeam == game.currentTeam))
+                    c.GetComponent<Renderer>().enabled = true;
+                else
+                    c.GetComponent<Renderer>().enabled = false;
+            }
+        }
     }
     public void CheckWinConditions()
     {
@@ -831,12 +846,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (!game.gameOver)
         {
-            roundIndicator.text = "Round " + game.currentRound;
+            roundIndicator.text = $"Round {game.currentRound}";
             if (game.currentTeam == 1)
                 teamTurnIndicator.text = "<color=red>";
             else
                 teamTurnIndicator.text = "<color=blue>";
-            teamTurnIndicator.text += "Team " + game.currentTeam + "</color> Turn";
+            teamTurnIndicator.text += $"Team {game.currentTeam}</color> Turn";
         }
     }
     public string FormatFloatTime(float time)
@@ -1090,11 +1105,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void DisplayActiveSoldier()
     {
         Transform soldierBanner = soldierOptionsUI.transform.Find("SoldierBanner");
-        soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = "HP: " + activeSoldier.GetFullHP().ToString();
-        soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = "AP: " + activeSoldier.ap.ToString();
-        soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MA: " + activeSoldier.mp.ToString();
-        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Max Move: " + activeSoldier.InstantSpeed.ToString();
-        soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = "XP: " + activeSoldier.xp.ToString();
+        soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = $"HP: {activeSoldier.GetFullHP()}";
+        soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = $"AP: {activeSoldier.ap}";
+        soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = $"MA: {activeSoldier.mp}";
+        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = $"Max Move: {activeSoldier.InstantSpeed}";
+        soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = $"XP: {activeSoldier.xp}";
         soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = activeSoldier.GetStatus();
 
         if (overrideView)
@@ -1177,108 +1192,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
         }
     }
-    
-        
-        
-
-
-        /*
-
-         def engaged_state(id)
-
-             ans = ""
-
-             controlled_by = ""
-
-             controlling = ""
-
-
-             engage_array = @soldier_array[id][236].split(' ')
-
-             for i in 1..engage_array.length - 1
-
-                 if engage_array[i].end_with ? ("c")
-
-                     controlled_by += "#{engage_array[i].to_i}"
-
-                 else
-                 controlling += "#{engage_array[i].to_i}"
-
-                 end
-             end
-
-
-             if controlled_by.length > 0
-
-                 controlled_by.prepend("Engaged (Controlled By: ")
-
-                 ans += ", " + "#{controlled_by})".red
-
-             end
-
-             if controlling.length > 0
-
-                 controlling.prepend("Engaged (Controlling: ")
-
-                 ans += ", " + "#{controlling})".green
-
-             end
-             ans
-
-         end
-
-         def armour_state(id)
-
-             armour = ""
-
-
-             if @soldier_array[id][54] > 0 #check for J armour
-                 armour += ", " + "Juggernaut Armour".green
-
-             elsif @soldier_array[id][56] > 0 #check for X armour
-                 armour += ", " + "Exo Suit".green
-
-             elsif @soldier_array[id][55] > 0 #check for G armour
-                 armour += ", " + "Ghillie Suit".green
-
-             elsif @soldier_array[id][57] > 0 #check for stim armour
-                 armour += ", " + "Stimulant Armour".green
-
-             elsif @soldier_array[id][53] > 0 #check for B armour
-                 armour += ", " + "Body Armour".green
-
-             end
-             armour
-
-         end
-
-         def carrying(id)
-
-             carry = ""
-
-
-             if @soldier_array[id][215] > 0
-
-                 carry += ", " + "Carrying #{name_call(@soldier_array[id][215])}".yellow
-
-             end
-             carry
-
-         end
-
-         def spotting(id)
-
-             spot = ""
-
-
-             if @soldier_array[id][233] > 0
-
-                 spot += ", " + "Spotting #{name_call(@soldier_array[id][233])}".green
-
-             end
-             spot
-
-         end*/
 
     public void CloseSoldierMenu()
     {
@@ -1487,6 +1400,35 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         detectionAlert.transform.Find("Counter").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(counter);
         detectionAlert.transform.Find("Counter").Find("CounterLocation").GetComponent<TextMeshProUGUI>().text = "X:" + counter.X + "\nY:" + counter.Y + "\nZ:" + counter.Z;
     }
+    public void AddDetectionAlert(Soldier detector, Claymore claymore, string detectorLabel, string counterLabel, string arrowType)
+    {
+        //print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
+        //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
+        foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
+            if (child.GetComponent<ClaymoreAlertLOS>().soldier == detector && child.GetComponent<ClaymoreAlertLOS>().claymore == claymore)
+                Destroy(child.gameObject);
+
+        GameObject detectionAlert = Instantiate(detectionAlertClaymorePrefab, detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+
+        //block invalid selections
+        detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
+
+        //force reveal for claymores
+        detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
+        detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
+
+        detectionAlert.GetComponent<ClaymoreAlertLOS>().SetSoldierAndClaymore(detector, claymore);
+        detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
+
+        detectionAlert.transform.Find("Detector").Find("DetectorSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + detector.stats.SR.Val + ")";
+        detectionAlert.transform.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text = counterLabel;
+        detectionAlert.transform.Find("Detector").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(detector);
+        detectionAlert.transform.Find("Detector").Find("DetectorLocation").GetComponent<TextMeshProUGUI>().text = "X:" + detector.X + "\nY:" + detector.Y + "\nZ:" + detector.Z;
+
+        detectionAlert.transform.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text = detectorLabel;
+        detectionAlert.transform.Find("Counter").Find("POIPortrait").GetComponent<POIPortrait>().Init(claymore);
+        detectionAlert.transform.Find("Counter").Find("CounterLocation").GetComponent<TextMeshProUGUI>().text = "X:" + claymore.X + "\nY:" + claymore.Y + "\nZ:" + claymore.Z;
+    }
     public void PayAllDetections()
     {
         if (OverrideKey())
@@ -1550,93 +1492,94 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             Transform detectionAlert = detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
             foreach (Transform child in detectionAlert)
             {
-                Soldier detector = child.GetComponent<SoldierAlertLOS>().s1;
-                Soldier counter = child.GetComponent<SoldierAlertLOS>().s2;
-
-                if (child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn == true)
+                if (child.GetComponent<SoldierAlertLOS>() != null)
                 {
-                    if (child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                    Soldier detector = child.GetComponent<SoldierAlertLOS>().s1;
+                    Soldier counter = child.GetComponent<SoldierAlertLOS>().s2;
+
+                    if (child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn == true)
                     {
-                        //if not a glimpse or a retreat detection, add soldier to revealing list
-                        if (!child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
-                            allSoldiersRevealing[counter.id].Add(detector.id);
+                        if (child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                        {
+                            //if not a glimpse or a retreat detection, add soldier to revealing list
+                            if (!child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
+                                allSoldiersRevealing[counter.id].Add(detector.id);
+                            else
+                            {
+                                AddLosGlimpseAlert(detector, child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text);
+                                StartCoroutine(OpenLostLOSList());
+                                allSoldiersNotRevealing[counter.id].Add(detector.id);
+                            }
+
+                            if (detector.IsOnturnAndAlive())
+                            {
+                                if (detector.stats.F.Val > 2)
+                                    AddXpAlert(counter, detector.stats.F.Val, $"Detected stealthed soldier ({detector.soldierName}) with F > 2.", true);
+                            }
+                            else
+                            {
+                                if (detector.stats.C.Val > 2)
+                                    AddXpAlert(counter, detector.stats.C.Val, $"Detected camouflaged soldier ({detector.soldierName}) with C > 2.", true);
+                            }
+
+                            //check for overwatch shot
+                            if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch") && child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
+                                StartCoroutine(OpenOverwatchShotUI(counter, detector));
+                        }
                         else
                         {
-                            AddLosGlimpseAlert(detector, child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text);
-                            StartCoroutine(OpenLostLOSList());
                             allSoldiersNotRevealing[counter.id].Add(detector.id);
+                            if (detector.IsOnturnAndAlive())
+                                AddXpAlert(detector, 2, $"Avoided stealth detection ({counter.soldierName}).", true);
+                            else
+                                AddXpAlert(detector, 1, $"Avoided camouflage detection ({counter.soldierName}).", true);
                         }
-
-                        if (detector.IsOnturnAndAlive())
-                        {
-                            if (detector.stats.F.Val > 2)
-                                AddXpAlert(counter, detector.stats.F.Val, "Detected stealthed soldier (" + detector.soldierName + ") with F > 2.", true);
-                        }
-                        else
-                        {
-                            if (detector.stats.C.Val > 2)
-                                AddXpAlert(counter, detector.stats.C.Val, "Detected camouflaged soldier (" + detector.soldierName + ") with C > 2.", true);
-                        }
-
-                        //check for overwatch shot
-                        if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch") && child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
-                            StartCoroutine(OpenOverwatchShotUI(counter, detector));
                     }
                     else
-                    {
                         allSoldiersNotRevealing[counter.id].Add(detector.id);
-                        if (detector.IsOnturnAndAlive())
-                            AddXpAlert(detector, 2, "Avoided stealth detection (" + counter.soldierName + ").", true);
-                        else
-                            AddXpAlert(detector, 1, "Avoided camouflage detection (" + counter.soldierName + ").", true);
-                    }
-                }
-                else
-                    allSoldiersNotRevealing[counter.id].Add(detector.id);
 
-                if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
-                {
-                    if (child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                    if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
                     {
-                        //if not a glimpse or a retreat detection, add soldier to revealing list
-                        if (!child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
-                            allSoldiersRevealing[detector.id].Add(counter.id);
+                        if (child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                        {
+                            //if not a glimpse or a retreat detection, add soldier to revealing list
+                            if (!child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
+                                allSoldiersRevealing[detector.id].Add(counter.id);
+                            else
+                            {
+                                AddLosGlimpseAlert(counter, child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text);
+                                StartCoroutine(OpenLostLOSList());
+                                allSoldiersNotRevealing[detector.id].Add(counter.id);
+                            }
+
+                            if (counter.IsOnturnAndAlive())
+                            {
+                                if (counter.stats.F.Val > 2)
+                                    AddXpAlert(detector, counter.stats.F.Val, $"Detected stealthed soldier ({counter.soldierName}) with F > 2.", true);
+                            }
+                            else
+                            {
+                                if (counter.stats.C.Val > 2)
+                                    AddXpAlert(detector, counter.stats.C.Val, $"Detected camouflaged soldier ({counter.soldierName}) with C > 2.", true);
+                            }
+                        }
                         else
                         {
-                            AddLosGlimpseAlert(counter, child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text);
-                            StartCoroutine(OpenLostLOSList());
                             allSoldiersNotRevealing[detector.id].Add(counter.id);
+                            if (counter.IsOnturnAndAlive())
+                                AddXpAlert(counter, 1, $"Avoided stealth detection ({detector.soldierName}).", true);
+                            else
+                                AddXpAlert(counter, 1, $"Avoided camouflage detection ({detector.soldierName}).", true);
                         }
-
-                        if (counter.IsOnturnAndAlive())
-                        {
-                            if (counter.stats.F.Val > 2)
-                                AddXpAlert(detector, counter.stats.F.Val, "Detected stealthed soldier (" + counter.soldierName + ") with F > 2.", true);
-                        }
-                        else
-                        {
-                            if (counter.stats.C.Val > 2)
-                                AddXpAlert(detector, counter.stats.C.Val, "Detected camouflaged soldier (" + counter.soldierName + ") with C > 2.", true);
-                        }
-
-                        //check for overwatch shot
-                        /*if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch") && child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
-                        {
-                            StartCoroutine(CreateOverwatchShotUI(detector, counter));
-                            StartCoroutine(OpenOverwatchShotUI());
-                        }*/
                     }
                     else
-                    {
                         allSoldiersNotRevealing[detector.id].Add(counter.id);
-                        if (counter.IsOnturnAndAlive())
-                            AddXpAlert(counter, 1, "Avoided stealth detection (" + detector.soldierName + ").", true);
-                        else
-                            AddXpAlert(counter, 1, "Avoided camouflage detection (" + detector.soldierName + ").", true);
-                    }
                 }
-                else
-                    allSoldiersNotRevealing[detector.id].Add(counter.id);
+                else if (child.GetComponent<ClaymoreAlertLOS>() != null)
+                {
+                    Claymore claymore = child.GetComponent<ClaymoreAlertLOS>().claymore;
+                    claymore.revealed = true;
+                }
             }
 
             //combine old revealing list with fresh revealing list and not revealing list
@@ -3185,11 +3128,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 if (learnerEnabled && soldier.IsLearner())
                 {
                     xpAlert.transform.Find("LearnerIndicator").gameObject.SetActive(true);
-                    xpAlert.transform.Find("LearnerIndicator").GetComponent<TextMeshProUGUI>().text = "(+" + (int)((1.5f * xp) + 1 - xp) + ")";
+                    xpAlert.transform.Find("LearnerIndicator").GetComponent<TextMeshProUGUI>().text = $"(+{(int)((1.5f * xp) + 1 - xp)})";
                 }
             }
             else
-                print(soldier.soldierName + " cannot recieve xp unconscious.");
+                print($"{soldier.soldierName} cannot recieve xp unconscious.");
         }
     }
 

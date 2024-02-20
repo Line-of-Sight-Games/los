@@ -5,10 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
-using System.Diagnostics;
-using System.Reflection;
-using UnityEditor.Experimental.GraphView;
-using static UnityEngine.GraphicsBuffer;
+using UnityEditorInternal;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -44,6 +41,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public List<Soldier> AllSoldiers()
     {
         return soldierManager.allSoldiers;
+    }
+    public List<IAmDetectable> AllDetectable()
+    {
+        return FindObjectsOfType<MonoBehaviour>().OfType<IAmDetectable>().ToList();
+    }
+    public List<IAmShootable> AllShootable()
+    {
+        return FindObjectsOfType<MonoBehaviour>().OfType<IAmShootable>().ToList();
     }
     public List<GoodyBox> AllGoodyBoxes()
     {
@@ -123,7 +128,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public IAmShootable FindShootableById(string id)
     {
-        foreach (IAmShootable shootable in FindObjectsOfType<MonoBehaviour>().OfType<IAmShootable>())
+        foreach (IAmShootable shootable in AllShootable())
             if (shootable.Id == id)
                 return shootable;
         return null;
@@ -282,7 +287,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //only give xp for every 4 rounds coscious on the field
                     s.roundsFieldedConscious++;
                     if (s.roundsFieldedConscious % 4 == 0)
-                        menu.AddXpAlert(s, 1, "Survived " + s.roundsFieldedConscious + " rounds.", true);
+                        menu.AddXpAlert(s, 1, $"Survived {s.roundsFieldedConscious} rounds.", true);
                 }
 
                 //increase rounds without food
@@ -625,7 +630,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //blow up claymores
         foreach (Claymore claymore in FindObjectsOfType<Claymore>())
-            claymore.CheckClaymoreTriggeredBy(movingSoldier);
+            claymore.MoveOverClaymore(movingSoldier);
 
         //check for smoke clouds
         movingSoldier.CheckSmokeClouds();
@@ -1391,7 +1396,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (shotTypeDropdown.value == 0) //standard shot
         {
-            FileUtility.WriteToReport($"{shooter.soldierName} shooting at {target}");
+            if (target is Soldier)
+                FileUtility.WriteToReport($"{shooter.soldierName} shooting at {(target as Soldier).soldierName}");
+            else
+                FileUtility.WriteToReport($"{shooter.soldierName} shooting at {target.GetType()}");
 
             resistSuppression = shooter.SuppressionCheck();
             gun.SpendSingleAmmo();
@@ -2360,6 +2368,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (activeSoldier.IsGunner() && itemUsed.IsAmmo())
             ap = 1;
 
+        FileUtility.WriteToReport($"{((Soldier)itemUsed.owner).soldierName} used {itemUsed.itemName}.");
+
         switch (itemUsed.itemName)
         {
             case "E_Tool":
@@ -2612,9 +2622,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             && int.TryParse(facingX.text, out int facingXInt) && int.TryParse(facingY.text, out int facingYInt))
             {
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                Claymore claymore = Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id));
-                foreach (Soldier s in AllSoldiers())
-                    claymore.CheckClaymoreTriggeredBy(s);
+                Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id)).PlaceClaymore();
+
                 menu.CloseClaymoreUI();
             }
         }
@@ -3431,134 +3440,86 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //imperceptible delay to allow colliders to be recalculated at new destination
         yield return new WaitForSeconds(0.05f);
 
-        if (movingSoldier.IsAlive() /*&& !movingSoldier.IsPlayingDead()*/)
+        if (movingSoldier.IsAlive())
         {
             bool showDetectionUI = false;
-            foreach (Soldier detectee in AllSoldiers())
+            foreach (IAmDetectable detectee in AllDetectable())
             {
                 bool detectedLeft = false, detectedRight = false, avoidanceLeft = false, avoidanceRight = false, noDetectRight = false, noDetectLeft = false, overwatchRight = false, overwatchLeft = false;
                 string arrowType = "";
                 string detectorLabel = "", counterLabel = "";
 
-                if (detectee.IsAlive() && /*!detectee.IsPlayingDead() &&*/ movingSoldier.IsOppositeTeamAs(detectee))
+                if (detectee is Soldier detecteeSoldier && detecteeSoldier.IsAlive() && movingSoldier.IsOppositeTeamAs(detecteeSoldier))
                 {
                     bool addDetection = false;
 
                     //check moving soldier seeing static soldiers
                     if (movingSoldier.IsAbleToSee())
                     {
-                        if (movingSoldier.PhysicalObjectWithinMinRadius(detectee))
+                        if (movingSoldier.PhysicalObjectWithinMinRadius(detecteeSoldier))
                         {
                             addDetection = true;
-
-                            if (detectee.stats.GetStat(detecteeActiveStat).Val > movingSoldier.stats.P.Val * movingSoldierMultipliers[0])
+                            
+                            if (detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat) > movingSoldier.DetectionActiveStat(movingSoldierMultipliers[0]))
                             {
-                                detectorLabel += CreateDetectionMessage("avoidance", "3cm", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
+                                detectorLabel += CreateDetectionMessage("avoidance", "3cm", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
                                 avoidanceRight = true;
                             }
                             else
                             {
-                                /*if (movingSoldier.IsOnOverwatch())
-                                {
-                                    if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
-                                    {
-                                        detectorLabel += CreateDetectionMessage("detected", "3cm", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
-                                        detectedRight = true;
-                                    }
-                                    else
-                                    {
-                                        detectorLabel += "Not detected\n(out of overwatch cone)";
-                                        noDetectRight = true;
-                                    }
-                                }
-                                else*/
-                                {
-                                    detectorLabel += CreateDetectionMessage("detection", "3cm", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
-                                    detectedRight = true;
-                                }
+                                detectorLabel += CreateDetectionMessage("detection", "3cm", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
+                                detectedRight = true;
                             }
                         }
-                        else if (movingSoldier.PhysicalObjectWithinHalfRadius(detectee))
+                        else if (movingSoldier.PhysicalObjectWithinHalfRadius(detecteeSoldier))
                         {
                             addDetection = true;
 
-                            if (detectee.stats.GetStat(detecteeActiveStat).Val > movingSoldier.stats.P.Val * movingSoldierMultipliers[1])
+                            if (detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat) > movingSoldier.DetectionActiveStat(movingSoldierMultipliers[1]))
                             {
-                                detectorLabel += CreateDetectionMessage("avoidance", "half SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
+                                detectorLabel += CreateDetectionMessage("avoidance", "half SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
                                 avoidanceRight = true;
                             }
                             else
                             {
-                                /*if (movingSoldier.IsOnOverwatch() && triggersOverwatch)
-                                {
-                                    if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
-                                    {
-                                        detectorLabel += CreateDetectionMessage("detected", "half SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
-                                        detectedRight = true;
-                                    }
-                                    else
-                                    {
-                                        detectorLabel += "Not detected\n(out of overwatch cone)";
-                                        noDetectRight = true;
-                                    }
-                                }
-                                else*/
-                                {
-                                    detectorLabel += CreateDetectionMessage("detection", "half SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
-                                    detectedRight = true;
-                                }
+                                detectorLabel += CreateDetectionMessage("detection", "half SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[1], movingSoldier.stats.P.Val);
+                                detectedRight = true;
                             }
                         }
-                        else if (movingSoldier.PhysicalObjectWithinMaxRadius(detectee))
+                        else if (movingSoldier.PhysicalObjectWithinMaxRadius(detecteeSoldier))
                         {
                             addDetection = true;
 
-                            if (detectee.stats.GetStat(detecteeActiveStat).Val > movingSoldier.stats.P.Val * movingSoldierMultipliers[2])
+                            if (detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat) > movingSoldier.DetectionActiveStat(movingSoldierMultipliers[2]))
                             {
-                                detectorLabel += CreateDetectionMessage("avoidance", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
+                                detectorLabel += CreateDetectionMessage("avoidance", "full SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
                                 avoidanceRight = true;
                             }
                             else
                             {
-                                /*if (movingSoldier.IsOnOverwatch() && triggersOverwatch)
-                                {
-                                    if (movingSoldier.PhysicalObjectWithinOverwatchCone(detectee))
-                                    {
-                                        detectorLabel += CreateDetectionMessage("detected", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
-                                        detectedRight = true;
-                                    }
-                                    else
-                                    {
-                                        detectorLabel += "Not detected\n(out of overwatch cone)";
-                                        noDetectRight = true;
-                                    }
-                                }
-                                else*/
-                                {
-                                    detectorLabel += CreateDetectionMessage("detection", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
-                                    detectedRight = true;
-                                }
+                                detectorLabel += CreateDetectionMessage("detection", "full SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[2], movingSoldier.stats.P.Val);
+                                detectedRight = true;
                             }
                         }
-                        else if (movingSoldierOldPosition != Vector3.zero && GlimpseDetectionMovingSeesDetectee(movingSoldier, detectee, movingSoldierOldPosition))
+                        else if (movingSoldierOldPosition != Vector3.zero && GlimpseDetectionMovingSeesDetectee(movingSoldier, detecteeSoldier, movingSoldierOldPosition))
                         {
                             addDetection = true;
 
-                            if (detectee.stats.GetStat(detecteeActiveStat).Val > movingSoldier.stats.P.Val * movingSoldierMultipliers[2])
+                            if (detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat) > movingSoldier.DetectionActiveStat(movingSoldierMultipliers[2]))
                             {
                                 if (boundCrossTwo != Vector3.zero)
-                                    detectorLabel += CreateDetectionMessage("glimpseavoidance", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                    detectorLabel += CreateDetectionMessage("glimpseavoidance", "full SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                 else
-                                    detectorLabel += CreateDetectionMessage("glimpseavoidance", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne);
+                                    detectorLabel += CreateDetectionMessage("glimpseavoidance", "full SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne);
 
                                 avoidanceRight = true;
                             }
                             else
                             {
                                 if (boundCrossTwo != Vector3.zero)
-                                    detectorLabel += CreateDetectionMessage("glimpsedetection", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                    detectorLabel += CreateDetectionMessage("glimpsedetection", "full SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                 else
-                                    detectorLabel += CreateDetectionMessage("glimpsedetection", "full SR", detecteeActiveStat, detectee.stats.GetStat(detecteeActiveStat).Val, movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne);
+                                    detectorLabel += CreateDetectionMessage("glimpsedetection", "full SR", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[2], movingSoldier.stats.P.Val, boundCrossOne);
 
                                 detectedRight = true;
                             }
@@ -3566,44 +3527,42 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         else
                         {
                             detectorLabel += "Not detected\n(out of SR)";
-                            //print("Not detected\n(out of SR)");
                             noDetectRight = true;
                         }
                     }
                     else
                     {
                         detectorLabel += "Not detected\n(blind)";
-                        //print("Not detected\n(blind)");
                         noDetectRight = true;
                     }
 
                     //check static soldiers seeing moving soldier
-                    if (detectee.IsAbleToSee())
+                    if (detecteeSoldier.IsAbleToSee())
                     {
-                        if (detectee.PhysicalObjectWithinMinRadius(movingSoldier))
+                        if (detecteeSoldier.PhysicalObjectWithinMinRadius(movingSoldier))
                         {
                             addDetection = true;
 
-                            if (movingSoldier.stats.GetStat(movingSoldierActiveStat).Val > detectee.stats.P.Val * detecteeMultipliers[0])
+                            if (movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat) > detecteeSoldier.DetectionActiveStat(detecteeMultipliers[0]))
                             {
-                                counterLabel += CreateDetectionMessage("avoidance", "3cm", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[0], detectee.stats.P.Val);
+                                counterLabel += CreateDetectionMessage("avoidance", "3cm", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[0], detecteeSoldier.stats.P.Val);
                                 avoidanceLeft = true;
                             }
                             else
                             {
-                                if (detectee.IsOnOverwatch() && triggersOverwatch)
+                                if (detecteeSoldier.IsOnOverwatch() && triggersOverwatch)
                                 {
-                                    if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
+                                    if (detecteeSoldier.PhysicalObjectWithinOverwatchCone(movingSoldier))
                                     {
-                                        counterLabel += CreateDetectionMessage("overwatch", "3cm", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[0], detectee.stats.P.Val);
+                                        counterLabel += CreateDetectionMessage("overwatch", "3cm", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[0], detecteeSoldier.stats.P.Val);
                                         overwatchLeft = true;
                                     }
-                                    else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detectee, movingSoldierOldPosition))
+                                    else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detecteeSoldier, movingSoldierOldPosition))
                                     {
                                         if (boundCrossTwo != Vector3.zero)
-                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                         else
-                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
+                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne);
 
                                         overwatchLeft = true;
                                     }
@@ -3615,35 +3574,35 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 }
                                 else
                                 {
-                                    counterLabel += CreateDetectionMessage("detection", "3cm", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[0], detectee.stats.P.Val);
+                                    counterLabel += CreateDetectionMessage("detection", "3cm", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[0], detecteeSoldier.stats.P.Val);
                                     detectedLeft = true;
                                 }
                             }
                         }
-                        else if (detectee.PhysicalObjectWithinHalfRadius(movingSoldier))
+                        else if (detecteeSoldier.PhysicalObjectWithinHalfRadius(movingSoldier))
                         {
                             addDetection = true;
 
-                            if (movingSoldier.stats.GetStat(movingSoldierActiveStat).Val > detectee.stats.P.Val * detecteeMultipliers[1])
+                            if (movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat) > detecteeSoldier.DetectionActiveStat(detecteeMultipliers[1]))
                             {
-                                counterLabel += CreateDetectionMessage("avoidance", "half SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[1], detectee.stats.P.Val);
+                                counterLabel += CreateDetectionMessage("avoidance", "half SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[1], detecteeSoldier.stats.P.Val);
                                 avoidanceLeft = true;
                             }
                             else
                             {
-                                if (detectee.IsOnOverwatch() && triggersOverwatch)
+                                if (detecteeSoldier.IsOnOverwatch() && triggersOverwatch)
                                 {
-                                    if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
+                                    if (detecteeSoldier.PhysicalObjectWithinOverwatchCone(movingSoldier))
                                     {
-                                        counterLabel += CreateDetectionMessage("overwatch", "half SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[1], detectee.stats.P.Val);
+                                        counterLabel += CreateDetectionMessage("overwatch", "half SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[1], detecteeSoldier.stats.P.Val);
                                         overwatchLeft = true;
                                     }
-                                    else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detectee, movingSoldierOldPosition))
+                                    else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detecteeSoldier, movingSoldierOldPosition))
                                     {
                                         if (boundCrossTwo != Vector3.zero)
-                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                         else
-                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
+                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne);
 
                                         overwatchLeft = true;
                                     }
@@ -3655,35 +3614,35 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 }
                                 else
                                 {
-                                    counterLabel += CreateDetectionMessage("detection", "half SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[1], detectee.stats.P.Val);
+                                    counterLabel += CreateDetectionMessage("detection", "half SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[1], detecteeSoldier.stats.P.Val);
                                     detectedLeft = true;
                                 }
                             }
                         }
-                        else if (detectee.PhysicalObjectWithinMaxRadius(movingSoldier))
+                        else if (detecteeSoldier.PhysicalObjectWithinMaxRadius(movingSoldier))
                         {
                             addDetection = true;
 
-                            if (movingSoldier.stats.GetStat(movingSoldierActiveStat).Val > detectee.stats.P.Val * detecteeMultipliers[2])
+                            if (movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat) > detecteeSoldier.DetectionActiveStat(detecteeMultipliers[2]))
                             {
-                                counterLabel += CreateDetectionMessage("avoidance", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val);
+                                counterLabel += CreateDetectionMessage("avoidance", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val);
                                 avoidanceLeft = true;
                             }
                             else
                             {
-                                if (detectee.IsOnOverwatch() && triggersOverwatch)
+                                if (detecteeSoldier.IsOnOverwatch() && triggersOverwatch)
                                 {
-                                    if (detectee.PhysicalObjectWithinOverwatchCone(movingSoldier))
+                                    if (detecteeSoldier.PhysicalObjectWithinOverwatchCone(movingSoldier))
                                     {
-                                        counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val);
+                                        counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val);
                                         overwatchLeft = true;
                                     }
-                                    else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detectee, movingSoldierOldPosition))
+                                    else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detecteeSoldier, movingSoldierOldPosition))
                                     {
                                         if (boundCrossTwo != Vector3.zero)
-                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                         else
-                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
+                                            counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne);
 
                                         overwatchLeft = true;
                                     }
@@ -3695,39 +3654,39 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 }
                                 else
                                 {
-                                    counterLabel += CreateDetectionMessage("detection", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val);
+                                    counterLabel += CreateDetectionMessage("detection", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val);
                                     detectedLeft = true;
                                 }
                             }
                         }
-                        else if (movingSoldierOldPosition != Vector3.zero && GlimpseDetectionDetecteeSeesMoving(movingSoldier, detectee, movingSoldierOldPosition))
+                        else if (movingSoldierOldPosition != Vector3.zero && GlimpseDetectionDetecteeSeesMoving(movingSoldier, detecteeSoldier, movingSoldierOldPosition))
                         {
                             addDetection = true;
 
-                            if (movingSoldier.stats.GetStat(movingSoldierActiveStat).Val > detectee.stats.P.Val * detecteeMultipliers[2])
+                            if (movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat) > detecteeSoldier.DetectionActiveStat(detecteeMultipliers[2]))
                             {
                                 if (boundCrossTwo != Vector3.zero)
-                                    counterLabel += CreateDetectionMessage("glimpseavoidance", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                    counterLabel += CreateDetectionMessage("glimpseavoidance", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                 else
-                                    counterLabel += CreateDetectionMessage("glimpseavoidance", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
+                                    counterLabel += CreateDetectionMessage("glimpseavoidance", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne);
 
                                 avoidanceLeft = true;
                             }
-                            else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detectee, movingSoldierOldPosition))
+                            else if (GlimpseDetectionDetecteeSeesMovingThroughOverwatchCone(movingSoldier, detecteeSoldier, movingSoldierOldPosition))
                             {
                                 if (boundCrossTwo != Vector3.zero)
-                                    counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                    counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                 else
-                                    counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
+                                    counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne);
                                     
                                 overwatchLeft = true;
                             }
                             else
                             {
                                 if (boundCrossTwo != Vector3.zero)
-                                    counterLabel += CreateDetectionMessage("glimpsedetection", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne, boundCrossTwo);
+                                    counterLabel += CreateDetectionMessage("glimpsedetection", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                 else
-                                    counterLabel += CreateDetectionMessage("glimpsedetection", "full SR", movingSoldierActiveStat, movingSoldier.stats.GetStat(movingSoldierActiveStat).Val, detecteeMultipliers[2], detectee.stats.P.Val, boundCrossOne);
+                                    counterLabel += CreateDetectionMessage("glimpsedetection", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne);
 
                                 detectedLeft = true;
                             }
@@ -3791,17 +3750,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //suppress detection alerts that evaluate the same as prior state on stat changes which can not affect LOS
                     if (causeOfLosCheck.Equals("statChange"))
                     {
-                        if (arrowType == "detection2Way" && movingSoldier.RevealedBySoldiers.Contains(detectee.id) && detectee.RevealedBySoldiers.Contains(movingSoldier.id))
+                        if (arrowType == "detection2Way" && movingSoldier.RevealedBySoldiers.Contains(detecteeSoldier.id) && detecteeSoldier.RevealedBySoldiers.Contains(movingSoldier.id))
                         {
                             addDetection = false;
                             //print(arrowType + ": soldiers can already see each other");
                         }
-                        else if (arrowType == "detection1WayRight" && detectee.RevealedBySoldiers.Contains(movingSoldier.id))
+                        else if (arrowType == "detection1WayRight" && detecteeSoldier.RevealedBySoldiers.Contains(movingSoldier.id))
                         {
                             addDetection = false;
                             //print(arrowType + ": onturn can see offturn (1 way)");
                         }
-                        else if (arrowType == "detection1WayLeft" && movingSoldier.RevealedBySoldiers.Contains(detectee.id))
+                        else if (arrowType == "detection1WayLeft" && movingSoldier.RevealedBySoldiers.Contains(detecteeSoldier.id))
                         {
                             addDetection = false;
                             //print(arrowType + ": offturn can see onturn (1 way)");
@@ -3810,8 +3769,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     if (addDetection)
                     {
-                        menu.AddDetectionAlert(movingSoldier, detectee, detectorLabel, counterLabel, arrowType);
+                        menu.AddDetectionAlert(movingSoldier, detecteeSoldier, detectorLabel, counterLabel, arrowType);
                         showDetectionUI = true;
+                    }
+                }
+                else if (detectee is Claymore detecteeClaymore && !detecteeClaymore.revealed && movingSoldier.IsOppositeTeamAs(detecteeClaymore.placedBy) && movingSoldier.stats.P.Val > detecteeClaymore.ActiveC && movingSoldier.stats.P.Val > detecteeClaymore.ActiveF)
+                {
+                    if (movingSoldier.PhysicalObjectWithinMaxRadius(detecteeClaymore))
+                    {
+                        counterLabel = CreateDetectionMessageClaymore(detecteeClaymore.ActiveC, detecteeClaymore.ActiveF, movingSoldier.stats.P.Val);
+                        menu.AddDetectionAlert(movingSoldier, detecteeClaymore, "Not detected\n(N/A)", counterLabel, "detection1WayRight");
+                        showDetectionUI = true;
+
+                        print($"{movingSoldier.soldierName} detected the claymore at {detecteeClaymore.x},{detecteeClaymore.y},{detecteeClaymore.z}");
                     }
                 }
             }
@@ -3828,6 +3798,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
     }
 
+    public string CreateDetectionMessageClaymore(int claymoreC, int claymoreF, int soldierP)
+    {
+        return $"<color=red>DETECTED</color>\nClaymore C={claymoreC}, F={claymoreF} did not exceed P={soldierP}";
+    }
     public string CreateDetectionMessage(string type, string distance, string activeStatName, int activeStatValue, int perceptivenessMultiplier, int soldierPerceptiveness)
     {
         string title, part1, join, part2;
@@ -3934,6 +3908,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown terminalTypeDropdown = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").Find("TerminalTypeDropdown").GetComponent<TMP_Dropdown>();
         Transform gbItemsPanel = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("AllItemsPanel").Find("Viewport").Find("GoodyBoxItemsContent");
+        TMP_InputField claymoreFacingXInput = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField claymoreFacingYInput = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
 
         int spawnedObject = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ObjectType").Find("ObjectTypeDropdown").GetComponent<TMP_Dropdown>().value;
         //check input formatting
@@ -3955,6 +3931,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 Instantiate(poiManager.terminalPrefab).Init(spawnLocation, terminalTypeDropdown.options[terminalTypeDropdown.value].text);
             else if (spawnedObject == 3)
                 Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
+            else if (spawnedObject == 4)
+            {
+                if (claymoreFacingXInput.textComponent.color == menu.normalTextColour && claymoreFacingYInput.textComponent.color == menu.normalTextColour && int.TryParse(claymoreFacingXInput.text, out int facingXInt) && int.TryParse(claymoreFacingYInput.text, out int facingYInt))
+                    Instantiate(poiManager.claymorePrefab).Init(spawnLocation, Tuple.Create(1, 1, facingXInt, facingYInt, "")).PlaceClaymore();
+            }
 
             menu.CloseOverrideInsertObjectsUI();
         }
@@ -3984,8 +3965,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         int spawnedObject = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ObjectType").Find("ObjectTypeDropdown").GetComponent<TMP_Dropdown>().value;
         GameObject terminalType = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").gameObject;
         GameObject allItemsPanel = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("AllItemsPanel").gameObject;
+        GameObject claymoreFacing = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ClaymoreFacing").gameObject;
         terminalType.SetActive(false);
         allItemsPanel.SetActive(false);
+        claymoreFacing.SetActive(false);
 
         if (spawnedObject == 1)
         {
@@ -3996,9 +3979,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             terminalType.SetActive(true);
         }
-        else if (spawnedObject == 3)
+        else if (spawnedObject == 4)
         {
-            
+            claymoreFacing.SetActive(true);
         }
     }
 

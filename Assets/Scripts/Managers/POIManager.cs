@@ -64,7 +64,6 @@ public class POIManager : MonoBehaviour, IDataPersistence
             newPOI.LoadData(data);
         }
     }
-
     public void SaveData(ref GameData data)
     {
         allPOIIds.Clear();

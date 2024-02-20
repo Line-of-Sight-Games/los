@@ -8,8 +8,9 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
+using System.Diagnostics.Contracts;
 
-public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable
+public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable, IAmDetectable
 {
     public Dictionary<string, object> details;
     public string soldierName, soldierTerrain, soldierSpeciality;
@@ -890,6 +891,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             stats.C.Val = 0;
             stats.F.Val = 0;
+            stats.P.Val = 0;
 
             if (CheckTabunEffectLevel(100))
             {
@@ -2314,7 +2316,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         //experimentalist ability
         if (IsExperimentalist())
-            rCheck = true;
+        {
+            if (!rCheck && !healCheck)
+                rCheck = true;
+            else if (rCheck ^ healCheck)
+            {
+                rCheck = true;
+                healCheck = true;
+            }
+        }
 
         if (rCheck && healCheck)
             menu.AddXpAlert(this, 1, $"{soldierName} resisted tabun gas.", false);
@@ -4014,4 +4024,24 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public GameObject GameObject
     { get { return gameObject; } }
     public List<string> InventoryList { get { return inventoryList; } }
+
+    public int ActiveC
+    { get { return stats.C.Val; } }
+    public int ActiveF
+    { get { return stats.F.Val; } }
+
+    public int AvoidanceActiveStat(string statName)
+    {
+        if (statName == "C")
+            return ActiveC;
+        else if (statName == "F")
+            return ActiveF;
+
+        return 0;
+    }
+
+    public int DetectionActiveStat(int multiplier)
+    {
+        return stats.P.Val * multiplier;
+    }
 }

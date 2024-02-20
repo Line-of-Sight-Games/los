@@ -8,6 +8,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
 {
     public POIManager poiManager;
     public bool triggered;
+    public bool exploded;
     private void Start()
     {
         poiType = "barrel";
@@ -63,7 +64,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     public void CheckExplosionBarrel(Soldier explodedBy)
     {
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel : {X},{Y},{Z}").gameObject;
-        int damage = 0, stun = 1;
+        int damage = 0;
         foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
         {
             if (obj.PhysicalObjectWithinRadius(this, 3))
@@ -80,7 +81,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
                 else if (obj is POI hitPoi && hitPoi != this)
                     menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y), explodedBy, damage, stun); 
+                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y), explodedBy, damage, 1);
             }
         }
 
@@ -94,4 +95,9 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     { 
         get { return id; } 
     }
+
+    public bool Triggered
+    { get { return triggered; } set { triggered = value; } }
+    public bool Exploded
+    { get { return exploded; } set { exploded = value; } }
 }

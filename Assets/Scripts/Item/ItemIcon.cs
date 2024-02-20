@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEditor.VersionControl;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -161,7 +160,6 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                         }
                         else
                             menu.OpenCannotUseItemUI(message);
-                        print(message);
                     }
                 }
             }
