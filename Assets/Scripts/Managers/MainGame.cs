@@ -31,6 +31,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
+    public int tempAP, tempMP;
     public Tuple<Soldier, IAmShootable> tempShooterTarget;
 
     public UnitDisplayPanel displayPanel;
@@ -174,14 +175,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartModaTurn(Soldier modaSoldier)
     {
-        menu.turnTitle.text = "<color=purple>M O D A F I N I L    T U R N</color>";
-
         //change game parameters
         modaTurn = true;
         SwitchTeam(modaSoldier.soldierTeam);
 
         //activate the surviving soldier
-        modaSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu();
+        modaSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu("moda");
         modaSoldier.GenerateAP();
         modaSoldier.modaProtect = false;
     }
@@ -189,24 +188,28 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         activeSoldier.Kill(null, new() { "Modafinil" });
         modaTurn = false;
-        SwitchTeam(currentTeam);
+        SwitchTeam(tempTeam);
     }
     public void StartFrozenTurn(Soldier frozenSoldier)
     {
-        menu.turnTitle.text = "<color=red>F R O Z E N    T U R N</color>";
+        tempAP = frozenSoldier.ap;
+        tempMP = frozenSoldier.mp;
 
         //change game parameters
         frozenTurn = true;
         SwitchTeam(frozenSoldier.soldierTeam);
 
         //activate the surviving soldier
-        frozenSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu();
-        frozenSoldier.GenerateAP();
+        frozenSoldier.ap = 100;
+        frozenSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu("frozen");
+        menu.OpenShotUI();
     }
     public void EndFrozenTurn()
     {
+        activeSoldier.ap = tempAP;
+        activeSoldier.mp = tempMP;
         frozenTurn = false;
-        SwitchTeam(currentTeam);
+        SwitchTeam(tempTeam);
     }
     public void EndTurnNonCoroutine()
     {
@@ -668,10 +671,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
 
-    public void TakeTrauma()
-    {
-        activeSoldier.TakeTrauma(1);
-    }
+
+
+
+
 
 
 
@@ -2938,7 +2941,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         //print(friendly.soldierName + " trauma check actually running");
                         //desensitised
-                        if (friendly.tp >= 5)
+                        if (friendly.IsDesensitised())
                             menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
                         else
                         {
@@ -3044,9 +3047,26 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //block confirm if all buttons haven't been clicked
             if (!unresolved)
             {
-                //destroy all detection alerts for given team after done
+                Dictionary<Soldier, int> soldiersToTraumatise = new();
                 foreach (Transform child in traumaAlerts)
+                {
+                    if (child.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text.Contains("GAINED"))
+                    {
+                        Soldier traumatisedSoldier = child.GetComponent<SoldierAlert>().soldier;
+                        int.TryParse(child .Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text, out int trauma);
+
+                        // Check if the soldier is already in the dictionary
+                        if (soldiersToTraumatise.ContainsKey(traumatisedSoldier))
+                            soldiersToTraumatise[traumatisedSoldier] += trauma;
+                        else
+                            soldiersToTraumatise.Add(traumatisedSoldier, trauma);
+                    }
                     Destroy(child.gameObject);
+                }
+
+                //iterate through the list 
+                foreach (KeyValuePair<Soldier, int> kvp in soldiersToTraumatise)
+                    kvp.Key.TakeTrauma(kvp.Value);
 
                 menu.CloseTraumaUI();
             }

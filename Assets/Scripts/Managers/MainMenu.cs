@@ -952,7 +952,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), playdeadButton), "<color=yellow>Playdead</color>");
         else if (activeSoldier.ap == 0)
             GreyOutButtons(AddAllButtons(buttonStates), "No AP");
-        else if (activeSoldier.tp == 4)
+        else if (activeSoldier.IsFrozen() && game.frozenTurn)
+        {
+            GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), shotButton), "<color=orange>Frozen</color>");
+            if (!activeSoldier.EquippedGun.CheckAnyAmmo())
+            {
+                buttonStates.Add(shotButton, "Gun Empty");
+                GreyOutButtons(buttonStates, "");
+            }
+        }
+        else if (activeSoldier.IsBroken())
         {
             //if in last stand regain control
             if (activeSoldier.IsLastStand())
@@ -1023,8 +1032,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             //block dipelec button
             //if (activeSoldier.stats.SR.Val == 0) { }
-                //buttonStates.Add(dipElecButton, "Blind");
-            /*else*/ if (!activeSoldier.TerminalInRange())
+            //buttonStates.Add(dipElecButton, "Blind");
+            /*else*/
+            if (!activeSoldier.TerminalInRange())
                 buttonStates.Add(dipElecButton, "No Terminal");
             else if (!activeSoldier.ClosestTerminal().terminalEnabled)
                 buttonStates.Add(dipElecButton, "Terminal Disabled");

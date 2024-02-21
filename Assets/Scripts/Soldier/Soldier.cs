@@ -507,16 +507,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void FrozenMultiShot()
     {
-        if (HasGunEquipped())
-        {
-            if (EquippedGun.CheckAnyAmmo())
-            {
-                if (!IsMeleeControlled())
-                {
-                    game.StartFrozenTurn(this);
-                }
-            }
-        }
+        if (HasGunEquipped() && EquippedGun.CheckAnyAmmo() && !IsMeleeControlled())
+            game.StartFrozenTurn(this);
     }
 
     public void DestroyAllBreakableItems(Soldier destroyedBy)
@@ -1421,13 +1413,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             tp += trauma;
 
             //perform frozen shenanigans
-            if (tp == 3)
+            if (IsFrozen())
             {
                 FrozenMultiShot();
             }
 
             //drop all items for broken
-            if (tp == 4)
+            if (IsBroken())
             {
                 BrokenDropAllItemsExceptArmour();
                 foreach (Soldier s in game.AllSoldiers())
@@ -2961,7 +2953,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
-
+    public bool IsDesensitised()
+    {
+        if (tp >= 5)
+            return true;
+        return false;
+    }
+    public bool IsNotDesensitised()
+    {
+        if (!IsDesensitised())
+            return true;
+        return false;
+    }
 
 
 

@@ -54,7 +54,7 @@ public class SoldierUI : MonoBehaviour
         }
     }
 
-    public void OpenSoldierMenu()
+    public void OpenSoldierMenu(string type)
     {
         linkedSoldier.selected = true;
         menu.activeSoldier = linkedSoldier;
@@ -62,7 +62,12 @@ public class SoldierUI : MonoBehaviour
         //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
         menu.menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(false);
         menu.menuUI.transform.Find("Options Panel").Find("SoldierOptions").gameObject.SetActive(true);
-        menu.turnTitle.text = "N O R M A L    T U R N";
+        if (type == "frozen")
+            menu.turnTitle.text = "<color=orange>F R O Z E N    T U R N</color>";
+        else if (type == "moda")
+            menu.turnTitle.text = "<color=purple>M O D A F I N I L    T U R N</color>";
+        else
+            menu.turnTitle.text = "N O R M A L    T U R N";
 
         //populate soldier loadout
         Transform soldierBanner = menu.soldierOptionsUI.transform.Find("SoldierBanner");
