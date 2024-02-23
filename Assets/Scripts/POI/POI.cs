@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 public class POI : PhysicalObject, IDataPersistence
 {
+    public POIManager poiManager;
     public Dictionary<string, object> details;
     public string poiType;
 
@@ -16,5 +17,10 @@ public class POI : PhysicalObject, IDataPersistence
     public virtual void SaveData(ref GameData data)
     {
 
+    }
+
+    public string Id
+    {
+        get { return id; }
     }
 }

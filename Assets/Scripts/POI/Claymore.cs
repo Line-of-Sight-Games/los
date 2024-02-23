@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 
 public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
 {
-    public POIManager poiManager;
     public bool triggered;
     public bool revealed;
     public bool exploded;
@@ -82,7 +81,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
             { "placedById", placedById }
         };
 
-        //add the item in
+        //add the poi in
         if (data.allPOIDetails.ContainsKey(id))
             data.allPOIDetails.Remove(id);
 
@@ -167,11 +166,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
         }
         return false;
     }
-    public string Id 
-    { 
-        get { return id; } 
-    }
-
     public int ActiveC
     { get { return c; } }
     public int ActiveF

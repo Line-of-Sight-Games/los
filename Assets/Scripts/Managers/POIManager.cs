@@ -13,6 +13,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
     public Claymore claymorePrefab;
     public SmokeCloud smokeCloudPrefab;
     public TabunCloud tabunCloudPrefab;
+    public DeploymentBeacon deploymentBeaconPrefab;
 
     public void LoadData(GameData data)
     {
@@ -27,39 +28,24 @@ public class POIManager : MonoBehaviour, IDataPersistence
             POI newPOI = Instantiate(poiPrefab);
             newPOI.id = id;
             newPOI.LoadData(data);
-            //print($"{newPOI.id}: {newPOI.poiType}: {newPOI.GetType()}");
-            if (newPOI.poiType == "terminal")
-            {
-                Destroy(newPOI.gameObject);
+            string spawnType = newPOI.poiType;
+            Destroy(newPOI.gameObject);
+
+            if (spawnType == "terminal")
                 newPOI = Instantiate(terminalPrefab);
-                
-            }
-            else if (newPOI.poiType == "gb")
-            {
-                Destroy(newPOI.gameObject);
+            else if (spawnType == "gb")
                 newPOI = Instantiate(gbPrefab);
-            }
-            else if (newPOI.poiType == "barrel")
-            {
-                Destroy(newPOI.gameObject);
+            else if (spawnType == "barrel")
                 newPOI = Instantiate(barrelPrefab);
-            }
-            else if (newPOI.poiType == "claymore")
-            {
-                Destroy(newPOI.gameObject);
+            else if (spawnType == "claymore")
                 newPOI = Instantiate(claymorePrefab);
-            }
-            else if (newPOI.poiType == "smoke")
-            {
-                Destroy(newPOI.gameObject);
+            else if (spawnType == "smoke")
                 newPOI = Instantiate(smokeCloudPrefab);
-            }
-            else if (newPOI.poiType == "tabun")
-            {
-                Destroy(newPOI.gameObject);
+            else if (spawnType == "tabun")
                 newPOI = Instantiate(tabunCloudPrefab);
-            }
-            //print($"{newPOI.GetType()}");
+            else if (spawnType == "depbeacon")
+                newPOI = Instantiate(deploymentBeaconPrefab);
+
             newPOI.id = id;
             newPOI.LoadData(data);
         }

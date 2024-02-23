@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class POIPortrait : MonoBehaviour
 {
-    public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite, claymoreSprite;
+    public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite, claymoreSprite, deploymentBeaconSprite;
     public void Init(POI poi)
     {
         //print(poi.poiType);
@@ -14,6 +14,7 @@ public class POIPortrait : MonoBehaviour
             "gb" => goodyBoxSprite,
             "terminal" => terminalSprite,
             "claymore" => claymoreSprite,
+            "depbeacon" => deploymentBeaconSprite,
             _ => null,
         };
         transform.Find("POILocation").GetComponent<TextMeshProUGUI>().text = $"X:{poi.X} Y:{poi.Y} Z:{poi.Z}";

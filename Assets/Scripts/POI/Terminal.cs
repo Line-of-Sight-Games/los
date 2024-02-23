@@ -94,9 +94,5 @@ public class Terminal : POI, IDataPersistence, IAmShootable
         get { return soldiersAlreadyHacked; }
         set { soldiersAlreadyHacked = value; }
     }
-    public string Id
-    {
-        get { return id; }
-    }
 }
 

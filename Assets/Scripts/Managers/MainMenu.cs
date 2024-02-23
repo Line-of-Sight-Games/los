@@ -22,7 +22,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI, claymoreUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI, claymoreUI, deploymentBeaconUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -1988,7 +1988,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (poiHit is not GoodyBox)
         {
-            if ((poiHit is ExplosiveBarrel barrel && !barrel.triggered) || (poiHit is Claymore claymore && !claymore.triggered) || poiHit is Terminal)
+            if ((poiHit is ExplosiveBarrel barrel && !barrel.triggered) || (poiHit is Claymore claymore && !claymore.triggered) || poiHit is Terminal || poiHit is DeploymentBeacon)
             {
                 GameObject explosionAlert = Instantiate(explosionAlertPOIPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
                 explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, poiHit);
@@ -3330,6 +3330,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_SMG" => "Reload Sub-Machine Gun?",
             "Ammo_Sn" => "Reload Sniper?",
             "Claymore" => "Place Claymore?",
+            "Deployment_Beacon" => "Place Deployment Beacon?",
             "Food_Pack" => "Consume food pack?",
             "Grenade_Flashbang" => "Throw flashbang?",
             "Grenade_Frag" => "Throw frag?",
@@ -3669,7 +3670,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         ClearClaymoreUI();
         claymoreUI.SetActive(false);
     }
+    public void OpenDeploymentBeaconUI(UseItemUI useItemUI)
+    {
+        deploymentBeaconUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        deploymentBeaconUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        deploymentBeaconUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
 
+        deploymentBeaconUI.SetActive(true);
+    }
+    public void ClearDeploymentBeaconUI()
+    {
+        deploymentBeaconUI.transform.Find("OptionPanel").Find("BeaconPlacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        deploymentBeaconUI.transform.Find("OptionPanel").Find("BeaconPlacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        deploymentBeaconUI.transform.Find("OptionPanel").Find("BeaconPlacing").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+    }
+    public void CloseDeploymentBeaconUI()
+    {
+        ClearDeploymentBeaconUI();
+        deploymentBeaconUI.SetActive(false);
+    }
 
 
 

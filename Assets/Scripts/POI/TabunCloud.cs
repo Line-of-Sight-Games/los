@@ -8,7 +8,6 @@ public class TabunCloud : POI, IDataPersistence
 {
     readonly int segments = 100;
     readonly int tabunRadius = 20;
-    public POIManager poiManager;
     public int turnsUntilDissipation;
     public List<string> alliesAffected, enemiesAffected;
     public string placedById;
@@ -141,11 +140,6 @@ public class TabunCloud : POI, IDataPersistence
         
         poiManager.DestroyPOI(this);
     }
-    public string Id 
-    { 
-        get { return id; } 
-    }
-
     public int TurnsUntilDissipation
     {
         get { return turnsUntilDissipation; }

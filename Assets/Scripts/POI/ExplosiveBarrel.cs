@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 
 public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
 {
-    public POIManager poiManager;
     public bool triggered;
     public bool exploded;
     private void Start()
@@ -91,11 +90,6 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         
         poiManager.DestroyPOI(this);
     }
-    public string Id 
-    { 
-        get { return id; } 
-    }
-
     public bool Triggered
     { get { return triggered; } set { triggered = value; } }
     public bool Exploded

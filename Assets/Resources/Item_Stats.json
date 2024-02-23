@@ -285,7 +285,7 @@
     },
     {
       "Name": "Deployment_Beacon",
-      "Traits": [ "Usable", "Fragile", "Placeable", "Throwable" ],
+      "Traits": [ "Usable", "Consumable", "Fragile", "Placeable", "Throwable" ],
       "UsageAP": 3,
       "Weight": 2,
       "LoudRadius": 10,

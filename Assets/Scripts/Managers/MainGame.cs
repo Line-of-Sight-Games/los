@@ -2391,6 +2391,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Claymore":
                 menu.OpenClaymoreUI(useItemUI);
                 break;
+            case "Deployment_Beacon":
+                menu.OpenDeploymentBeaconUI(useItemUI);
+                break;
             case "Poison_Satchel":
                 itemUsed.UseItem(linkedIcon, itemUsedOn, null);
                 break;
@@ -2628,10 +2631,34 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (int.TryParse(placedX.text, out int placedXInt) && int.TryParse(placedY.text, out int placedYInt) && int.TryParse(placedZ.text, out int placedZInt) 
             && int.TryParse(facingX.text, out int facingXInt) && int.TryParse(facingY.text, out int facingYInt))
             {
-                useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id)).PlaceClaymore();
+                if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
+                {
+                    useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
+                    Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id)).PlaceClaymore();
 
-                menu.CloseClaymoreUI();
+                    menu.CloseClaymoreUI();
+                }
+            }
+        }
+    }
+    public void ConfirmDeploymentBeacon(UseItemUI useDeploymentBeacon)
+    {
+        TMP_InputField placedX = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField placedY = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField placedZ = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("ZPos").GetComponent<TMP_InputField>();
+        TMP_Dropdown terrainOn = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
+
+        if (placedX.textComponent.color == menu.normalTextColour && placedY.textComponent.color == menu.normalTextColour && placedZ.textComponent.color == menu.normalTextColour && terrainOn.value != 0)
+        {
+            if (int.TryParse(placedX.text, out int placedXInt) && int.TryParse(placedY.text, out int placedYInt) && int.TryParse(placedZ.text, out int placedZInt))
+            {
+                if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
+                {
+                    useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
+                    Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), activeSoldier.Id);
+
+                    menu.CloseDeploymentBeaconUI();
+                }
             }
         }
     }

@@ -62,6 +62,10 @@ public class ExplosionList : MonoBehaviour
                         explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" });
                     menu.poiManager.DestroyPOI(terminal);
                 }
+                else if (hitByExplosion is DeploymentBeacon deploymentBeacon)
+                {
+                    menu.poiManager.DestroyPOI(deploymentBeacon);
+                }
                 else if (hitByExplosion is Soldier hitSoldier)
                 {
                     if (int.TryParse(child.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage))
