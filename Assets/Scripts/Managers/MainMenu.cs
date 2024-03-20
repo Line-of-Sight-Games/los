@@ -2000,6 +2000,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddExplosionAlertItem(GameObject explosionList, Item itemHit, Vector3 explosionLocation, Soldier explodedBy, int damage)
     {
+        print($"{itemHit.itemName} - {itemHit.id} - explosion alert");
         if (itemHit.owner is not GoodyBox)
         {
             //riot shield block

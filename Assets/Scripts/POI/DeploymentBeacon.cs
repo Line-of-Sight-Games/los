@@ -18,6 +18,11 @@ public class DeploymentBeacon : POI, IDataPersistence
         poiManager = FindObjectOfType<POIManager>();
     }
 
+    private void Update()
+    {
+        placedBy = menu.soldierManager.FindSoldierById(placedById);
+    }
+
     public DeploymentBeacon Init(Tuple<Vector3, string> location, string placedBySoldierId)
     {
         id = GenerateGuid();

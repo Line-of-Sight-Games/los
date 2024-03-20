@@ -50,6 +50,7 @@ public class SoldierUI : MonoBehaviour
                 linkedSoldier.CheckSpecialityColor(linkedSoldier.soldierSpeciality);
                 transform.Find("PopupBox").gameObject.SetActive(false);
                 game.PerformMove(linkedSoldier, 0, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.options[terrainDropdown.value].text), false, false, string.Empty, true);
+                game.CheckDeploymentBeacons(linkedSoldier);
             }
         }
     }

@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using UnityEditor;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 [System.Serializable]
 public class Item : PhysicalObject, IDataPersistence
@@ -784,6 +782,12 @@ public class Item : PhysicalObject, IDataPersistence
     public bool IsGrenade()
     {
         if (name.Contains("Grenade"))
+            return true;
+        return false;
+    }
+    public bool IsClaymore()
+    {
+        if (name.Contains("Claymore"))
             return true;
         return false;
     }

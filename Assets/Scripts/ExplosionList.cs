@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -38,7 +39,7 @@ public class ExplosionList : MonoBehaviour
                     {
                         if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
                         {
-                            if (item.IsGrenade())
+                            if (item.IsGrenade() || item.IsClaymore())
                                 item.traits.Add("Triggered");
                             else
                                 item.DamageItem(explodedBy, damage);
@@ -114,10 +115,12 @@ public class ExplosionList : MonoBehaviour
                     if (hitClaymore.triggered)
                         hitClaymore.CheckExplosionClaymore(explodedBy, true);
                 }
-                else if (hitByExplosion is Item hitItem)
+                else if (hitByExplosion is Item hitItem && hitItem.IsTriggered())
                 {
-                    if (hitItem.IsGrenade() && hitItem.IsTriggered())
+                    if (hitItem.IsGrenade())
                         hitItem.CheckExplosionGrenade(explodedBy, new(hitItem.X, hitItem.Y, hitItem.Z));
+                    else if (hitItem.IsClaymore())
+                        Instantiate(menu.poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(hitItem.X, hitItem.Y, hitItem.Z), "Urban"), Tuple.Create(0, 0, hitItem.X, hitItem.Y, explodedBy.Id)).CheckExplosionClaymore(explodedBy, true);
                 } 
             }
 

@@ -2038,7 +2038,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void CheckSpecialityColor(string speciality)
     {
-        if (fielded)
+        if (IsFielded())
         {
             soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Button>().enabled = true;
             soldierUI.transform.Find("FieldButton").gameObject.SetActive(false);

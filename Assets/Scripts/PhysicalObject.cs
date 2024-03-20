@@ -43,16 +43,22 @@ public class PhysicalObject : MonoBehaviour
         get { return z; }
         set { z = value; MapPhysicalPosition(x, y, z); }
     }
+    public bool OnBattlefield()
+    {
+        if (X > 0 && X <= game.maxX && Y > 0 && Y <= game.maxY && Z <= game.maxZ)
+            return true;
+        return false;
+    }
     public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
     {
-        if (game.CalculateRange(this, obj) <= radius)
+        if (OnBattlefield() && obj.OnBattlefield() && game.CalculateRange(this, obj) <= radius)
             return true;
 
         return false;
     }
     public bool PhysicalObjectWithinRadius(Vector3 point, float radius)
     {
-        if (game.CalculateRange(this, point) <= radius)
+        if (OnBattlefield() && (point.x > 0 && X <= game.maxX && point.y > 0 && point.y <= game.maxY && point.z <= game.maxZ) && game.CalculateRange(this, point) <= radius)
             return true;
 
         return false;

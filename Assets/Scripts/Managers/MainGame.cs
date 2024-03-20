@@ -667,7 +667,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (movingSoldier.X == movingSoldier.startX && movingSoldier.Y == movingSoldier.startY && movingSoldier.Z == movingSoldier.startZ)
                 menu.OpenBrokenFledUI();
     }
-
+    public void CheckDeploymentBeacons(Soldier fieldedSoldier)
+    {
+        foreach (DeploymentBeacon beacon in FindObjectsOfType<DeploymentBeacon>())
+            if (beacon.placedBy.IsSameTeamAs(fieldedSoldier) && fieldedSoldier.X == beacon.X && fieldedSoldier.Y == beacon.Y && fieldedSoldier.Z == beacon.Z)
+                menu.AddXpAlert(beacon.placedBy, 1, $"Ally ({fieldedSoldier.soldierName}) deployed through beacon at ({beacon.X}, {beacon.Y}, {beacon.Z})", true);
+    }
 
 
 
@@ -2675,12 +2680,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {
-        float damagef = 0;
-        //imperceptible delay to allow colliders to be recalculated at new destination
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF : {position.x}, {position.y}, {position.z}").gameObject;
 
         foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
         {
+            float damagef = 0;
             if (obj.PhysicalObjectWithinRadius(position, radius / 2))
                 damagef = damage;
             else if (obj.PhysicalObjectWithinRadius(position, radius))

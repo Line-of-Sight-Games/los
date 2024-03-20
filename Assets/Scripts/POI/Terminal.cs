@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Terminal : POI, IDataPersistence, IAmShootable
+public class Terminal : POI, IDataPersistence
 {
     public string terminalType;
     public bool terminalEnabled;
