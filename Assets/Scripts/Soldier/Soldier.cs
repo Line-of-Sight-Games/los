@@ -23,7 +23,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, 
-        plannerDonatedMove, dugIn, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
+        plannerDonatedMove, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
@@ -147,7 +147,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "suppressionValue", suppressionValue },
             { "healthRemovedFromStarve", healthRemovedFromStarve },
             { "poisonedBy", poisonedBy },
-            { "dugIn", dugIn },
             { "glucoState", glucoState },
             { "amphStatReduction", amphStatReduction },
             { "modaProtect", modaProtect },
@@ -243,7 +242,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         suppressionValue = Convert.ToInt32(details["suppressionValue"]);
         healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
         poisonedBy = (string)details["poisonedBy"];
-        dugIn = Convert.ToInt32(details["dugIn"]);
         glucoState = (string)details["glucoState"];
         amphStatReduction = (bool)details["amphStatReduction"];
         modaProtect = (bool)details["modaProtect"];
@@ -722,7 +720,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void ApplyVisMods()
     {
-        if (!IsCommander())
+        if (!IsWearingThermalGoggles())
         {
             if (game.weather.CurrentWeather.Contains("Zero visibility"))
                 stats.SR.Val -= 100;
@@ -865,13 +863,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (IsSmokeBlinded())
             {
                 stats.E.Val += 6;
-                if (!IsCommander())
+                if (!IsWearingThermalGoggles())
                     stats.SR.Val = 0;
             }
             else if (IsSmokeCovered())
             {
                 stats.E.Val += 3;
-                if (!IsCommander())
+                if (!IsWearingThermalGoggles())
                     stats.SR.Val -= 70;
                 stats.P.Val -= 2;
             }
@@ -1018,20 +1016,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         UnsetState("Playdead");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
-    }
-    public void UnsetDugIn()
-    {
-        dugIn = 0;
-    }
-    public void IncrementDugIn()
-    {
-        SetDugIn();
-        dugIn++;
-    }
-    public void SetDugIn()
-    {
-        if (dugIn == 0)
-            SetCover();
     }
     public void TakeDrug(string drugName, Soldier administeredBy)
     {
@@ -1562,7 +1546,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         float visModMove;
 
         //commander immune
-        if (IsCommander())
+        if (IsWearingThermalGoggles())
             visModMove = 0.0f;
         else
         {
@@ -3098,6 +3082,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool IsWearingThermalGoggles()
+    {
+        if (Inventory.HasItemOfType("Thermal_Goggles"))
+            return true;
+        return false;
+    }
     public bool IsWearingBodyArmour(bool hasIntegrity)
     {
         if (Inventory.HasItemOfType("Armour_Body"))
@@ -3727,12 +3717,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return ", <color=yellow>Playdead</color>";
         return "";
     }
-    public string GetDugInState()
-    {
-        if (dugIn > 0)
-            return $", <color=green>Dug In({dugIn})</color>";
-        return "";
-    }
     public string GetSmokedState()
     {
         if (IsSmokeBlinded())
@@ -3848,7 +3832,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetPoisonedState();
             status += GetSuppressionState();
             status += GetPlaydeadState();
-            status += GetDugInState();
             status += GetSmokedState();
             status += GetTabunedState();
             status += GetDrugState();

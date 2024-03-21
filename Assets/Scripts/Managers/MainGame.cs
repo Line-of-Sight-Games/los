@@ -628,9 +628,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //break suppression
         movingSoldier.UnsetSuppression();
 
-        //clear e tool dug in
-        movingSoldier.UnsetDugIn();
-
         //blow up claymores
         foreach (Claymore claymore in FindObjectsOfType<Claymore>())
             claymore.MoveOverClaymore(movingSoldier);
@@ -1089,7 +1086,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         float visMod;
 
-        if (shooter.IsCommander())
+        if (shooter.IsWearingThermalGoggles())
             visMod = 0.0f;
         else
         {

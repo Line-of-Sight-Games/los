@@ -42,7 +42,15 @@ public class Item : PhysicalObject, IDataPersistence
         reader = FindObjectOfType<ItemReader>();
         itemManager = FindObjectOfType<ItemManager>();
     }
-
+    private void Update()
+    {
+        if (owner != null) 
+        {
+            X = owner.X;
+            Y = owner.Y;
+            Z = owner.Z;
+        }
+    }
     public Item Init(string name)
     {
         owner = null;
@@ -147,9 +155,10 @@ public class Item : PhysicalObject, IDataPersistence
             "Syringe_Trenbolone" => 60,
             "Syringe_Unlabelled" => 61,
             "Thermal_Camera" => 62,
-            "UHF_Radio" => 63,
-            "ULF_Radio" => 64,
-            "Water_Canteen" => 65,
+            "Thermal_Goggles" => 63,
+            "UHF_Radio" => 64,
+            "ULF_Radio" => 65,
+            "Water_Canteen" => 66,
             _ => -1,
         };
     }
@@ -220,6 +229,7 @@ public class Item : PhysicalObject, IDataPersistence
             "Syringe_Trenbolone" => ItemAssets.Instance.Syringe_Trenbolone,
             "Syringe_Unlabelled" => ItemAssets.Instance.Syringe_Unlabelled,
             "Thermal_Camera" => ItemAssets.Instance.Thermal_Camera,
+            "Thermal_Goggles" => ItemAssets.Instance.Thermal_Goggles,
             "UHF_Radio" => ItemAssets.Instance.UHF_Radio,
             "ULF_Radio" => ItemAssets.Instance.ULF_Radio,
             "Water_Canteen" => ItemAssets.Instance.Water_Canteen,
@@ -518,7 +528,7 @@ public class Item : PhysicalObject, IDataPersistence
             switch (itemName)
             {
                 case "E_Tool":
-                    linkedSoldier.IncrementDugIn();
+                    menu.OpenEtoolResultUI();
                     break;
                 case "Ammo_AR":
                 case "Ammo_LMG":
@@ -698,6 +708,8 @@ public class Item : PhysicalObject, IDataPersistence
             menu.OpenExplosionUI();
         else
             Destroy(explosionList);
+
+        DestroyItem(explodedBy);
     }
     public void ConsumeItem()
     {
@@ -711,13 +723,10 @@ public class Item : PhysicalObject, IDataPersistence
     }
     public void DestroyItem(Soldier destroyedBy)
     {
-            if (IsGrenade() && !IsTriggered())
-                CheckExplosionGrenade(destroyedBy, new(X, Y, Z));
-            else
-                ConsumeItem();
+        ConsumeItem();
 
-            if (owner is Soldier linkedSoldier)
-                menu.AddDamageAlert(linkedSoldier, $"{linkedSoldier.soldierName} had {this.itemName} destroyed.", false, true);
+        if (owner is Soldier linkedSoldier)
+            menu.AddDamageAlert(linkedSoldier, $"{linkedSoldier.soldierName} had {this.itemName} destroyed.", false, true);
     }
     public bool IsBreakable()
     {

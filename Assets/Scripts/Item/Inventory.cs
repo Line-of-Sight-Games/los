@@ -69,9 +69,6 @@ public class Inventory
         itemList.Remove(item);
         itemIds.Remove(item.id);
         item.transform.SetParent(null, true);
-        item.X = linkedInventoryObject.X;
-        item.Y = linkedInventoryObject.Y;
-        item.Z = linkedInventoryObject.Z;
         item.owner = null;
     }
 

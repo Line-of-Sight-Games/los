@@ -1197,6 +1197,14 @@
       "WhereEquipped": ""
     },
     {
+      "Name": "Thermal_Goggles",
+      "Traits": [ "Fragile" ],
+      "Weight": 1,
+      "GunTraits": {},
+      "EquippableSlots": [ "Head" ],
+      "WhereEquipped": ""
+    },
+    {
       "Name": "UHF_Radio",
       "Traits": [ "Usable", "Consumable", "Fragile" ],
       "UsageAP": 3,

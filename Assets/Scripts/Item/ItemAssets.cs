@@ -74,6 +74,7 @@ public class ItemAssets : MonoBehaviour
     public Sprite Syringe_Trenbolone;
     public Sprite Syringe_Unlabelled;
     public Sprite Thermal_Camera;
+    public Sprite Thermal_Goggles;
     public Sprite UHF_Radio;
     public Sprite ULF_Radio;
     public Sprite Water_Canteen;

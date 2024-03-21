@@ -22,7 +22,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, grenadeUI, claymoreUI, deploymentBeaconUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -2000,22 +2000,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddExplosionAlertItem(GameObject explosionList, Item itemHit, Vector3 explosionLocation, Soldier explodedBy, int damage)
     {
-        print($"{itemHit.itemName} - {itemHit.id} - explosion alert");
         if (itemHit.owner is not GoodyBox)
         {
             //riot shield block
             if (itemHit.owner is Soldier hitByExplosion && hitByExplosion.HasActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
-            { 
                 damage /= 2;
-                print($"{itemHit.itemName} item damage = {damage}");
-            }
 
             if ((itemHit.IsBreakable() && damage >= 5) || (itemHit.IsFragile() && damage > 0))
             {
-                print($"{itemHit.itemName} item damage = {damage}");
                 if (!itemHit.IsTriggered())
                 {
-                    print($"{itemHit.itemName} item damage = {damage}");
                     GameObject explosionAlert = Instantiate(explosionAlertItemPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
                     explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, itemHit);
 
@@ -3565,6 +3559,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CloseUseItemUI()
     {
         useItemUI.SetActive(false);
+    }
+    public void OpenEtoolResultUI()
+    {
+        etoolResultUI.SetActive(true);
+    }
+    public void CloseEtoolResultUI()
+    {
+        etoolResultUI.SetActive(false);
     }
     public void OpenULFResultUI(string message)
     {

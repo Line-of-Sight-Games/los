@@ -100,7 +100,7 @@ public class ExplosionList : MonoBehaviour
                 }
             }
 
-            //actually explode the barrels
+            //actually explode triggered things
             foreach(Transform child in explosionAlerts)
             {
                 PhysicalObject hitByExplosion = child.GetComponent<ExplosiveAlert>().hitByExplosion;
@@ -120,7 +120,10 @@ public class ExplosionList : MonoBehaviour
                     if (hitItem.IsGrenade())
                         hitItem.CheckExplosionGrenade(explodedBy, new(hitItem.X, hitItem.Y, hitItem.Z));
                     else if (hitItem.IsClaymore())
+                    {
                         Instantiate(menu.poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(hitItem.X, hitItem.Y, hitItem.Z), "Urban"), Tuple.Create(0, 0, hitItem.X, hitItem.Y, explodedBy.Id)).CheckExplosionClaymore(explodedBy, true);
+                        hitItem.DestroyItem(explodedBy);
+                    }
                 } 
             }
 
