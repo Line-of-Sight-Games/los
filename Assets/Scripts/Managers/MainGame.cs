@@ -2576,14 +2576,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     else
                         (newX, newY) = CalculateScatteredCoordinates(int.Parse(targetX.text), int.Parse(targetY.text), scatterDegree, scatterDistance);
 
-                    if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
+                    targetX.text = $"{newX}";
+                    targetY.text = $"{newY}";
+
+                    if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
                     {
-                        targetX.text = $"{newX}";
-                        targetY.text = $"{newY}";
-                    }
-                    else
-                    {
-                        useGrenade.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattered off map";
+                        useGrenade.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattering off map";
                         useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
                     }
                 }
@@ -2593,7 +2591,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else //second press
         {
-            if (useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
+            (int newX, int newY) = (int.Parse(targetX.text), int.Parse(targetY.text));
+            if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY)
             {
                 useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
                 menu.CloseGrenadeUI();
@@ -2678,6 +2677,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF : {position.x}, {position.y}, {position.z}").gameObject;
+        explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
         {

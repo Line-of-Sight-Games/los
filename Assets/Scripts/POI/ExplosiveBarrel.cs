@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -63,6 +64,8 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     public void CheckExplosionBarrel(Soldier explodedBy)
     {
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel : {this.X},{this.Y},{this.Z}").gameObject;
+        explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
+
         foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
         {
             int damage = 0;
@@ -80,10 +83,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
                 else if (obj is POI hitPoi && hitPoi != this)
                     menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
                 else if (obj is Soldier hitSoldier)
-                {
                     menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y), explodedBy, damage, 1);
-                    print(hitSoldier.soldierName);
-                }
             }
         }
 

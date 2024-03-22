@@ -4,6 +4,7 @@ using UnityEngine;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using UnityEditor;
+using TMPro;
 
 [System.Serializable]
 public class Item : PhysicalObject, IDataPersistence
@@ -643,9 +644,8 @@ public class Item : PhysicalObject, IDataPersistence
     }
     public void CheckExplosionGrenade(Soldier explodedBy, Vector3 position)
     {
-        //grenade.traits.Add("Triggered");
-        //imperceptible delay to allow colliders to be recalculated at new destination
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} : {position.x},{position.y},{position.z}").gameObject;
+        explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         if (IsFrag())
         {

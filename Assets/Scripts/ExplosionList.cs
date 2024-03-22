@@ -22,8 +22,10 @@ public class ExplosionList : MonoBehaviour
     }
     public void ConfirmExplosion(GameObject explosionList)
     {
+        int posXp = 0, negXp = 0;
         ScrollRect explosionScroller = explosionList.transform.Find("Scroll").GetComponent<ScrollRect>();
-
+        Soldier explosionCausedBy = menu.soldierManager.FindSoldierById(transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text);
+        print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Start - {posXp}, {negXp}");
         if (explosionScroller.verticalNormalizedPosition <= 0.05f)
         {
             Transform explosionAlerts = explosionList.transform.Find("Scroll").Find("View").Find("Content");
@@ -76,16 +78,20 @@ public class ExplosionList : MonoBehaviour
                             if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Claymore")) //if it's a claymore
                             {
                                 if (hitSoldier.IsUnconscious() || hitSoldier.IsLastStand() || hitSoldier.IsWearingExoArmour() || hitSoldier.IsWearingGhillieArmour() || hitSoldier.IsWearingStimulantArmour())
-                                {
-                                    damage = 0;
-                                    hitSoldier.InstantKill(explodedBy, new() { "Explosive" });
-                                }
+                                    damage = hitSoldier.GetFullHP();
                                 else if (hitSoldier.IsWearingBodyArmour(false))
                                     damage = hitSoldier.GetFullHP() - 1;
                             }
                             hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
+
+                            //do xp calculations, enemy - friendly damage
+                            if (hitSoldier.IsOppositeTeamAs(explodedBy)) 
+                                posXp += damage;
+                            else
+                                negXp += damage;
                         }
                     }
+                    print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) ({explodedBy.soldierName} {explodedBy.soldierTeam}) Tested {hitSoldier.soldierName} {hitSoldier.soldierTeam} - {posXp}, {negXp}");
 
                     if (int.TryParse(child.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int stun))
                     {
@@ -126,6 +132,11 @@ public class ExplosionList : MonoBehaviour
                     }
                 } 
             }
+            print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Resolved - {posXp}, {negXp}");
+
+            //actually apply the xp
+            if (posXp - negXp > 0)
+                menu.AddXpAlert(explosionCausedBy, posXp - negXp, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posXp} damage to enemies and {negXp} damage to allies.", false);
 
             Destroy(explosionList);
         }

@@ -16,5 +16,7 @@ public class ExplosiveAlert : MonoBehaviour
     {
         if (hitByExplosion == null)
             Destroy(gameObject);
+        else if (hitByExplosion is Soldier hitSoldier && hitSoldier.IsDead())
+            Destroy(gameObject);
     }
 }

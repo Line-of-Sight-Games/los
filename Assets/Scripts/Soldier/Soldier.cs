@@ -279,8 +279,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (fielded)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsAlive()
     {
@@ -393,7 +392,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsSameTeamAs(Soldier s)
     {
-        if (IsAlive() && soldierTeam == s.soldierTeam && IsNotSelf(s))
+        if (soldierTeam == s.soldierTeam && IsNotSelf(s))
             return true;
         
         return false;
@@ -407,38 +406,34 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsOppositeTeamAs(Soldier s)
     {
-        if (IsAlive() && soldierTeam != s.soldierTeam && IsNotSelf(s))
+        if (soldierTeam != s.soldierTeam && IsNotSelf(s))
             return true;
-        else
-            return false;
+
+        return false;
     }
     public bool IsOnturn()
     {
         if (soldierTeam == game.currentTeam)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsOnturnAndAlive()
     {
         if (IsAlive() && IsOnturn())
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsOffturn()
     {
         if (soldierTeam != game.currentTeam)
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsOffturnAndAlive()
     {
         if (IsAlive() && IsOffturn())
             return true;
-        else
-            return false;
+        return false;
     }
     public bool IsRevealed()
     {
@@ -1023,7 +1018,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             menu.AddDamageAlert(this, $"{soldierName} is wearing Stim Armour, {drugName} had no effect.", true, true);
         else
         {
-            if (administeredBy.IsSameTeamAsIncludingSelf(this) && administeredBy.IsMedic())
+            if (this.IsSameTeamAsIncludingSelf(administeredBy) && administeredBy.IsMedic())
             {
                 if (!IsOnDrug(drugName))
                 {
@@ -1242,117 +1237,120 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void TakeDamage(Soldier damagedBy, int damage, bool skipDamageMods, List<string> damageSource)
     {
-        //apply damage mods
-        if (!skipDamageMods)
-            damage = ApplyDamageMods(damagedBy, damage, damageSource);
-
-        //make sure damage came from another soldier
-        if (damagedBy != null && this.IsOppositeTeamAs(damagedBy))
+        if (IsAlive())
         {
-            //apply witness ability slurp
-            if (IsWitness() && !damagedBy.IsRevoker())
-            {
-                //apply the fresh abilities
-                soldierAbilities.Clear();
-                soldierAbilities.Add("Witness");
-                soldierAbilities.AddRange(damagedBy.soldierAbilities);
+            //apply damage mods
+            if (!skipDamageMods)
+                damage = ApplyDamageMods(damagedBy, damage, damageSource);
 
-                //store fresh abilities
-                witnessStoredAbilities.AddRange(damagedBy.soldierAbilities);
-                witnessStoredAbilities = witnessStoredAbilities.Distinct().ToList(); //make sure only unique abilities are represented
+            //make sure damage came from another soldier
+            if (damagedBy != null && this.IsOppositeTeamAs(damagedBy))
+            {
+                //apply witness ability slurp
+                if (IsWitness() && !damagedBy.IsRevoker())
+                {
+                    //apply the fresh abilities
+                    soldierAbilities.Clear();
+                    soldierAbilities.Add("Witness");
+                    soldierAbilities.AddRange(damagedBy.soldierAbilities);
+
+                    //store fresh abilities
+                    witnessStoredAbilities.AddRange(damagedBy.soldierAbilities);
+                    witnessStoredAbilities = witnessStoredAbilities.Distinct().ToList(); //make sure only unique abilities are represented
+                }
+
+                //informer ability display info
+                if (IsInformer() && !damagedBy.IsRevoker())
+                    AddSoldierSnapshot(damagedBy);
             }
 
-            //informer ability display info
-            if (IsInformer() && !damagedBy.IsRevoker())
-                AddSoldierSnapshot(damagedBy);
-        }
-
-        if (damage > 0)
-        {
-            //remove overwatch if damage taken
-            UnsetOverwatch();
-            //remove all spotting if damage taken
-            RemoveAllSpotting();
-
-            if (hp > 0)
+            if (damage > 0)
             {
-                hp -= damage;
+                //remove overwatch if damage taken
+                UnsetOverwatch();
+                //remove all spotting if damage taken
+                RemoveAllSpotting();
 
-                if (hp <= 0)
+                if (hp > 0)
                 {
-                    hp = 0;
-                    Kill(damagedBy, damageSource);
-                }
-                else
-                {
-                    if (IsUnconscious())
-                        Kill(damagedBy, damageSource);
-                    else if (IsLastStand())
+                    hp -= damage;
+
+                    if (hp <= 0)
                     {
-                        if (!ResilienceCheck())
-                            MakeUnconscious();
-                        else
-                        {
-                            menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
-                            menu.AddDamageAlert(this, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", true, true);
-                        }
+                        hp = 0;
+                        Kill(damagedBy, damageSource);
                     }
                     else
                     {
-                        if (hp == 1)
+                        if (IsUnconscious())
+                            Kill(damagedBy, damageSource);
+                        else if (IsLastStand())
                         {
                             if (!ResilienceCheck())
+                                MakeUnconscious();
+                            else
                             {
-                                MakeLastStand();
                                 menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
                                 menu.AddDamageAlert(this, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", true, true);
                             }
-                            else
-                                MakeUnconscious();
                         }
-                        else if (hp == 2)
+                        else
                         {
-                            if (!ResilienceCheck())
-                                MakeLastStand();
-                            else
+                            if (hp == 1)
                             {
-                                menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
-                                menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
+                                if (!ResilienceCheck())
+                                {
+                                    MakeLastStand();
+                                    menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
+                                    menu.AddDamageAlert(this, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", true, true);
+                                }
+                                else
+                                    MakeUnconscious();
                             }
-                        }
-                        else if (hp == 3)
-                        {
-                            bool pass = false;
-
-                            for (int i = 0; i < stats.R.Val; i++)
+                            else if (hp == 2)
                             {
-                                if (ResilienceCheck())
-                                    pass = true;
+                                if (!ResilienceCheck())
+                                    MakeLastStand();
+                                else
+                                {
+                                    menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
+                                    menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
+                                }
                             }
-
-                            if (!pass)
-                                MakeLastStand();
-                            else
+                            else if (hp == 3)
                             {
-                                menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
-                                menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
+                                bool pass = false;
+
+                                for (int i = 0; i < stats.R.Val; i++)
+                                {
+                                    if (ResilienceCheck())
+                                        pass = true;
+                                }
+
+                                if (!pass)
+                                    MakeLastStand();
+                                else
+                                {
+                                    menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
+                                    menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
+                                }
                             }
                         }
                     }
+
+                    //if not broken by health state change break remaining melee engagements
+                    game.BreakAllControllingMeleeEngagments(this);
                 }
 
-                //if not broken by health state change break remaining melee engagements
-                game.BreakAllControllingMeleeEngagments(this);
-            }
-
-            //add damage alert
-            menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage. He is now {CheckHealthState()}.", false, false);
-            //make sure damage came from another soldier
-            if (damagedBy != null)
-            {
-                //apply stun affect from tranquiliser
-                if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
-                    MakeStunned(1);
+                //add damage alert
+                menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage. He is now {CheckHealthState()}.", false, false);
+                //make sure damage came from another soldier
+                if (damagedBy != null)
+                {
+                    //apply stun affect from tranquiliser
+                    if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
+                        MakeStunned(1);
+                }
             }
         }
     }
@@ -1607,9 +1605,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         int kd = 0;
         foreach (Soldier s in game.AllSoldiers())
         {
-            if (IsOppositeTeamAs(s) && s.IsDead())
+            if (this.IsOppositeTeamAs(s) && s.IsDead())
                 kd++;
-            else if (IsSameTeamAs(s) && s.IsDead())
+            else if (this.IsSameTeamAs(s) && s.IsDead())
                 kd--;
         }
 
@@ -1685,7 +1683,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (Soldier s in game.AllSoldiers())
         {
-            if (s.IsAlive() && IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
+            if (s.IsAlive() && this.IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
             {
                 if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 3)
                     vulnerableTurns = 3;
@@ -1715,7 +1713,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (Soldier s in game.AllSoldiers())
         {
-            if (s.IsAlive() && IsOppositeTeamAs(s))
+            if (s.IsConscious() && this.IsOppositeTeamAs(s))
             {
                 if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 3)
                     vulnerableTurns = 3;
@@ -2570,7 +2568,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
 
                     //set haskilled flag for avenger
-                    if (killedBy.IsOppositeTeamAs(this))
+                    if (this.IsOppositeTeamAs(killedBy))
                         killedBy.hasKilled = true;
                 }
             }
@@ -2679,7 +2677,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         List<Tuple<float, Soldier>> soldierDistances = new();
 
         foreach (Soldier s in game.AllSoldiers())
-            if (s.IsSameTeamAs(this))
+            if (s.IsAlive() && this.IsSameTeamAs(s))
                 soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
@@ -2694,7 +2692,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         List<Tuple<float, Soldier>> soldierDistances = new();
 
         foreach (Soldier s in game.AllSoldiers())
-            if (s.IsSameTeamAs(this) && s.IsAbleToWalk() && !s.IsRevoker())
+            if (this.IsSameTeamAs(s) && s.IsAbleToWalk() && !s.IsRevoker())
                 soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
@@ -2709,7 +2707,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         List<Tuple<float, Soldier>> soldierDistances = new();
 
         foreach (Soldier s in game.AllSoldiers())
-            if (s.IsOppositeTeamAs(this))
+            if (s.IsAlive() && this.IsOppositeTeamAs(s))
                 soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
@@ -2724,7 +2722,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         List<Tuple<float, Soldier>> soldierDistances = new();
 
         foreach (Soldier s in game.AllSoldiers())
-            if (s.IsOppositeTeamAs(this) && s.IsRevealed())
+            if (s.IsAlive() && this.IsOppositeTeamAs(s) && s.IsRevealed())
                 soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
@@ -2738,7 +2736,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         bool objectIsRevealed = false;
 
         foreach (Soldier s in game.AllSoldiers())
-            if (s.IsAbleToSee() && IsSameTeamAsIncludingSelf(s))
+            if (s.IsAbleToSee() && this.IsSameTeamAsIncludingSelf(s))
                 if (game.CalculateRange(s, obj) <= s.SRColliderMax.radius)
                     objectIsRevealed = true;
         return objectIsRevealed;
@@ -2757,9 +2755,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
                 if (IsInSmoke())
                 {
-                    if (IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
+                    if (this.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
                         cloud.alliesAffected.Add(Id);
-                    else if (IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
+                    else if (this.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
                         cloud.enemiesAffected.Add(Id);
                 }
             }
@@ -2786,9 +2784,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
                     if (IsInTabun())
                     {
-                        if (IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
+                        if (this.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
                             cloud.alliesAffected.Add(Id);
-                        else if (IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
+                        else if (this.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
                             cloud.enemiesAffected.Add(Id);
                     }
                 }

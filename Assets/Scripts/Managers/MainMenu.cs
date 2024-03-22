@@ -1747,6 +1747,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         damageAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
         damageAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         damageAlert.transform.Find("DamageDescription").GetComponent<TextMeshProUGUI>().text = description;
+        damageAlert.transform.SetAsFirstSibling();
         FileUtility.WriteToReport($"{soldier.soldierName} damage alert: {description}, resisted: {resisted}, nonDamage: {nonDamage}");
         //try and open damagealert
         StartCoroutine(OpenDamageList());
@@ -1979,7 +1980,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (stunRounds > 0)
                 explosionAlert.transform.Find("Stun").gameObject.SetActive(true);
 
-            //delete the alert if no damage and no stun
+            //delete the alert if target is already dead, or if there's no damage and no stun
             if (damage <= 0 && stunRounds <= 0)
                 Destroy(explosionAlert);
         }
@@ -3103,14 +3104,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddXpAlert(Soldier soldier, int xp, string xpDescription, bool learnerEnabled)
     {
+        print($"tried to add xp = {xp} alert to {soldier.soldierName} - {xpDescription}");
         if (soldier != null && xp > 0)
         {
             //block duplicate xp alerts being created, made to obey the rule that xp for avoidance or detection can only be one per soldier per turn
             foreach (Transform child in xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
             {
                 //destroy duplicate avoidances/detections against same detecting/avoiding soldier
-                if ((child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Avoided") && child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text == xpDescription) || (child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Detected") && child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text == xpDescription))
+                if ((child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Avoided") && child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text == xpDescription && child.GetComponent<SoldierAlert>().soldier == soldier) || (child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Detected") && child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text == xpDescription && child.GetComponent<SoldierAlert>().soldier == soldier))
+                {
+                    print($"destroying {xpDescription}");
                     Destroy(child.gameObject);
+                }
             }
 
             if (soldier.IsConscious())
@@ -3135,6 +3140,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     xpAlert.transform.Find("LearnerIndicator").gameObject.SetActive(true);
                     xpAlert.transform.Find("LearnerIndicator").GetComponent<TextMeshProUGUI>().text = $"(+{(int)((1.5f * xp) + 1 - xp)})";
                 }
+                print($"actually added xp = {xp} alert to {soldier.soldierName} - {xpDescription}");
             }
             else
                 print($"{soldier.soldierName} cannot recieve xp unconscious.");
@@ -3203,17 +3209,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (xpAlerts.childCount > 0)
         {
+            print($"xpalerts number {xpAlerts.childCount}");
             foreach (Transform child in xpAlerts)
             {
-                if (child.GetComponent<SoldierAlert>().soldier.IsOnturnAndAlive())
+                Soldier xpReciever = child.GetComponent<SoldierAlert>().soldier;
+                print($"xpalerts soldier {xpReciever.soldierName}");
+                //destroy xp alerts for soldiers who are dead or unconscious
+                if (!xpReciever.IsConscious())
                 {
-                    //destroy xp alerts going to unconscious soldiers
-                    if (!child.GetComponent<SoldierAlert>().soldier.IsConscious())
-                        Destroy(child.gameObject);
-                    else
-                        display = true;
-
+                    print($"xpalerts removed for {xpReciever.soldierName}");
+                    Destroy(child.gameObject);
                 }
+                else if (xpReciever.IsOnturnAndAlive())
+                    display = true;
             }
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -127,6 +128,8 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
     public void CheckExplosionClaymore(Soldier explodedBy, bool exploded)
     {
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {this.X},{this.Y},{this.Z}").gameObject;
+        explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
+
         float arc;
         if (exploded)
             arc = 360f;
