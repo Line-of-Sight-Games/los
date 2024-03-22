@@ -22,10 +22,10 @@ public class ExplosionList : MonoBehaviour
     }
     public void ConfirmExplosion(GameObject explosionList)
     {
-        int posXp = 0, negXp = 0;
+        int posDamage = 0, negDamage = 0, posStun = 0, negStun = 0;
         ScrollRect explosionScroller = explosionList.transform.Find("Scroll").GetComponent<ScrollRect>();
         Soldier explosionCausedBy = menu.soldierManager.FindSoldierById(transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text);
-        print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Start - {posXp}, {negXp}");
+        print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Start - {posDamage + posStun}, {negDamage + negStun}");
         if (explosionScroller.verticalNormalizedPosition <= 0.05f)
         {
             Transform explosionAlerts = explosionList.transform.Find("Scroll").Find("View").Find("Content");
@@ -86,12 +86,12 @@ public class ExplosionList : MonoBehaviour
 
                             //do xp calculations, enemy - friendly damage
                             if (hitSoldier.IsOppositeTeamAs(explodedBy)) 
-                                posXp += damage;
+                                posDamage += damage;
                             else
-                                negXp += damage;
+                                negDamage += damage;
                         }
                     }
-                    print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) ({explodedBy.soldierName} {explodedBy.soldierTeam}) Tested {hitSoldier.soldierName} {hitSoldier.soldierTeam} - {posXp}, {negXp}");
+                    print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) ({explodedBy.soldierName} {explodedBy.soldierTeam}) Tested {hitSoldier.soldierName} {hitSoldier.soldierTeam} - {posDamage + posStun}, {negDamage + negStun}");
 
                     if (int.TryParse(child.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int stun))
                     {
@@ -101,6 +101,16 @@ public class ExplosionList : MonoBehaviour
                                 hitSoldier.SetStunned(stun); //non-resistable stunnage on flashbang grenades only
                             else
                                 hitSoldier.MakeStunned(stun);
+
+                            //add xp for stunning Flashbang only
+                            if (explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang")) 
+                            {
+                                //do xp calculations, enemy - friendly stunnage
+                                if (hitSoldier.IsOppositeTeamAs(explodedBy))
+                                    posStun += stun;
+                                else
+                                    negStun += stun;
+                            }
                         }
                     }
                 }
@@ -132,11 +142,17 @@ public class ExplosionList : MonoBehaviour
                     }
                 } 
             }
-            print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Resolved - {posXp}, {negXp}");
+            print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Resolved - {posDamage + posStun}, {negDamage + negStun}");
 
             //actually apply the xp
-            if (posXp - negXp > 0)
-                menu.AddXpAlert(explosionCausedBy, posXp - negXp, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posXp} damage to enemies and {negXp} damage to allies.", false);
+            if (posDamage + posStun > negDamage + negStun)
+            {
+                if (explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
+                    menu.AddXpAlert(explosionCausedBy, posDamage - negDamage + posStun - negStun, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage}/{posStun} damage/stun to enemies and {negDamage}/{negStun} damage/stun to allies.", false);
+                else
+                    menu.AddXpAlert(explosionCausedBy, posDamage - negDamage, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage} damage to enemies and {negDamage} damage to allies.", false);
+            }
+                
 
             Destroy(explosionList);
         }
