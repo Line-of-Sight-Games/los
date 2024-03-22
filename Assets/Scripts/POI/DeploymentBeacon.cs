@@ -7,12 +7,12 @@ public class DeploymentBeacon : POI, IDataPersistence
 {
     public string placedById;
     public Soldier placedBy;
-    public bool beaconEnabled;
+    public bool active;
 
     private void Start()
     {
         poiType = "depbeacon";
-        beaconEnabled = true;
+        active = true;
         menu = FindObjectOfType<MainMenu>();
         game = FindObjectOfType<MainGame>();
         poiManager = FindObjectOfType<POIManager>();
@@ -48,7 +48,7 @@ public class DeploymentBeacon : POI, IDataPersistence
             terrainOn = (string)details["terrainOn"];
             MapPhysicalPosition(x, y, z);
 
-            beaconEnabled = (bool)details["beaconEnabled"];
+            active = (bool)details["active"];
             placedById = (string)details["placedById"];
         }
     }
@@ -62,7 +62,7 @@ public class DeploymentBeacon : POI, IDataPersistence
             { "y", y },
             { "z", z },
             { "terrainOn", terrainOn },
-            { "beaconEnabled", beaconEnabled },
+            { "active", active },
             { "placedById", placedById }
         };
 

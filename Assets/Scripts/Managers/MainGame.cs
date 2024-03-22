@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Linq;
 using UnityEditorInternal;
+using System.Runtime.CompilerServices;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -633,10 +634,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
             claymore.MoveOverClaymore(movingSoldier);
 
         //check for smoke clouds
-        movingSoldier.CheckSmokeClouds();
+        if (!movingSoldier.CheckSmokeClouds() && movingSoldier.IsInSmoke())
+            movingSoldier.UnsetSmoked();
 
         //check for tabun clouds
-        movingSoldier.CheckTabunClouds();
+        if (!movingSoldier.CheckTabunClouds() && movingSoldier.IsInTabun())
+            movingSoldier.UnsetTabun();
 
         //check for fall damage
         if (fallDistanceInt > 0)
@@ -2299,7 +2302,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                     totalPickup++;
 
-                if (item.IsArmour())
+                if (item.equippableSlots.Contains("Head")) //is a special armour
                     ap = 3;
             }
         }
@@ -2395,6 +2398,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 break;
             case "Deployment_Beacon":
                 menu.OpenDeploymentBeaconUI(useItemUI);
+                break;
+            case "Thermal_Camera":
+                menu.OpenThermalCamUI(useItemUI);
                 break;
             case "Poison_Satchel":
                 itemUsed.UseItem(linkedIcon, itemUsedOn, null);
@@ -2584,8 +2590,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         useGrenade.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattering off map";
                         useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
                     }
+                    useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(true);
                 }
-                useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(true);
+                else
+                {
+                    targetX.interactable = false;
+                    targetY.interactable = false;
+                    targetZ.interactable = false;
+                    useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("DirectHit").gameObject.SetActive(true);
+                }
+
                 useGrenade.transform.Find("PressedOnce").gameObject.SetActive(true);
             }
         }
@@ -2622,9 +2636,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField placedX = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField placedY = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField placedZ = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("ZPos").GetComponent<TMP_InputField>();
+        TMP_Dropdown terrainOn = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
         TMP_InputField facingX = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField facingY = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
-        TMP_Dropdown terrainOn = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
+        
 
         if (placedX.textComponent.color == menu.normalTextColour && placedY.textComponent.color == menu.normalTextColour && placedZ.textComponent.color == menu.normalTextColour
         && facingX.textComponent.color == menu.normalTextColour && facingY.textComponent.color == menu.normalTextColour && terrainOn.value != 0)
@@ -2639,6 +2654,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     menu.CloseClaymoreUI();
                 }
+                else
+                    useClaymore.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
             }
         }
     }
@@ -2660,6 +2677,35 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     menu.CloseDeploymentBeaconUI();
                 }
+                else
+                    useDeploymentBeacon.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
+            }
+        }
+    }
+    public void ConfirmThermalCam(UseItemUI useThermalCam)
+    {
+        TMP_InputField placedX = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField placedY = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField placedZ = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("ZPos").GetComponent<TMP_InputField>();
+        TMP_Dropdown terrainOn = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
+        TMP_InputField facingX = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField facingY = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("YPos").GetComponent<TMP_InputField>();
+
+        if (placedX.textComponent.color == menu.normalTextColour && placedY.textComponent.color == menu.normalTextColour && placedZ.textComponent.color == menu.normalTextColour
+        && facingX.textComponent.color == menu.normalTextColour && facingY.textComponent.color == menu.normalTextColour && terrainOn.value != 0)
+        {
+            if (int.TryParse(placedX.text, out int placedXInt) && int.TryParse(placedY.text, out int placedYInt) && int.TryParse(placedZ.text, out int placedZInt)
+            && int.TryParse(facingX.text, out int facingXInt) && int.TryParse(facingY.text, out int facingYInt))
+            {
+                if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
+                {
+                    useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
+                    Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(facingXInt, facingYInt, activeSoldier.Id));
+
+                    menu.CloseThermalCamUI();
+                }
+                else
+                    useThermalCam.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
             }
         }
     }
@@ -2706,12 +2752,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void CheckAllSmokeClouds()
     {
         foreach (Soldier s in AllSoldiers())
-            s.CheckSmokeClouds();
+            if (!s.CheckSmokeClouds() && s.IsInSmoke())
+                s.UnsetSmoked();
     }
     public void CheckAllTabunClouds()
     {
         foreach (Soldier s in AllSoldiers())
-            s.CheckTabunClouds();
+            if (!s.CheckTabunClouds() && s.IsInTabun())
+                s.UnsetTabun();
     }
     public void IncreaseRoundsActiveAllClouds()
     {

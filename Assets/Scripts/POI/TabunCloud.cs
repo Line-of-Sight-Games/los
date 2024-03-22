@@ -131,14 +131,13 @@ public class TabunCloud : POI, IDataPersistence
     }
     public void DissipateCloud()
     {
-        game.CheckAllTabunClouds();
-
         //pay xp
-        int xp = alliesAffected.Count - enemiesAffected.Count;
+        int xp = enemiesAffected.Count - alliesAffected.Count;
         if (xp > 0)
-            menu.AddXpAlert(placedBy, xp, $"{placedBy.soldierName} successfully used tabun grenade.", true);
-        
-        poiManager.DestroyPOI(this);
+            menu.AddXpAlert(placedBy, xp, $"Tabun grenade affected {enemiesAffected.Count} enemies and {alliesAffected.Count} allies.", false);
+
+        //dissipate and recheck
+        game.CheckAllTabunClouds();
     }
     public int TurnsUntilDissipation
     {

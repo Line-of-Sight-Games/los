@@ -95,6 +95,7 @@ MonoBehaviour:
   terminalSprite: {fileID: 21300000, guid: b5a0715b4ec69674c94ca4d8949a823e, type: 3}
   claymoreSprite: {fileID: 21300000, guid: 60aebaf83f3d29942af77bd121c2f74f, type: 3}
   deploymentBeaconSprite: {fileID: 21300000, guid: 16736cdb167ed4a4086c73584c2e5dc7, type: 3}
+  thermalCameraSprite: {fileID: 21300000, guid: b89e630fd70f44544a963021acb9bd76, type: 3}
 --- !u!1 &8471546288538956594
 GameObject:
   m_ObjectHideFlags: 0

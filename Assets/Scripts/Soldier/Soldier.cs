@@ -1370,23 +1370,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void TabunTraumaCheck()
     {
-        bool safe = false;
-        int attempts = stats.R.Val + stats.Heal.Val;
-
-        for (int i = 0; i < attempts; i++)
-        {
-            if (ResilienceCheck())
-            {
-                safe = true;
-                break;
-            }
-        }
-
-        if (!safe)
-        {
-            menu.AddTraumaAlert(this, 1, "Exposed to tabun gas and failed check, automatic trauma point has been accrued.", 0, 0, "");
-            menu.OpenTraumaAlertUI();
-        }
+        menu.AddTraumaAlert(this, 1, "Tabun exposure.", stats.R.Val + stats.Heal.Val, 0, "");
+        menu.OpenTraumaAlertUI();
     }
     public void TakeTrauma(int trauma)
     {
@@ -2301,11 +2286,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
 
         if (rCheck && healCheck)
+        {
             menu.AddXpAlert(this, 1, $"{soldierName} resisted tabun gas.", false);
+            menu.AddDamageAlert(this, $"Resisted tabun gas.", true, true);
+        }
         else if (rCheck ^ healCheck)
+        {
             SetTabunEffectLevel(25);
+            menu.AddDamageAlert(this, $"Suffered <color=yellow>Light</color> effects from tabun gas.", false, true);
+        }
         else
+        {
             SetTabunEffectLevel(50);
+            menu.AddDamageAlert(this, $"Suffered <color=orange>Moderate</color> effects from tabun gas.", false, true);
+        }
     }
     public void SetTabunInnerAffected()
     {
@@ -2316,15 +2310,25 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             rCheck = true;
 
         if (rCheck && healCheck)
-            menu.AddXpAlert(this, 1, $"{soldierName} resisted tabun gas.", false);
+        {
+            menu.AddXpAlert(this, 1, $"Resisted tabun gas.", false);
+            menu.AddDamageAlert(this, $"Resisted tabun gas.", true, true);
+        }
         else if (rCheck ^ healCheck)
+        {
             SetTabunEffectLevel(50);
+            menu.AddDamageAlert(this, $"Suffered <color=orange>Moderate</color> effects from tabun gas.", false, true);
+        }
         else
+        {
             SetTabunEffectLevel(100);
+            menu.AddDamageAlert(this, $"Suffered <color=red>Severe</color> effects from tabun gas.", false, true);
+        }
     }
     public void UnsetTabun()
     {
         state.RemoveAll(e => e.Contains("Tabun"));
+        TabunTraumaCheck();
     }
     public void SetOverwatch(int x, int y, int r, int a)
     {
@@ -2741,60 +2745,97 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     objectIsRevealed = true;
         return objectIsRevealed;
     }
-    public void CheckSmokeClouds()
+    public bool CheckSmokeClouds()
     {
-        if (IsAlive())
+        SmokeCloud[] allSmokeClouds = FindObjectsOfType<SmokeCloud>();
+        if (allSmokeClouds.Length > 0)
         {
-            foreach (SmokeCloud cloud in FindObjectsOfType<SmokeCloud>())
+            if (IsAlive())
             {
-                if (PhysicalObjectWithinRadius(cloud, 5))
-                    SetSmokeBlinded();
-                else if (PhysicalObjectWithinRadius(cloud, 20))
-                    SetSmokeCovered();
-
-                //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
-                if (IsInSmoke())
+                bool currentlyInSmoke = false;
+                foreach (SmokeCloud cloud in allSmokeClouds)
                 {
-                    if (this.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
-                        cloud.alliesAffected.Add(Id);
-                    else if (this.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
-                        cloud.enemiesAffected.Add(Id);
-                }
-            }
-        }
-    }
-    public void CheckTabunClouds()
-    {
-        bool wasInTabun = false;
-
-        if (IsAlive() && !IsWearingStimulantArmour())
-        {
-            //check if soldier already in tabun
-            if (IsInTabun())
-                wasInTabun = true;
-            else
-            {
-                foreach (TabunCloud cloud in FindObjectsOfType<TabunCloud>())
-                {
-                    if (PhysicalObjectWithinRadius(cloud, 5))
-                        SetTabunInnerAffected();
-                    else if (PhysicalObjectWithinRadius(cloud, 20))
-                        SetTabunOuterAffected();
-
-                    //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
-                    if (IsInTabun())
+                    if (cloud.TurnsUntilDissipation > 0)
                     {
-                        if (this.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
-                            cloud.alliesAffected.Add(Id);
-                        else if (this.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
-                            cloud.enemiesAffected.Add(Id);
-                    }
-                }
-            }
+                        if (PhysicalObjectWithinRadius(cloud, 5))
+                        {
+                            currentlyInSmoke = true;
+                            SetSmokeBlinded();
+                        }
+                        else if (PhysicalObjectWithinRadius(cloud, 20))
+                        {
+                            currentlyInSmoke = true;
+                            SetSmokeCovered();
+                        }
 
-            if (!IsInTabun() && wasInTabun)
-                TabunTraumaCheck();
+
+                        //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
+                        if (IsInSmoke())
+                        {
+                            if (this.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
+                                cloud.alliesAffected.Add(Id);
+                            else if (this.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
+                                cloud.enemiesAffected.Add(Id);
+                        }
+                    }
+                    else
+                        game.poiManager.DestroyPOI(cloud);
+                }
+
+                if (currentlyInSmoke)
+                    return true;
+            }
         }
+            
+        return false;
+    }
+    public bool CheckTabunClouds()
+    {
+        TabunCloud[] allTabunClouds = FindObjectsOfType<TabunCloud>();
+        print($"running function checktabunclouds for {this.soldierName}");
+        if (allTabunClouds.Length > 0)
+        {
+            print($"there are clouds to test {this.soldierName}");
+            if (IsAlive() && !IsWearingStimulantArmour())
+            {
+                print($"testing soldier {this.soldierName}");
+                bool currentlyInTabun = false;
+                foreach (TabunCloud cloud in allTabunClouds)
+                {
+                    if (cloud.TurnsUntilDissipation > 0)
+                    {
+                        print($"testing tabun cloud {cloud.Id}");
+                        if (PhysicalObjectWithinRadius(cloud, 5))
+                        {
+                            print($"{this.soldierName} in inner tabun cloud {cloud.Id}");
+                            currentlyInTabun = true;
+                            SetTabunInnerAffected();
+                        }
+                        else if (PhysicalObjectWithinRadius(cloud, 20))
+                        {
+                            print($"{this.soldierName} in outer tabun cloud {cloud.Id}");
+                            currentlyInTabun = true;
+                            SetTabunOuterAffected();
+                        }
+
+                        //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
+                        if (IsInTabun())
+                        {
+                            if (this.IsSameTeamAs(cloud.placedBy) && !cloud.alliesAffected.Contains(Id))
+                                cloud.alliesAffected.Add(Id);
+                            else if (this.IsOppositeTeamAs(cloud.placedBy) && !cloud.enemiesAffected.Contains(Id))
+                                cloud.enemiesAffected.Add(Id);
+                        }
+                    }
+                    else
+                        game.poiManager.DestroyPOI(cloud);
+                }
+
+                if (currentlyInTabun)
+                    return true;
+            }
+        }
+        return false;
     }
 
 

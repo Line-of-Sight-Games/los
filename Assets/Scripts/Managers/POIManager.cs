@@ -14,6 +14,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
     public SmokeCloud smokeCloudPrefab;
     public TabunCloud tabunCloudPrefab;
     public DeploymentBeacon deploymentBeaconPrefab;
+    public ThermalCamera thermalCamPrefab;
 
     public void LoadData(GameData data)
     {
@@ -45,6 +46,8 @@ public class POIManager : MonoBehaviour, IDataPersistence
                 newPOI = Instantiate(tabunCloudPrefab);
             else if (spawnType == "depbeacon")
                 newPOI = Instantiate(deploymentBeaconPrefab);
+            else if (spawnType == "thermalcam")
+                newPOI = Instantiate(thermalCamPrefab);
 
             newPOI.id = id;
             newPOI.LoadData(data);

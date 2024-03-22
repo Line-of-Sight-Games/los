@@ -312,6 +312,7 @@ public class Item : PhysicalObject, IDataPersistence
                 owningSoldier.ResetRoundsWithoutFood();
                 for (int i = 0; i < itemManager.drugTable.Length; i++)
                     owningSoldier.UnsetOnDrug(itemManager.drugTable[i]);
+                owningSoldier.UnsetTabun();
             }
 
             //spawn small medkit inside brace

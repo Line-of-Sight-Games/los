@@ -227,9 +227,16 @@ public class SoldierAlert : MonoBehaviour
 
         if (transform.Find("TraumaToggle").GetComponent<Toggle>().isOn)
         {
-            if (transform.Find("TraumaToggle").GetComponent<Toggle>().IsInteractable())
+            if (transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text.Contains("automatic"))
             {
-                //do a resilience check
+                //automatic trauma
+                transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
+                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} took {trauma} trauma.";
+            }
+            else
+            {
+                print($"trauma rolls: {rolls}");
+                //do the trauma check
                 for (int i = 0; i < rolls; i++)
                 {
                     if (soldier.ResilienceCheck())
@@ -248,11 +255,6 @@ public class SoldierAlert : MonoBehaviour
                     transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
                     transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} failed to resist and took {trauma} trauma.";
                 }
-            }
-            else
-            {
-                transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "TRAUMA GAINED";
-                transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} took {trauma} trauma.";
             }
             
         }

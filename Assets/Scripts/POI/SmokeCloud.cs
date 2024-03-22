@@ -135,14 +135,13 @@ public class SmokeCloud : POI, IDataPersistence
     }
     public void DissipateCloud()
     {
-        game.CheckAllSmokeClouds();
-
         //pay xp
         int xp = alliesAffected.Count - enemiesAffected.Count;
         if (xp > 0)
-            menu.AddXpAlert(placedBy, xp, $"{placedBy.soldierName} successfully used smoke grenade.", true);
-        
-        poiManager.DestroyPOI(this);
+            menu.AddXpAlert(placedBy, xp, $"Smoke grenade covered {alliesAffected.Count} allies and {enemiesAffected.Count} enemies.", true);
+
+        //dissipate and recheck
+        game.CheckAllSmokeClouds();
     }
     public int TurnsUntilDissipation
     {

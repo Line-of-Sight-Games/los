@@ -7,6 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -22,7 +23,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -1878,28 +1879,24 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         traumaAlert.transform.Find("Distance").GetComponent<TextMeshProUGUI>().text = range;
 
         //block invalid trauma alerts being created
-        if (friendly.tp >= 5)
+        if (friendly.IsDesensitised())
         {
-            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
-            traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
-            traumaAlert.transform.Find("ConfirmButton").gameObject.SetActive(false);
             traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=blue>DESENSITISED</color>";
+            traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
+            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
+            traumaAlert.transform.Find("ConfirmButton").gameObject.SetActive(false);
         }
-        else
+        else if (friendly.IsResilient())
         {
-            if (reason.Contains("automatic"))
-            {
-                traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().isOn = true;
-                traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
-            }
-            else if (friendly.IsResilient())
-            {
-                traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>TRAUMA RESISTED</color>";
-                traumaAlert.transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = $"<color=green>{trauma}</color>";
-            }
+            traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>RESILIENT</color>";
+            traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
+            traumaAlert.transform.Find("ConfirmButton").Find("Text").GetComponent<TextMeshProUGUI>().text = "<color=green>Test</color>";
         }
-
-        
+        else if (reason.Contains("automatic") || reason.Contains("Tabun"))
+        {
+            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().isOn = true;
+            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
+        }
     }
 
     public void OpenTraumaAlertUI()
@@ -3104,7 +3101,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddXpAlert(Soldier soldier, int xp, string xpDescription, bool learnerEnabled)
     {
-        print($"tried to add xp = {xp} alert to {soldier.soldierName} - {xpDescription}");
         if (soldier != null && xp > 0)
         {
             //block duplicate xp alerts being created, made to obey the rule that xp for avoidance or detection can only be one per soldier per turn
@@ -3140,7 +3136,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     xpAlert.transform.Find("LearnerIndicator").gameObject.SetActive(true);
                     xpAlert.transform.Find("LearnerIndicator").GetComponent<TextMeshProUGUI>().text = $"(+{(int)((1.5f * xp) + 1 - xp)})";
                 }
-                print($"actually added xp = {xp} alert to {soldier.soldierName} - {xpDescription}");
             }
             else
                 print($"{soldier.soldierName} cannot recieve xp unconscious.");
@@ -3209,17 +3204,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (xpAlerts.childCount > 0)
         {
-            print($"xpalerts number {xpAlerts.childCount}");
             foreach (Transform child in xpAlerts)
             {
                 Soldier xpReciever = child.GetComponent<SoldierAlert>().soldier;
-                print($"xpalerts soldier {xpReciever.soldierName}");
                 //destroy xp alerts for soldiers who are dead or unconscious
                 if (!xpReciever.IsConscious())
-                {
-                    print($"xpalerts removed for {xpReciever.soldierName}");
                     Destroy(child.gameObject);
-                }
                 else if (xpReciever.IsOnturnAndAlive())
                     display = true;
             }
@@ -3324,7 +3314,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         useItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemUsedFromSlotName;
         useItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = itemUsed.itemName switch
         {
-            "E_Tool" => "Dig bunker?",
             "Ammo_AR" => "Reload Assault Rifle?",
             "Ammo_LMG" => "Reload Light Machine Gun?",
             "Ammo_Pi" => "Reload Pistol?",
@@ -3334,6 +3323,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_Sn" => "Reload Sniper?",
             "Claymore" => "Place Claymore?",
             "Deployment_Beacon" => "Place Deployment Beacon?",
+            "E_Tool" => "Dig bunker?",
             "Food_Pack" => "Consume food pack?",
             "Grenade_Flashbang" => "Throw flashbang?",
             "Grenade_Frag" => "Throw frag?",
@@ -3353,6 +3343,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Syringe_Shard" => "Administer Shard?",
             "Syringe_Trenbolone" => "Administer Trenbolone?",
             "Syringe_Unlabelled" => "Administer Unlabelled Syringe?",
+            "Thermal_Camera" => "Place Thermal Camera?",
             "UHF_Radio" => "Call UHF strike?",
             "ULF_Radio" => "Attempt to use ULF radio?",
             "Water_Canteen" => "Drink water?",
@@ -3649,11 +3640,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ClearGrenadeUI()
     {
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
         grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
         grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
         grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        grenadeUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
         grenadeUI.transform.Find("PressedOnce").gameObject.SetActive(false);
         grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(false);
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("DirectHit").gameObject.SetActive(false);
     }
     public void CloseGrenadeUI()
     {
@@ -3670,6 +3666,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ClearClaymoreUI()
     {
+        claymoreUI.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(false);
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("ZPos").GetComponent<TMP_InputField>().text = "";
@@ -3691,6 +3688,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ClearDeploymentBeaconUI()
     {
+        deploymentBeaconUI.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(false);
         deploymentBeaconUI.transform.Find("OptionPanel").Find("BeaconPlacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
         deploymentBeaconUI.transform.Find("OptionPanel").Find("BeaconPlacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
         deploymentBeaconUI.transform.Find("OptionPanel").Find("BeaconPlacing").Find("ZPos").GetComponent<TMP_InputField>().text = "";
@@ -3700,7 +3698,28 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         ClearDeploymentBeaconUI();
         deploymentBeaconUI.SetActive(false);
     }
+    public void OpenThermalCamUI(UseItemUI useItemUI)
+    {
+        thermalCamUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        thermalCamUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        thermalCamUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
 
+        thermalCamUI.SetActive(true);
+    }
+    public void ClearThermalCamUI()
+    {
+        thermalCamUI.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(false);
+        thermalCamUI.transform.Find("OptionPanel").Find("CamPlacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        thermalCamUI.transform.Find("OptionPanel").Find("CamPlacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        thermalCamUI.transform.Find("OptionPanel").Find("CamPlacing").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        thermalCamUI.transform.Find("OptionPanel").Find("CamFacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        thermalCamUI.transform.Find("OptionPanel").Find("CamFacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
+    }
+    public void CloseThermalCamUI()
+    {
+        ClearThermalCamUI();
+        thermalCamUI.SetActive(false);
+    }
 
 
 
