@@ -2879,7 +2879,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
             else
             {
-                menu.AddDamageAlert(this, $"{soldierName} resisted {suppressionValue} suppression.", true, true);
+                menu.AddDamageAlert(this, $"{soldierName} failed to resist {suppressionValue} suppression.", false, true);
                 return false;
             }
         }

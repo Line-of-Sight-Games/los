@@ -2393,6 +2393,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Ammo_Sh":
             case "Ammo_SMG":
             case "Ammo_Sn":
+                break;
             case "Claymore":
                 menu.OpenClaymoreUI(useItemUI);
                 break;
