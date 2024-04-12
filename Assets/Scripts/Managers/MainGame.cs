@@ -475,7 +475,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateMoveAP()
     {
         int ap = 0;
-        string move = moveTypeDropdown.options[moveTypeDropdown.value].text;
+        string move = moveTypeDropdown.captionText.text;
 
         if (move.Contains("Full"))
             ap = 3;
@@ -500,7 +500,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateMoveDonated()
     {
-        if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Planner"))
+        if (moveTypeDropdown.captionText.text.Contains("Planner"))
             menu.moveUI.transform.Find("MoveDonated").Find("MoveDonatedDisplay").GetComponent<TextMeshProUGUI>().text = activeSoldier.HalfMove.ToString();
     }
     public void UpdateMoveUI()
@@ -516,7 +516,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         moveLocation = default;
         if (xPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && yPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && zPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && terrainDropdown.value != 0)
         {
-            moveLocation = Tuple.Create(new Vector3(int.Parse(xPos.text), int.Parse(yPos.text), int.Parse(zPos.text)), terrainDropdown.options[terrainDropdown.value].text);
+            moveLocation = Tuple.Create(new Vector3(int.Parse(xPos.text), int.Parse(yPos.text), int.Parse(zPos.text)), terrainDropdown.captionText.text);
             return true;
         }
 
@@ -526,7 +526,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         int.TryParse(moveAP.text, out int ap);
 
-        if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Planner"))
+        if (moveTypeDropdown.captionText.text.Contains("Planner"))
         {
             if (CheckMP(1) && CheckAP(ap))
             {
@@ -538,7 +538,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             menu.CloseMoveUI();
         }
-        else if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Exo"))
+        else if (moveTypeDropdown.captionText.text.Contains("Exo"))
         {
             if (GetMoveLocation(out Tuple<Vector3, string> moveToLocation))
             {
@@ -565,9 +565,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             //get maxmove
             float maxMove;
-            if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Full"))
+            if (moveTypeDropdown.captionText.text.Contains("Full"))
                 maxMove = activeSoldier.FullMove;
-            else if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Half"))
+            else if (moveTypeDropdown.captionText.text.Contains("Half"))
                 maxMove = activeSoldier.HalfMove;
             else
                 maxMove = activeSoldier.TileMove;
@@ -799,7 +799,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateTarget(Soldier shooter)
     {
-        IAmShootable target = FindShootableById(targetDropdown.options[targetDropdown.value].text);
+        IAmShootable target = FindShootableById(targetDropdown.captionText.text);
 
         //initialise
         menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").gameObject.SetActive(false);
@@ -826,7 +826,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateSuppressionValue(Soldier shooter)
     {
         Item gun = shooter.EquippedGun;
-        IAmShootable target = FindShootableById(targetDropdown.options[targetDropdown.value].text);
+        IAmShootable target = FindShootableById(targetDropdown.captionText.text);
 
         int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
         {
@@ -1389,7 +1389,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmShot(bool retry)
     {
         Soldier shooter = soldierManager.FindSoldierById(menu.shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-        IAmShootable target = FindShootableById(targetDropdown.options[targetDropdown.value].text);
+        IAmShootable target = FindShootableById(targetDropdown.captionText.text);
         Item gun = shooter.EquippedGun;
         int.TryParse(menu.shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
         int actingHitChance;
@@ -1613,7 +1613,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateMeleeUI()
     {
         Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
+        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
         if (!menu.clearMeleeFlag)
         {
@@ -1693,7 +1693,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateMeleeTypeOptions()
     {
         Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
+        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
         List<TMP_Dropdown.OptionData> meleeTypeDetails = new()
         {
@@ -1860,7 +1860,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         float chargeMod;
 
-        chargeMod = meleeUI.meleeTypeDropdown.options[meleeUI.meleeTypeDropdown.value].text switch
+        chargeMod = meleeUI.meleeTypeDropdown.captionText.text switch
         {
             "Full Charge Attack" => 1.9f,
             "Half Charge Attack" => 1.4f,
@@ -2116,7 +2116,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmMelee()
     {
         Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
+        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
         if (int.TryParse(meleeUI.apCost.text, out int ap))
         {
@@ -2444,11 +2444,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateSoldierUsedOn(UseItemUI useItemUI)
     {
-        useItemUI.soldierUsedOn = soldierManager.FindSoldierById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
+        useItemUI.soldierUsedOn = soldierManager.FindSoldierById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
     }
     public void UpdateItemUsedOn(UseItemUI useItemUI)
     {
-        useItemUI.itemUsedOn = itemManager.FindItemById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
+        useItemUI.itemUsedOn = itemManager.FindItemById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
     }
     public void ConfirmUHF(UseItemUI useUHFUI)
     {
@@ -2457,7 +2457,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetZ = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").GetComponent<TMP_InputField>();
         TMP_Dropdown strikeOption = useUHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>();
 
-        if (int.TryParse(strikeOption.options[strikeOption.value].text.Split('(', ')')[1], out int dipelecScore))
+        if (int.TryParse(strikeOption.captionText.text.Split('(', ')')[1], out int dipelecScore))
         {
             Tuple<int, string, int, int, int> strike = itemManager.GetStrike(dipelecScore);
             int rolls = strike.Item4;
@@ -2652,7 +2652,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
                 {
                     useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                    Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id)).PlaceClaymore();
+                    Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.captionText.text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id)).PlaceClaymore();
 
                     menu.CloseClaymoreUI();
                 }
@@ -2675,7 +2675,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
                 {
                     useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
-                    Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), activeSoldier.Id);
+                    Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.captionText.text), activeSoldier.Id);
 
                     menu.CloseDeploymentBeaconUI();
                 }
@@ -2702,7 +2702,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
                 {
                     useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
-                    Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.options[terrainOn.value].text), Tuple.Create(facingXInt, facingYInt, activeSoldier.Id));
+                    Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.captionText.text), Tuple.Create(facingXInt, facingYInt, activeSoldier.Id));
 
                     menu.CloseThermalCamUI();
                 }
@@ -3171,12 +3171,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //damage event functions - game
     public void ConfirmDamageEvent()
     {
-        if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Bloodletting"))
+        if (damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
         {
             activeSoldier.TakeBloodlettingDamage();
             menu.CloseDamageEventUI();
         }
-        else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Other") && int.TryParse(menu.damageEventUI.transform.Find("Other").Find("OtherInput").GetComponent<TMP_InputField>().text, out int otherDamage))
+        else if (damageEventTypeDropdown.captionText.text.Contains("Other") && int.TryParse(menu.damageEventUI.transform.Find("Other").Find("OtherInput").GetComponent<TMP_InputField>().text, out int otherDamage))
         {
             activeSoldier.TakeDamage(null, otherDamage, false, new() { menu.damageEventUI.transform.Find("DamageSource").Find("DamageSourceInput").GetComponent<TMP_InputField>().text });
             menu.CloseDamageEventUI();
@@ -3186,9 +3186,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //check input
             if (GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation))
             {
-                if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Fall"))
+                if (damageEventTypeDropdown.captionText.text.Contains("Fall"))
                     activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(menu.damageEventUI.transform.Find("FallDistance").Find("FallInputZ").GetComponent<TMP_InputField>().text)), false, new() { "Fall" });
-                else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Collapse"))
+                else if (damageEventTypeDropdown.captionText.text.Contains("Collapse"))
                 {
                     int structureHeight = int.Parse(menu.damageEventUI.transform.Find("StructureHeight").Find("StructureHeightInputZ").GetComponent<TMP_InputField>().text);
                     //add xp if survives, otherwise kill
@@ -3233,7 +3233,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             fallCollapseLocation = Tuple.Create(new Vector3(int.Parse(menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text),
                 int.Parse(menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text),
                 int.Parse(menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text)), 
-                menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text);
+                menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().captionText.text);
 
             return true;
         }
@@ -4030,7 +4030,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
             else if (spawnedObject == 2)
-                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, terminalTypeDropdown.options[terminalTypeDropdown.value].text);
+                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, terminalTypeDropdown.captionText.text);
             else if (spawnedObject == 3)
                 Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
             else if (spawnedObject == 4)
@@ -4055,7 +4055,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             insertLocation = Tuple.Create(new Vector3(int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text),
                 int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>().text),
                 int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text)),
-                menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text);
+                menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().captionText.text);
 
             return true;
         }

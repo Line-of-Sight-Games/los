@@ -64,7 +64,7 @@ public class OverwatchShotUI : MonoBehaviour
     public void ConfirmShotOverwatch(bool retry)
     {
         Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-        IAmShootable target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
+        IAmShootable target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
         Item gun = shooter.EquippedGun;
         int actingHitChance;
         menu.SetShotResolvedFlagTo(false);
@@ -140,7 +140,7 @@ public class OverwatchShotUI : MonoBehaviour
                         targetSoldier.X = xOver;
                         targetSoldier.Y = yOver;
                         targetSoldier.Z = zOver;
-                        targetSoldier.terrainOn = overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().options[overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value].text;
+                        targetSoldier.terrainOn = overwatchLocation.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().captionText.text;
                         targetSoldier.ap = 0;
                         menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} suffered overwatch daze at X: {targetSoldier.X}, Y: {targetSoldier.Y}, Z: {targetSoldier.Z}, Ter: {targetSoldier.terrainOn}.", false, true);
                     }
@@ -199,7 +199,7 @@ public class OverwatchShotUI : MonoBehaviour
             //find shooter
             GameObject shotConfirmUI = transform.Find("ConfirmShotUI").gameObject;
             Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-            Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().options[transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value].text);
+            Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item gun = shooter.EquippedGun;
             Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
 

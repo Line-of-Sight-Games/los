@@ -16,8 +16,8 @@ public class SetTeamParameters : MonoBehaviour
     }
     public void Confirm()
     {
-        int.TryParse(maxPlayerDropdown.options[maxPlayerDropdown.value].text, out maxTeams);
-        int.TryParse(activeMaxSoldierDropdown.options[activeMaxSoldierDropdown.value].text, out maxSoldiers);
+        int.TryParse(maxPlayerDropdown.captionText.text, out maxTeams);
+        int.TryParse(activeMaxSoldierDropdown.captionText.text, out maxSoldiers);
         setupMenuUI.SetActive(false);
         createSoldierMenuUI.SetActive(true);
     }

@@ -223,7 +223,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			while (checkingValid)
 			{
 				terrainDropdown.value = UnityEngine.Random.Range(1, terrainDropdown.options.Count);
-				if (!selectedCommanderTerrains.Contains(terrainDropdown.options[terrainDropdown.value].text))
+				if (!selectedCommanderTerrains.Contains(terrainDropdown.captionText.text))
 					checkingValid = false;
 			}
 		}
@@ -238,7 +238,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		for (int i = 0; i < range.Length; i++)
         {
 			activePortraitDropdown.value = range[i];
-			if (!selectedPortraits.Contains(activePortraitDropdown.options[activePortraitDropdown.value].text))
+			if (!selectedPortraits.Contains(activePortraitDropdown.captionText.text))
             {
 				valid = true;
 				break;
@@ -263,7 +263,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		while (checkingValid)
         {
 			activeSpecialityDropdown.value = UnityEngine.Random.Range(1, activeSpecialityDropdown.options.Count);
-			if (!selectedSkills.Contains(activeSpecialityDropdown.options[activeSpecialityDropdown.value].text))
+			if (!selectedSkills.Contains(activeSpecialityDropdown.captionText.text))
 				checkingValid = false;
 		}
 	}
@@ -273,7 +273,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		while (checkingValid)
         {
 			abilityDropdown.value = UnityEngine.Random.Range(1, abilityDropdown.options.Count);
-			if (!selectedAbilities.Contains(abilityDropdown.options[abilityDropdown.value].text))
+			if (!selectedAbilities.Contains(abilityDropdown.captionText.text))
 				checkingValid = false;
 		}
 	}
@@ -291,21 +291,21 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	{
 		if (CheckValidDetails())
 		{
-			Instantiate(baseSoldier).Init(soldierName.text, currentTeam, terrainDropdown.options[terrainDropdown.value].text, activePortraitDropdown.options[activePortraitDropdown.value].image, activePortraitDropdown.options[activePortraitDropdown.value].text, GetSpeciality(), abilityDropdown.options[abilityDropdown.value].text);
+			Instantiate(baseSoldier).Init(soldierName.text, currentTeam, terrainDropdown.captionText.text, activePortraitDropdown.captionImage.sprite, activePortraitDropdown.captionText.text, GetSpeciality(), abilityDropdown.captionText.text);
 
 			//refresh input fields and exclude previously chosen options
 			bannedNames.Add(soldierName.text); 
 			soldierName.text = "";
             //exclude commander terrains that have been selected
             if (GetSpeciality().Equals("Leadership"))
-				selectedCommanderTerrains.Add(terrainDropdown.options[terrainDropdown.value].text);
+				selectedCommanderTerrains.Add(terrainDropdown.captionText.text);
 
             terrainDropdown.value = 0;
-			selectedSkills.Add(activeSpecialityDropdown.options[activeSpecialityDropdown.value].text);
+			selectedSkills.Add(activeSpecialityDropdown.captionText.text);
 			activeSpecialityDropdown.value = 0;
-			selectedAbilities.Add(abilityDropdown.options[abilityDropdown.value].text);
+			selectedAbilities.Add(abilityDropdown.captionText.text);
 			abilityDropdown.value = 0;
-			selectedPortraits.Add(activePortraitDropdown.options[activePortraitDropdown.value].text);
+			selectedPortraits.Add(activePortraitDropdown.captionText.text);
             
 
             //increment soldier and player as necessary
@@ -356,7 +356,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 	public string GetSpeciality()
     {
-        return activeSpecialityDropdown.options[activeSpecialityDropdown.value].text switch
+        return activeSpecialityDropdown.captionText.text switch
         {
             "Commander (L)" => "Leadership",
             "Spartan (H)" => "Health",
@@ -461,7 +461,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
         {
 			if (soldierIdentifier.text.Contains("Commander"))
 			{
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Alpine"))
+				if (terrainDropdown.captionText.text.Contains("Alpine"))
 				{
 					commanderAlpineDropdownObj.SetActive(true);
 					activePortraitDropdown = commanderAlpineDropdown;
@@ -469,7 +469,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				else
 					commanderAlpineDropdownObj.SetActive(false);
 
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Desert"))
+				if (terrainDropdown.captionText.text.Contains("Desert"))
 				{
 					commanderDesertDropdownObj.SetActive(true);
 					activePortraitDropdown = commanderDesertDropdown;
@@ -477,7 +477,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				else
 					commanderDesertDropdownObj.SetActive(false);
 
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Jungle"))
+				if (terrainDropdown.captionText.text.Contains("Jungle"))
 				{
 					commanderJungleDropdownObj.SetActive(true);
 					activePortraitDropdown = commanderJungleDropdown;
@@ -485,7 +485,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				else
 					commanderJungleDropdownObj.SetActive(false);
 
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Urban"))
+				if (terrainDropdown.captionText.text.Contains("Urban"))
 				{
 					commanderUrbanDropdownObj.SetActive(true);
 					activePortraitDropdown = commanderUrbanDropdown;
@@ -499,7 +499,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				commanderDesertDropdownObj.SetActive(false);
 				commanderJungleDropdownObj.SetActive(false);
 				commanderUrbanDropdownObj.SetActive(false);
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Alpine"))
+				if (terrainDropdown.captionText.text.Contains("Alpine"))
 				{
 					alpineDropdownObj.SetActive(true);
 					activePortraitDropdown = alpineDropdown;
@@ -507,7 +507,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				else
 					alpineDropdownObj.SetActive(false);
 
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Desert"))
+				if (terrainDropdown.captionText.text.Contains("Desert"))
 				{
 					desertDropdownObj.SetActive(true);
 					activePortraitDropdown = desertDropdown;
@@ -515,7 +515,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				else
 					desertDropdownObj.SetActive(false);
 
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Jungle"))
+				if (terrainDropdown.captionText.text.Contains("Jungle"))
 				{
 					jungleDropdownObj.SetActive(true);
 					activePortraitDropdown = jungleDropdown;
@@ -523,7 +523,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				else
 					jungleDropdownObj.SetActive(false);
 
-				if (terrainDropdown.options[terrainDropdown.value].text.Contains("Urban"))
+				if (terrainDropdown.captionText.text.Contains("Urban"))
 				{
 					urbanDropdownObj.SetActive(true);
 					activePortraitDropdown = urbanDropdown;

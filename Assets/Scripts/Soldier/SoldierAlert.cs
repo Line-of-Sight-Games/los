@@ -67,7 +67,7 @@ public class SoldierAlert : MonoBehaviour
 
     public void PromoteSoldier()
     {
-        string choiceStat = statDropdown.options[statDropdown.value].text;
+        string choiceStat = statDropdown.captionText.text;
         bool displayDropdown = false;
 
         if (choiceStat != "Select Option")
@@ -180,13 +180,13 @@ public class SoldierAlert : MonoBehaviour
 
     public void PromoteSoldierCaptain()
     {
-        if (abilityDropdown.options[abilityDropdown.value].text != "Select Option")
+        if (abilityDropdown.captionText.text != "Select Option")
         {
-            soldier.soldierAbilities.Add(abilityDropdown.options[abilityDropdown.value].text);
+            soldier.soldierAbilities.Add(abilityDropdown.captionText.text);
 
             transform.Find("AbilityDropdown").gameObject.SetActive(false);
             transform.Find("ConfirmButton2").gameObject.SetActive(false);
-            transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Ability gained: " + abilityDropdown.options[abilityDropdown.value].text;
+            transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Ability gained: " + abilityDropdown.captionText.text;
             promotionComplete = true;
 
             //soldier.game.soundManager.PlayPromotion();

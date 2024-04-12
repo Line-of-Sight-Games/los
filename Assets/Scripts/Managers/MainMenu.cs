@@ -2123,7 +2123,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (game.CheckAP(ap))
             {
                 Soldier shooter = soldierManager.FindSoldierById(shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-                IAmShootable target = game.FindShootableById(game.targetDropdown.options[game.targetDropdown.value].text);
+                IAmShootable target = game.FindShootableById(game.targetDropdown.captionText.text);
                 Item gun = shooter.EquippedGun;
                 Tuple<int, int, int> chances = null;
                 bool validDetails = true;
@@ -2295,7 +2295,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             meleeUI.targetDropdown.AddOptions(defenderDetails);
 
-            Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
+            Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
             if (defender.controlledBySoldiersList.Contains(activeSoldier.id))
                 meleeUI.meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=green>Disengage</color>") });
@@ -2342,7 +2342,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             meleeUI.flankersMeleeDefenderUI.SetActive(false);
         }
         
-        if (meleeUI.meleeTypeDropdown.options[meleeUI.meleeTypeDropdown.value].text.Contains("Request"))
+        if (meleeUI.meleeTypeDropdown.captionText.text.Contains("Request"))
             OpenMeleeBreakEngagementRequestUI();
     }
     public void ClearMeleeUI()
@@ -2373,7 +2373,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 //find attacker and defender
                 Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-                Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
+                Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
                 int meleeDamage = game.CalculateMeleeResult(attacker, defender);
 
@@ -2517,7 +2517,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown moveTypeDropdown = moveUI.transform.Find("MoveType").Find("MoveTypeDropdown").GetComponent<TMP_Dropdown>();
 
-        if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Planner"))
+        if (moveTypeDropdown.captionText.text.Contains("Planner"))
         {
             moveUI.transform.Find("Location").gameObject.SetActive(false);
             moveUI.transform.Find("Terrain").gameObject.SetActive(false);
@@ -2528,7 +2528,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             moveUI.transform.Find("ClosestAlly").gameObject.SetActive(true);
             moveUI.transform.Find("MoveDonated").gameObject.SetActive(true);
         }
-        else if (moveTypeDropdown.options[moveTypeDropdown.value].text.Contains("Exo"))
+        else if (moveTypeDropdown.captionText.text.Contains("Exo"))
         {
             moveUI.transform.Find("Location").gameObject.SetActive(true);
             moveUI.transform.Find("Terrain").gameObject.SetActive(true);
@@ -3025,7 +3025,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown damageEventTypeDropdown = damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>();
 
-        if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Fall"))
+        if (damageEventTypeDropdown.captionText.text.Contains("Fall"))
         {
             damageEventUI.transform.Find("FallDistance").gameObject.SetActive(true);
             damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(false);
@@ -3033,7 +3033,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
             damageEventUI.transform.Find("Location").gameObject.SetActive(true);
         }
-        else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Collapse"))
+        else if (damageEventTypeDropdown.captionText.text.Contains("Collapse"))
         {
             damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
             damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(true);
@@ -3041,7 +3041,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
             damageEventUI.transform.Find("Location").gameObject.SetActive(true);
         }
-        else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Other"))
+        else if (damageEventTypeDropdown.captionText.text.Contains("Other"))
         {
             damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
             damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(false);
@@ -3049,7 +3049,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(true);
             damageEventUI.transform.Find("Location").gameObject.SetActive(false);
         }
-        else if (damageEventTypeDropdown.options[damageEventTypeDropdown.value].text.Contains("Bloodletting"))
+        else if (damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
         {
             damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
             damageEventUI.transform.Find("Other").gameObject.SetActive(false);
