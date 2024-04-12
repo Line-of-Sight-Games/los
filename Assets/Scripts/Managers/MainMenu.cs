@@ -23,8 +23,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
+
+    public MoveUI moveUI;
+    public ShotUI shotUI;
     public MeleeUI meleeUI;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -1209,7 +1213,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 game.EndModaTurn();
             if (game.frozenTurn)
                 game.EndFrozenTurn();
-            activeSoldier.selected = false;
+            activeSoldier.UnsetActiveSoldier();
             soldierOptionsUI.SetActive(false);
             menuUI.transform.Find("GameMenu").Find("UnitDisplayPanel").gameObject.SetActive(true);
             //turnTitle.text = "L I N E    O F    S I G H T";
@@ -2052,7 +2056,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         game.UpdateShotType(shooter);
         game.UpdateShotUI(shooter);
 
-        shotUI.SetActive(true);
+        shotUI.gameObject.SetActive(true);
     }
     public void BlockShotOptions()
     {
@@ -2113,7 +2117,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public void CloseShotUI()
     {
-        shotUI.SetActive(false);
+        shotUI.gameObject.SetActive(false);
         shotConfirmUI.SetActive(false);
     }
     public void OpenShotConfirmUI()
@@ -2122,8 +2126,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (game.CheckAP(ap))
             {
-                Soldier shooter = soldierManager.FindSoldierById(shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-                IAmShootable target = game.FindShootableById(game.targetDropdown.captionText.text);
+                Soldier shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
+                IAmShootable target = game.FindShootableById(shotUI.targetDropdown.captionText.text);
                 Item gun = shooter.EquippedGun;
                 Tuple<int, int, int> chances = null;
                 bool validDetails = true;
@@ -2135,7 +2139,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 if (validDetails)
                 {
-                    if (game.shotTypeDropdown.value == 1)
+                    if (shotUI.shotTypeDropdown.value == 1)
                         chances = Tuple.Create(100, 0, 100);
                     else
                         chances = game.CalculateHitPercentage(shooter, target, gun);
@@ -2144,7 +2148,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     if (chances != null)
                     {
                         //only shot suppression hit chance if suppressed
-                        if (shooter.IsSuppressed() && game.shotTypeDropdown.value != 1)
+                        if (shooter.IsSuppressed() && shotUI.shotTypeDropdown.value != 1)
                             shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(true);
                         else
                             shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(false);
@@ -2154,7 +2158,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
 
                         //enable back button only if shot is aimed and under 25%
-                        if (game.aimTypeDropdown.value != 1 && chances.Item1 <= 25)
+                        if (shotUI.aimTypeDropdown.value != 1 && chances.Item1 <= 25)
                             shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = true;
                         else
                             shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
@@ -2496,14 +2500,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //move functions - menu
     public void ShowClosestAlly()
     {
-        GameObject closestAllyUI = moveUI.transform.Find("ClosestAlly").gameObject;
-        ClearClosestAllyUI(closestAllyUI);
+        ClearClosestAllyUI(moveUI.closestAllyUI);
 
         Soldier closestAlly = activeSoldier.ClosestAllyForPlannerBuff();
 
         if (closestAlly != null)
         {
-            GameObject closestAllyPortrait = Instantiate(soldierPortraitPrefab, closestAllyUI.transform.Find("ClosestAllyPanel"));
+            GameObject closestAllyPortrait = Instantiate(soldierPortraitPrefab, moveUI.closestAllyUI.transform.Find("ClosestAllyPanel"));
             closestAllyPortrait.GetComponent<SoldierPortrait>().Init(closestAlly);
         }
     }
@@ -2515,53 +2518,38 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CheckMoveType()
     {
-        TMP_Dropdown moveTypeDropdown = moveUI.transform.Find("MoveType").Find("MoveTypeDropdown").GetComponent<TMP_Dropdown>();
+        //set default
+        moveUI.locationUI.SetActive(true);
+        moveUI.terrainDropdownUI.SetActive(true);
+        moveUI.coverToggleUI.SetActive(true);
+        moveUI.meleeToggleUI.SetActive(true);
+        moveUI.fallInputUI.SetActive(true);
+        moveUI.closestAllyUI.SetActive(false);
+        moveUI.moveDonatedUI.SetActive(false);
 
-        if (moveTypeDropdown.captionText.text.Contains("Planner"))
+        if (moveUI.moveTypeDropdown.captionText.text.Contains("Planner"))
         {
-            moveUI.transform.Find("Location").gameObject.SetActive(false);
-            moveUI.transform.Find("Terrain").gameObject.SetActive(false);
-            moveUI.transform.Find("Cover").gameObject.SetActive(false);
-            moveUI.transform.Find("Melee").gameObject.SetActive(false);
-            moveUI.transform.Find("Fall").gameObject.SetActive(false);
+            moveUI.locationUI.SetActive(false);
+            moveUI.terrainDropdownUI.SetActive(false);
+            moveUI.coverToggleUI.SetActive(false);
+            moveUI.meleeToggleUI.SetActive(false);
+            moveUI.fallInputUI.SetActive(false);
             ShowClosestAlly();
-            moveUI.transform.Find("ClosestAlly").gameObject.SetActive(true);
-            moveUI.transform.Find("MoveDonated").gameObject.SetActive(true);
+            moveUI.closestAllyUI.SetActive(true);
+            moveUI.moveDonatedUI.SetActive(true);
         }
-        else if (moveTypeDropdown.captionText.text.Contains("Exo"))
-        {
-            moveUI.transform.Find("Location").gameObject.SetActive(true);
-            moveUI.transform.Find("Terrain").gameObject.SetActive(true);
-            moveUI.transform.Find("Cover").gameObject.SetActive(true);
-            moveUI.transform.Find("Melee").gameObject.SetActive(true);
-            moveUI.transform.Find("Fall").gameObject.SetActive(false);
-            moveUI.transform.Find("ClosestAlly").gameObject.SetActive(false);
-            moveUI.transform.Find("MoveDonated").gameObject.SetActive(false);
-        }
-        else
-        {
-            moveUI.transform.Find("Location").gameObject.SetActive(true);
-            moveUI.transform.Find("Terrain").gameObject.SetActive(true);
-            moveUI.transform.Find("Cover").gameObject.SetActive(true);
-            moveUI.transform.Find("Melee").gameObject.SetActive(true);
-            moveUI.transform.Find("Fall").gameObject.SetActive(true);
-            moveUI.transform.Find("ClosestAlly").gameObject.SetActive(false);
-            moveUI.transform.Find("MoveDonated").gameObject.SetActive(false);
-        }
+        else if (moveUI.moveTypeDropdown.captionText.text.Contains("Exo"))
+            moveUI.fallInputUI.SetActive(false);
+
     }
     public void OpenMoveUI(bool suppressed)
     {
-        TMP_Dropdown moveTypeDropdown = moveUI.transform.Find("MoveType").Find("MoveTypeDropdown").GetComponent<TMP_Dropdown>();
-        Toggle coverToggle = moveUI.transform.Find("Cover").Find("CoverToggle").GetComponent<Toggle>();
-        Toggle meleeToggle = moveUI.transform.Find("Melee").Find("MeleeToggle").GetComponent<Toggle>();
-        GameObject backButton = moveUI.transform.Find("BackButton").gameObject;
-
         List<TMP_Dropdown.OptionData> moveTypeDetails;
-        moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
-        moveTypeDropdown.ClearOptions();
-        moveTypeDropdown.interactable = true;
-        coverToggle.interactable = true;
-        meleeToggle.interactable = true;
+        moveUI.moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+        moveUI.moveTypeDropdown.ClearOptions();
+        moveUI.moveTypeDropdown.interactable = true;
+        moveUI.coverToggle.interactable = true;
+        moveUI.meleeToggle.interactable = true;
 
         //add suppression indicators if suppressed
         string fullMoveSuppressed = "", halfMoveSuppressed = "";
@@ -2580,10 +2568,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 new TMP_Dropdown.OptionData("Half: " + halfMoveSuppressed),
                 new TMP_Dropdown.OptionData("Tile: " + activeSoldier.TileMove),
             };
-            moveTypeDropdown.interactable = false;
-            coverToggle.interactable = false;
-            meleeToggle.interactable = false;
-            backButton.SetActive(false);
+            moveUI.moveTypeDropdown.interactable = false;
+            moveUI.coverToggle.interactable = false;
+            moveUI.meleeToggle.interactable = false;
+            moveUI.backButton.SetActive(false);
         }
         else
         {
@@ -2593,7 +2581,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 new TMP_Dropdown.OptionData("Half: " + activeSoldier.HalfMove + halfMoveSuppressed),
                 new TMP_Dropdown.OptionData("Tile: " + activeSoldier.TileMove),
             };
-            backButton.SetActive(true);
+            moveUI.backButton.SetActive(true);
         }
         
         //add extra move options for planner/exo
@@ -2601,36 +2589,36 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Planner Donation</color>"));
         if (activeSoldier.IsWearingExoArmour())
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Exo Jump</color>"));
-        moveTypeDropdown.AddOptions(moveTypeDetails);
+        moveUI.moveTypeDropdown.AddOptions(moveTypeDetails);
 
         if (activeSoldier.IsSmokeBlinded())
         {
-            moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
-            moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");
-            moveTypeDropdown.value = 2;
+            moveUI.moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
+            moveUI.moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");
+            moveUI.moveTypeDropdown.value = 2;
         }
         else
         {
             //grey options according to AP
             if (activeSoldier.ap < 3)
             {
-                moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
-                moveTypeDropdown.value = 1;
+                moveUI.moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
+                moveUI.moveTypeDropdown.value = 1;
             }
             if (activeSoldier.ap < 2)
             {
-                moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");
-                moveTypeDropdown.value = 2;
+                moveUI.moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");
+                moveUI.moveTypeDropdown.value = 2;
             }
         }
 
         //block cover for JA
         if (activeSoldier.IsWearingJuggernautArmour(false))
-            coverToggle.interactable = false;
+            moveUI.coverToggle.interactable = false;
 
         //block melee toggle if within engage distance of enemy
         if (activeSoldier.ClosestEnemyVisible() != null && activeSoldier.PhysicalObjectWithinMeleeRadius(activeSoldier.ClosestEnemyVisible()) || suppressed)
-            meleeToggle.interactable = false;
+            moveUI.meleeToggle.interactable = false;
 
         /*//block planner if already moved
         if (!activeSoldier.usedMP)
@@ -2639,26 +2627,26 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();*/
 
         //prefill movement position inputs with current position
-        moveUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
-        moveUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
-        moveUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
+        moveUI.xPos.placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
+        moveUI.yPos.placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
+        moveUI.zPos.placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
         
         //block options and show start location if broken
         if (activeSoldier.IsBroken())
         {
-            moveUI.transform.Find("Location").Find("StartLocation").Find("StartX").GetComponent<TextMeshProUGUI>().text = activeSoldier.startX.ToString();
-            moveUI.transform.Find("Location").Find("StartLocation").Find("StartY").GetComponent<TextMeshProUGUI>().text = activeSoldier.startY.ToString();
-            moveUI.transform.Find("Location").Find("StartLocation").Find("StartZ").GetComponent<TextMeshProUGUI>().text = activeSoldier.startZ.ToString();
-            coverToggle.interactable = false;
-            meleeToggle.interactable = false;
-            moveUI.transform.Find("Location").Find("StartLocation").gameObject.SetActive(true);
+            moveUI.startX.text = activeSoldier.startX.ToString();
+            moveUI.startY.text = activeSoldier.startY.ToString();
+            moveUI.startZ.text = activeSoldier.startZ.ToString();
+            moveUI.coverToggle.interactable = false;
+            moveUI.meleeToggle.interactable = false;
+            moveUI.startlocationUI.SetActive(true);
         }
         else
-            moveUI.transform.Find("Location").Find("StartLocation").gameObject.SetActive(false);
+            moveUI.startlocationUI.SetActive(false);
 
         game.UpdateMoveUI();
         
-        moveUI.SetActive(true);
+        moveUI.gameObject.SetActive(true);
     }
     public void OpenMoveToSameSpotUI()
     {
@@ -2690,20 +2678,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void ClearMoveUI()
     {
         clearMoveFlag = true;
-        moveUI.transform.Find("MoveType").Find("MoveTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        moveUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        moveUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text = "";
-        moveUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        moveUI.transform.Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        moveUI.transform.Find("Cover").Find("CoverToggle").GetComponent<Toggle>().isOn = false;
-        moveUI.transform.Find("Melee").Find("MeleeToggle").GetComponent<Toggle>().isOn = false;
-        moveUI.transform.Find("Fall").Find("FallInputZ").GetComponent<TMP_InputField>().text = "";
+        moveUI.moveTypeDropdown.value = 0;
+        moveUI.xPos.text = "";
+        moveUI.yPos.text = "";
+        moveUI.zPos.text = "";
+        moveUI.terrainDropdown.value = 0;
+        moveUI.coverToggle.isOn = false;
+        moveUI.meleeToggle.isOn = false;
+        moveUI.fallInput.text = "";
         clearMoveFlag = false;
     }
     public void CloseMoveUI()
     {
         ClearMoveUI();
-        moveUI.SetActive(false);
+        moveUI.gameObject.SetActive(false);
         overmoveUI.SetActive(false);
     }
     public void ConfirmOvermove()

@@ -18,6 +18,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public DipelecGen dipelec;
     public SoundManager soundManager;
 
+    public MoveUI moveUI; 
+    public ShotUI shotUI;
     public MeleeUI meleeUI;
 
     public bool gameOver, modaTurn, frozenTurn;
@@ -26,10 +28,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
-    public TMP_InputField xPos, yPos, zPos, fallInput, overwatchXPos, overwatchYPos, overwatchRadius, overwatchAngle;
-    public TMP_Dropdown moveTypeDropdown, terrainDropdown, shotTypeDropdown, aimTypeDropdown, coverLevelDropdown, targetDropdown, damageEventTypeDropdown;
-    public TextMeshProUGUI moveAP;
-    public Toggle coverToggle, meleeToggle;
+    public TMP_InputField overwatchXPos, overwatchYPos, overwatchRadius, overwatchAngle;
+    public TMP_Dropdown damageEventTypeDropdown;
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
@@ -215,7 +215,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void EndTurnNonCoroutine()
     {
-        StartCoroutine(EndTurn());
+        if (activeSoldier == null)
+            StartCoroutine(EndTurn());
     }
     public IEnumerator EndTurn()
     {
@@ -475,7 +476,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateMoveAP()
     {
         int ap = 0;
-        string move = moveTypeDropdown.captionText.text;
+        string move = moveUI.moveTypeDropdown.captionText.text;
 
         if (move.Contains("Full"))
             ap = 3;
@@ -492,16 +493,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (ap > 1 && activeSoldier.IsSprinter())
                 ap--;
 
-            if (coverToggle.isOn)
+            if (moveUI.coverToggle.isOn)
                 ap++;
         }
 
-        menu.moveUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
+        moveUI.apCost.text = ap.ToString();
     }
     public void UpdateMoveDonated()
     {
-        if (moveTypeDropdown.captionText.text.Contains("Planner"))
-            menu.moveUI.transform.Find("MoveDonated").Find("MoveDonatedDisplay").GetComponent<TextMeshProUGUI>().text = activeSoldier.HalfMove.ToString();
+        if (moveUI.moveTypeDropdown.captionText.text.Contains("Planner"))
+            moveUI.moveDonated.text = activeSoldier.HalfMove.ToString();
     }
     public void UpdateMoveUI()
     {
@@ -514,9 +515,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetMoveLocation(out Tuple<Vector3, string> moveLocation)
     {
         moveLocation = default;
-        if (xPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && yPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && zPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && terrainDropdown.value != 0)
+        if (moveUI.xPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && moveUI.yPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && moveUI.zPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && moveUI.terrainDropdown.value != 0)
         {
-            moveLocation = Tuple.Create(new Vector3(int.Parse(xPos.text), int.Parse(yPos.text), int.Parse(zPos.text)), terrainDropdown.captionText.text);
+            moveLocation = Tuple.Create(new Vector3(int.Parse(moveUI.xPos.text), int.Parse(moveUI.yPos.text), int.Parse(moveUI.zPos.text)), moveUI.terrainDropdown.captionText.text);
             return true;
         }
 
@@ -524,21 +525,21 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmMove(bool force)
     {
-        int.TryParse(moveAP.text, out int ap);
+        int.TryParse(moveUI.apCost.text, out int ap);
 
-        if (moveTypeDropdown.captionText.text.Contains("Planner"))
+        if (moveUI.moveTypeDropdown.captionText.text.Contains("Planner"))
         {
             if (CheckMP(1) && CheckAP(ap))
             {
                 //planner donation proceeds
                 DeductAP(ap);
                 DrainMP();
-                foreach (Transform child in menu.moveUI.transform.Find("ClosestAlly").Find("ClosestAllyPanel"))
+                foreach (Transform child in moveUI.closestAllyUI.transform.Find("ClosestAllyPanel"))
                     soldierManager.FindSoldierByName(child.Find("SoldierName").GetComponent<TextMeshProUGUI>().text).plannerDonatedMove += activeSoldier.HalfMove;
             }
             menu.CloseMoveUI();
         }
-        else if (moveTypeDropdown.captionText.text.Contains("Exo"))
+        else if (moveUI.moveTypeDropdown.captionText.text.Contains("Exo"))
         {
             if (GetMoveLocation(out Tuple<Vector3, string> moveToLocation))
             {
@@ -548,7 +549,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (CheckAP(ap))
                         {
-                            PerformMove(activeSoldier, ap, moveToLocation, meleeToggle.isOn, coverToggle.isOn, fallInput.text, true);
+                            PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
                             //trigger loud action
                             activeSoldier.PerformLoudAction(10);
                         }
@@ -565,9 +566,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             //get maxmove
             float maxMove;
-            if (moveTypeDropdown.captionText.text.Contains("Full"))
+            if (moveUI.moveTypeDropdown.captionText.text.Contains("Full"))
                 maxMove = activeSoldier.FullMove;
-            else if (moveTypeDropdown.captionText.text.Contains("Half"))
+            else if (moveUI.moveTypeDropdown.captionText.text.Contains("Half"))
                 maxMove = activeSoldier.HalfMove;
             else
                 maxMove = activeSoldier.TileMove;
@@ -577,13 +578,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (activeSoldier.X != moveToLocation.Item1.x || activeSoldier.Y != moveToLocation.Item1.y || activeSoldier.Z != moveToLocation.Item1.z)
                 {
                     //skip supression check if it's already happened before, otherwise run it
-                    if (!activeSoldier.IsSuppressed() || (activeSoldier.IsSuppressed() && (moveTypeDropdown.interactable == false || activeSoldier.SuppressionCheck())))
+                    if (!activeSoldier.IsSuppressed() || (activeSoldier.IsSuppressed() && (moveUI.moveTypeDropdown.interactable == false || activeSoldier.SuppressionCheck())))
                     {
                         int distance = CalculateMoveDistance(moveToLocation.Item1);
                         if (force || distance <= maxMove)
                         {
                             if (CheckMP(1) && CheckAP(ap))
-                                PerformMove(activeSoldier, ap, moveToLocation, meleeToggle.isOn, coverToggle.isOn, fallInput.text, false);
+                                PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
                             menu.CloseMoveUI();
                         }
                         else
@@ -649,11 +650,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //launch melee if melee toggle is on
         if (meleeToggle)
         {
-            if (moveTypeDropdown.value == 0)
+            if (moveUI.moveTypeDropdown.value == 0)
                 launchMelee = "Full Charge Attack";
-            else if (moveTypeDropdown.value == 1)
+            else if (moveUI.moveTypeDropdown.value == 1)
                 launchMelee = "Half Charge Attack";
-            else if (moveTypeDropdown.value == 2)
+            else if (moveUI.moveTypeDropdown.value == 2)
                 launchMelee = "3cm Charge Attack";
         }
 
@@ -690,12 +691,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         //if function is called not from a script, shooter has to be determined from interface
         if (shooter.id == "0")
-            shooter = soldierManager.FindSoldierById(menu.shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
+            shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
 
         if (!menu.clearShotFlag)
         {
             UpdateShotAP(shooter);
-            if (shotTypeDropdown.value == 0)
+            if (shotUI.shotTypeDropdown.value == 0)
                 UpdateTarget(shooter);
             else
                 UpdateSuppressionValue(shooter);
@@ -705,17 +706,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         //if function is called not from a script, shooter has to be determined from interface
         if (shooter.id == "0")
-            shooter = soldierManager.FindSoldierById(menu.shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
+            shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
 
-        TMP_Dropdown shotTypeDropdown = menu.shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
-        TMP_Dropdown targetDropdown = menu.shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
         List<TMP_Dropdown.OptionData> targetOptionDataList = new();
 
         //initialise
-        targetDropdown.ClearOptions();
-        menu.shotUI.transform.Find("Aim").gameObject.SetActive(false);
-        menu.shotUI.transform.Find("SuppressionValue").gameObject.SetActive(false);
-        menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").gameObject.SetActive(false);
+        shotUI.targetDropdown.ClearOptions();
+        shotUI.aimTypeUI.SetActive(false);
+        shotUI.suppressionValueUI.SetActive(false);
+        shotUI.coverLocationUI.SetActive(false);
 
         //generate target list
         foreach (Soldier s in AllSoldiers())
@@ -743,9 +742,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
 
-        if (shotTypeDropdown.value == 0)
+        if (shotUI.shotTypeDropdown.value == 0)
         {
-            menu.shotUI.transform.Find("Aim").gameObject.SetActive(true);
+            shotUI.aimTypeUI.SetActive(true);
 
             //add explosive barrels to target list
             foreach (ExplosiveBarrel b in FindObjectsOfType<ExplosiveBarrel>())
@@ -761,22 +760,22 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //add coverman
             targetOptionDataList.Add(new("coverman", menu.covermanSprite));
         }
-        else if (shotTypeDropdown.value == 1)
-            menu.shotUI.transform.Find("SuppressionValue").gameObject.SetActive(true);
+        else if (shotUI.shotTypeDropdown.value == 1)
+            shotUI.suppressionValueUI.SetActive(true);
 
-        targetDropdown.AddOptions(targetOptionDataList);
+        shotUI.targetDropdown.AddOptions(targetOptionDataList);
         UpdateShotUI(shooter);
     }
     public void UpdateShotAP(Soldier shooter)
     {
         int ap = 1;
-        if (shotTypeDropdown.value == 1)
+        if (shotUI.shotTypeDropdown.value == 1)
         {
             ap = shooter.ap;
         }
         else
         {
-            if (aimTypeDropdown.value == 0)
+            if (shotUI.aimTypeDropdown.value == 0)
             {
                 if (shooter.IsGunner())
                     ap++;
@@ -795,30 +794,30 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (shooter.soldierTeam != currentTeam)
             ap = 0;
         
-        menu.shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
+        shotUI.apCost.text = ap.ToString();
     }
     public void UpdateTarget(Soldier shooter)
     {
-        IAmShootable target = FindShootableById(targetDropdown.captionText.text);
+        IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
 
         //initialise
-        menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").gameObject.SetActive(false);
-        menu.shotUI.transform.Find("TargetPanel").Find("Target").Find("BarrelLocation").gameObject.SetActive(false);
-        menu.shotUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(false);
+        shotUI.coverLocationUI.SetActive(false);
+        shotUI.barrelLocationUI.SetActive(false);
+        shotUI.coverLevelUI.SetActive(false);
 
         if (target is Coverman)
         {
-            menu.shotUI.transform.Find("TargetPanel").Find("CoverLocation").gameObject.SetActive(true);
+            shotUI.coverLocationUI.SetActive(true);
         }
         else if (target is ExplosiveBarrel targetBarrel)
         {
-            menu.shotUI.transform.Find("TargetPanel").Find("Target").Find("BarrelLocation").GetComponent<TextMeshProUGUI>().text = $"X:{targetBarrel.X} Y:{targetBarrel.Y} Z:{targetBarrel.Z}";
-            menu.shotUI.transform.Find("TargetPanel").Find("Target").Find("BarrelLocation").gameObject.SetActive(true);
+            shotUI.barrelLocation.text = $"X:{targetBarrel.X} Y:{targetBarrel.Y} Z:{targetBarrel.Z}";
+            shotUI.barrelLocationUI.SetActive(true);
         }
         else if (target is Soldier targetSoldier)
         {
             if (targetSoldier.IsInCover())
-                menu.shotUI.transform.Find("TargetPanel").Find("CoverLevel").gameObject.SetActive(true);
+                shotUI.coverLevelUI.SetActive(true);
                 
             UpdateTargetFlanking(shooter, targetSoldier);
         }
@@ -826,7 +825,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateSuppressionValue(Soldier shooter)
     {
         Item gun = shooter.EquippedGun;
-        IAmShootable target = FindShootableById(targetDropdown.captionText.text);
+        IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
 
         int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
         {
@@ -837,7 +836,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             _ => 0,
         };
 
-        menu.shotUI.transform.Find("SuppressionValue").Find("SuppressionValueDisplay").GetComponent<TextMeshProUGUI>().text = suppressionValue.ToString();
+        shotUI.suppressionValue.text = suppressionValue.ToString();
     }
     public void UpdateTargetFlanking(Soldier shooter, Soldier target)
     {
@@ -908,31 +907,31 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             case "Melee":
             case "CQB":
-                if (aimTypeDropdown.value == 0)
+                if (shotUI.aimTypeDropdown.value == 0)
                     baseWeaponHitChance = gun.gunTraits.CQBA;
                 else
                     baseWeaponHitChance = gun.gunTraits.CQBU;
                 break;
             case "Short":
-                if (aimTypeDropdown.value == 0)
+                if (shotUI.aimTypeDropdown.value == 0)
                     baseWeaponHitChance = gun.gunTraits.ShortA;
                 else
                     baseWeaponHitChance = gun.gunTraits.ShortU;
                 break;
             case "Medium":
-                if (aimTypeDropdown.value == 0)
+                if (shotUI.aimTypeDropdown.value == 0)
                     baseWeaponHitChance = gun.gunTraits.MedA;
                 else
                     baseWeaponHitChance = gun.gunTraits.MedU;
                 break;
             case "Long":
-                if (aimTypeDropdown.value == 0)
+                if (shotUI.aimTypeDropdown.value == 0)
                     baseWeaponHitChance = gun.gunTraits.LongA;
                 else
                     baseWeaponHitChance = gun.gunTraits.LongU;
                 break;
             case "Coriolis":
-                if (aimTypeDropdown.value == 0)
+                if (shotUI.aimTypeDropdown.value == 0)
                     baseWeaponHitChance = gun.gunTraits.CoriolisA;
                 else
                     baseWeaponHitChance = gun.gunTraits.CoriolisU;
@@ -1073,7 +1072,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public float CoverMod()
     {
-        var coverMod = coverLevelDropdown.value switch
+        var coverMod = shotUI.coverLevelDropdown.value switch
         {
             1 => 0.1f,
             2 => 0.34f,
@@ -1388,10 +1387,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmShot(bool retry)
     {
-        Soldier shooter = soldierManager.FindSoldierById(menu.shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-        IAmShootable target = FindShootableById(targetDropdown.captionText.text);
+        Soldier shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
+        IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
         Item gun = shooter.EquippedGun;
-        int.TryParse(menu.shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
+        int.TryParse(shotUI.apCost.text, out int ap);
         int actingHitChance;
         bool resistSuppression;
         menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
@@ -1403,7 +1402,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         menu.SetShotResolvedFlagTo(false);
         DeductAP(ap);
 
-        if (shotTypeDropdown.value == 0) //standard shot
+        if (shotUI.shotTypeDropdown.value == 0) //standard shot
         {
             if (target is Soldier)
                 FileUtility.WriteToReport($"{shooter.soldierName} shooting at {(target as Soldier).soldierName}");
@@ -1565,7 +1564,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
         }
-        else if (shotTypeDropdown.value == 1) //supression shot
+        else if (shotUI.shotTypeDropdown.value == 1) //supression shot
         {
             FileUtility.WriteToReport($"{shooter.soldierName} suppressing {target}");
 

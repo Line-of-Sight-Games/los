@@ -274,7 +274,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return this;
     }
-
+    public void SetActiveSoldier()
+    {
+        menu.activeSoldier = this;
+        game.activeSoldier = this;
+        selected = true;
+    }
+    public void UnsetActiveSoldier()
+    {
+        menu.activeSoldier = null;
+        game.activeSoldier = null;
+        selected = false;
+    }
     public bool IsFielded()
     {
         if (fielded)

@@ -57,9 +57,8 @@ public class SoldierUI : MonoBehaviour
 
     public void OpenSoldierMenu(string type)
     {
-        linkedSoldier.selected = true;
-        menu.activeSoldier = linkedSoldier;
-        game.activeSoldier = linkedSoldier;
+        linkedSoldier.SetActiveSoldier();
+        
         //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
         menu.menuUI.transform.Find("GameMenu").Find("UnitDisplayPanel").gameObject.SetActive(false);
         menu.menuUI.transform.Find("GameMenu").Find("SoldierOptions").gameObject.SetActive(true);
