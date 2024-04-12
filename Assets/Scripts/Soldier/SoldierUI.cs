@@ -61,14 +61,14 @@ public class SoldierUI : MonoBehaviour
         menu.activeSoldier = linkedSoldier;
         game.activeSoldier = linkedSoldier;
         //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
-        menu.menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(false);
-        menu.menuUI.transform.Find("Options Panel").Find("SoldierOptions").gameObject.SetActive(true);
-        if (type == "frozen")
+        menu.menuUI.transform.Find("GameMenu").Find("UnitDisplayPanel").gameObject.SetActive(false);
+        menu.menuUI.transform.Find("GameMenu").Find("SoldierOptions").gameObject.SetActive(true);
+        /*if (type == "frozen")
             menu.turnTitle.text = "<color=orange>F R O Z E N    T U R N</color>";
         else if (type == "moda")
             menu.turnTitle.text = "<color=purple>M O D A F I N I L    T U R N</color>";
         else
-            menu.turnTitle.text = "N O R M A L    T U R N";
+            menu.turnTitle.text = "N O R M A L    T U R N";*/
 
         //populate soldier loadout
         Transform soldierBanner = menu.soldierOptionsUI.transform.Find("SoldierBanner");

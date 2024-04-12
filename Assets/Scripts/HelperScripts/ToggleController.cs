@@ -25,6 +25,7 @@ public class ToggleController : MonoBehaviour
             ColorBlock newColors = toggle.colors;
             newColors.normalColor = selectedBackgroundColor;
             newColors.selectedColor = selectedBackgroundColor;
+            newColors.highlightedColor = selectedBackgroundColor;
             toggle.colors = newColors;
         }
         else

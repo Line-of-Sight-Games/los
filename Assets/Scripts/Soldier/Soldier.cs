@@ -446,16 +446,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         return !IsRevealed();
     }
-    public bool IsRevealing(string id)
+    public bool IsRevealing(Soldier soldier)
     {
-        if (IsAbleToSee() && RevealingSoldiers.Contains(id))
+        if (IsAbleToSee() && RevealingSoldiers.Contains(soldier.Id))
             return true;
         else
             return false;
     }
-    public bool IsBeingRevealedBy(string id)
+    public bool IsBeingRevealedBy(Soldier soldier)
     {
-        if (IsAlive() && RevealedBySoldiers.Contains(id))
+        if (IsAlive() && RevealedBySoldiers.Contains(soldier.Id))
             return true;
         else
             return false;

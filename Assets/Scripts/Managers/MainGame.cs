@@ -17,7 +17,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public WeatherGen weather;
     public DipelecGen dipelec;
     public SoundManager soundManager;
-    public SetBattlefieldParameters setBattlefieldParameters;
+
+    public MeleeUI meleeUI;
 
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
@@ -26,7 +27,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
     public TMP_InputField xPos, yPos, zPos, fallInput, overwatchXPos, overwatchYPos, overwatchRadius, overwatchAngle;
-    public TMP_Dropdown moveTypeDropdown, terrainDropdown, shotTypeDropdown, aimTypeDropdown, coverLevelDropdown, targetDropdown, meleeTypeDropdown, attackerWeaponDropdown, meleeTargetDropdown, defenderWeaponDropdown, damageEventTypeDropdown;
+    public TMP_Dropdown moveTypeDropdown, terrainDropdown, shotTypeDropdown, aimTypeDropdown, coverLevelDropdown, targetDropdown, damageEventTypeDropdown;
     public TextMeshProUGUI moveAP;
     public Toggle coverToggle, meleeToggle;
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
@@ -1611,88 +1612,88 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //melee functions
     public void UpdateMeleeUI()
     {
-        Soldier attacker = soldierManager.FindSoldierById(menu.meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeTargetDropdown.options[meleeTargetDropdown.value].text);
+        Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
+        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
 
         if (!menu.clearMeleeFlag)
         {
             UpdateMeleeAP(attacker);
-            UpdateMeleeDefenderWeapon(defender);
-            UpdateMeleeFlankingAgainstAttacker(attacker, defender);
-            UpdateMeleeFlankingAgainstDefender(attacker, defender);
+            if (meleeUI.meleeTypeDropdown.value == 0) //If it's an actual attack
+            {
+                UpdateMeleeDefenderWeapon(defender);
+                UpdateMeleeFlankingAgainstAttacker(attacker, defender);
+                UpdateMeleeFlankingAgainstDefender(attacker, defender);
+            }
         }
-            
     }
     public void UpdateMeleeAP(Soldier attacker)
     {
-        if (meleeTypeDropdown.options[0].text == "Static Attack")
+        if (meleeUI.meleeTypeDropdown.options[0].text == "Static Attack")
         {
             if (attacker.IsFighter())
-                menu.meleeUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "1";
+                meleeUI.apCost.text = "1";
             else
-                menu.meleeUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "2";
+                meleeUI.apCost.text = "2";
         }
         else
-            menu.meleeUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "0";
+            meleeUI.apCost.text = "0";
     }
     public void UpdateMeleeDefenderWeapon(Soldier defender)
     {
-        Image defenderWeaponImage = menu.meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").Find("WeaponImage").GetComponent<Image>();
-
         //show defender weapon
         if (defender.BestMeleeWeapon != null)
-            defenderWeaponImage.sprite = defender.BestMeleeWeapon.itemImage;
+            meleeUI.defenderWeaponImage.sprite = defender.BestMeleeWeapon.itemImage;
         else
-            defenderWeaponImage.sprite = menu.fist;
+            meleeUI.defenderWeaponImage.sprite = menu.fist;
     }
     public void UpdateMeleeFlankingAgainstAttacker(Soldier attacker, Soldier defender)
     {
         //clear the flanker ui
-        menu.ClearFlankersUI(menu.flankersMeleeAttackerUI);
+        menu.ClearFlankersUI(meleeUI.flankersMeleeAttackerUI);
         int flankersCount = 0;
         foreach (Soldier s in AllSoldiers())
         {
-            if (s.IsAbleToSee() && s.IsOppositeTeamAs(attacker) && !s.IsSelf(defender) && s.PhysicalObjectWithinMeleeRadius(attacker))
+            if (s.IsAbleToSee() && s.IsOppositeTeamAs(attacker) && !s.IsSelf(defender) && s.PhysicalObjectWithinMeleeRadius(attacker) && s.IsRevealing(attacker))
             {
                 //add flanker to ui to visualise
                 flankersCount++;
-                GameObject flankerPortrait = Instantiate(menu.possibleFlankerPrefab, menu.flankersMeleeAttackerUI.transform.Find("FlankersPanel"));
+                GameObject flankerPortrait = Instantiate(menu.possibleFlankerPrefab, meleeUI.flankersMeleeAttackerUI.transform.Find("FlankersPanel"));
                 flankerPortrait.GetComponentInChildren<SoldierPortrait>().Init(s);
             }
         }
 
         //display flankers if there are any
         if (flankersCount > 0)
-            menu.OpenFlankersUI(menu.flankersMeleeAttackerUI);
+            menu.OpenFlankersUI(meleeUI.flankersMeleeAttackerUI);
     }
     public void UpdateMeleeFlankingAgainstDefender(Soldier attacker, Soldier defender)
     {
         //clear the flanker ui
-        menu.ClearFlankersUI(menu.flankersMeleeDefenderUI);
+        menu.ClearFlankersUI(meleeUI.flankersMeleeDefenderUI);
         int flankersCount = 0;
         if (!defender.IsTactician() || attacker.IsRevoker())
         {
             foreach (Soldier s in AllSoldiers())
             {
-                if (s.IsAbleToSee() && s.IsOppositeTeamAs(defender) && !s.IsSelf(attacker) && s.PhysicalObjectWithinMeleeRadius(defender) && flankersCount < 3)
+                if (s.IsAbleToSee() && s.IsOppositeTeamAs(defender) && !s.IsSelf(attacker) && s.PhysicalObjectWithinMeleeRadius(defender) && s.IsRevealing(defender) && flankersCount < 3)
                 {
                     flankersCount++;
 
                     //add flanker to ui to visualise
-                    GameObject flankerPortrait = Instantiate(menu.possibleFlankerPrefab, menu.flankersMeleeDefenderUI.transform.Find("FlankersPanel"));
+                    GameObject flankerPortrait = Instantiate(menu.possibleFlankerPrefab, meleeUI.flankersMeleeDefenderUI.transform.Find("FlankersPanel"));
                     flankerPortrait.GetComponentInChildren<SoldierPortrait>().Init(s);
                 }
             }
 
             //display flankers if there are any
             if (flankersCount > 0)
-                menu.OpenFlankersUI(menu.flankersMeleeDefenderUI);
+                menu.OpenFlankersUI(meleeUI.flankersMeleeDefenderUI);
         }
     }
     public void UpdateMeleeTypeOptions()
     {
-        Soldier attacker = soldierManager.FindSoldierById(menu.meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeTargetDropdown.options[meleeTargetDropdown.value].text);
+        Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
+        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
 
         List<TMP_Dropdown.OptionData> meleeTypeDetails = new()
         {
@@ -1705,8 +1706,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else if (defender.controllingSoldiersList.Contains(attacker.id))
             meleeTypeDetails.Add(new TMP_Dropdown.OptionData("<color=red>Request Disengage</color>"));
 
-        meleeTypeDropdown.ClearOptions();
-        meleeTypeDropdown.AddOptions(meleeTypeDetails);
+        meleeUI.meleeTypeDropdown.ClearOptions();
+        meleeUI.meleeTypeDropdown.AddOptions(meleeTypeDetails);
     }
     public float AttackerMeleeSkill(Soldier attacker)
     {
@@ -1788,7 +1789,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public float FlankingAgainstAttackerMod()
     {
         int flankersCount = 0;
-        foreach (Transform child in menu.flankersMeleeAttackerUI.transform.Find("FlankersPanel"))
+        foreach (Transform child in meleeUI.flankersMeleeAttackerUI.transform.Find("FlankersPanel"))
             if (child.GetComponentInChildren<Toggle>().isOn)
                 flankersCount++;
 
@@ -1859,7 +1860,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         float chargeMod;
 
-        chargeMod = meleeTypeDropdown.options[meleeTypeDropdown.value].text switch
+        chargeMod = meleeUI.meleeTypeDropdown.options[meleeUI.meleeTypeDropdown.value].text switch
         {
             "Full Charge Attack" => 1.9f,
             "Half Charge Attack" => 1.4f,
@@ -1904,7 +1905,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (!defender.IsTactician())
         {
             int flankersCount = 0;
-            foreach (Transform child in menu.flankersMeleeDefenderUI.transform.Find("FlankersPanel"))
+            foreach (Transform child in meleeUI.flankersMeleeDefenderUI.transform.Find("FlankersPanel"))
                 if (child.GetComponentInChildren<Toggle>().isOn)
                     flankersCount++;
 
@@ -1947,7 +1948,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         int bloodrageMultiplier = 1;
 
         //if it's a normal attack
-        if (meleeTypeDropdown.value == 0)
+        if (meleeUI.meleeTypeDropdown.value == 0)
         {
             meleeDamage = (AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * KdMod(attacker) * FlankingAgainstAttackerMod() * SuppressionMod(attacker) + AttackerStrengthMod(attacker) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * SuppressionMod(defender) + DefenderStrengthMod(defender));
 
@@ -2114,10 +2115,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmMelee()
     {
-        Soldier attacker = soldierManager.FindSoldierById(menu.meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeTargetDropdown.options[meleeTargetDropdown.value].text);
+        Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
+        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
 
-        if (int.TryParse(menu.meleeUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap))
+        if (int.TryParse(meleeUI.apCost.text, out int ap))
         {
             if (CheckAP(ap))
             {
@@ -2136,12 +2137,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 bool counterattack = false, instantKill = false, loudAction = true, disengage = false;
 
                 //engagement only options
-                if (meleeTypeDropdown.value == 1)
+                if (meleeUI.meleeTypeDropdown.value == 1)
                 {
                     damageMessage = "<color=orange>No Damage\n(Enagament Only)</color>";
                     //loudAction = false;
                 }
-                else if (meleeTypeDropdown.value == 2)
+                else if (meleeUI.meleeTypeDropdown.value == 2)
                 {
                     damageMessage = "<color=orange>No Damage\n(Disengagement)</color>";
                     disengage = true;
@@ -2220,7 +2221,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
 
                 //add xp for successful melee attack
-                if (meleeTypeDropdown.value == 0 && !damageMessage.Contains("No Damage"))
+                if (meleeUI.meleeTypeDropdown.value == 0 && !damageMessage.Contains("No Damage"))
                 {
                     if (counterattack)
                         menu.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);

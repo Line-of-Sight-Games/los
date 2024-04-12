@@ -3,7 +3,6 @@ using TMPro;
 
 public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
 {
-    public DataPersistenceManager dataPersistenceManager;
     public MainMenu menu;
     public WeatherGen weather;
     public MainGame game;
@@ -35,11 +34,7 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
 
     private void Start()
     {
-        dataPersistenceManager = FindObjectOfType<DataPersistenceManager>();
-        if (dataPersistenceManager == null)
-        {
-            print("Found the data persistence mnanager");
-        }
+
     }
 
     public void ChangeXSize()
@@ -86,7 +81,7 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
     {
         if (int.TryParse(xSize.text, out x) && int.TryParse(ySize.text, out z) && int.TryParse(zSize.text, out y) && int.TryParse(maxRoundsInput.text, out maxRounds) && int.TryParse(turnTimeInput.text, out maxTurnTime))
         {
-            if (x > 0 && y > 0 && z >= 0)
+            if (xSize.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && ySize.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && zSize.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && maxRoundsInput.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && turnTimeInput.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour)
             {
                 game.currentRound = 1;
                 game.currentTeam = 1;
