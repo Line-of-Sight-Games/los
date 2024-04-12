@@ -27,8 +27,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public MoveUI moveUI;
     public ShotUI shotUI;
     public MeleeUI meleeUI;
+    public ConfigureUI configUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -2122,7 +2123,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenShotConfirmUI()
     {
-        if (int.TryParse(shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap))
+        if (int.TryParse(shotUI.apCost.text, out int ap))
         {
             if (game.CheckAP(ap))
             {
@@ -2197,7 +2198,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ExitShotConfirmUI()
     {
-        int.TryParse(shotUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
+        int.TryParse(shotUI.apCost.text, out int ap);
         //deduct ap for aiming if leaving shot
         game.DeductAP(ap - 1);
 
@@ -2727,7 +2728,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //configure functions - menu
     public void AddGroundInventorySourceButton()
     {
-        GameObject groundInventoryPanel = Instantiate(inventoryPanelGroundPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(null).gameObject;
+        GameObject groundInventoryPanel = Instantiate(inventoryPanelGroundPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(null).gameObject;
         Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
         foreach (Item i in game.FindNearbyItems())
         {
@@ -2742,22 +2743,22 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         foreach (Soldier s in game.AllSoldiers())
             if (s.IsFielded() && activeSoldier.PhysicalObjectWithinItemRadius(s) && (activeSoldier.IsSameTeamAs(s) || s.IsUnconscious() || s.IsDead()) && s.IsInteractable())
-                Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
+                Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
     }
     public void AddPOIInventorySourceButtons()
     {
         foreach (GoodyBox gb in game.AllGoodyBoxes())
             if (activeSoldier.PhysicalObjectWithinItemRadius(gb))
-                Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configureUI.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
+                Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
     }
     public void AddGlobalInventorySourceButton()
     {
-        Instantiate(globalInventoryIconPrefab, inventorySourceIconsUI.transform).GetComponent<InventorySourceIcon>().Init(configureUI.transform.Find("AllItemsPanel").gameObject);
+        Instantiate(globalInventoryIconPrefab, inventorySourceIconsUI.transform).GetComponent<InventorySourceIcon>().Init(configUI.transform.Find("AllItemsPanel").gameObject);
     }
     public void OpenConfigureUI()
     {
         //populate active soldier inventory
-        configureUI.transform.Find("SoldierInventory").Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(activeSoldier);
+        configUI.activeSoldierInventory.Init(activeSoldier);
 
         //add global button
         //AddGlobalInventorySourceButton();
@@ -2771,19 +2772,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //populate gb icons
         AddPOIInventorySourceButtons();
 
-        configureUI.SetActive(true);
+        configUI.gameObject.SetActive(true);
     }
     public void ClearConfigureUI()
     {
         //reset ap counter to 0
-        configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "0";
+        configUI.apCost.text = "0";
 
         //clear all display panels
-        foreach (Transform child in configureUI.transform.Find("ExternalItemSources").Find("InventorySourceIconPanel").Find("Viewport").Find("Contents"))
+        foreach (Transform child in configUI.inventorySourceIconPanel.transform.Find("Viewport").Find("Contents"))
             Destroy(child.gameObject);
 
         //destroy all item source panels
-        foreach (Transform child in configureUI.transform)
+        foreach (Transform child in configUI.externalItemSourcesPanel.transform)
             if (child.GetComponent<InventorySourcePanel>() != null)
                 Destroy(child.gameObject);
     }
@@ -2805,7 +2806,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         ClearConfigureUI();
         if (configureButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text == "Spawn Config")
             activeSoldier.usedAP = true;
-        configureUI.SetActive(false);
+        configUI.gameObject.SetActive(false);
     }
 
 

@@ -17,6 +17,7 @@ public class InventorySourcePanel : MonoBehaviour
         if (linkedInventorySource is Soldier linkedSoldier)
         {
             transform.Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(linkedSoldier);
+            transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
         }
         else if (linkedInventorySource is GoodyBox linkedGoodyBox)
         {

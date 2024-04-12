@@ -21,6 +21,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public MoveUI moveUI; 
     public ShotUI shotUI;
     public MeleeUI meleeUI;
+    public ConfigureUI configUI;
 
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
@@ -2286,7 +2287,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         int totalDrop = 0, totalPickup = 0, totalSwap = 0, ap = 0;
 
-        foreach (ItemIcon itemIcon in menu.configureUI.GetComponentsInChildren<ItemIcon>(true))
+        foreach (ItemIcon itemIcon in menu.configUI.GetComponentsInChildren<ItemIcon>(true))
         {
             Item item = itemIcon.item;
             if (item.markedForAction != string.Empty)
@@ -2328,7 +2329,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
             ap = 0;
 
-        menu.configureUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
+        configUI.apCost.text = ap.ToString();
         return ap;
     }
     public List<Item> FindNearbyItems()
@@ -2346,7 +2347,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (CheckAP(ap)) 
         {
             DeductAP(ap);
-            foreach (ItemIcon itemIcon in menu.configureUI.GetComponentsInChildren<ItemIcon>(true))
+            foreach (ItemIcon itemIcon in configUI.GetComponentsInChildren<ItemIcon>(true))
             {
                 Item item = itemIcon.item;
                 if (item.markedForAction != string.Empty)
