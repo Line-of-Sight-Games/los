@@ -27,7 +27,7 @@ public class OverwatchShotUI : MonoBehaviour
         List<TMP_Dropdown.OptionData> targetDetails = new();
 
         //display shooter
-        if (shooter.IsBeingRevealedBy(target.id))
+        if (shooter.IsBeingRevealedBy(target))
         {
             transform.Find("ShooterPortrait").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(shooter);
             transform.Find("ShooterPortrait").gameObject.SetActive(true);

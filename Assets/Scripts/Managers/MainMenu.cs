@@ -23,7 +23,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, flankersMeleeAttackerUI, flankersMeleeDefenderUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public MeleeUI meleeUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, shotUI, flankersShotUI, shotConfirmUI, shotResultUI, moveUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI,configureUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -193,12 +194,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     DisplayActiveSoldier();
                     DisplayActionMenu();
                 }
-
-                //hard turn cap
-                /*if (turnTime > setBattlefieldParameters.maxTurnTime * 1.2)
-                {
-                    game.EndTurn();
-                }*/
             }
         }
     }
@@ -1216,8 +1211,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 game.EndFrozenTurn();
             activeSoldier.selected = false;
             soldierOptionsUI.SetActive(false);
-            menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(true);
-            turnTitle.text = "L I N E    O F    S I G H T";
+            menuUI.transform.Find("GameMenu").Find("UnitDisplayPanel").gameObject.SetActive(true);
+            //turnTitle.text = "L I N E    O F    S I G H T";
         }
     }
     public void CloseSoldierMenuUndo()
@@ -2247,14 +2242,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         yield return new WaitForSeconds(0.05f);
         //set attacker
         Soldier attacker = activeSoldier;
-        meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text = attacker.id;
+        meleeUI.attackerID.text = attacker.id;
 
         meleeChargeIndicator = meleeCharge;
-        TMP_Dropdown meleeTypeDropdown = meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>();
-        meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
-        Image attackerWeaponImage = meleeUI.transform.Find("AttackerWeapon").Find("WeaponImage").GetComponent<Image>();
-        Image defenderWeaponImage = meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").Find("WeaponImage").GetComponent<Image>();
-        TMP_Dropdown targetDropdown = meleeUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>();
+        meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+
         List<TMP_Dropdown.OptionData> defenderDetails = new();
 
         //generate melee type dropdown
@@ -2263,17 +2255,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             new TMP_Dropdown.OptionData(meleeCharge),
             new TMP_Dropdown.OptionData("Engagement Only"),
         };
-        meleeTypeDropdown.AddOptions(meleeTypeDetails);
+        meleeUI.meleeTypeDropdown.AddOptions(meleeTypeDetails);
 
         //block engagement only if melee controlled
         if (attacker.IsMeleeEngaged())
-            meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Engagement Only");
+            meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Engagement Only");
 
         //display best attacker weapon
         if (attacker.BestMeleeWeapon != null)
-            attackerWeaponImage.sprite = attacker.BestMeleeWeapon.itemImage;
+            meleeUI.attackerWeaponImage.sprite = attacker.BestMeleeWeapon.itemImage;
         else
-            attackerWeaponImage.sprite = fist;
+            meleeUI.attackerWeaponImage.sprite = fist;
 
 
 
@@ -2301,25 +2293,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (defenderDetails.Count > 0)
         {
-            targetDropdown.AddOptions(defenderDetails);
+            meleeUI.targetDropdown.AddOptions(defenderDetails);
 
-            Soldier defender = soldierManager.FindSoldierByName(targetDropdown.options[targetDropdown.value].text);
+            Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
 
             if (defender.controlledBySoldiersList.Contains(activeSoldier.id))
-                meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=green>Disengage</color>") });
+                meleeUI.meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=green>Disengage</color>") });
             else if (defender.controllingSoldiersList.Contains(activeSoldier.id))
-                meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=red>Request Disengage</color>") });
+                meleeUI.meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=red>Request Disengage</color>") });
 
             //show defender weapon
             if (defender.BestMeleeWeapon != null)
-                defenderWeaponImage.sprite = defender.BestMeleeWeapon.itemImage;
+                meleeUI.defenderWeaponImage.sprite = defender.BestMeleeWeapon.itemImage;
             else
-                defenderWeaponImage.sprite = fist;
+                meleeUI.defenderWeaponImage.sprite = fist;
 
             CheckMeleeType();
             game.UpdateMeleeUI();
 
-            meleeUI.SetActive(true);
+            meleeUI.gameObject.SetActive(true);
         }
         else
         {
@@ -2329,58 +2321,59 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ClearFlankersUI(GameObject flankersUI)
     {
-        flankersUI.SetActive(false);
         foreach (Transform child in flankersUI.transform.Find("FlankersPanel"))
             Destroy(child.gameObject);
+        flankersUI.SetActive(false);
     }
     public void CheckMeleeType()
     {
-        TMP_Dropdown meleeTypeDropdown = meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>();
-        meleeUI.transform.Find("AttackerWeapon").gameObject.SetActive(false);
-        meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").gameObject.SetActive(false);
-        flankersMeleeAttackerUI.SetActive(false);
-        flankersMeleeDefenderUI.SetActive(false);
-
-        if (meleeTypeDropdown.value == 0)
+        if (meleeUI.meleeTypeDropdown.value == 0)
         {
-            meleeUI.transform.Find("AttackerWeapon").gameObject.SetActive(true);
-            meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").gameObject.SetActive(true);
-            flankersMeleeAttackerUI.SetActive(true);
-            flankersMeleeDefenderUI.SetActive(true);
+            meleeUI.attackerWeaponUI.SetActive(true);
+            meleeUI.defenderWeaponUI.SetActive(true);
+            meleeUI.flankersMeleeAttackerUI.SetActive(true);
+            meleeUI.flankersMeleeDefenderUI.SetActive(true);
         }
-
-        if (meleeTypeDropdown.options[meleeTypeDropdown.value].text.Contains("Request"))
+        else
+        {
+            meleeUI.attackerWeaponUI.SetActive(false);
+            meleeUI.defenderWeaponUI.SetActive(false);
+            meleeUI.flankersMeleeAttackerUI.SetActive(false);
+            meleeUI.flankersMeleeDefenderUI.SetActive(false);
+        }
+        
+        if (meleeUI.meleeTypeDropdown.options[meleeUI.meleeTypeDropdown.value].text.Contains("Request"))
             OpenMeleeBreakEngagementRequestUI();
     }
     public void ClearMeleeUI()
     {
         clearMeleeFlag = true;
-        meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
-        meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        meleeUI.transform.Find("AttackerWeapon").Find("WeaponImage").GetComponent<Image>().sprite = null;
-        meleeUI.transform.Find("TargetPanel").Find("DefenderWeapon").Find("WeaponImage").GetComponent<Image>().sprite = null;
-        meleeUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
-        meleeUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        ClearFlankersUI(flankersMeleeAttackerUI);
-        ClearFlankersUI(flankersMeleeDefenderUI);
+        meleeUI.meleeTypeDropdown.ClearOptions();
+        meleeUI.meleeTypeDropdown.value = 0;
+        meleeUI.attackerWeaponImage.sprite = null;
+        meleeUI.defenderWeaponImage.sprite = null;
+        meleeUI.targetDropdown.ClearOptions();
+        meleeUI.targetDropdown.value = 0;
+        ClearFlankersUI(meleeUI.flankersMeleeAttackerUI);
+        ClearFlankersUI(meleeUI.flankersMeleeDefenderUI);
         clearMeleeFlag = false;
     }
     public void CloseMeleeUI()
     {
         ClearMeleeUI();
         ClearMeleeConfirmUI();
-        meleeUI.SetActive(false);
+        meleeUI.gameObject.SetActive(false);
         meleeConfirmUI.SetActive(false);
     }
     public void OpenMeleeConfirmUI()
     {
-        if (int.TryParse(meleeUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap))
+        if (int.TryParse(meleeUI.apCost.text, out int ap))
         {
             if (game.CheckAP(ap))
             {
                 //find attacker and defender
-                Soldier attacker = soldierManager.FindSoldierById(meleeUI.transform.Find("Attacker").GetComponent<TextMeshProUGUI>().text);
-                Soldier defender = soldierManager.FindSoldierByName(game.meleeTargetDropdown.options[game.meleeTargetDropdown.value].text);
+                Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
+                Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.options[meleeUI.targetDropdown.value].text);
 
                 int meleeDamage = game.CalculateMeleeResult(attacker, defender);
 
