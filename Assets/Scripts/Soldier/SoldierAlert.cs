@@ -245,10 +245,14 @@ public class SoldierAlert : MonoBehaviour
 
                 if (resisted)
                 {
+                    if (transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text.Contains("Tabun"))
+                        soldier.menu.AddXpAlert(soldier, xpOnResist, $"Resisted tabun trauma.", true);
+                    else
+                        soldier.menu.AddXpAlert(soldier, xpOnResist, $"Resisted trauma from death witnessed at {distance} range.", true);
+
                     transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>TRAUMA RESISTED</color>";
                     transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = "";
                     transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} resisted the trauma.";
-                    soldier.menu.AddXpAlert(soldier, xpOnResist, $"Resisted traumatic event at {distance} range.", true);
                 }
                 else
                 {

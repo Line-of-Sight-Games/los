@@ -577,7 +577,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void IncrementXP(int xp, bool learnerEnabled)
     {
         if (learnerEnabled && IsLearner()) 
-            this.xp += (int)((1.5f * xp) + 1);
+            this.xp += Mathf.CeilToInt(1.5f * xp);
         else
             this.xp += xp;
     }
@@ -1381,7 +1381,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void TabunTraumaCheck()
     {
-        menu.AddTraumaAlert(this, 1, "Tabun exposure.", stats.R.Val + stats.Heal.Val, 0, "");
+        menu.AddTraumaAlert(this, 1, "Tabun exposure.", stats.R.Val + stats.Heal.Val, 1, "");
         menu.OpenTraumaAlertUI();
     }
     public void TakeTrauma(int trauma)
@@ -2298,7 +2298,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (rCheck && healCheck)
         {
-            menu.AddXpAlert(this, 1, $"{soldierName} resisted tabun gas.", false);
+            menu.AddXpAlert(this, 2, $"{soldierName} resisted tabun gas.", false);
             menu.AddDamageAlert(this, $"Resisted tabun gas.", true, true);
         }
         else if (rCheck ^ healCheck)
@@ -2322,11 +2322,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (rCheck && healCheck)
         {
-            menu.AddXpAlert(this, 1, $"Resisted tabun gas.", false);
+            menu.AddXpAlert(this, 2, $"Fully resisted tabun gas.", false);
             menu.AddDamageAlert(this, $"Resisted tabun gas.", true, true);
         }
         else if (rCheck ^ healCheck)
         {
+            menu.AddXpAlert(this, 1, $"Partially resisted tabun gas.", false);
             SetTabunEffectLevel(50);
             menu.AddDamageAlert(this, $"Suffered <color=orange>Moderate</color> effects from tabun gas.", false, true);
         }
@@ -2448,7 +2449,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (ResilienceCheck())
         {
             menu.AddDamageAlert(this, $"Resisted a {stunRounds} round stun.", true, true);
-            menu.AddXpAlert(this, 2, "Resisted stunning.", true);
+            menu.AddXpAlert(this, 1, "Resisted stunning.", true);
         }
         else
         {
@@ -2885,7 +2886,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (ResilienceCheck())
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {suppressionValue} suppression.", true, true);
-                menu.AddXpAlert(this, 2, "Resisted Suppression.", true);
+                menu.AddXpAlert(this, 1, "Resisted Suppression.", true);
                 return true;
             }
             else

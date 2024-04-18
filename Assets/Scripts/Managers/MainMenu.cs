@@ -175,7 +175,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 //check if game has not run out of turns
                 if (game.currentRound <= game.maxRounds)
                 {
-                    UnfreezeTime();
                     playTimeTotal += Time.deltaTime;
                     turnTime += Time.deltaTime;
                     weatherIndicator.text = DisplayWeather();
@@ -1882,7 +1881,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         traumaAlert.transform.Find("Distance").GetComponent<TextMeshProUGUI>().text = range;
 
         //block invalid trauma alerts being created
-        if (friendly.IsDesensitised())
+        if (reason.Contains("automatic") || reason.Contains("Tabun"))
+        {
+            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().isOn = true;
+            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
+        }
+        else if (friendly.IsDesensitised())
         {
             traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=blue>DESENSITISED</color>";
             traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
@@ -1894,11 +1898,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>RESILIENT</color>";
             traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
             traumaAlert.transform.Find("ConfirmButton").Find("Text").GetComponent<TextMeshProUGUI>().text = "<color=green>Test</color>";
-        }
-        else if (reason.Contains("automatic") || reason.Contains("Tabun"))
-        {
-            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().isOn = true;
-            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
         }
     }
 
@@ -3106,11 +3105,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 if (learnerEnabled && soldier.IsLearner())
                 {
                     xpAlert.transform.Find("LearnerIndicator").gameObject.SetActive(true);
-                    xpAlert.transform.Find("LearnerIndicator").GetComponent<TextMeshProUGUI>().text = $"(+{(int)((1.5f * xp) + 1 - xp)})";
+                    xpAlert.transform.Find("LearnerIndicator").GetComponent<TextMeshProUGUI>().text = $"(+{Mathf.CeilToInt(0.5f * xp)})";
                 }
             }
             else
-                print($"{soldier.soldierName} cannot recieve xp unconscious.");
+                print($"{soldier.soldierName} cannot receive xp unconscious.");
         }
     }
 
@@ -3295,7 +3294,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_Sn" => "Reload Sniper?",
             "Claymore" => "Place Claymore?",
             "Deployment_Beacon" => "Place Deployment Beacon?",
-            "E_Tool" => "Dig bunker?",
+            "E_Tool" => "Dig?",
             "Food_Pack" => "Consume food pack?",
             "Grenade_Flashbang" => "Throw flashbang?",
             "Grenade_Frag" => "Throw frag?",

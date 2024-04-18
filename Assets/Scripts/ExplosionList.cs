@@ -98,7 +98,12 @@ public class ExplosionList : MonoBehaviour
                         if (child.Find("Stun").Find("StunToggle").GetComponent<Toggle>().isOn)
                         {
                             if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
-                                hitSoldier.SetStunned(stun); //non-resistable stunnage on flashbang grenades only
+                            {
+                                if (stun == 0)
+                                    menu.AddXpAlert(hitSoldier, 2, $"Resisted stunning from flashbang.", true);
+                                else
+                                    hitSoldier.SetStunned(stun); //non-resistable stunnage on flashbang grenades only   
+                            }
                             else
                                 hitSoldier.MakeStunned(stun);
 

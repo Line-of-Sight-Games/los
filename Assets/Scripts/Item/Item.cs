@@ -646,7 +646,7 @@ public class Item : PhysicalObject, IDataPersistence
     public void CheckExplosionGrenade(Soldier explodedBy, Vector3 position)
     {
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} : {position.x},{position.y},{position.z}").gameObject;
-        explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
+        explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.Id;
 
         if (IsFrag())
         {
@@ -691,7 +691,7 @@ public class Item : PhysicalObject, IDataPersistence
                 if (stun > 0 || damage > 0)
                 {
                     if (obj is Soldier hitSoldier)
-                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage - hitSoldier.stats.R.Val, stun - hitSoldier.stats.R.Val);
+                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage - hitSoldier.stats.R.Val, stun - Mathf.CeilToInt(hitSoldier.stats.R.Val/2.0f));
                     else if (obj is POI hitPoi && damage > 0)
                         menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
                     else if (obj is Item hitItem && damage > 0)

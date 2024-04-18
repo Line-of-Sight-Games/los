@@ -133,8 +133,15 @@ public class OverwatchShotUI : MonoBehaviour
                     }
 
                     //apply overwatch freeze on spot unless resisted
-                    if (targetSoldier.ResilienceCheck() || targetSoldier.IsGuardsman())
-                        menu.AddDamageAlert(targetSoldier, targetSoldier.soldierName + " resisted overwatch daze.", true, true);
+                    if (targetSoldier.ResilienceCheck())
+                    {
+                        menu.AddXpAlert(targetSoldier, 2, $"Resisted overwatch daze.", false);
+                        menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} resisted overwatch daze.", true, true);
+                    }
+                    else if (targetSoldier.IsGuardsman())
+                    {
+                        menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} resisted overwatch daze (<color=green>Guardsman</color>).", true, true);
+                    }
                     else
                     {
                         targetSoldier.X = xOver;
