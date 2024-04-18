@@ -43,7 +43,6 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         {4, "Torrential"}
     };
 
-    private List<List<int>> weather = new();
     public List<string> savedWeather = new();
     private int vis, sp, dir, rn;
     public void LoadData(GameData data)
@@ -58,41 +57,38 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
 
     public void GenerateWeather()
     {
+        int k = 0;
         vis = game.RandomNumber(0, 4);
         sp = game.RandomNumber(0, 3);
         dir = game.RandomNumber(0, 7);
         rn = game.RandomNumber(0, 4);
 
-        for (int i = 0; i < game.maxRounds; i++)
+        for (int i = 1; i <= game.maxRounds; i++)
         {
-            List<int> turnWeather = new();
-            turnWeather.Add(vis);
-            turnWeather.Add(sp);
-            turnWeather.Add(dir);
-            turnWeather.Add(rn);
-            weather.Add(turnWeather);
-
-            vis = NextVis(vis);
-            sp = NextWindSpeed(sp);
-            dir = NextWindDirection(dir);
-            rn = NextRain(rn);
-        }
-
-        foreach (List<int> w in weather)
-        {
-            string weatherString = "";
-            weatherString += visibility[w[0]] + " visibility, ";
-            if (w[1] == 0)
+            for (int j = 1; j <= 2; j++)
             {
-                weatherString += "no wind, ";
+                if (k % 3 == 0)
+                {
+                    vis = NextVis(vis);
+                    sp = NextWindSpeed(sp);
+                    dir = NextWindDirection(dir);
+                    rn = NextRain(rn);
+                }
+                string weatherString = "";
+                weatherString += visibility[vis] + " visibility, ";
+                if (sp == 0)
+                {
+                    weatherString += "no wind, ";
+                }
+                else
+                {
+                    weatherString += windSpeed[sp] + " ";
+                    weatherString += windDirection[dir] + " wind, ";
+                }
+                weatherString += rain[rn] + " rain.";
+                savedWeather.Add(weatherString);
+                k++;
             }
-            else
-            {
-                weatherString += windSpeed[w[1]] + " ";
-                weatherString += windDirection[w[2]] + " wind, ";
-            }
-            weatherString += rain[w[3]] + " rain.";
-            savedWeather.Add(weatherString);
         }
     }
 
@@ -239,21 +235,21 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     }
     public string CurrentWeather
     {
-        get { return savedWeather[game.currentRound - 1]; }
-        set { savedWeather[game.currentRound - 1] = value; }
+        get { return savedWeather[game.currentTurn]; }
+        set { savedWeather[game.currentTurn] = value; }
     }
     public string LastTurnWeather
     {
         get
         {
-            return savedWeather[game.currentRound - 2];
+            return savedWeather[game.currentTurn - 1];
         }
     }
     public string NextTurnWeather
     {
         get
         {
-            return savedWeather[game.currentRound];
+            return savedWeather[game.currentTurn + 1];
         }
     }
     public string LastTurnVis

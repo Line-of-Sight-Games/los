@@ -7,6 +7,7 @@ public class GameData
 {
     public int currentRound;
     public int currentTeam;
+    public int currentTurn;
     public int maxRounds;
     public int maxTeams;
     public float playTimeTotal, turnTime;
@@ -35,6 +36,7 @@ public class GameData
     {
         currentRound = 0;
         currentTeam = 0;
+        currentTurn = 0;
         maxRounds = 0;
         maxTeams = 0;
         playTimeTotal = 0;

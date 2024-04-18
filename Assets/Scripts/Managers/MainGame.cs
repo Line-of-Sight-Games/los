@@ -5,8 +5,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
-using UnityEditorInternal;
-using System.Runtime.CompilerServices;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -27,7 +25,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
-    public int currentRound, maxRounds, currentTeam, maxTeams, maxTurnTime, tempTeam;
+    public int currentRound, currentTeam, currentTurn, maxRounds, maxTeams, maxTurnTime, tempTeam;
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
@@ -232,9 +230,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 
                 yield return new WaitUntil(() => menu.teamTurnOverFlag == true);
 
+                currentTurn++;
                 if (currentTeam < maxTeams)
                 {
-                    currentTeam += 1;
+                    currentTeam++;
                 }
                 else
                 {
@@ -244,7 +243,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         currentTeam = 1;
                         EndRound();
-                        currentRound += 1;
+                        currentRound++;
                     }
                 }
 
@@ -4083,6 +4082,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         currentRound = data.currentRound;
         currentTeam = data.currentTeam;
+        currentTurn = data.currentTurn;
 
         battlefield.transform.position = data.mapPosition;
         battlefield.transform.localScale = data.mapDimensions;
@@ -4107,6 +4107,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         data.currentRound = currentRound;
         data.currentTeam = currentTeam;
+        data.currentTurn = currentTurn;
 
         data.mapPosition = battlefield.transform.position;
         data.mapDimensions = battlefield.transform.localScale;

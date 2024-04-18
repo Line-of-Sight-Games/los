@@ -4,11 +4,14 @@ using TMPro;
 public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
 {
     public MainMenu menu;
-    public WeatherGen weather;
     public MainGame game;
     public Camera cam;
     public Light sun;
-    public GameObject battlefield, bottomPlane, outlineArea, setupMenuUI, gameTimer, gameMenuUI;
+
+    public WeatherGen weather;
+    public DipelecGen dipelec;
+
+    public GameObject battlefield, bottomPlane, outlineArea, setupMenuUI, gameMenuUI;
     public TMP_InputField xSize, ySize, zSize, maxRoundsInput, turnTimeInput;
     public int x, y, z, maxRounds, maxTurnTime;
 
@@ -91,10 +94,12 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
                 game.maxY = z;
                 game.maxZ = y;
 
+                weather.GenerateWeather();
+                dipelec.GenerateDipelec();
+
                 DataPersistenceManager.Instance.SaveGame();
 
                 setupMenuUI.SetActive(false);
-                gameTimer.SetActive(true);
                 gameMenuUI.SetActive(true);
             }
             else
