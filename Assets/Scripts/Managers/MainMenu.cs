@@ -28,8 +28,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public ShotUI shotUI;
     public MeleeUI meleeUI;
     public ConfigureUI configUI;
+    public DipElecUI dipelecUI;
+    public DamageEventUI damageEventUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecUI, dipelecResultUI, damageEventUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameTimerUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -2823,39 +2825,38 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenDipElecUI()
     {
         Terminal terminal = activeSoldier.ClosestTerminal();
-        dipelecUI.transform.Find("Terminal").GetComponent<TextMeshProUGUI>().text = terminal.id;
-        TMP_Dropdown dipElecDropdown = dipelecUI.transform.Find("DipElecType").GetComponentInChildren<TMP_Dropdown>();
-        dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+        dipelecUI.terminalID.text = terminal.id;
+
+        dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         if (terminal.terminalType == "Dip Only")
-            dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
+            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
         else if (terminal.terminalType == "Elec Only")
-            dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
+            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
 
         if (terminal.SoldiersAlreadyHacked.Contains(activeSoldier.id))
-            dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
+            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
         if (terminal.SoldiersAlreadyNegotiated.Contains(activeSoldier.id))
-            dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
+            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
 
-        if (dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Hack") && dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
-            dipElecDropdown.value = 2;
-        else if (dipElecDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
-            dipElecDropdown.value = 1;
+        if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Hack") && dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
+            dipelecUI.dipElecTypeDropdown.value = 2;
+        else if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
+            dipelecUI.dipElecTypeDropdown.value = 1;
 
-        dipelecUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "3";
+        dipelecUI.apCost.text = "3";
         game.UpdateDipElecUI();
-        dipelecUI.SetActive(true);
+        dipelecUI.gameObject.SetActive(true);
     }
     public void CloseDipElecUI()
     {
         ClearDipElecUI();
-        dipelecUI.SetActive(false);
+        dipelecUI.gameObject.SetActive(false);
     }
     public void ClearDipElecUI()
     {
         clearDipelecFlag = true;
         dipelecUI.transform.Find("DipElecType").Find("DipElecTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
         dipelecUI.transform.Find("Level").Find("LevelDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = "";
         dipelecUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "";
         dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
         clearDipelecFlag = false;
@@ -2964,8 +2965,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //damage event functions - menu
     public void OpenDamageEventUI()
     {
-        TMP_Dropdown damageEventTypeDropdown = damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>();
-        damageEventTypeDropdown.ClearOptions();
+        damageEventUI.damageEventTypeDropdown.ClearOptions();
 
         //generate damage event type dropdown
         List<TMP_Dropdown.OptionData> damageEventTypeDetails = new()
@@ -2976,12 +2976,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         };
         if (activeSoldier.IsBloodletter() && !activeSoldier.bloodLettedThisTurn)
             damageEventTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Bloodletting</color>"));
-        damageEventTypeDropdown.AddOptions(damageEventTypeDetails);
+        damageEventUI.damageEventTypeDropdown.AddOptions(damageEventTypeDetails);
 
         //prefill movement position inputs with current position
-        damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
-        damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
-        damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
+        damageEventUI.xPos.placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
+        damageEventUI.yPos.placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
+        damageEventUI.zPos.placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
 
         /*//block bloodletter if already bloodletted this turn
         if (activeSoldier.IsBloodletter() && activeSoldier.bloodLettedThisTurn)
@@ -2989,62 +2989,51 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
             damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();*/
 
-        damageEventUI.SetActive(true);
+        damageEventUI.gameObject.SetActive(true);
     }
     public void ClearDamageEventUI()
     {
         clearDamageEventFlag = true;
-        damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        damageEventUI.transform.Find("FallDistance").Find("FallInputZ").GetComponent<TMP_InputField>().text = "";
-        damageEventUI.transform.Find("StructureHeight").Find("StructureHeightInputZ").GetComponent<TMP_InputField>().text = "";
-        damageEventUI.transform.Find("Other").Find("OtherInput").GetComponent<TMP_InputField>().text = "";
-        damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text = "";
-        damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        damageEventUI.transform.Find("DamageSource").Find("DamageSourceInput").GetComponent<TMP_InputField>().text = "";
+        damageEventUI.damageEventTypeDropdown.value = 0;
+        damageEventUI.fallInput.text = "";
+        damageEventUI.structureHeight.text = "";
+        damageEventUI.otherInput.text = "";
+        damageEventUI.damageSource.text = "";
+        damageEventUI.xPos.text = "";
+        damageEventUI.yPos.text = "";
+        damageEventUI.zPos.text = "";
+        damageEventUI.terrainDropdown.value = 0;
         clearDamageEventFlag = false;
     }
     public void CloseDamageEventUI()
     {
         ClearDamageEventUI();
-        damageEventUI.SetActive(false);
+        damageEventUI.gameObject.SetActive(false);
     }
     public void CheckDamageEventType()
     {
-        TMP_Dropdown damageEventTypeDropdown = damageEventUI.transform.Find("DamageEventType").Find("DamageEventTypeDropdown").GetComponent<TMP_Dropdown>();
+        damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
+        damageEventUI.transform.Find("Other").gameObject.SetActive(false);
+        damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(false);
+        damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
+        damageEventUI.transform.Find("Location").gameObject.SetActive(false);
 
-        if (damageEventTypeDropdown.captionText.text.Contains("Fall"))
+        if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Fall"))
         {
-            damageEventUI.transform.Find("FallDistance").gameObject.SetActive(true);
-            damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(false);
-            damageEventUI.transform.Find("Other").gameObject.SetActive(false);
-            damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
-            damageEventUI.transform.Find("Location").gameObject.SetActive(true);
+            damageEventUI.fallDistanceUI.SetActive(true);
+            damageEventUI.locationUI.SetActive(true);
         }
-        else if (damageEventTypeDropdown.captionText.text.Contains("Collapse"))
+        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Collapse"))
         {
-            damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
             damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(true);
-            damageEventUI.transform.Find("Other").gameObject.SetActive(false);
-            damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
             damageEventUI.transform.Find("Location").gameObject.SetActive(true);
         }
-        else if (damageEventTypeDropdown.captionText.text.Contains("Other"))
+        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Other"))
         {
-            damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
-            damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(false);
             damageEventUI.transform.Find("Other").gameObject.SetActive(true);
             damageEventUI.transform.Find("DamageSource").gameObject.SetActive(true);
-            damageEventUI.transform.Find("Location").gameObject.SetActive(false);
         }
-        else if (damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
-        {
-            damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
-            damageEventUI.transform.Find("Other").gameObject.SetActive(false);
-            damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
-            damageEventUI.transform.Find("Location").gameObject.SetActive(false);
-        }
+        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting")) {}
     }
 
 

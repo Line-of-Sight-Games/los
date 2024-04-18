@@ -22,6 +22,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public ShotUI shotUI;
     public MeleeUI meleeUI;
     public ConfigureUI configUI;
+    public DipElecUI dipelecUI;
+    public DamageEventUI damageEventUI;
 
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
@@ -30,7 +32,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
     public TMP_InputField overwatchXPos, overwatchYPos, overwatchRadius, overwatchAngle;
-    public TMP_Dropdown damageEventTypeDropdown;
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
@@ -2785,38 +2786,33 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateDipElecRewardAndChance()
     {
-        TMP_Dropdown dipelecType = menu.dipelecUI.transform.Find("DipElecType").Find("DipElecTypeDropdown").GetComponent<TMP_Dropdown>();
-        TMP_Dropdown level = menu.dipelecUI.transform.Find("Level").Find("LevelDropdown").GetComponent<TMP_Dropdown>();
-        level.GetComponent<DropdownController>().optionsToGrey.Clear();
+        dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
 
-        if (dipelecType.value == 0)
+        if (dipelecUI.dipElecTypeDropdown.value == 0)
         {
-            menu.dipelecUI.transform.Find("Level").gameObject.SetActive(true);
+            dipelecUI.levelUI.SetActive(true);
             for (int i = 1; i <= 6; i++)
                 if (activeSoldier.stats.Dip.Val + activeSoldier.TacticianBonus() < i)
-                    level.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
-            if (level.GetComponent<DropdownController>().optionsToGrey.Contains($"{level.value + 1}"))
-                level.value = 0;
+                    dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
+            if (dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Contains($"{dipelecUI.dipElecLevelDropdown.value + 1}"))
+                dipelecUI.dipElecLevelDropdown.value = 0;
 
-            menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.GetLevelDip(level.value + 1);
-            menu.dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Dip.Val + activeSoldier.TacticianBonus(), level.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
+            dipelecUI.successChanceDisplay.text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Dip.Val + activeSoldier.TacticianBonus(), dipelecUI.dipElecLevelDropdown.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
         }
-        else if (dipelecType.value == 1)
+        else if (dipelecUI.dipElecTypeDropdown.value == 1)
         {
-            menu.dipelecUI.transform.Find("Level").gameObject.SetActive(true);
+            dipelecUI.levelUI.SetActive(true);
             for (int i = 1; i <= 6; i++)
                 if (activeSoldier.stats.Elec.Val + activeSoldier.CalculatorBonus() < i)
-                    level.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
-            if (level.GetComponent<DropdownController>().optionsToGrey.Contains($"{level.value + 1}"))
-                level.value = 0;
-            menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = dipelec.GetLevelElec(level.value + 1);
-            menu.dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Elec.Val + activeSoldier.CalculatorBonus(), level.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
+                    dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
+            if (dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Contains($"{dipelecUI.dipElecLevelDropdown.value + 1}"))
+                dipelecUI.dipElecLevelDropdown.value = 0;
+            dipelecUI.successChanceDisplay.text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Elec.Val + activeSoldier.CalculatorBonus(), dipelecUI.dipElecLevelDropdown.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
         }
         else
         {
-            menu.dipelecUI.transform.Find("Level").gameObject.SetActive(false);
-            menu.dipelecUI.transform.Find("Reward").Find("Reward").Find("RewardDisplay").GetComponent<TextMeshProUGUI>().text = "Permanently disable this terminal?\n<color=red>Warning: Penalties Apply</color>";
-            menu.dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = "100%";
+            dipelecUI.levelUI.SetActive(false);
+            dipelecUI.successChanceDisplay.text = "100%";
         }
     }
     public void ConfirmDipElec()
@@ -2827,12 +2823,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
             bool terminalDisabled = false;
             int passCount = 0;
             string resultString = "";
-            TMP_Dropdown levelDropdown = menu.dipelecUI.transform.Find("Level").Find("LevelDropdown").GetComponent<TMP_Dropdown>();
-            Terminal terminal = poiManager.FindPOIById(menu.dipelecUI.transform.Find("Terminal").GetComponent<TextMeshProUGUI>().text) as Terminal;
 
-            if (menu.dipelecUI.transform.Find("DipElecType").Find("DipElecTypeDropdown").GetComponent<TMP_Dropdown>().value == 0)
+            Terminal terminal = poiManager.FindPOIById(dipelecUI.terminalID.text) as Terminal;
+
+            if (dipelecUI.dipElecTypeDropdown.value == 0)
             {
-                terminal.SoldiersAlreadyNegotiated.Add(activeSoldier.id);
+                terminal.SoldiersAlreadyNegotiated.Add(activeSoldier.Id);
                 for (int i = 0; i < activeSoldier.stats.Dip.Val; i++)
                 {
                     if (CoinFlip())
@@ -2840,9 +2836,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 resultString = "Negotiation";
             }
-            else if (menu.dipelecUI.transform.Find("DipElecType").Find("DipElecTypeDropdown").GetComponent<TMP_Dropdown>().value == 1)
+            else if (dipelecUI.dipElecTypeDropdown.value == 1)
             {
-                terminal.SoldiersAlreadyHacked.Add(activeSoldier.id);
+                terminal.SoldiersAlreadyHacked.Add(activeSoldier.Id);
                 for (int i = 0; i < activeSoldier.stats.Elec.Val; i++)
                 {
                     if (CoinFlip())
@@ -2857,17 +2853,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             if (!terminalDisabled)
             {
-                if (passCount > levelDropdown.value)
+                if (passCount > dipelecUI.dipElecLevelDropdown.value)
                 {
                     menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"<color=green>Successful {resultString}</color>";
-                    menu.AddXpAlert(activeSoldier, (int)Mathf.Pow(2, levelDropdown.value), $"Successful level {levelDropdown.value + 1} {resultString}", true);
-                    menu.dipelecUI.transform.Find("Level").gameObject.SetActive(true);
+                    menu.AddXpAlert(activeSoldier, (int)Mathf.Pow(2, dipelecUI.dipElecLevelDropdown.value), $"Successful level {dipelecUI.dipElecLevelDropdown.value + 1} {resultString}", true);
+                    dipelecUI.levelUI.SetActive(true);
                     menu.dipelecResultUI.transform.Find("RewardPanel").gameObject.SetActive(true);
-                    for (int i = 0; i <= levelDropdown.value; i++)
+                    for (int i = 0; i <= dipelecUI.dipElecLevelDropdown.value; i++)
                     {
-                        print("got into loop");
                         GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("RewardPanel").Find("Scroll").Find("View").Find("Content"));
-                        print("passed instantiation");
                         TextMeshProUGUI textComponent = dipelecReward.GetComponentInChildren<TextMeshProUGUI>();
 
                         textComponent.text = (resultString == "Hack") ? dipelec.GetLevelElec(i+1) : dipelec.GetLevelDip(i+1);
@@ -3171,14 +3165,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //damage event functions - game
     public void ConfirmDamageEvent()
     {
-        if (damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
+        if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
         {
             activeSoldier.TakeBloodlettingDamage();
             menu.CloseDamageEventUI();
         }
-        else if (damageEventTypeDropdown.captionText.text.Contains("Other") && int.TryParse(menu.damageEventUI.transform.Find("Other").Find("OtherInput").GetComponent<TMP_InputField>().text, out int otherDamage))
+        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Other") && int.TryParse(damageEventUI.otherInput.text, out int otherDamage))
         {
-            activeSoldier.TakeDamage(null, otherDamage, false, new() { menu.damageEventUI.transform.Find("DamageSource").Find("DamageSourceInput").GetComponent<TMP_InputField>().text });
+            activeSoldier.TakeDamage(null, otherDamage, false, new() { damageEventUI.damageSource.text });
             menu.CloseDamageEventUI();
         }
         else
@@ -3186,11 +3180,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //check input
             if (GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation))
             {
-                if (damageEventTypeDropdown.captionText.text.Contains("Fall"))
-                    activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(menu.damageEventUI.transform.Find("FallDistance").Find("FallInputZ").GetComponent<TMP_InputField>().text)), false, new() { "Fall" });
-                else if (damageEventTypeDropdown.captionText.text.Contains("Collapse"))
+                if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Fall"))
+                    activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(damageEventUI.fallInput.text)), false, new() { "Fall" });
+                else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Collapse"))
                 {
-                    int structureHeight = int.Parse(menu.damageEventUI.transform.Find("StructureHeight").Find("StructureHeightInputZ").GetComponent<TMP_InputField>().text);
+                    int structureHeight = int.Parse(damageEventUI.structureHeight.text);
                     //add xp if survives, otherwise kill
                     if (activeSoldier.StructuralCollapseCheck(structureHeight))
                     {
@@ -3225,15 +3219,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation)
     {
         fallCollapseLocation = default;
-        if (menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
-            menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
-            menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
-            menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
+        if (damageEventUI.xPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && damageEventUI.yPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && damageEventUI.zPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && damageEventUI.terrainDropdown.value != 0)
         {
-            fallCollapseLocation = Tuple.Create(new Vector3(int.Parse(menu.damageEventUI.transform.Find("Location").Find("XPos").GetComponent<TMP_InputField>().text),
-                int.Parse(menu.damageEventUI.transform.Find("Location").Find("YPos").GetComponent<TMP_InputField>().text),
-                int.Parse(menu.damageEventUI.transform.Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text)), 
-                menu.damageEventUI.transform.Find("Location").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            fallCollapseLocation = Tuple.Create(new Vector3(int.Parse(damageEventUI.xPos.text), int.Parse(damageEventUI.yPos.text), int.Parse(damageEventUI.zPos.text)), damageEventUI.terrainDropdown.captionText.text);
 
             return true;
         }
