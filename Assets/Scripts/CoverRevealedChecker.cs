@@ -29,9 +29,9 @@ public class CoverRevealedChecker : MonoBehaviour
     public bool GetCoverLocation(out Vector3 coverLocation)
     {
         coverLocation = default;
-        if (XPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && YPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && ZPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour)
+        if (menu.ValidateIntInput(XPos, out int x) && menu.ValidateIntInput(YPos, out int y) && menu.ValidateIntInput(ZPos, out int z))
         {
-            coverLocation = new Vector3(int.Parse(XPos.text), int.Parse(YPos.text), int.Parse(ZPos.text));
+            coverLocation = new Vector3(x, y, z);
             return true;
         }
         return false;

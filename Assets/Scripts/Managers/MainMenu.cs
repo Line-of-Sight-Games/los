@@ -30,8 +30,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public ConfigureUI configUI;
     public DipElecUI dipelecUI;
     public DamageEventUI damageEventUI;
+    public OverwatchUI overwatchUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -461,6 +462,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         muteIcon.SetActive(!muteIcon.activeSelf);
         soundManager.noisePlayer.mute = !soundManager.noisePlayer.mute;
+    }
+    public bool ValidateIntInput(TMP_InputField inputField, out int outputInt)
+    {
+        outputInt = 0;
+        if (inputField.textComponent.color == normalTextColour)
+        {
+            outputInt = int.Parse(inputField.text);
+            return true;
+        }
+        return false;
     }
 
 
@@ -994,9 +1005,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else if (activeSoldier.IsMeleeControlled())
         {
             if (activeSoldier.HasSMGOrPistolEquipped())
-                GreyOutButtons(ExceptButton(ExceptButton(AddAllButtons(buttonStates), meleeButton), shotButton), "<color=red>Melee Controlled</color>");
+                GreyOutButtons(ExceptButton(ExceptButton(AddAllButtons(buttonStates), meleeButton), shotButton), "Melee Controlled");
             else
-                GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), meleeButton), "<color=red>Melee Controlled</color>");
+                GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), meleeButton), "Melee Controlled");
         }
         else
         {
@@ -1006,41 +1017,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             else if (activeSoldier.mp == 0)
                 buttonStates.Add(moveButton, "No MA");
             else if (activeSoldier.IsMeleeControlling())
-                buttonStates.Add(moveButton, "Melee Controlling");
+                buttonStates.Add(moveButton, "<color=green>Melee Controlling</color>");
 
-            //block cover button
-            if (activeSoldier.IsWearingJuggernautArmour(false))
-                buttonStates.Add(coverButton, "<color=green>Juggernaut</color>");
-            else if (activeSoldier.IsInCover())
-                buttonStates.Add(coverButton, "<color=green>Taking Cover</color>");
-
-
-            //block shot and overwatch buttons
+            //block shot button
             if (!activeSoldier.HasGunEquipped())
-            {
                 buttonStates.Add(shotButton, "No Gun");
-                buttonStates.Add(overwatchButton, "No Gun");
-            }
             else if (!activeSoldier.IsAbleToSee())
-            {
                 buttonStates.Add(shotButton, "Blind");
-                buttonStates.Add(overwatchButton, "Blind");
-            }
+            else if (!activeSoldier.EquippedGun.CheckAnyAmmo())
+                buttonStates.Add(shotButton, "Gun Empty");
             else if (activeSoldier.IsMeleeControlling())
             {
                 if (!activeSoldier.HasSMGOrPistolEquipped())
-                    buttonStates.Add(shotButton, "Melee Controlling");
-                buttonStates.Add(overwatchButton, "Melee Controlling");
-            }
-            else if (activeSoldier.IsDualWielding())
-            {
-                buttonStates.Add(shotButton, "Dual Wield"); //TO BE REMOVED AFTER DUAL WIELD RULING
-                buttonStates.Add(overwatchButton, "Dual Wield");
-            }
-            else if (!activeSoldier.EquippedGun.CheckAnyAmmo())
-            {
-                buttonStates.Add(shotButton, "Gun Empty");
-                buttonStates.Add(overwatchButton, "Gun Empty");
+                    buttonStates.Add(shotButton, "<color=green>Melee Controlling</color>");
             }
 
             //block melee button
@@ -1057,10 +1046,34 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(dipElecButton, "No Terminal");
             else if (!activeSoldier.ClosestTerminal().terminalEnabled)
                 buttonStates.Add(dipElecButton, "Terminal Disabled");
+            else if (activeSoldier.IsMeleeControlling())
+                buttonStates.Add(dipElecButton, "<color=green>Melee Controlling</color>");
+
+            //block overwatch button
+            if (!activeSoldier.HasGunEquipped())
+                buttonStates.Add(overwatchButton, "No Gun");
+            else if (!activeSoldier.IsAbleToSee())
+                buttonStates.Add(overwatchButton, "Blind");
+            else if (!activeSoldier.EquippedGun.CheckAnyAmmo())
+                buttonStates.Add(overwatchButton, "Gun Empty");
+            else if (activeSoldier.IsDualWielding())
+                buttonStates.Add(overwatchButton, "Dual Wield");
+            else if (activeSoldier.IsMeleeControlling())
+                buttonStates.Add(overwatchButton, "<color=green>Melee Controlling</color>");
+
+            //block cover button
+            if (activeSoldier.IsWearingJuggernautArmour(false))
+                buttonStates.Add(coverButton, "<color=green>Juggernaut</color>");
+            else if (activeSoldier.IsInCover())
+                buttonStates.Add(coverButton, "<color=green>Taking Cover</color>");
+            else if (activeSoldier.IsMeleeControlling())
+                buttonStates.Add(coverButton, "<color=green>Melee Controlling</color>");
 
             //block playdead button
             if (activeSoldier.IsWearingJuggernautArmour(false))
                 buttonStates.Add(playdeadButton, "Juggernaut");
+            else if (activeSoldier.IsMeleeControlling())
+                buttonStates.Add(playdeadButton, "<color=green>Melee Controlling</color>");
 
             GreyOutButtons(buttonStates, "");
         }
@@ -2930,34 +2943,40 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenOverwatchUI()
     {
         
-        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Radius").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"Max {activeSoldier.SRColliderMax.radius}";
-        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Radius").GetComponent<InputController>().max = Mathf.RoundToInt(activeSoldier.SRColliderMax.radius);
+        overwatchUI.radius.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max {activeSoldier.SRColliderMax.radius}";
+        overwatchUI.radius.GetComponent<InputController>().max = Mathf.RoundToInt(activeSoldier.SRColliderMax.radius);
         
         //allow guardsman to overwatch up to 180 degrees
         if (activeSoldier.IsGuardsman())
         {
-            overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Angle").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"Max 180";
-            overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Angle").GetComponent<InputController>().max = 180;
+            overwatchUI.arc.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max 180";
+            overwatchUI.arc.GetComponent<InputController>().max = 180;
         }
         else
         {
-            overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Angle").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"Max 90";
-            overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Angle").GetComponent<InputController>().max = 90;
+            overwatchUI.arc.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max 90";
+            overwatchUI.arc.GetComponent<InputController>().max = 90;
         }
 
-        overwatchUI.SetActive(true);
+        //set ap cost
+        if (activeSoldier.ap < 2)
+            overwatchUI.apCost.text = "2";
+        else
+            overwatchUI.apCost.text = $"{activeSoldier.ap}";
+
+        overwatchUI.gameObject.SetActive(true);
     }
     public void ClearOverwatchUI()
     {
-        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>().text = "";
-        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Radius").GetComponent<TMP_InputField>().text = "";
-        overwatchUI.transform.Find("OptionPanel").Find("Location").Find("Angle").GetComponent<TMP_InputField>().text = "";
+        overwatchUI.xPos.text = "";
+        overwatchUI.yPos.text = "";
+        overwatchUI.radius.text = "";
+        overwatchUI.arc.text = "";
     }
     public void CloseOverwatchUI()
     {
         ClearOverwatchUI();
-        overwatchUI.SetActive(false);
+        overwatchUI.gameObject.SetActive(false);
     }
     public void OpenLastandicideConfirmUI()
     {

@@ -82,35 +82,24 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
 
     public void Confirm()
     {
-        if (int.TryParse(xSize.text, out x) && int.TryParse(ySize.text, out z) && int.TryParse(zSize.text, out y) && int.TryParse(maxRoundsInput.text, out maxRounds) && int.TryParse(turnTimeInput.text, out maxTurnTime))
+        if (menu.ValidateIntInput(xSize, out int x) && menu.ValidateIntInput(ySize, out int y) && menu.ValidateIntInput(zSize, out int z) && menu.ValidateIntInput(maxRoundsInput, out int maxRounds) && menu.ValidateIntInput(turnTimeInput, out int maxTurnTime))
         {
-            if (xSize.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && ySize.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && zSize.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && maxRoundsInput.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && turnTimeInput.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour)
-            {
-                game.currentRound = 1;
-                game.currentTeam = 1;
-                game.maxRounds = maxRounds;
-                game.maxTurnTime = maxTurnTime * 60;
-                game.maxX = x;
-                game.maxY = z;
-                game.maxZ = y;
+            game.currentRound = 1;
+            game.currentTeam = 1;
+            game.maxRounds = maxRounds;
+            game.maxTurnTime = maxTurnTime * 60;
+            game.maxX = x;
+            game.maxY = z;
+            game.maxZ = y;
 
-                weather.GenerateWeather();
-                dipelec.GenerateDipelec();
+            weather.GenerateWeather();
+            dipelec.GenerateDipelec();
 
-                DataPersistenceManager.Instance.SaveGame();
+            DataPersistenceManager.Instance.SaveGame();
 
-                menu.UnfreezeTime();
-                setupMenuUI.SetActive(false);
-                gameMenuUI.SetActive(true);
-            }
-            else
-            {
-                print("Create a popup which says their x, y, z values must not be negative.");
-            }
-        }
-        else
-        {
-            print("Create a popup which says their formatting was wrong and to try again.");
+            menu.UnfreezeTime();
+            setupMenuUI.SetActive(false);
+            gameMenuUI.SetActive(true);
         }
     }
 }

@@ -22,6 +22,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public ConfigureUI configUI;
     public DipElecUI dipelecUI;
     public DamageEventUI damageEventUI;
+    public OverwatchUI overwatchUI;
 
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
@@ -29,7 +30,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
-    public TMP_InputField overwatchXPos, overwatchYPos, overwatchRadius, overwatchAngle;
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
@@ -448,15 +448,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //overwatch functions
     public void ConfirmOverwatch()
     {
-        if (int.TryParse(overwatchXPos.text, out int x) && int.TryParse(overwatchYPos.text, out int y) && int.TryParse(overwatchRadius.text, out int r) && int.TryParse(overwatchAngle.text, out int a))
+        if (menu.ValidateIntInput(overwatchUI.xPos, out int x) && menu.ValidateIntInput(overwatchUI.yPos, out int y) && menu.ValidateIntInput(overwatchUI.radius, out int r) && menu.ValidateIntInput(overwatchUI.arc, out int a))
         {
             if (CheckAP(2))
             {
                 DrainAP();
                 activeSoldier.SetOverwatch(x, y, r, a);
-                menu.CloseOverwatchUI();
             }
+            menu.CloseOverwatchUI();
         }
+        
     }
 
 
@@ -511,9 +512,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetMoveLocation(out Tuple<Vector3, string> moveLocation)
     {
         moveLocation = default;
-        if (moveUI.xPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && moveUI.yPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && moveUI.zPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && moveUI.terrainDropdown.value != 0)
+        if (menu.ValidateIntInput(moveUI.xPos, out int x) && menu.ValidateIntInput(moveUI.yPos, out int y) && menu.ValidateIntInput(moveUI.zPos, out int z) && moveUI.terrainDropdown.value != 0)
         {
-            moveLocation = Tuple.Create(new Vector3(int.Parse(moveUI.xPos.text), int.Parse(moveUI.yPos.text), int.Parse(moveUI.zPos.text)), moveUI.terrainDropdown.captionText.text);
+            moveLocation = Tuple.Create(new Vector3(x, y, z), moveUI.terrainDropdown.captionText.text);
             return true;
         }
 
@@ -1623,15 +1624,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateMeleeAP(Soldier attacker)
     {
-        if (meleeUI.meleeTypeDropdown.captionText.text == "Static Attack")
+        if (meleeUI.meleeTypeDropdown.options[0].text.Contains("Charge"))
+            meleeUI.apCost.text = "0";
+        else 
         {
             if (attacker.IsFighter())
                 meleeUI.apCost.text = "1";
             else
                 meleeUI.apCost.text = "2";
         }
-        else
-            meleeUI.apCost.text = "0";
     }
     public void UpdateMeleeDefenderWeapon(Soldier defender)
     {
@@ -2462,9 +2463,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
             {
                 
-                if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour)
+                if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y))
                 {
-
                     int highestRoll = 0, newX, newY;
                     float scatterDistance;
                     int scatterDegree = RandomNumber(0, 360);
@@ -2487,7 +2487,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     if (scatterDistance != -1)
                     {
-                        (newX, newY) = CalculateScatteredCoordinates(int.Parse(targetX.text), int.Parse(targetY.text), scatterDegree, scatterDistance);
+                        (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
                         if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
                         {
@@ -2514,8 +2514,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else //second press
             {
-                print("second press");
-
                 if (useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
                 {
                     menu.CloseUHFUI();
@@ -2523,16 +2521,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
-                    if (float.TryParse(targetX.text, out float x) && float.TryParse(targetY.text, out float y) && float.TryParse(targetZ.text, out float z))
+                    if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
                     {
-                        if (targetZ.textComponent.color == menu.normalTextColour)
+                        if (useUHFUI.itemUsed.owner is Soldier linkedSoldier)
                         {
-                            if (useUHFUI.itemUsed.owner is Soldier linkedSoldier)
-                            {
-                                menu.CloseUHFUI();
-                                useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
-                                CheckExplosionUHF(linkedSoldier, new Vector3(x, y, z), radius, damage);
-                            }
+                            menu.CloseUHFUI();
+                            useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+                            CheckExplosionUHF(linkedSoldier, new Vector3(x, y, z), radius, damage);
                         }
                     }
                 }
@@ -2544,11 +2539,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetX = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("YPos").GetComponent<TMP_InputField>();
 
-        if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour)
+        if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y))
         {
             //set riot shield facing
-            activeSoldier.riotXPoint = int.Parse(targetX.text);
-            activeSoldier.riotYPoint = int.Parse(targetY.text);
+            activeSoldier.riotXPoint = x;
+            activeSoldier.riotYPoint = y;
 
             menu.CloseRiotShieldUI();
             useRiotShield.itemUsed.UseItem(useRiotShield.itemUsedIcon, useRiotShield.itemUsedOn, useRiotShield.soldierUsedOn);
@@ -2562,7 +2557,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetZ = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>();
         if (!useGrenade.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour && targetZ.textComponent.color == menu.normalTextColour)
+            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
             {
                 int newX, newY;
                 int scatterDegree = RandomNumber(0, 360);
@@ -2574,10 +2569,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                 if (scatterDistance != -1)
                 {
-                    if (int.Parse(targetX.text) == activeSoldier.X && int.Parse(targetY.text) == activeSoldier.Y)
-                        (newX, newY) = (int.Parse(targetX.text), int.Parse(targetY.text));
+                    if (x == activeSoldier.X && y == activeSoldier.Y)
+                        (newX, newY) = (x, y);
                     else
-                        (newX, newY) = CalculateScatteredCoordinates(int.Parse(targetX.text), int.Parse(targetY.text), scatterDegree, scatterDistance);
+                        (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
                     targetX.text = $"{newX}";
                     targetY.text = $"{newY}";
@@ -2602,25 +2597,25 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else //second press
         {
-            (int newX, int newY) = (int.Parse(targetX.text), int.Parse(targetY.text));
-            if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY)
+            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
             {
-                useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
-                menu.CloseGrenadeUI();
-            }
-            else
-            {
-                if (targetX.textComponent.color == menu.normalTextColour && targetY.textComponent.color == menu.normalTextColour && targetZ.textComponent.color == menu.normalTextColour)
+                (int newX, int newY) = (x, y);
+                if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY)
+                {
+                    useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
+                    menu.CloseGrenadeUI();
+                }
+                else
                 {
                     if (useGrenade.itemUsed.owner is Soldier linkedSoldier)
                     {
                         useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
                         if (grenadeName.Contains("Frag") || grenadeName.Contains("Flashbang"))
-                            useGrenade.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)));
+                            useGrenade.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(x, y, z));
                         else if (grenadeName.Contains("Smoke"))
-                            Instantiate(poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)), string.Empty), activeSoldier.Id);
+                            Instantiate(poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
                         else if (grenadeName.Contains("Tabun"))
-                            Instantiate(poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(int.Parse(targetX.text), int.Parse(targetY.text), int.Parse(targetZ.text)), string.Empty), activeSoldier.Id);
+                            Instantiate(poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
 
                         menu.CloseGrenadeUI();
                     }
@@ -2638,22 +2633,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField facingY = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
         
 
-        if (placedX.textComponent.color == menu.normalTextColour && placedY.textComponent.color == menu.normalTextColour && placedZ.textComponent.color == menu.normalTextColour
-        && facingX.textComponent.color == menu.normalTextColour && facingY.textComponent.color == menu.normalTextColour && terrainOn.value != 0)
+        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy) && terrainOn.value != 0)
         {
-            if (int.TryParse(placedX.text, out int placedXInt) && int.TryParse(placedY.text, out int placedYInt) && int.TryParse(placedZ.text, out int placedZInt) 
-            && int.TryParse(facingX.text, out int facingXInt) && int.TryParse(facingY.text, out int facingYInt))
+            if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
-                if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
-                {
-                    useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                    Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.captionText.text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, facingXInt, facingYInt, activeSoldier.Id)).PlaceClaymore();
+                useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
+                Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, fx, fy, activeSoldier.Id)).PlaceClaymore();
 
-                    menu.CloseClaymoreUI();
-                }
-                else
-                    useClaymore.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
+                menu.CloseClaymoreUI();
             }
+            else
+                useClaymore.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
         }
     }
     public void ConfirmDeploymentBeacon(UseItemUI useDeploymentBeacon)
@@ -2663,20 +2653,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField placedZ = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("ZPos").GetComponent<TMP_InputField>();
         TMP_Dropdown terrainOn = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
 
-        if (placedX.textComponent.color == menu.normalTextColour && placedY.textComponent.color == menu.normalTextColour && placedZ.textComponent.color == menu.normalTextColour && terrainOn.value != 0)
+        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && terrainOn.value != 0)
         {
-            if (int.TryParse(placedX.text, out int placedXInt) && int.TryParse(placedY.text, out int placedYInt) && int.TryParse(placedZ.text, out int placedZInt))
+            if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
-                if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
-                {
-                    useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
-                    Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.captionText.text), activeSoldier.Id);
+                useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
+                Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), activeSoldier.Id);
 
-                    menu.CloseDeploymentBeaconUI();
-                }
-                else
-                    useDeploymentBeacon.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
+                menu.CloseDeploymentBeaconUI();
             }
+            else
+                useDeploymentBeacon.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
         }
     }
     public void ConfirmThermalCam(UseItemUI useThermalCam)
@@ -2688,22 +2675,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField facingX = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField facingY = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("YPos").GetComponent<TMP_InputField>();
 
-        if (placedX.textComponent.color == menu.normalTextColour && placedY.textComponent.color == menu.normalTextColour && placedZ.textComponent.color == menu.normalTextColour
-        && facingX.textComponent.color == menu.normalTextColour && facingY.textComponent.color == menu.normalTextColour && terrainOn.value != 0)
+        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy) && terrainOn.value != 0)
         {
-            if (int.TryParse(placedX.text, out int placedXInt) && int.TryParse(placedY.text, out int placedYInt) && int.TryParse(placedZ.text, out int placedZInt)
-            && int.TryParse(facingX.text, out int facingXInt) && int.TryParse(facingY.text, out int facingYInt))
+            if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
-                if (CalculateRange(activeSoldier, new Vector3(placedXInt, placedYInt, placedZInt)) <= activeSoldier.SRColliderMin.radius)
-                {
-                    useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
-                    Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(placedXInt, placedYInt, placedZInt), terrainOn.captionText.text), Tuple.Create(facingXInt, facingYInt, activeSoldier.Id));
+                useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
+                Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(fx, fy, activeSoldier.Id));
 
-                    menu.CloseThermalCamUI();
-                }
-                else
-                    useThermalCam.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
+                menu.CloseThermalCamUI();
             }
+            else
+                useThermalCam.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
         }
     }
     static Tuple<int, int> CalculateScatteredCoordinates(int targetX, int targetY, float scatterDegree, float scatterDistance)
@@ -3213,9 +3195,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation)
     {
         fallCollapseLocation = default;
-        if (damageEventUI.xPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && damageEventUI.yPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && damageEventUI.zPos.textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour && damageEventUI.terrainDropdown.value != 0)
+        if (menu.ValidateIntInput(damageEventUI.xPos, out int x) && menu.ValidateIntInput(damageEventUI.yPos, out int y) && menu.ValidateIntInput(damageEventUI.zPos, out int z) && damageEventUI.terrainDropdown.value != 0)
         {
-            fallCollapseLocation = Tuple.Create(new Vector3(int.Parse(damageEventUI.xPos.text), int.Parse(damageEventUI.yPos.text), int.Parse(damageEventUI.zPos.text)), damageEventUI.terrainDropdown.captionText.text);
+            fallCollapseLocation = Tuple.Create(new Vector3(x, y, z), damageEventUI.terrainDropdown.captionText.text);
 
             return true;
         }
@@ -4017,8 +3999,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
             else if (spawnedObject == 4)
             {
-                if (claymoreFacingXInput.textComponent.color == menu.normalTextColour && claymoreFacingYInput.textComponent.color == menu.normalTextColour && int.TryParse(claymoreFacingXInput.text, out int facingXInt) && int.TryParse(claymoreFacingYInput.text, out int facingYInt))
-                    Instantiate(poiManager.claymorePrefab).Init(spawnLocation, Tuple.Create(1, 1, facingXInt, facingYInt, "")).PlaceClaymore();
+                if (menu.ValidateIntInput(claymoreFacingXInput, out int fx) && menu.ValidateIntInput(claymoreFacingYInput, out int fy))
+                    Instantiate(poiManager.claymorePrefab).Init(spawnLocation, Tuple.Create(1, 1, fx, fy, "")).PlaceClaymore();
             }
 
             menu.CloseOverrideInsertObjectsUI();
@@ -4029,15 +4011,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetInsertLocation(out Tuple<Vector3, string> insertLocation)
     {
         insertLocation = default;
-        if (menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
-            menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
-            menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("ZPos").GetComponent<TMP_InputField>().textComponent.GetComponent<TextMeshProUGUI>().color == menu.normalTextColour &&
-            menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
+        if (menu.ValidateIntInput(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>(), out int x) && menu.ValidateIntInput(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>(), out int y) && menu.ValidateIntInput(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("ZPos").GetComponent<TMP_InputField>(), out int z) && menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
         {
-            insertLocation = Tuple.Create(new Vector3(int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>().text),
-                int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>().text),
-                int.Parse(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("ZPos").GetComponent<TMP_InputField>().text)),
-                menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            insertLocation = Tuple.Create(new Vector3(x, y, z), menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().captionText.text);
 
             return true;
         }

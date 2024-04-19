@@ -2483,7 +2483,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         ClearHealthState();
         SetState("Active");
-        print(soldierName + " returns to service.");
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
     }
     public void MakeLastStand()
@@ -2511,7 +2510,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
         StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
-        //print(soldierName + " is Unconscious.");
     }
     public void Resurrect(int hp)
     {
