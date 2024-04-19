@@ -2424,18 +2424,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         UnsetState("Crushed");
     }
+    public void DropHandheldItems()
+    {
+        Item leftHand = Inventory.GetItemInSlot("LeftHand"), rightHand = Inventory.GetItemInSlot("RightHand");
+
+        if (leftHand != null)
+            DropItemFromSlot(leftHand, "LeftHand");
+        if (rightHand != null)
+            DropItemFromSlot(rightHand, "RightHand");
+    }
     public void SetStunned(int stunRounds)
     {
         if (stunRounds > stunnedRoundsVulnerable)
         {
-            Item leftHand = Inventory.GetItemInSlot("LeftHand"), rightHand = Inventory.GetItemInSlot("RightHand");
             stunnedRoundsVulnerable = stunRounds;
 
-            //drop handheld items
-            if (leftHand != null)
-                DropItemFromSlot(leftHand, "LeftHand");
-            if (rightHand != null)
-                DropItemFromSlot(rightHand, "RightHand");
+            DropHandheldItems();
 
             //remove all engagements
             if (IsMeleeEngaged())
@@ -2499,6 +2503,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         ClearHealthState();
         SetState("Unconscious");
         menu.AddDamageAlert(this, $"{soldierName} fell into <color=blue>Unconscious</color>.", false, true);
+
+        DropHandheldItems();
 
         //remove all engagements
         if (IsMeleeEngaged())

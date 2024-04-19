@@ -143,10 +143,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 return hasInventory;
         return null;
     }
-    public void ToggleMute()
-    {
-        soundManager.noisePlayer.mute = !soundManager.noisePlayer.mute;
-    }
     
 
 
@@ -215,8 +211,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void EndTurnNonCoroutine()
     {
-        if (activeSoldier == null)
-            StartCoroutine(EndTurn());
+        StartCoroutine(EndTurn());
     }
     public IEnumerator EndTurn()
     {
@@ -1628,7 +1623,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateMeleeAP(Soldier attacker)
     {
-        if (meleeUI.meleeTypeDropdown.options[0].text == "Static Attack")
+        if (meleeUI.meleeTypeDropdown.captionText.text == "Static Attack")
         {
             if (attacker.IsFighter())
                 meleeUI.apCost.text = "1";
@@ -3014,7 +3009,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         //desensitised
                         if (friendly.IsDesensitised())
                             menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
-                        else
+                        else if (friendly.IsAlive())
                         {
                             //guaranteed trauma from commander death and/or lastandicide
                             if (commander)

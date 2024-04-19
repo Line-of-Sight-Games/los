@@ -31,7 +31,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public DipElecUI dipelecUI;
     public DamageEventUI damageEventUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, overrideMuteButton, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, overwatchUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, overrideInsertObjectsUI, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     public OverwatchShotUI overwatchShotUI;
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -185,7 +185,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     RenderSoldierVisuals();
                     CheckWinConditions();
                 }
-                
+
+                //check for game mute
+                if (Input.GetKeyDown(KeyCode.M))
+                {
+                    if (OverrideKey())
+                        ToggleMute();
+                }
+
+                //show/hide end turn button
+                if (activeSoldier == null)
+                    endTurnButton.SetActive(true);
+                else
+                    endTurnButton.SetActive(false);
+
                 DisplayItems();
                 gameTimer.text = FormatFloatTime(playTimeTotal);
                 turnTimer.text = FormatFloatTime(game.maxTurnTime - turnTime);
@@ -444,6 +457,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         teamTurnStartFlag = value;
     }
+    public void ToggleMute()
+    {
+        muteIcon.SetActive(!muteIcon.activeSelf);
+        soundManager.noisePlayer.mute = !soundManager.noisePlayer.mute;
+    }
 
 
 
@@ -471,7 +489,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             overrideVersionDisplay.SetActive(false);
             overrideVisibilityDropdown.SetActive(false);
             overrideInsertObjectsButton.SetActive(false);
-            overrideMuteButton.SetActive(false);
         }
         else
             overrideUI.SetActive(true);
@@ -499,7 +516,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             overrideVersionDisplay.SetActive(true);
             overrideVisibilityDropdown.SetActive(true);
             overrideInsertObjectsButton.SetActive(true);
-            overrideMuteButton.SetActive(true);
             GetOverrideVisibility();
         }
     }
@@ -2034,26 +2050,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         //set shooter details
         Soldier shooter = activeSoldier;
-        shotUI.transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text = shooter.id;
-
-        TMP_Dropdown shotTypeDropdown = shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>();
-        shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
-        Image gunImage = shotUI.transform.Find("Gun").Find("GunImage").GetComponent<Image>();
-        TMP_Dropdown aimDropdown = shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>();
-        shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("InvalidLocation").gameObject.SetActive(false);
+        shotUI.shooterID.text = shooter.Id;
 
         //generate gun image
-        gunImage.sprite = shooter.EquippedGun.itemImage;
+        shotUI.gunImage.sprite = shooter.EquippedGun.itemImage;
 
         //block suppression option if gun does not have enough ammo
         if (!shooter.EquippedGun.CheckSpecificAmmo(shooter.EquippedGun.gunTraits.SuppressDrain, true))
-            shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression Shot");
+            shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression Shot");
 
         //if soldier engaged in melee block force unaimed shot
         if (shooter.IsMeleeEngaged())
-            aimDropdown.value = 1;
+            shotUI.aimTypeDropdown.value = 1;
         else
-            aimDropdown.value = 0;
+            shotUI.aimTypeDropdown.value = 0;
 
         BlockShotOptions();
         game.UpdateShotType(shooter);
@@ -2065,19 +2075,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (activeSoldier.IsMeleeEngaged())
         {
-            shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = true;
-            shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = false;
-            shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().interactable = false;
-            shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().interactable = true;
-            shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = false;
+            shotUI.backButton.interactable = true;
+            shotUI.shotTypeDropdown.interactable = false;
+            shotUI.aimTypeDropdown.interactable = false;
+            shotUI.targetDropdown.interactable = true;
+            shotUI.coverLevelDropdown.interactable = false;
         }
         else
         {
-            shotUI.transform.Find("BackButton").GetComponent<Button>().interactable = true;
-            shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().interactable = true;
-            shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().interactable = true;
-            shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().interactable = true;
-            shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().interactable = true;
+            shotUI.backButton.interactable = true;
+            shotUI.shotTypeDropdown.interactable = true;
+            shotUI.aimTypeDropdown.interactable = true;
+            shotUI.targetDropdown.interactable = true;
+            shotUI.coverLevelDropdown.interactable = true;
         }
     }
 
@@ -2105,15 +2115,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void ClearShotUI()
     {
         clearShotFlag = true;
-        shotUI.transform.Find("ShotType").Find("ShotTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        shotUI.transform.Find("Gun").Find("GunImage").GetComponent<Image>().sprite = null;
-        shotUI.transform.Find("Aim").Find("AimDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
-        shotUI.transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        shotUI.transform.Find("TargetPanel").Find("CoverLevel").Find("CoverLevelDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("YPos").GetComponent<TMP_InputField>().text = "";
-        shotUI.transform.Find("TargetPanel").Find("CoverLocation").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+        shotUI.shotTypeDropdown.value = 0;
+        shotUI.gunImage.sprite = null;
+        shotUI.aimTypeDropdown.value = 0;
+        shotUI.targetDropdown.ClearOptions();
+        shotUI.targetDropdown.value = 0;
+        shotUI.coverLevelDropdown.value = 0;
+        shotUI.coverXPos.text = "";
+        shotUI.coverYPos.text = "";
+        shotUI.coverZPos.text = "";
+        shotUI.invalidCoverLocationUI.SetActive(false);
         ClearFlankersUI(flankersShotUI);
         clearShotFlag = false;
     }
@@ -2161,7 +2173,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
 
                         //enable back button only if shot is aimed and under 25%
-                        if (shotUI.aimTypeDropdown.value != 1 && chances.Item1 <= 25)
+                        if (shotUI.aimTypeDropdown.captionText.text.Contains("Aimed") && chances.Item1 <= 25)
                             shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = true;
                         else
                             shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
@@ -2481,7 +2493,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void DenyBreakEngagementRequest()
     {
-        meleeUI.transform.Find("MeleeType").Find("MeleeTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
+        meleeUI.meleeTypeDropdown.value = 0;
         game.UpdateMeleeUI();
         CloseMeleeBreakEngagementRequestUI();
     }
