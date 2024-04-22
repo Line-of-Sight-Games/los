@@ -23,6 +23,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public DipElecUI dipelecUI;
     public DamageEventUI damageEventUI;
     public OverwatchUI overwatchUI;
+    public InsertObjectsUI insertObjectsUI;
 
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
@@ -3972,20 +3973,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //insert game objects functions
     public void ConfirmInsertGameObjects()
     {
-        TMP_Dropdown terminalTypeDropdown = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").Find("TerminalTypeDropdown").GetComponent<TMP_Dropdown>();
-        Transform gbItemsPanel = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("AllItemsPanel").Find("Viewport").Find("GoodyBoxItemsContent");
-        TMP_InputField claymoreFacingXInput = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>();
-        TMP_InputField claymoreFacingYInput = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
-
-        int spawnedObject = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ObjectType").Find("ObjectTypeDropdown").GetComponent<TMP_Dropdown>().value;
         //check input formatting
-        if (spawnedObject != 0 && GetInsertLocation(out Tuple<Vector3, string> spawnLocation))
+        if (insertObjectsUI.objectTypeDropdown.value != 0 && GetInsertLocation(out Tuple<Vector3, string> spawnLocation))
         {
-            if (spawnedObject == 1)
+            if (insertObjectsUI.objectTypeDropdown.value == 1)
             {
                 GoodyBox gb = Instantiate(poiManager.gbPrefab).Init(spawnLocation);
                 //fill gb with items
-                foreach (Transform child in gbItemsPanel)
+                foreach (Transform child in insertObjectsUI.gbItemsPanel)
                 {
                     ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
                     if (itemIcon != null && itemIcon.pickupNumber > 0)
@@ -3993,15 +3988,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             gb.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
                 }
             }
-            else if (spawnedObject == 2)
-                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, terminalTypeDropdown.captionText.text);
-            else if (spawnedObject == 3)
+            else if (insertObjectsUI.objectTypeDropdown.value == 2)
+                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, insertObjectsUI.terminalTypeDropdown.captionText.text);
+            else if (insertObjectsUI.objectTypeDropdown.value == 3)
                 Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
-            else if (spawnedObject == 4)
-            {
-                if (menu.ValidateIntInput(claymoreFacingXInput, out int fx) && menu.ValidateIntInput(claymoreFacingYInput, out int fy))
-                    Instantiate(poiManager.claymorePrefab).Init(spawnLocation, Tuple.Create(1, 1, fx, fy, "")).PlaceClaymore();
-            }
 
             menu.CloseOverrideInsertObjectsUI();
         }
@@ -4011,9 +4001,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetInsertLocation(out Tuple<Vector3, string> insertLocation)
     {
         insertLocation = default;
-        if (menu.ValidateIntInput(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("XPos").GetComponent<TMP_InputField>(), out int x) && menu.ValidateIntInput(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("YPos").GetComponent<TMP_InputField>(), out int y) && menu.ValidateIntInput(menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Location").Find("ZPos").GetComponent<TMP_InputField>(), out int z) && menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().value != 0)
+        if (menu.ValidateIntInput(insertObjectsUI.xPos, out int x) && menu.ValidateIntInput(insertObjectsUI.yPos, out int y) && menu.ValidateIntInput(insertObjectsUI.zPos, out int z) && insertObjectsUI.terrainDropdown.value != 0)
         {
-            insertLocation = Tuple.Create(new Vector3(x, y, z), menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            insertLocation = Tuple.Create(new Vector3(x, y, z), insertObjectsUI.terrainDropdown.captionText.text);
 
             return true;
         }
@@ -4022,26 +4012,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateInsertGameObjectsUI()
     {
-        int spawnedObject = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ObjectType").Find("ObjectTypeDropdown").GetComponent<TMP_Dropdown>().value;
-        GameObject terminalType = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("TerminalType").gameObject;
-        GameObject allItemsPanel = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("AllItemsPanel").gameObject;
-        GameObject claymoreFacing = menu.overrideInsertObjectsUI.transform.Find("OptionPanel").Find("ClaymoreFacing").gameObject;
-        terminalType.SetActive(false);
-        allItemsPanel.SetActive(false);
-        claymoreFacing.SetActive(false);
+        insertObjectsUI.terminalTypeUI.SetActive(false);
+        insertObjectsUI.allItemsPanelUI.SetActive(false);
 
-        if (spawnedObject == 1)
+        if (insertObjectsUI.objectTypeDropdown.value == 1)
         {
-            allItemsPanel.SetActive(true);
-            activeItemPanel = allItemsPanel.transform;
+            insertObjectsUI.allItemsPanelUI.SetActive(true);
+            activeItemPanel = insertObjectsUI.allItemsPanelUI.transform;
         }
-        else if (spawnedObject == 2)
+        else if (insertObjectsUI.objectTypeDropdown.value == 2)
         {
-            terminalType.SetActive(true);
-        }
-        else if (spawnedObject == 4)
-        {
-            claymoreFacing.SetActive(true);
+            insertObjectsUI.terminalTypeUI.SetActive(true);
         }
     }
 
