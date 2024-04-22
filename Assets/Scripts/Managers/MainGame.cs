@@ -2391,6 +2391,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Ammo_Sh":
             case "Ammo_SMG":
             case "Ammo_Sn":
+                itemUsed.UseItem(linkedIcon, null, soldierUsedOn);
                 break;
             case "Claymore":
                 menu.OpenClaymoreUI(useItemUI);
