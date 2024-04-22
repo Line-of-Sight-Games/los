@@ -4636,7 +4636,7 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Desert_Commander
-      m_Image: {fileID: 21300000, guid: e0cc09bcfb116f84b8800f27c25c5362, type: 3}
+      m_Image: {fileID: 21300000, guid: 06ec6d44393298c478f5f5b4aa87e29b, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -8181,19 +8181,19 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Jungle_Balaclava
-      m_Image: {fileID: 21300000, guid: 78bca733e0556bf46a6b0bbc0827ca79, type: 3}
+      m_Image: {fileID: 21300000, guid: 24139de458576c7498f4de5883d0ed26, type: 3}
     - m_Text: Jungle_BeardWWII
-      m_Image: {fileID: 21300000, guid: 2eec8d14d8eb6084ab27387119ba33fa, type: 3}
-    - m_Text: Jungle_Mewham
-      m_Image: {fileID: 21300000, guid: 8d7cc58003e397c49a5be2d763361fe1, type: 3}
+      m_Image: {fileID: 21300000, guid: 9d75dcde352bb484090140e6cb2b49e6, type: 3}
     - m_Text: Jungle_DarkWWII
-      m_Image: {fileID: 21300000, guid: 4c0c820fd9ff1b441bd2b6c9b12436f4, type: 3}
+      m_Image: {fileID: 21300000, guid: 6c0ba02aadb983645b7c439743245937, type: 3}
     - m_Text: Jungle_LightWWII
-      m_Image: {fileID: 21300000, guid: c352004bf9204fe4dabc08600d938226, type: 3}
+      m_Image: {fileID: 21300000, guid: 45f50ff58364be041aea76fa1666a2b0, type: 3}
+    - m_Text: Jungle_Mewham
+      m_Image: {fileID: 21300000, guid: 97b4e6c7b6d6b384cb6e980dc3f9d883, type: 3}
     - m_Text: Jungle_Rang
-      m_Image: {fileID: 21300000, guid: f6529cdef48aa234e80103717546c129, type: 3}
+      m_Image: {fileID: 21300000, guid: d9c2e60f4813f4d4787a2db23ef38a59, type: 3}
     - m_Text: Jungle_Shades
-      m_Image: {fileID: 21300000, guid: 906309e04da222c498ae57a32b26259f, type: 3}
+      m_Image: {fileID: 21300000, guid: 794b20a588e3e1a4cad41aa1f6f25b69, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -10801,19 +10801,19 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Urban_Anubis
-      m_Image: {fileID: 21300000, guid: 9580fc33d8d56644d8f72f3d03d56711, type: 3}
+      m_Image: {fileID: 21300000, guid: 93bcd9f34b04c2e45a28ea9f62698600, type: 3}
     - m_Text: Urban_Beret
-      m_Image: {fileID: 21300000, guid: f8738ed81f6d72045a2c5367aae80f97, type: 3}
+      m_Image: {fileID: 21300000, guid: 269654be565eadb4d944624a4255f20c, type: 3}
     - m_Text: Urban_BlackBalaclava
-      m_Image: {fileID: 21300000, guid: 5d6a447e4168c3b47babd0a624210f16, type: 3}
+      m_Image: {fileID: 21300000, guid: c131963afef223147af5872a9472da46, type: 3}
     - m_Text: Urban_BrownBalaclava
-      m_Image: {fileID: 21300000, guid: 5da23a7f075033a44b8051967a4233b6, type: 3}
+      m_Image: {fileID: 21300000, guid: 1e9021cd9cc08d542bbcebd202b73dfe, type: 3}
     - m_Text: Urban_Facepaint
-      m_Image: {fileID: 21300000, guid: c479ce12f04934c4c8c7199a0f211df9, type: 3}
+      m_Image: {fileID: 21300000, guid: f2ff41f7e1aaf004c95db737d1102d04, type: 3}
     - m_Text: Urban_Shades
-      m_Image: {fileID: 21300000, guid: 8c0f5c0b33b786d46b28a12d2a233307, type: 3}
+      m_Image: {fileID: 21300000, guid: a5a64b430e35ca24b88a59c5e5cb768a, type: 3}
     - m_Text: Urban_WWII
-      m_Image: {fileID: 21300000, guid: dd8fb645189778f4f9050760ce2e96c7, type: 3}
+      m_Image: {fileID: 21300000, guid: 5531787a825789845a722eae55b2cdd4, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -11439,19 +11439,19 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Alpine_Balaclava
-      m_Image: {fileID: 21300000, guid: 61037a077c33c8a468f8a1c7ed156c4f, type: 3}
+      m_Image: {fileID: 21300000, guid: a75988cf01d23504d9c5fed212839b8b, type: 3}
     - m_Text: Alpine_BroadBrim
-      m_Image: {fileID: 21300000, guid: 0c8c397546f8d00448c06c1df84b6c5a, type: 3}
+      m_Image: {fileID: 21300000, guid: 4ba2bb108f883fc42a9fa48177be247b, type: 3}
     - m_Text: Alpine_Cap
-      m_Image: {fileID: 21300000, guid: bd81eff12657635428626c9d5fc28b65, type: 3}
+      m_Image: {fileID: 21300000, guid: 6edd76bca3d3112418193d8b0b173ce2, type: 3}
     - m_Text: Alpine_GasMask
-      m_Image: {fileID: 21300000, guid: 296ab19ea2b247d4ab4934707eca28bf, type: 3}
+      m_Image: {fileID: 21300000, guid: 19ad522ec59893d46b40023b527c343f, type: 3}
     - m_Text: Alpine_Helmet
-      m_Image: {fileID: 21300000, guid: 246091d0838906b49a14ef89e948b79e, type: 3}
+      m_Image: {fileID: 21300000, guid: 163189329d4d0764c85ca7bdaede2cfd, type: 3}
     - m_Text: Alpine_Visor
-      m_Image: {fileID: 21300000, guid: 0c0ac81bc3cfff445a0623284bdf3ce1, type: 3}
+      m_Image: {fileID: 21300000, guid: 30dfbd921b1533f41aa29f9c5f91ebaf, type: 3}
     - m_Text: Alpine_WWII
-      m_Image: {fileID: 21300000, guid: 037fb4c2c910b8547a9760b08abeb618, type: 3}
+      m_Image: {fileID: 21300000, guid: 611da4e6dd56eeb42a9ffd111cf8058a, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -13492,19 +13492,19 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Desert_Balaclava
-      m_Image: {fileID: 21300000, guid: 1390f5bfc5e792c4aa3a8ddb2b17784d, type: 3}
+      m_Image: {fileID: 21300000, guid: 44d736b4c440e044ba01e77f8f77490f, type: 3}
     - m_Text: Desert_BroadBrim
-      m_Image: {fileID: 21300000, guid: 1259c4db252c3b149b3a5f1f6eb77fa0, type: 3}
+      m_Image: {fileID: 21300000, guid: ec9732d531e3a934d9ad61fe17686bc6, type: 3}
     - m_Text: Desert_DarkWWII
-      m_Image: {fileID: 21300000, guid: a6e9cb61d01b0934d8cf1bb8bec91f23, type: 3}
+      m_Image: {fileID: 21300000, guid: 7a0ddabbd9366504ca524263034b8bb0, type: 3}
     - m_Text: Desert_GasMask
-      m_Image: {fileID: 21300000, guid: ab2bfd5f2913e6b4999b9bcbbaf10d78, type: 3}
+      m_Image: {fileID: 21300000, guid: 56c1ea6975fd2ca4aa52796b65e8a23c, type: 3}
     - m_Text: Desert_Helmet
-      m_Image: {fileID: 21300000, guid: 00e0492592c746a47ac9482c2e6e9699, type: 3}
+      m_Image: {fileID: 21300000, guid: fbe8411a8d31f8546aeb074735ccdd67, type: 3}
     - m_Text: Desert_LightWWII
-      m_Image: {fileID: 21300000, guid: 12bfda77bd4858b4ba444d689e119603, type: 3}
+      m_Image: {fileID: 21300000, guid: c0150500145622649a6cbdf6aeb3efd7, type: 3}
     - m_Text: Desert_Shades
-      m_Image: {fileID: 21300000, guid: f77ba8b8142601449835a150008d2b17, type: 3}
+      m_Image: {fileID: 21300000, guid: 8b56f53d91a28be40aa6d89176f704fc, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -18405,7 +18405,7 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Urban_Commander
-      m_Image: {fileID: 21300000, guid: 1827ed244d3bb6b4abdee8e3d3653047, type: 3}
+      m_Image: {fileID: 21300000, guid: fd1c6878f27edaf429ed80538a95f247, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -22017,7 +22017,7 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Alpine_Commander
-      m_Image: {fileID: 21300000, guid: a10e4d0c5c53b164193b174a542ad8fc, type: 3}
+      m_Image: {fileID: 21300000, guid: e8df2331a71e38340a747b785e80e5ca, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -26024,32 +26024,32 @@ MonoBehaviour:
   teamTurnIndicator: {fileID: 0}
   weatherIndicator: {fileID: 0}
   turnTitle: {fileID: 0}
+  moveUI: {fileID: 0}
+  shotUI: {fileID: 0}
+  meleeUI: {fileID: 0}
+  configUI: {fileID: 0}
+  dipelecUI: {fileID: 0}
+  damageEventUI: {fileID: 0}
+  overwatchUI: {fileID: 0}
   menuUI: {fileID: 0}
   teamTurnOverUI: {fileID: 0}
   teamTurnStartUI: {fileID: 0}
   setupMenuUI: {fileID: 0}
-  gameTimerUI: {fileID: 0}
   gameMenuUI: {fileID: 0}
   soldierOptionsUI: {fileID: 0}
   soldierStatsUI: {fileID: 0}
-  shotUI: {fileID: 0}
   flankersShotUI: {fileID: 0}
   shotConfirmUI: {fileID: 0}
   shotResultUI: {fileID: 0}
-  moveUI: {fileID: 0}
   overmoveUI: {fileID: 0}
   suppressionMoveUI: {fileID: 0}
   moveToSameSpotUI: {fileID: 0}
-  meleeUI: {fileID: 0}
   noMeleeTargetsUI: {fileID: 0}
   meleeBreakEngagementRequestUI: {fileID: 0}
   meleeResultUI: {fileID: 0}
   meleeConfirmUI: {fileID: 0}
-  configureUI: {fileID: 0}
   soldierOptionsAdditionalUI: {fileID: 0}
-  dipelecUI: {fileID: 0}
   dipelecResultUI: {fileID: 0}
-  damageEventUI: {fileID: 0}
   overrideUI: {fileID: 0}
   detectionAlertUI: {fileID: 0}
   detectionUI: {fileID: 0}
@@ -26067,12 +26067,10 @@ MonoBehaviour:
   endSoldierTurnAlertUI: {fileID: 0}
   playdeadAlertUI: {fileID: 0}
   coverAlertUI: {fileID: 0}
-  overwatchUI: {fileID: 0}
   externalItemSourcesUI: {fileID: 0}
   inventorySourceIconsUI: {fileID: 0}
-  flankersMeleeAttackerUI: {fileID: 0}
-  flankersMeleeDefenderUI: {fileID: 0}
   detectionAlertPrefab: {fileID: 0}
+  detectionAlertClaymorePrefab: {fileID: 0}
   lostLosAlertPrefab: {fileID: 0}
   losGlimpseAlertPrefab: {fileID: 0}
   damageAlertPrefab: {fileID: 0}
@@ -26104,15 +26102,18 @@ MonoBehaviour:
   overrideVisibilityDropdown: {fileID: 0}
   overrideInsertObjectsButton: {fileID: 0}
   overrideInsertObjectsUI: {fileID: 0}
-  overrideMuteButton: {fileID: 0}
+  muteIcon: {fileID: 0}
   undoButton: {fileID: 0}
   blockingScreen: {fileID: 0}
   itemSlotPrefab: {fileID: 0}
   itemIconPrefab: {fileID: 0}
   cannotUseItemUI: {fileID: 0}
   useItemUI: {fileID: 0}
+  etoolResultUI: {fileID: 0}
   grenadeUI: {fileID: 0}
   claymoreUI: {fileID: 0}
+  deploymentBeaconUI: {fileID: 0}
+  thermalCamUI: {fileID: 0}
   ULFResultUI: {fileID: 0}
   UHFUI: {fileID: 0}
   riotShieldUI: {fileID: 0}
@@ -29980,7 +29981,7 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: Jungle_Commander
-      m_Image: {fileID: 21300000, guid: 94e57450410172d4fad5c26d04dff252, type: 3}
+      m_Image: {fileID: 21300000, guid: b431ac41974e9ff479b60b2b65312077, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
