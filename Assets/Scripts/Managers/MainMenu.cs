@@ -553,6 +553,32 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
             activeSoldier.MakeActive();
     }
+    public void GetOverrideTerrainOn(Transform soldierStatsUI)
+    {
+        TMP_Dropdown dropdown = soldierStatsUI.Find("General").Find("OverrideTerrainOn").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
+
+        if (activeSoldier.terrainOn.Equals("Alpine"))
+            dropdown.value = 0;
+        else if (activeSoldier.terrainOn.Equals("Desert"))
+            dropdown.value = 1;
+        else if (activeSoldier.terrainOn.Equals("Jungle"))
+            dropdown.value = 2;
+        else if(activeSoldier.terrainOn.Equals("Urban"))
+            dropdown.value = 3;
+    }
+    public void SetOverrideTerrainOn()
+    {
+        TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideTerrainOn").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
+
+        if (dropdown.value == 0)
+            activeSoldier.terrainOn = "Alpine";
+        else if (dropdown.value == 1)
+            activeSoldier.terrainOn = "Desert";
+        else if (dropdown.value == 2)
+            activeSoldier.terrainOn = "Jungle";
+        else if (dropdown.value == 3)
+            activeSoldier.terrainOn = "Urban";
+    }
     public void GetOverrideVisibility()
     {
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
@@ -1198,13 +1224,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     soldierStatsUI.Find("General").Find("OverrideLocation").Find("OverrideLocationY").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
                     soldierStatsUI.Find("General").Find("OverrideLocation").Find("OverrideLocationZ").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
                     soldierStatsUI.Find("General").Find("OverrideTerrainOn").gameObject.SetActive(true);
-                    soldierStatsUI.Find("General").Find("OverrideTerrainOn").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.terrainOn;
+                    GetOverrideTerrainOn(soldierStatsUI);
                     soldierStatsUI.Find("General").Find("OverrideRoundsWithoutFood").gameObject.SetActive(true);
                     soldierStatsUI.Find("General").Find("OverrideRoundsWithoutFood").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.RoundsWithoutFood.ToString();
                     soldierStatsUI.Find("General").Find("OverrideTraumaPoints").gameObject.SetActive(true);
                     soldierStatsUI.Find("General").Find("OverrideTraumaPoints").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
                     soldierStatsUI.Find("General").Find("OverrideHealthState").gameObject.SetActive(true);
                     GetOverrideHealthState(soldierStatsUI);
+                    
                 }
                 else
                 {
