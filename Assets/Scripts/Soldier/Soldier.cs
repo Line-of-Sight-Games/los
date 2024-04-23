@@ -8,7 +8,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
-using System.Diagnostics.Contracts;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable, IAmDetectable
 {
@@ -22,7 +21,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, 
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
@@ -38,6 +37,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         { "RightBrace", "" }, { "Backpack1", "" }, { "Backpack2", "" }, { "Backpack3", "" }, { "Armour1", "" }, { "Armour2", "" }, { "Armour3", "" }, { "Armour4", "" }, { "Misc1", "" }, { "Misc2", "" },
         { "Misc3", "" }, { "Misc4", "" }, { "Misc5", "" }, { "Misc6", "" }, { "Misc7", "" }, { "Misc8", "" }
     };
+    public string madeUnconBy;
+    public List<string> madeUnconBydamageList;
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
 
@@ -147,6 +148,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "suppressionValue", suppressionValue },
             { "healthRemovedFromStarve", healthRemovedFromStarve },
             { "poisonedBy", poisonedBy },
+            { "bleedoutTurns", bleedoutTurns },
+            { "madeUnconBy", madeUnconBy },
+            { "madeUnconBydamageList", madeUnconBydamageList },
+
+            //save item details
             { "glucoState", glucoState },
             { "amphStatReduction", amphStatReduction },
             { "modaProtect", modaProtect },
@@ -242,6 +248,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         suppressionValue = Convert.ToInt32(details["suppressionValue"]);
         healthRemovedFromStarve = Convert.ToInt32(details["healthRemovedFromStarve"]);
         poisonedBy = (string)details["poisonedBy"];
+        bleedoutTurns = Convert.ToInt32(details["bleedoutTurns"]);
+        madeUnconBy = (string)details["madeUnconBy"];
+        madeUnconBydamageList = (details["madeUnconBydamageList"] as JArray).Select(token => token.ToString()).ToList();
+
+        //load item details
         glucoState = (string)details["glucoState"];
         amphStatReduction = (bool)details["amphStatReduction"];
         modaProtect = (bool)details["modaProtect"];
@@ -250,7 +261,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         riotXPoint = Convert.ToInt32(details["riotXPoint"]);
         riotYPoint = Convert.ToInt32(details["riotYPoint"]);
 
-        //load abiltiy details
+        //load ability details
         plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
         bloodLettedThisTurn = (bool)details["bloodLettedThisTurn"];
         patriotic = (bool)details["patriotic"];
@@ -836,14 +847,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (roundsWithoutFood >= 20 && healthRemovedFromStarve == 0)
         {
             healthRemovedFromStarve = Mathf.RoundToInt(hp / 2.0f);
-            TakeDamage(null, healthRemovedFromStarve, true, new List<string> { "Sustenance" });
+            TakeDamage(null, healthRemovedFromStarve, true, new() { "Sustenance" });
         }
 
         if (roundsWithoutFood >= 30 && IsConscious())
-            MakeUnconscious();
+            MakeUnconscious(null, new() { "Sustenance" });
 
         if (roundsWithoutFood >= 40)
-            InstantKill(null, new List<string>() { "Sustenance" });
+            InstantKill(null, new() { "Sustenance" });
     }
 
     public void ApplyHealthStateMods()
@@ -1148,6 +1159,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         yield return new WaitUntil(() => menu.xpResolvedFlag == true);
         TakeDamage(soldierManager.FindSoldierById(poisonedBy), 2, false, new() { "Poison" });
     }
+    public IEnumerator BleedoutKill()
+    {
+        yield return new WaitUntil(() => menu.xpResolvedFlag == true);
+        madeUnconBydamageList.Add("Bleedout");
+        InstantKill(soldierManager.FindSoldierById(madeUnconBy), madeUnconBydamageList);
+    }
 
     public int ApplyDamageMods(Soldier damagedBy, int damage, List<string> damageSource)
     {
@@ -1194,14 +1211,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             //tank the damage on the armour if wearing BA or JA
             if (IsWearingJuggernautArmour(true))
             {
-                remainingDamage = Inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damage);
+                remainingDamage = Inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damagedBy, damage, damageSource);
 
                 if (remainingDamage < damage)
                     menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
             }
             else if (IsWearingBodyArmour(true))
             {
-                remainingDamage = Inventory.GetItem("Armour_Body").TakeAblativeDamage(damage);
+                remainingDamage = Inventory.GetItem("Armour_Body").TakeAblativeDamage(damagedBy, damage, damageSource);
 
                 if (remainingDamage < damage)
                     menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Body Armour.", true, false);
@@ -1298,7 +1315,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         else if (IsLastStand())
                         {
                             if (!ResilienceCheck())
-                                MakeUnconscious();
+                                MakeUnconscious(damagedBy, damageSource);
                             else
                             {
                                 menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
@@ -1316,7 +1333,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                                     menu.AddDamageAlert(this, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", true, true);
                                 }
                                 else
-                                    MakeUnconscious();
+                                    MakeUnconscious(damagedBy, damageSource);
                             }
                             else if (hp == 2)
                             {
@@ -1918,6 +1935,46 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             _ => allPortraits.options[0].image,
         };
     }
+    public Sprite LoadPortraitJammed(string portraitName)
+    {
+        TMP_Dropdown allPortraits = FindObjectOfType<AllPortraits>().allPortraitsJammedDropdown;
+        return portraitName switch
+        {
+            "Alpine_Commander" => allPortraits.options[0].image,
+            "Alpine_Balaclava" => allPortraits.options[1].image,
+            "Alpine_BroadBrim" => allPortraits.options[2].image,
+            "Alpine_Cap" => allPortraits.options[3].image,
+            "Alpine_GasMask" => allPortraits.options[4].image,
+            "Alpine_Helmet" => allPortraits.options[5].image,
+            "Alpine_Visor" => allPortraits.options[6].image,
+            "Alpine_WWII" => allPortraits.options[7].image,
+            "Desert_Commander" => allPortraits.options[8].image,
+            "Desert_Balaclava" => allPortraits.options[9].image,
+            "Desert_BroadBrim" => allPortraits.options[10].image,
+            "Desert_DarkWWII" => allPortraits.options[11].image,
+            "Desert_GasMask" => allPortraits.options[12].image,
+            "Desert_Helmet" => allPortraits.options[13].image,
+            "Desert_LightWWII" => allPortraits.options[14].image,
+            "Desert_Shades" => allPortraits.options[15].image,
+            "Jungle_Commander" => allPortraits.options[16].image,
+            "Jungle_Balaclava" => allPortraits.options[17].image,
+            "Jungle_BeardWWII" => allPortraits.options[18].image,
+            "Jungle_Mewham" => allPortraits.options[19].image,
+            "Jungle_DarkWWII" => allPortraits.options[20].image,
+            "Jungle_LightWWII" => allPortraits.options[21].image,
+            "Jungle_Rang" => allPortraits.options[22].image,
+            "Jungle_Shades" => allPortraits.options[23].image,
+            "Urban_Commander" => allPortraits.options[24].image,
+            "Urban_Anubis" => allPortraits.options[25].image,
+            "Urban_Beret" => allPortraits.options[26].image,
+            "Urban_BlackBalaclava" => allPortraits.options[27].image,
+            "Urban_BrownBalaclava" => allPortraits.options[28].image,
+            "Urban_Facepaint" => allPortraits.options[29].image,
+            "Urban_Shades" => allPortraits.options[30].image,
+            "Urban_WWII" => allPortraits.options[31].image,
+            _ => allPortraits.options[0].image,
+        };
+    }
     public Sprite LoadInsignia(string rank)
     {
         TMP_Dropdown allInsignia = FindObjectOfType<AllInsignia>().allInsigniaDropdown;
@@ -1936,6 +1993,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Lieutenant-General" => allInsignia.options[11].image,
             "General" => allInsignia.options[12].image,
             "Recruit" or _ => allInsignia.options[0].image,
+        };
+    }
+    public Sprite LoadPosition(string position)
+    {
+        TMP_Dropdown allPositions = FindObjectOfType<AllPositions>().allPositionsDropdown;
+        return position switch
+        {
+            "Last Stand" => allPositions.options[1].image,
+            "Unconscious" => allPositions.options[2].image,
+            "Active" or _ => allPositions.options[0].image,
         };
     }
     public string IncrementRandom(string choiceStat)
@@ -2497,11 +2564,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         }
     }
-    public void MakeUnconscious()
+    public void MakeUnconscious(Soldier damagedBy, List<string> damageSource)
     {
+        bleedoutTurns = (stats.H.Val + stats.R.Val) / 3;
+
         ClearHealthState();
         SetState("Unconscious");
-        menu.AddDamageAlert(this, $"{soldierName} fell into <color=blue>Unconscious</color>.", false, true);
+        menu.AddDamageAlert(this, $"{soldierName} fell into <color=blue>Unconscious ({bleedoutTurns})</color>.", false, true);
+        
+        //set up payout for who made soldier uncon
+        if (damagedBy != null)
+            madeUnconBy = damagedBy.Id;
+        else
+            madeUnconBy = string.Empty;
+        madeUnconBydamageList = damageSource;
 
         DropHandheldItems();
 
@@ -2585,7 +2661,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         killedBy.FighterMeleeKillReward(damageSource);
                     }
                     else if (damageSource.Contains("Poison"))
-                        menu.AddXpAlert(killedBy, 10 + stats.R.Val, $"Killed {soldierName} by poisoning.", false);
+                        menu.AddXpAlert(killedBy, 10 + this.stats.R.Val, $"Killed {soldierName} by poisoning.", false);
 
                     //set haskilled flag for avenger
                     if (this.IsOppositeTeamAs(killedBy))
@@ -3657,7 +3733,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetConsciousState()
     {
         if (IsUnconscious())
-            return ", <color=blue>Unconscious</color>";
+            return $", <color=blue>Unconscious ({bleedoutTurns})</color>";
         else if (IsLastStand())
             return ", <color=red>Last Stand</color>";
         else

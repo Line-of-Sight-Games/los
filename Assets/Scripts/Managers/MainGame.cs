@@ -262,7 +262,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //pre xp check stuff
         foreach (Soldier s in AllSoldiers())
         {
-            if (s.IsOnturnAndAlive()) //run things that trigger at the end of players turn
+            if (s.IsOnturnAndAlive()) //run things that trigger at the end of friendly team turn
             {
                 //reset usedap flag
                 s.usedAP = false;
@@ -303,7 +303,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //unset suppression
                 s.UnsetSuppression();
             }
-            else //run things that trigger at the end of another team's turn
+            else if (s.IsOffturnAndAlive()) //run things that trigger at the end of enemy team turn
             {
                 //unset overwatch
                 if (s.IsOnOverwatch())
@@ -313,6 +313,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (s.loudActionRoundsVulnerable > 0)
                     s.loudActionRoundsVulnerable--;
             }
+            //run things that trigger at the end of any team turn
+            
         }
 
         menu.CheckXP();
@@ -320,16 +322,23 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //post xp stuff
         foreach (Soldier s in AllSoldiers())
         {
-            if (s.IsOnturnAndAlive()) //run things that trigger at the end of players turn
+            if (s.IsOnturnAndAlive()) //run things that trigger at the end of friendly team turn
             {
                 //dish out poison damage
                 if (s.IsPoisoned())
                     StartCoroutine(s.TakePoisonDamage());
-
             }
-            else //run things that trigger at the end of another team's turn
+            else if (s.IsOffturnAndAlive()) //run things that trigger at the end of enemy team turn
             {
 
+            }
+            //run things that trigger at the end of any team turn
+            if (s.IsUnconscious())
+            {
+                if (s.bleedoutTurns == 0)
+                    StartCoroutine(s.BleedoutKill());
+                else
+                    s.bleedoutTurns--;
             }
         }
     }
@@ -723,16 +732,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (shooter.CanSeeInOwnRight(s))
                     targetOptionData = new(s.Id, s.soldierPortrait);
                 else
-                    targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText));
+                {
+                    if (s.IsJammer() && !shooter.IsRevoker())
+                        targetOptionData = new(s.Id, s.LoadPortraitJammed(s.soldierPortraitText));
+                    else
+                        targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText));
+                }
+                    
             }
 
             if (targetOptionData != null)
             {
                 targetOptionDataList.Add(targetOptionData);
-
-                //remove option if target is jammer and shooter can't see in own right
-                if (s.IsJammer() && !activeSoldier.CanSeeInOwnRight(s) && !shooter.IsRevoker())
-                    targetOptionDataList.Remove(targetOptionData);
 
                 //remove option if soldier is engaged and this soldier is not on the engagement list
                 if (activeSoldier.IsMeleeEngaged() && !activeSoldier.IsMeleeEngagedWith(s))
@@ -3173,12 +3184,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (activeSoldier.IsWearingJuggernautArmour(false))
                         {
-                            activeSoldier.MakeUnconscious();
+                            activeSoldier.MakeUnconscious(null, new() { "Structural Collapse" });
                             menu.AddDamageAlert(activeSoldier, $"{activeSoldier.soldierName} survived a {structureHeight}cm structural collapse with Juggernaut Armour.", true, false);
                         }
                         else
                         {
-                            activeSoldier.InstantKill(null, new List<string>() { "Structural Collapse" });
+                            activeSoldier.InstantKill(null, new() { "Structural Collapse" });
                             activeSoldier.SetCrushed();
                         }
                     }

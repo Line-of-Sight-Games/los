@@ -547,7 +547,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideHealthState").Find("HealthStateDropdown").GetComponent<TMP_Dropdown>();
 
         if (dropdown.value == 2)
-            activeSoldier.MakeUnconscious();
+            activeSoldier.MakeUnconscious(null, new() { "Override" });
         else if (dropdown.value == 1)
             activeSoldier.MakeLastStand();
         else

@@ -434,7 +434,7 @@ public class Item : PhysicalObject, IDataPersistence
             this.ammo -= ammo;
         }
     }
-    public int TakeAblativeDamage(int damage)
+    public int TakeAblativeDamage(Soldier damagedBy, int damage, List<string> damageSource)
     {
         if (damage > ablativeHealth)
         {
@@ -451,7 +451,7 @@ public class Item : PhysicalObject, IDataPersistence
         if (damage == 0)
             if (owner is Soldier owningSoldier && owningSoldier.IsLastStand())
                 if (!owningSoldier.ResilienceCheck())
-                    owningSoldier.MakeUnconscious();
+                    owningSoldier.MakeUnconscious(damagedBy, damageSource);
 
         return damage;
     }
