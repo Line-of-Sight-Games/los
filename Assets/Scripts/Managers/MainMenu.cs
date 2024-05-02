@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -32,9 +33,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public DamageEventUI damageEventUI;
     public OverwatchUI overwatchUI;
     public InsertObjectsUI insertObjectsUI;
+    public OverwatchShotUI overwatchShotUI;
 
     public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
-    public OverwatchShotUI overwatchShotUI;
+    
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public SightRadiusCircle sightRadiusCirclePrefab;
@@ -195,11 +197,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         ToggleMute();
                 }
 
-                //show/hide end turn button
-                if (activeSoldier == null)
-                    endTurnButton.SetActive(true);
-                else
-                    endTurnButton.SetActive(false);
+                if (!overrideView)
+                {
+                    //show/hide end turn button
+                    if (activeSoldier == null)
+                        endTurnButton.SetActive(true);
+                    else
+                        endTurnButton.SetActive(false);
+                }
 
                 DisplayItems();
                 gameTimer.text = FormatFloatTime(playTimeTotal);
@@ -398,6 +403,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void UnfreezeTime()
     {
         Time.timeScale = 1.0f;
+    }
+    public void SetDetectionResolvedFlagTo(bool value)
+    {
+        if (value)
+            UnfreezeTime();
+        else
+            FreezeTime();
+
+        detectionResolvedFlag = value;
     }
     public void SetXpResolvedFlagTo(bool value)
     {
@@ -1346,7 +1360,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (childCount > 0)
         {
-            detectionResolvedFlag = false;
+            SetDetectionResolvedFlagTo(false);
             FreezeTime();
 
             if (overwatchCount > 1) //more than a single overwatch line detected
@@ -1535,6 +1549,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ConfirmDetections()
     {
+        
         ScrollRect detectionScroller = detectionUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
         if (detectionScroller.verticalNormalizedPosition <= 0.05f)
         {
@@ -1711,8 +1726,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CloseDetectionUI()
     {
-        detectionResolvedFlag = true;
-        UnfreezeTime();
+        SetDetectionResolvedFlagTo(true);
         detectionUI.SetActive(false);
     }
     public void AddLostLosAlert(Soldier soldier)
@@ -2134,10 +2148,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public IEnumerator OpenOverwatchShotUI(Soldier shooter, Soldier target)
     {
-        overwatchShotUI.Init(shooter, target);
+        yield return new WaitUntil(() => detectionResolvedFlag == true);
 
-        yield return new WaitForSeconds(0.05f);
-        
+        overwatchShotUI.Init(shooter, target);
         overwatchShotUI.gameObject.SetActive(true);
     }
     public void GuardsmanOverwatchRetry()
@@ -3771,6 +3784,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         insertObjectsUI.yPos.text = string.Empty;
         insertObjectsUI.zPos.text = string.Empty;
         insertObjectsUI.terrainDropdown.value = 0;
+
+        foreach (Transform child in insertObjectsUI.gbItemsPanel)
+        {
+            ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
+            if (itemIcon != null && itemIcon.pickupNumber > 0)
+                itemIcon.pickupNumber = 0;
+        }
     }
     public void CloseOverrideInsertObjectsUI()
     {
