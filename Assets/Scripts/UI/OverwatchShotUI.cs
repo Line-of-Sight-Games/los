@@ -240,30 +240,7 @@ public class OverwatchShotUI : MonoBehaviour
             shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
 
             //add parameter to equation view
-            shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text =
-                $"{game.shotParameters.Find(tuple => tuple.Item1 == "accuracy")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "sharpshooter")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "inspired")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "WS")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "juggernaut")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "stim")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "trauma")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "sustenance")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tE")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "cover")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "vis")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "rain")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "wind")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "HP")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tHP")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "Ter")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tTer")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "elevation")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "kd")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "overwatch")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "flank")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "stealth")} " +
-                $"| {game.shotParameters.Find(tuple => tuple.Item1 == "suppression")}";
+            shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = menu.DisplayShotParameters();
 
             shotConfirmUI.SetActive(true);
         }

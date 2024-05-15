@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
@@ -488,8 +489,135 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
         return false;
     }
+    public string DisplayShotParameters()
+    {
+        List<string> colouredParameters = new();
+        foreach (Tuple<string,string> param in game.shotParameters)
+        {
 
+            if (param.Item1 == "accuracy" || param.Item1 == "sharpshooter" || param.Item1 == "inspired" || param.Item1 == "WS" || param.Item1 == "stim" || param.Item1 == "juggernaut")
+            {
+                if (float.Parse(param.Item2) > 0)
+                    colouredParameters.Add($"<color=green>{param}</color>");
+                else if (float.Parse(param.Item2) < 0)
+                    colouredParameters.Add($"<color=red>{param}</color>");
+                else
+                    colouredParameters.Add($"{param}");
+            }
+            else if (param.Item1 == "tE" || param.Item1 == "suppression")
+            {
+                if (float.Parse(param.Item2) > 0)
+                    colouredParameters.Add($"<color=red>{param}</color>");
+                else if (float.Parse(param.Item2) < 0)
+                    colouredParameters.Add($"<color=green>{param}</color>");
+                else
+                    colouredParameters.Add($"{param}");
+            }
+            else
+            {
+                if (float.Parse(param.Item2) > 1)
+                    colouredParameters.Add($"<color=green>{param}</color>");
+                else if (float.Parse(param.Item2) < 1)
+                    colouredParameters.Add($"<color=red>{param}</color>");
+                else
+                    colouredParameters.Add($"{param}");
+            }
+        }
 
+        return $"{colouredParameters.Find(str => str.Contains("accuracy"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("sharpshooter"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("inspired"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("WS"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("juggernaut"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("stim"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("trauma"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("sustenance"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("tE"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("cover"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("vis"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("rain"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("wind"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("HP"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("tHP"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("Ter"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("tTer"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("elevation"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("kd"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("overwatch"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("flank"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("stealth"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("smoke"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("tabun"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("suppression"))}";
+    }
+    public string DisplayMeleeParameters()
+    {
+        List<string> colouredParameters = new();
+        foreach (Tuple<string, string> param in game.meleeParameters)
+        {
+
+            if (param.Item1 == "aM" || param.Item1 == "aJuggernaut" || param.Item1 == "aInspirer" || param.Item1 == "aWep" || param.Item1 == "aStr")
+            {
+                if (float.Parse(param.Item2) > 0)
+                    colouredParameters.Add($"<color=green>{param}</color>");
+                else if (float.Parse(param.Item2) < 0)
+                    colouredParameters.Add($"<color=red>{param}</color>");
+                else
+                    colouredParameters.Add($"{param}");
+            }
+            else if (param.Item1 == "dM" || param.Item1 == "dJuggernaut" || param.Item1 == "dWep" || param.Item1 == "charge" || param.Item1 == "dStr")
+            {
+                if (float.Parse(param.Item2) > 0)
+                    colouredParameters.Add($"<color=red>{param}</color>");
+                else if (float.Parse(param.Item2) < 0)
+                    colouredParameters.Add($"<color=green>{param}</color>");
+                else
+                    colouredParameters.Add($"{param}");
+            }
+            else if (param.Item1 == "aSustenance" || param.Item1 == "aHP" || param.Item1 == "aTer" || param.Item1 == "aFlank" || param.Item1 == "kd" || param.Item1 == "aSuppression" || param.Item1 == "bloodrage")
+            {
+                if (float.Parse(param.Item2) > 1)
+                    colouredParameters.Add($"<color=green>{param}</color>");
+                else if (float.Parse(param.Item2) < 1)
+                    colouredParameters.Add($"<color=red>{param}</color>");
+                else
+                    colouredParameters.Add($"{param}");
+            }
+            else if (param.Item1 == "dSustenance" || param.Item1 == "dHP" || param.Item1 == "dTer" || param.Item1 == "dFlank" || param.Item1 == "dSuppression")
+            {
+                if (float.Parse(param.Item2) < 1)
+                    colouredParameters.Add($"<color=green>{param}</color>");
+                else if (float.Parse(param.Item2) > 1)
+                    colouredParameters.Add($"<color=red>{param}</color>");
+                else
+                    colouredParameters.Add($"{param}");
+            }
+        }
+
+        return $"{colouredParameters.Find(str => str.Contains("aM"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aJuggernaut"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aInspirer"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aSustenance"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aWep"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aHP"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aTer"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aFlank"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("kd"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aSuppression"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aStr"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dM"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dJuggernaut"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dInspirer"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dSustenance"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dWep"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("charge"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dHP"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dTer"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dFlank"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dSuppression"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dStr"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("bloodrage"))}";
+    }
 
 
 
@@ -2233,30 +2361,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                             shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
 
                         //add parameter to equation view
-                        shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text =
-                            $"{game.shotParameters.Find(tuple => tuple.Item1 == "accuracy")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "sharpshooter")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "inspired")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "WS")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "juggernaut")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "stim")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "trauma")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "sustenance")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tE")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "cover")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "vis")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "rain")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "wind")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "HP")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tHP")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "Ter")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "tTer")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "elevation")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "kd")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "overwatch")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "flank")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "stealth")} " +
-                            $"| {game.shotParameters.Find(tuple => tuple.Item1 == "suppression")}";
+                        shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayShotParameters();
+                            
 
                         shotConfirmUI.SetActive(true);
                     }
@@ -2453,30 +2559,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 meleeConfirmUI.transform.Find("OptionPanel").Find("Damage").Find("DamageDisplay").GetComponent<TextMeshProUGUI>().text = meleeDamage.ToString();
 
                 //add parameters to equation view
-                meleeConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text =
-                    $"{game.meleeParameters.Find(tuple => tuple.Item1 == "aM")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aJuggernaut")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aInspirer")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aSustenance")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aWep")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aHP")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aTer")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aFlank")} " +
-                    $"| {game.shotParameters.Find(tuple => tuple.Item1 == "kd")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "suppression")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "aStr")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dM")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dJuggernaut")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dInspirer")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dSustenance")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dWep")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "charge")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dHP")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dTer")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dFlank")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "suppression")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "dStr")} " +
-                    $"| {game.meleeParameters.Find(tuple => tuple.Item1 == "bloodrage")}";
+                meleeConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayMeleeParameters();
 
                 //add rounding to equation view
                 meleeConfirmUI.transform.Find("EquationPanel").Find("Rounding").GetComponent<TextMeshProUGUI>().text = $"Rounding: {game.meleeParameters.Find(tuple => tuple.Item1 == "rounding").Item2}";

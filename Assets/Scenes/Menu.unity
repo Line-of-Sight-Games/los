@@ -395,33 +395,35 @@ MonoBehaviour:
   roundIndicator: {fileID: 0}
   teamTurnIndicator: {fileID: 0}
   weatherIndicator: {fileID: 0}
+  turnTitle: {fileID: 0}
+  moveUI: {fileID: 0}
+  shotUI: {fileID: 0}
+  meleeUI: {fileID: 0}
+  configUI: {fileID: 0}
+  dipelecUI: {fileID: 0}
+  damageEventUI: {fileID: 0}
+  overwatchUI: {fileID: 0}
+  insertObjectsUI: {fileID: 0}
+  overwatchShotUI: {fileID: 0}
   menuUI: {fileID: 0}
   teamTurnOverUI: {fileID: 0}
   teamTurnStartUI: {fileID: 0}
   setupMenuUI: {fileID: 0}
-  gameTimerUI: {fileID: 0}
   gameMenuUI: {fileID: 0}
   soldierOptionsUI: {fileID: 0}
   soldierStatsUI: {fileID: 0}
-  shotUI: {fileID: 0}
   flankersShotUI: {fileID: 0}
   shotConfirmUI: {fileID: 0}
-  overwatchShotUI: {fileID: 0}
   shotResultUI: {fileID: 0}
-  moveUI: {fileID: 0}
   overmoveUI: {fileID: 0}
   suppressionMoveUI: {fileID: 0}
   moveToSameSpotUI: {fileID: 0}
-  meleeUI: {fileID: 0}
   noMeleeTargetsUI: {fileID: 0}
   meleeBreakEngagementRequestUI: {fileID: 0}
   meleeResultUI: {fileID: 0}
   meleeConfirmUI: {fileID: 0}
-  configureUI: {fileID: 0}
   soldierOptionsAdditionalUI: {fileID: 0}
-  dipelecUI: {fileID: 0}
   dipelecResultUI: {fileID: 0}
-  damageEventUI: {fileID: 0}
   overrideUI: {fileID: 0}
   detectionAlertUI: {fileID: 0}
   detectionUI: {fileID: 0}
@@ -439,12 +441,10 @@ MonoBehaviour:
   endSoldierTurnAlertUI: {fileID: 0}
   playdeadAlertUI: {fileID: 0}
   coverAlertUI: {fileID: 0}
-  overwatchUI: {fileID: 0}
   externalItemSourcesUI: {fileID: 0}
   inventorySourceIconsUI: {fileID: 0}
-  flankersMeleeAttackerUI: {fileID: 0}
-  flankersMeleeDefenderUI: {fileID: 0}
   detectionAlertPrefab: {fileID: 0}
+  detectionAlertClaymorePrefab: {fileID: 0}
   lostLosAlertPrefab: {fileID: 0}
   losGlimpseAlertPrefab: {fileID: 0}
   damageAlertPrefab: {fileID: 0}
@@ -455,6 +455,7 @@ MonoBehaviour:
   allyInventoryIconPrefab: {fileID: 0}
   groundInventoryIconPrefab: {fileID: 0}
   gbInventoryIconPrefab: {fileID: 0}
+  globalInventoryIconPrefab: {fileID: 0}
   inventoryPanelGroundPrefab: {fileID: 0}
   inventoryPanelAllyPrefab: {fileID: 0}
   inventoryPanelGoodyBoxPrefab: {fileID: 0}
@@ -464,22 +465,33 @@ MonoBehaviour:
   meleeAlertPrefab: {fileID: 0}
   overwatchShotUIPrefab: {fileID: 0}
   dipelecRewardPrefab: {fileID: 0}
+  explosionListPrefab: {fileID: 0}
   explosionAlertPrefab: {fileID: 0}
+  explosionAlertPOIPrefab: {fileID: 0}
+  explosionAlertItemPrefab: {fileID: 0}
   endTurnButton: {fileID: 0}
   overrideButton: {fileID: 0}
   overrideTimeStopIndicator: {fileID: 0}
   overrideVersionDisplay: {fileID: 0}
   overrideVisibilityDropdown: {fileID: 0}
   overrideInsertObjectsButton: {fileID: 0}
-  overrideInsertObjectsUI: {fileID: 0}
-  overrideMuteButton: {fileID: 0}
+  muteIcon: {fileID: 0}
   undoButton: {fileID: 0}
   blockingScreen: {fileID: 0}
   itemSlotPrefab: {fileID: 0}
   itemIconPrefab: {fileID: 0}
+  cannotUseItemUI: {fileID: 0}
+  useItemUI: {fileID: 0}
+  etoolResultUI: {fileID: 0}
+  grenadeUI: {fileID: 0}
+  claymoreUI: {fileID: 0}
+  deploymentBeaconUI: {fileID: 0}
+  thermalCamUI: {fileID: 0}
+  ULFResultUI: {fileID: 0}
+  UHFUI: {fileID: 0}
+  riotShieldUI: {fileID: 0}
   gbItemIconPrefab: {fileID: 0}
   LOSArrowPrefab: {fileID: 0}
-  overwatchArcPrefab: {fileID: 0}
   sightRadiusCirclePrefab: {fileID: 0}
   actionButtons: []
   insignia: []
@@ -497,7 +509,6 @@ MonoBehaviour:
   meleeChargeIndicator: 
   activeSoldier: {fileID: 0}
   overrideView: 0
-  displayLOSArrows: 0
   clearShotFlag: 0
   clearMeleeFlag: 0
   clearDipelecFlag: 0
@@ -510,6 +521,7 @@ MonoBehaviour:
   xpResolvedFlag: 0
   teamTurnOverFlag: 0
   teamTurnStartFlag: 0
+  onItemUseScreen: 0
   LInput: {fileID: 0}
   HInput: {fileID: 0}
   RInput: {fileID: 0}
@@ -546,7 +558,10 @@ MonoBehaviour:
   overwatch1WayRight: {fileID: 0}
   noDetect2Way: {fileID: 0}
   fist: {fileID: 0}
-  explosiveBarrel: {fileID: 0}
+  explosiveBarrelSprite: {fileID: 0}
+  goodyBoxSprite: {fileID: 0}
+  terminalSprite: {fileID: 0}
+  drugCabinetSprite: {fileID: 0}
   covermanSprite: {fileID: 0}
   normalTextColour: {r: 0.196, g: 0.196, b: 0.196, a: 1}
   terrainList:
@@ -4843,7 +4858,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 19070bea571e1a9428b25b74a6259ea7, type: 3}
+  m_audioClip: {fileID: 8300000, guid: b2ef312d6cf6a054d93e3c4a762caf48, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

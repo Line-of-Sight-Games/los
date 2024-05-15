@@ -1371,7 +1371,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 }
 
                 //add damage alert
-                menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage. He is now {CheckHealthState()}.", false, false);
+                menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage.", false, false);
                 //make sure damage came from another soldier
                 if (damagedBy != null)
                 {
@@ -2527,17 +2527,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             menu.AddDamageAlert(this, $"Suffered a {stunRounds} round stun.", false, true);
             SetStunned(stunRounds);
         }
-    }
-    public string CheckHealthState()
-    {
-        if (IsDead())
-            return "<color=red>Dead</color>";
-        else if (IsUnconscious())
-            return "<color=blue>Unconscious</color>";
-        else if (IsLastStand())
-            return "<color=red>Last Stand</color>";
-        else
-            return "Active";
     }
     public void ClearHealthState()
     {

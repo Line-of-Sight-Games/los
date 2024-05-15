@@ -14943,7 +14943,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 80a9c1399e307a14b909345f22de0578, type: 3}
+  m_audioClip: {fileID: 8300000, guid: ddf843047dc2e7d4ea0e2d478e24d887, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -26031,6 +26031,8 @@ MonoBehaviour:
   dipelecUI: {fileID: 0}
   damageEventUI: {fileID: 0}
   overwatchUI: {fileID: 0}
+  insertObjectsUI: {fileID: 0}
+  overwatchShotUI: {fileID: 0}
   menuUI: {fileID: 0}
   teamTurnOverUI: {fileID: 0}
   teamTurnStartUI: {fileID: 0}
@@ -26101,7 +26103,6 @@ MonoBehaviour:
   overrideVersionDisplay: {fileID: 0}
   overrideVisibilityDropdown: {fileID: 0}
   overrideInsertObjectsButton: {fileID: 0}
-  overrideInsertObjectsUI: {fileID: 0}
   muteIcon: {fileID: 0}
   undoButton: {fileID: 0}
   blockingScreen: {fileID: 0}
@@ -26117,7 +26118,6 @@ MonoBehaviour:
   ULFResultUI: {fileID: 0}
   UHFUI: {fileID: 0}
   riotShieldUI: {fileID: 0}
-  overwatchShotUI: {fileID: 0}
   gbItemIconPrefab: {fileID: 0}
   LOSArrowPrefab: {fileID: 0}
   sightRadiusCirclePrefab: {fileID: 0}
