@@ -2602,7 +2602,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
             else 
             {
-                menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}.", false, false);
+                menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}. He is now <color=red>Dead</color>", false, false);
                 int tp = 1;
                 bool lastandicide = false;
 
@@ -3929,8 +3929,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string GetWitnessState()
     {
-        if (IsWitness())
-            return $", <color=green>Witnessing ({menu.PrintList(soldierAbilities.Where(e => e != "Witness").ToList())})</color>";
+        if (IsWitness() && witnessStoredAbilities.Count != 0)
+            return $", <color=green>Witnessing ({menu.PrintList(soldierAbilities.Where(ability => witnessStoredAbilities.Contains(ability)).ToList())})</color>";
         return "";
     }
     public string GetStatus()
@@ -4145,7 +4145,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return 0;
     }
-
+    public int ThrowRadius()
+    {
+        return 10 * stats.Str.Val;
+    }
     public int DetectionActiveStat(int multiplier)
     {
         return stats.P.Val * multiplier;

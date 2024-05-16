@@ -36,7 +36,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, externalItemSourcesUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, throwItemUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -3428,7 +3428,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         cannotUseItemUI.SetActive(false);
     }
-    public void OpenUseItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon)
+    public void OpenUseItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon, int ap)
     {
         useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(true);
 
@@ -3475,6 +3475,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Water_Canteen" => "Drink water?",
             _ => "Unrecognised item",
         };
+        useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
 
         if (itemUsed.itemName.Contains("Medkit"))
         {
@@ -3685,6 +3686,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         useItemUI.SetActive(false);
     }
+    public void OpenThrowItemUI(Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon)
+    {
+        throwItemUI.GetComponent<UseItemUI>().itemUsed = itemThrown;
+        throwItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
+        throwItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemThrownFromSlotName;
+        throwItemUI.SetActive(true);
+    }
+    public void CloseThrowItemUI()
+    {
+        throwItemUI.SetActive(false);
+    }
     public void OpenEtoolResultUI()
     {
         etoolResultUI.SetActive(true);
@@ -3775,12 +3787,39 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         grenadeUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
         grenadeUI.transform.Find("PressedOnce").gameObject.SetActive(false);
         grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(false);
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("DirectHit").gameObject.SetActive(false);
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("PreciseThrow").gameObject.SetActive(false);
     }
     public void CloseGrenadeUI()
     {
         ClearGrenadeUI();
         grenadeUI.SetActive(false);
+    }
+    public void OpenThrowUI(UseItemUI useItemUI)
+    {
+        throwUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        throwUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        throwUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        throwUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text = $"Throwing {useItemUI.itemUsed.itemName} from inventory";
+        throwUI.SetActive(true);
+    }
+    public void ClearThrowUI()
+    {
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        throwUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
+        throwUI.transform.Find("PressedOnce").gameObject.SetActive(false);
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("FinalPosition").gameObject.SetActive(false);
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(false);
+    }
+    public void CloseThrowUI()
+    {
+        ClearThrowUI();
+        throwUI.SetActive(false);
     }
     public void OpenClaymoreUI(UseItemUI useItemUI)
     {

@@ -2207,6 +2207,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         //melee attack proceeds
                         if (meleeDamage > 0)
                         {
+                            //play success sound
+                            if (damageType.Contains("Charge"))
+                                soundManager.PlayMeleeResolution("successCharge");
+                            else
+                                soundManager.PlayMeleeResolution("successStatic");
+
                             if (attacker.IsWearingExoArmour() && !defender.IsWearingJuggernautArmour(false)) //exo kill on standard man
                             {
                                 damageMessage = "<color=green>INSTANT KILL\n(Exo Armour)</color>";
@@ -2225,7 +2231,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         else if (meleeDamage < 0)
                         {
                             //play counterattack sound
-                            soundManager.PlayCounterattack();
+                            soundManager.PlayMeleeResolution("counter");
 
                             if (!defender.IsWearingExoArmour() && attacker.IsWearingJuggernautArmour(false)) //no damage counter against jugs
                                 damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
@@ -2239,6 +2245,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else
                         {
+                            //play breakeven sound
+                            soundManager.PlayMeleeResolution("breakeven");
+
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
                             
                             //push the no damage attack through for abilities trigger
@@ -2394,18 +2403,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //item functions
     public void ConfirmUseItem(UseItemUI useItemUI)
     {
-
+        int.TryParse(useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
         Item itemUsed = useItemUI.itemUsed;
         Item itemUsedOn = useItemUI.itemUsedOn;
         Soldier soldierUsedOn = useItemUI.soldierUsedOn;
         ItemIcon linkedIcon = useItemUI.itemUsedIcon;
-        int ap = itemUsed.usageAP;
-        //adept ability
-        if (activeSoldier.IsAdept() && itemUsed.usageAP > 1)
-            ap--;
-        //gunner ability
-        if (activeSoldier.IsGunner() && itemUsed.IsAmmo())
-            ap = 1;
 
         FileUtility.WriteToReport($"{((Soldier)itemUsed.owner).soldierName} used {itemUsed.itemName}.");
 
@@ -2472,6 +2474,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         DeductAP(ap);
         menu.CloseUseItemUI();
+    }
+    public void ConfirmThrowItem(UseItemUI useItemUI)
+    {
+        int.TryParse(useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
+        menu.OpenThrowUI(useItemUI);
+
+        DeductAP(ap);
+        menu.CloseThrowItemUI();
     }
     public void UpdateSoldierUsedOn(UseItemUI useItemUI)
     {
@@ -2590,9 +2600,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetX = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField targetZ = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        GameObject invalidThrow = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("InvalidThrow").gameObject;
+        GameObject totalMiss = useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
+
         if (!useGrenade.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
+            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
             {
                 int newX, newY;
                 int scatterDegree = RandomNumber(0, 360);
@@ -2602,29 +2615,24 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     _ => -1,
                 };
 
-                if (scatterDistance != -1)
+                if (scatterDistance == -1 || (x == activeSoldier.X && y == activeSoldier.Y))
                 {
-                    if (x == activeSoldier.X && y == activeSoldier.Y)
-                        (newX, newY) = (x, y);
-                    else
-                        (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
+                    targetX.interactable = false;
+                    targetY.interactable = false;
+                    targetZ.interactable = false;
+                    useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("PreciseThrow").gameObject.SetActive(true);
+                }
+                else
+                {
+                    (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
                     targetX.text = $"{newX}";
                     targetY.text = $"{newY}";
 
                     if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
-                    {
-                        useGrenade.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattering off map";
-                        useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
-                    }
+                        totalMiss.SetActive(true);
+
                     useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(true);
-                }
-                else
-                {
-                    targetX.interactable = false;
-                    targetY.interactable = false;
-                    targetZ.interactable = false;
-                    useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("DirectHit").gameObject.SetActive(true);
                 }
 
                 useGrenade.transform.Find("PressedOnce").gameObject.SetActive(true);
@@ -2634,27 +2642,83 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
             {
-                (int newX, int newY) = (x, y);
-                if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY)
+                if (useGrenade.itemUsed.owner is Soldier linkedSoldier)
                 {
                     useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
-                    menu.CloseGrenadeUI();
+                    if (grenadeName.Contains("Frag") || grenadeName.Contains("Flashbang"))
+                        useGrenade.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(x, y, z));
+                    else if (grenadeName.Contains("Smoke"))
+                        Instantiate(poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
+                    else if (grenadeName.Contains("Tabun"))
+                        Instantiate(poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
+                }
+                menu.CloseGrenadeUI();
+            }
+            else if (totalMiss.activeInHierarchy)
+            {
+                activeSoldier.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
+                menu.CloseGrenadeUI();
+            }
+        }
+    }
+    public void ConfirmThrow(UseItemUI throwItemUI)
+    {
+        string yeet = throwItemUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text;
+        TMP_InputField targetX = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetY = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetZ = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        GameObject invalidThrow = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("InvalidThrow").gameObject;
+        GameObject totalMiss = throwItemUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
+
+        if (!throwItemUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
+        {
+            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
+            {
+                int newX, newY;
+                int scatterDegree = RandomNumber(0, 360);
+                int scatterDistance = activeSoldier.StrengthCheck() switch
+                {
+                    false => Mathf.CeilToInt(DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
+                    _ => -1,
+                };
+
+                if (scatterDistance == -1 || (x == activeSoldier.X && y == activeSoldier.Y))
+                {
+                    targetX.interactable = false;
+                    targetY.interactable = false;
+                    targetZ.interactable = false;
+                    throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(true);
                 }
                 else
                 {
-                    if (useGrenade.itemUsed.owner is Soldier linkedSoldier)
-                    {
-                        useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
-                        if (grenadeName.Contains("Frag") || grenadeName.Contains("Flashbang"))
-                            useGrenade.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(x, y, z));
-                        else if (grenadeName.Contains("Smoke"))
-                            Instantiate(poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
-                        else if (grenadeName.Contains("Tabun"))
-                            Instantiate(poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
+                    (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
-                        menu.CloseGrenadeUI();
-                    }
+                    targetX.text = $"{newX}";
+                    targetY.text = $"{newY}";
+
+                    if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
+                        totalMiss.SetActive(true);
+
+                    throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("FinalPosition").gameObject.SetActive(true);
                 }
+
+                throwItemUI.transform.Find("PressedOnce").gameObject.SetActive(true);
+            }
+        }
+        else //second press
+        {
+            if ((menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z)))
+            {
+                activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                throwItemUI.itemUsed.X = x;
+                throwItemUI.itemUsed.Y = y;
+                throwItemUI.itemUsed.Z = z;
+                menu.CloseThrowUI();
+            }
+            else if (totalMiss.activeInHierarchy)
+            {
+                activeSoldier.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
+                menu.CloseThrowUI();
             }
         }
     }

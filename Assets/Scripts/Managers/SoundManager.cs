@@ -8,7 +8,8 @@ public class SoundManager : MonoBehaviour
 
     //audio stuff
     public AudioSource noisePlayer;
-    public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade, counterattack;
+    public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
+    public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
     public bool banzaiPlayed;
 
     public void PlayBanzai()
@@ -63,8 +64,15 @@ public class SoundManager : MonoBehaviour
     {
         noisePlayer.PlayOneShot(newAbilityUpgrade);
     }
-    public void PlayCounterattack()
+    public void PlayMeleeResolution(string result)
     {
-        noisePlayer.PlayOneShot(counterattack);
+        if (result.Equals("counter"))
+            noisePlayer.PlayOneShot(meleeCounter);
+        else if (result.Equals("breakeven"))
+            noisePlayer.PlayOneShot(meleeBreakeven);
+        else if (result.Equals("successStatic"))
+            noisePlayer.PlayOneShot(meleeSuccessStatic);
+        else if (result.Equals("successCharge"))
+            noisePlayer.PlayOneShot(meleeSuccessCharge);
     }
 }

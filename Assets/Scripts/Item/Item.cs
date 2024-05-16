@@ -489,7 +489,7 @@ public class Item : PhysicalObject, IDataPersistence
             if (linkedSoldier.IsPolitician())
                 dip++;
 
-            //keep values within bouds
+            //keep values within bounds
             if (dip > 9)
                 dip = 9;
             if (elec > 9)
@@ -768,6 +768,12 @@ public class Item : PhysicalObject, IDataPersistence
     public bool IsPoisonable()
     {
         if (traits.Contains("Poisonable"))
+            return true;
+        return false;
+    }
+    public bool IsThrowable()
+    {
+        if (traits.Contains("Throwable"))
             return true;
         return false;
     }
