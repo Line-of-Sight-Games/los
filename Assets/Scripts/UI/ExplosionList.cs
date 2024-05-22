@@ -41,8 +41,12 @@ public class ExplosionList : MonoBehaviour
                     {
                         if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
                         {
+                            print($"{item.itemName} | {item.id} flagged for taking damage.");
                             if (item.IsGrenade() || item.IsClaymore())
-                                item.traits.Add("Triggered");
+                            {
+                                print($"{item.itemName} | {item.id} flagged for being triggered.");
+                                item.SetTriggered();
+                            }
                             else
                                 item.DamageItem(explodedBy, damage);
                         }
@@ -138,6 +142,7 @@ public class ExplosionList : MonoBehaviour
                 }
                 else if (hitByExplosion is Item hitItem && hitItem.IsTriggered())
                 {
+                    print($"{hitItem.id} is triggered.");
                     if (hitItem.IsGrenade())
                         hitItem.CheckExplosionGrenade(explodedBy, new(hitItem.X, hitItem.Y, hitItem.Z));
                     else if (hitItem.IsClaymore())
@@ -158,7 +163,6 @@ public class ExplosionList : MonoBehaviour
                     menu.AddXpAlert(explosionCausedBy, posDamage - negDamage, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage} damage to enemies and {negDamage} damage to allies.", false);
             }
                 
-
             Destroy(explosionList);
         }
         else

@@ -287,7 +287,7 @@ public class SoldierAlert : MonoBehaviour
             soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = "HP: " + snapshotSoldier.GetFullHP().ToString();
             soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = "AP: " + snapshotSoldier.ap.ToString();
             soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = "MA: " + snapshotSoldier.mp.ToString();
-            soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Max Move: " + snapshotSoldier.InstantSpeed.ToString();
+            soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = "Move: " + snapshotSoldier.InstantSpeed.ToString();
             soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = "XP: " + snapshotSoldier.xp.ToString();
             soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = "Status: " + snapshotSoldier.GetStatus();
 

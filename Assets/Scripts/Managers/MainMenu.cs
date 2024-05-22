@@ -36,7 +36,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, throwItemUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -484,8 +484,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         outputInt = 0;
         if (inputField.textComponent.color == normalTextColour)
         {
-            outputInt = int.Parse(inputField.text);
-            return true;
+            if (int.TryParse(inputField.text, out int innerOutputInt))
+            {
+                outputInt = innerOutputInt;
+                return true;
+            }
         }
         return false;
     }
@@ -1319,7 +1322,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = $"HP: {activeSoldier.GetFullHP()}";
         soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = $"AP: {activeSoldier.ap}";
         soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = $"MA: {activeSoldier.mp}";
-        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = $"Max Move: {activeSoldier.InstantSpeed}";
+        soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = $"Move: {activeSoldier.InstantSpeed}";
         soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = $"XP: {activeSoldier.xp}";
         soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = activeSoldier.GetStatus();
 
@@ -3428,6 +3431,56 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         cannotUseItemUI.SetActive(false);
     }
+    public void OpenThrowUI(UseItemUI useItemUI)
+    {
+        throwUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        throwUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        throwUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        throwUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text = $"Throwing {useItemUI.itemUsed.itemName} from {useItemUI.itemUsedFromSlotName} slot.";
+        throwUI.SetActive(true);
+    }
+    public void ClearThrowUI()
+    {
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        throwUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
+        throwUI.transform.Find("PressedOnce").gameObject.SetActive(false);
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("FinalPosition").gameObject.SetActive(false);
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(false);
+    }
+    public void CloseThrowUI()
+    {
+        ClearThrowUI();
+        throwUI.SetActive(false);
+    }
+    public void OpenDropUI(UseItemUI useItemUI)
+    {
+        dropUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        dropUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        dropUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        dropUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text = $"Dropping {useItemUI.itemUsed.itemName} from {useItemUI.itemUsedFromSlotName} slot.";
+        dropUI.SetActive(true);
+    }
+    public void ClearDropUI()
+    {
+        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
+        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
+        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
+        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+    }
+    public void CloseDropUI()
+    {
+        ClearDropUI();
+        dropUI.SetActive(false);
+    }
     public void OpenUseItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon, int ap)
     {
         useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(true);
@@ -3686,16 +3739,21 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         useItemUI.SetActive(false);
     }
-    public void OpenThrowItemUI(Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon)
+    public void OpenDropThrowItemUI(Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon)
     {
-        throwItemUI.GetComponent<UseItemUI>().itemUsed = itemThrown;
-        throwItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
-        throwItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemThrownFromSlotName;
-        throwItemUI.SetActive(true);
+        if (itemThrown.IsThrowable())
+            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item (up to {activeSoldier.ThrowRadius()}cm)?";
+        else
+            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Cannot throw, drop item (up to 3cm)?";
+
+        dropThrowItemUI.GetComponent<UseItemUI>().itemUsed = itemThrown;
+        dropThrowItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
+        dropThrowItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemThrownFromSlotName;
+        dropThrowItemUI.SetActive(true);
     }
-    public void CloseThrowItemUI()
+    public void CloseDropThrowItemUI()
     {
-        throwItemUI.SetActive(false);
+        dropThrowItemUI.SetActive(false);
     }
     public void OpenEtoolResultUI()
     {
@@ -3793,33 +3851,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         ClearGrenadeUI();
         grenadeUI.SetActive(false);
-    }
-    public void OpenThrowUI(UseItemUI useItemUI)
-    {
-        throwUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
-        throwUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
-        throwUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
-
-        throwUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text = $"Throwing {useItemUI.itemUsed.itemName} from inventory";
-        throwUI.SetActive(true);
-    }
-    public void ClearThrowUI()
-    {
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        throwUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
-        throwUI.transform.Find("PressedOnce").gameObject.SetActive(false);
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("FinalPosition").gameObject.SetActive(false);
-        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(false);
-    }
-    public void CloseThrowUI()
-    {
-        ClearThrowUI();
-        throwUI.SetActive(false);
     }
     public void OpenClaymoreUI(UseItemUI useItemUI)
     {

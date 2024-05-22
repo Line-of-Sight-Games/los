@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEditor.VersionControl;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -173,32 +172,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             if (item.owner is Soldier linkedSoldier /*&& linkedSoldier.IsAbleToSee()*/)
             {
                 if (linkedSoldier.game.CheckAP(1))
-                {
-                    if (item.IsThrowable())
-                    {
-                        string message = "";
-                        if (linkedSoldier.HasNonWeaponsInBothHands())
-                            message = "Hands Full";
-                        else if (linkedSoldier.IsCarryingRiotShield() && !item.IsRiotShield())
-                            message = "Riot Shield Blocking";
-                        else if (linkedSoldier.IsWearingJuggernautArmour(false) && !(item.IsGun() || item.IsGrenade() || item.IsRiotShield()))
-                            message = "Juggernaut Armour Blocking";
-
-                        if (message == "")
-                        {
-                            if (linkedSoldier.HasNothingInBothHands() || linkedSoldier.HasSingleWeaponInEitherHand()) //if hands empty or holding single weapon
-                                menu.OpenThrowItemUI(item, transform.parent.name, this);
-                            else if (linkedSoldier.HasSingleNonWeaponInEitherHand() && transform.parent.name.Contains("Hand")) //if holding single non weapon and the item for use is that item in hand
-                                menu.OpenThrowItemUI(item, transform.parent.name, this);
-                            else
-                                menu.OpenCannotUseItemUI("Hands Full");
-                        }
-                        else
-                            menu.OpenCannotUseItemUI(message);
-                    }
-                    else
-                        menu.OpenCannotUseItemUI("Item is not throwable");
-                }
+                    menu.OpenDropThrowItemUI(item, transform.parent.name, this);
             }
         }
     }

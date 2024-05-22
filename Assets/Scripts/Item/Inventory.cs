@@ -40,11 +40,8 @@ public class Inventory
         if (linkedInventoryObject is Soldier linkedSoldier)
         {
             RemoveItem(item);
-            if (linkedSoldier.inventorySlots[slotName] == item.id)
-            {
-                linkedSoldier.inventorySlots[slotName] = "";
-                item.whereEquipped = "";
-            }
+            linkedSoldier.inventorySlots[slotName] = "";
+            item.whereEquipped = "";
         }
     }
     public void ConsumeItemInSlot(Item item, string slotName)

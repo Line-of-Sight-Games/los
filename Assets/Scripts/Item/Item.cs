@@ -247,18 +247,18 @@ public class Item : PhysicalObject, IDataPersistence
             itemName = (string)details["itemName"];
             Init(itemName);
             id = tempId;
-            weight = System.Convert.ToInt32(details["weight"]);
-            ammo = System.Convert.ToInt32(details["ammo"]);
-            ablativeHealth = System.Convert.ToInt32(details["ablativeHealth"]);
-            charges = System.Convert.ToInt32(details["charges"]);
+            weight = Convert.ToInt32(details["weight"]);
+            ammo = Convert.ToInt32(details["ammo"]);
+            ablativeHealth = Convert.ToInt32(details["ablativeHealth"]);
+            charges = Convert.ToInt32(details["charges"]);
             poisonedBy = (string)details["poisonedBy"];
             equippableSlots = (details["equippableSlots"] as JArray).Select(token => token.ToString()).ToList();
             whereEquipped = (string)details["whereEquipped"];
 
             //load position
-            x = System.Convert.ToInt32(details["x"]);
-            y = System.Convert.ToInt32(details["y"]);
-            z = System.Convert.ToInt32(details["z"]);
+            x = Convert.ToInt32(details["x"]);
+            y = Convert.ToInt32(details["y"]);
+            z = Convert.ToInt32(details["z"]);
             MapPhysicalPosition(x, y, z);
         }
     }
@@ -645,6 +645,8 @@ public class Item : PhysicalObject, IDataPersistence
     }
     public void CheckExplosionGrenade(Soldier explodedBy, Vector3 position)
     {
+        print($"Explosion: {itemName} ({position.x},{position.y},{position.z}) | {id} ({explodedBy.soldierName})");
+
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} : {position.x},{position.y},{position.z}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.Id;
 
@@ -724,10 +726,10 @@ public class Item : PhysicalObject, IDataPersistence
     }
     public void DestroyItem(Soldier destroyedBy)
     {
-        ConsumeItem();
-
         if (owner is Soldier linkedSoldier)
-            menu.AddDamageAlert(linkedSoldier, $"{linkedSoldier.soldierName} had {this.itemName} destroyed.", false, true);
+            menu.AddDamageAlert(linkedSoldier, $"{linkedSoldier.soldierName} had {this.itemName} ({this.X},{this.Y},{this.Z}) destroyed.", false, true);
+
+        ConsumeItem();
     }
     public bool IsBreakable()
     {
@@ -761,9 +763,15 @@ public class Item : PhysicalObject, IDataPersistence
     }
     public bool IsTriggered()
     {
-        if (traits.Contains("Triggered"))
+        if (id.Contains("t"))
             return true;
         return false;
+    }
+    public void SetTriggered()
+    {
+        print($"Setting triggered {itemName} ({X},{Y},{Z}) | {id}");
+        if (!IsTriggered())
+            id = $"t{id}";
     }
     public bool IsPoisonable()
     {

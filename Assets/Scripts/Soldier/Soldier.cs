@@ -517,7 +517,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             item.RunDropEffect(slotName);
             Inventory.RemoveItemFromSlot(item, slotName);
-            
         }
     }
     public void FrozenMultiShot()
@@ -549,12 +548,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             foreach (KeyValuePair<string, string> kvp in itemSlots)
                 if (kvp.Value == item.id)
                     DropItemFromSlot(item, kvp.Key);
-    }
-    public Item DropItem(Item item)
-    {
-        Inventory.RemoveItem(item);
-
-        return item;
     }
     public int GetFullHP()
     {

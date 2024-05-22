@@ -2475,13 +2475,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
         DeductAP(ap);
         menu.CloseUseItemUI();
     }
-    public void ConfirmThrowItem(UseItemUI useItemUI)
+    public void ConfirmDropThrowItem(UseItemUI useItemUI)
     {
         int.TryParse(useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
-        menu.OpenThrowUI(useItemUI);
+        if (useItemUI.itemUsed.IsThrowable())
+            menu.OpenThrowUI(useItemUI);
+        else
+            menu.OpenDropUI(useItemUI);
 
         DeductAP(ap);
-        menu.CloseThrowItemUI();
+        menu.CloseDropThrowItemUI();
     }
     public void UpdateSoldierUsedOn(UseItemUI useItemUI)
     {
@@ -2645,12 +2648,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (useGrenade.itemUsed.owner is Soldier linkedSoldier)
                 {
                     useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
-                    if (grenadeName.Contains("Frag") || grenadeName.Contains("Flashbang"))
-                        useGrenade.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(x, y, z));
-                    else if (grenadeName.Contains("Smoke"))
-                        Instantiate(poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
-                    else if (grenadeName.Contains("Tabun"))
-                        Instantiate(poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(x, y, z), string.Empty), activeSoldier.Id);
+                    useGrenade.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(x, y, z));
                 }
                 menu.CloseGrenadeUI();
             }
@@ -2663,12 +2661,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmThrow(UseItemUI throwItemUI)
     {
-        string yeet = throwItemUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text;
         TMP_InputField targetX = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField targetZ = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>();
         GameObject invalidThrow = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("InvalidThrow").gameObject;
         GameObject totalMiss = throwItemUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
+        GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ItemWillBreak").gameObject;
 
         if (!throwItemUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
@@ -2709,17 +2707,66 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if ((menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z)))
             {
-                activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
-                throwItemUI.itemUsed.X = x;
-                throwItemUI.itemUsed.Y = y;
-                throwItemUI.itemUsed.Z = z;
+                if (itemWillBreak.activeInHierarchy)
+                {
+                    if (throwItemUI.itemUsed.IsGrenade())
+                    {
+                        if (throwItemUI.itemUsed.owner is Soldier linkedSoldier)
+                        {
+                            throwItemUI.itemUsed.UseItem(throwItemUI.itemUsedIcon, throwItemUI.itemUsedOn, throwItemUI.soldierUsedOn);
+                            throwItemUI.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(x, y, z));
+                        }
+                    }
+                    else
+                        throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+                }
+                else
+                {
+                    activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                    throwItemUI.itemUsed.X = x;
+                    throwItemUI.itemUsed.Y = y;
+                    throwItemUI.itemUsed.Z = z;
+                }
                 menu.CloseThrowUI();
             }
-            else if (totalMiss.activeInHierarchy)
+            else
             {
                 activeSoldier.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
                 menu.CloseThrowUI();
             }
+        }
+    }
+    public void ConfirmDrop(UseItemUI throwItemUI)
+    {
+        TMP_InputField targetX = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetY = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetZ = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        GameObject invalidThrow = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("InvalidThrow").gameObject;
+        GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ItemWillBreak").gameObject;
+
+        if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
+        {
+            if (itemWillBreak.activeInHierarchy)
+            {
+                if (throwItemUI.itemUsed.IsGrenade())
+                {
+                    if (throwItemUI.itemUsed.owner is Soldier linkedSoldier)
+                    {
+                        throwItemUI.itemUsed.UseItem(throwItemUI.itemUsedIcon, throwItemUI.itemUsedOn, throwItemUI.soldierUsedOn);
+                        throwItemUI.itemUsed.CheckExplosionGrenade(linkedSoldier, new Vector3(x, y, z));
+                    }
+                }
+                else
+                    throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+            }
+            else
+            {
+                activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                throwItemUI.itemUsed.X = x;
+                throwItemUI.itemUsed.Y = y;
+                throwItemUI.itemUsed.Z = z;
+            }
+            menu.CloseDropUI();
         }
     }
     public void ConfirmClaymore(UseItemUI useClaymore)
