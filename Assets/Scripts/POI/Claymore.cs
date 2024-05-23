@@ -149,9 +149,8 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
             }
         }
 
-        //if any exploded candidates
-        if (explosionList.transform.childCount > 0)
-            menu.OpenExplosionUI();
+        //show explosion ui
+        menu.OpenExplosionUI();
 
         Exploded = true;
     }

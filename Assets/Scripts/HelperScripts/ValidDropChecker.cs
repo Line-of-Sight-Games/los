@@ -21,7 +21,7 @@ public class ValidDropChecker : MonoBehaviour
     {
         invalidThrow.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && Vector2.Distance(new(throwLocation.x, throwLocation.y), new(menu.activeSoldier.X, menu.activeSoldier.Y)) > 3)
+        if (GetThrowLocation(out Vector3 throwLocation) && (Vector2.Distance(new(throwLocation.x, throwLocation.y), new(menu.activeSoldier.X, menu.activeSoldier.Y)) > 3 || throwLocation.z > menu.activeSoldier.Z + 3))
             invalidThrow.SetActive(true);
     }
     public bool GetThrowLocation(out Vector3 throwLocation)

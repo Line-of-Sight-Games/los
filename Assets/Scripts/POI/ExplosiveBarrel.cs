@@ -63,7 +63,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
 
     public void CheckExplosionBarrel(Soldier explodedBy)
     {
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel : {this.X},{this.Y},{this.Z}").gameObject;
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel | Detonated: {this.X},{this.Y},{this.Z}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
@@ -87,9 +87,8 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
             }
         }
 
-        //if any exploded candidates
-        if (explosionList.transform.childCount > 0)
-            menu.OpenExplosionUI();
+        //show explosion ui
+        menu.OpenExplosionUI();
         
         poiManager.DestroyPOI(this);
     }

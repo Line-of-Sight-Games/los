@@ -162,7 +162,8 @@ public class ExplosionList : MonoBehaviour
                 else
                     menu.AddXpAlert(explosionCausedBy, posDamage - negDamage, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage} damage to enemies and {negDamage} damage to allies.", false);
             }
-                
+            
+            menu.CloseExplosionUI();
             Destroy(explosionList);
         }
         else

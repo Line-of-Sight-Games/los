@@ -2847,7 +2847,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF : {position.x}, {position.y}, {position.z}").gameObject;
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
@@ -2869,10 +2869,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
 
-        if (explosionList.transform.Find("Scroll").Find("View").Find("Content").childCount > 0)
-            menu.OpenExplosionUI();
-        else
-            Destroy(explosionList);
+        //show explosion ui
+        menu.OpenExplosionUI();
     }
     public void CheckAllSmokeClouds()
     {

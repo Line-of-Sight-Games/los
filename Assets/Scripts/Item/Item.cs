@@ -645,9 +645,7 @@ public class Item : PhysicalObject, IDataPersistence
     }
     public void CheckExplosionGrenade(Soldier explodedBy, Vector3 position)
     {
-        print($"Explosion: {itemName} ({position.x},{position.y},{position.z}) | {id} ({explodedBy.soldierName})");
-
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} : {position.x},{position.y},{position.z}").gameObject;
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} | Detonated: {position.x},{position.y},{position.z}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.Id;
 
         if (IsFrag())
@@ -706,11 +704,8 @@ public class Item : PhysicalObject, IDataPersistence
         else if (IsTabun())
             Instantiate(game.poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
 
-        //show explosion list
-        if (explosionList.transform.Find("Scroll").Find("View").Find("Content").childCount > 0)
-            menu.OpenExplosionUI();
-        else
-            Destroy(explosionList);
+        //show explosion ui
+        menu.OpenExplosionUI();
 
         DestroyItem(explodedBy);
     }

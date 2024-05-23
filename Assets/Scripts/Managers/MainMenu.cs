@@ -48,8 +48,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public float turnTime;
     public string meleeChargeIndicator;
     public Soldier activeSoldier;
-    public bool overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, inspirerResolvedFlag, clearDamageEventFlag, 
-        xpResolvedFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
+    public bool overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
         detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist, explosiveBarrelSprite, goodyBoxSprite,
@@ -180,7 +179,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 //check if game has not run out of turns
                 if (game.currentRound <= game.maxRounds)
                 {
-                    playTimeTotal += Time.deltaTime;
+                    playTimeTotal += Time.unscaledDeltaTime;
                     turnTime += Time.deltaTime;
                     weatherIndicator.text = DisplayWeather();
                 }
@@ -212,7 +211,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 turnTimer.text = FormatFloatTime(game.maxTurnTime - turnTime);
                 TurnTimerColour();
                 ChangeRoundIndicators();
-                CloseExplosionUI();
 
                 //show LOS gizmos
                 DisplayLOSGizmos();
@@ -399,10 +397,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void FreezeTime()
     {
+        print("Tried to freeze time");
         Time.timeScale = 0f;
     }
     public void UnfreezeTime()
     {
+        print("Tried to unfreeze time");
         Time.timeScale = 1.0f;
     }
     public void SetDetectionResolvedFlagTo(bool value)
@@ -440,6 +440,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             FreezeTime();
 
         shotResolvedFlag = value;
+    }
+    public void SetExplosionResolvedFlagTo(bool value)
+    {
+        if (value)
+            UnfreezeTime();
+        else
+            FreezeTime();
+
+        explosionResolvedFlag = value;
     }
     public void SetInspirerResolvedFlagTo(bool value)
     {
@@ -2138,12 +2147,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //explosion functions
     public void OpenExplosionUI()
     {
+        SetExplosionResolvedFlagTo(false);
         explosionUI.SetActive(true);
     }
     public void CloseExplosionUI()
     {
-        if (explosionUI.transform.childCount == 0)
+        if (explosionUI.transform.childCount == 1) //check if this is the last explosion list
+        {
+            SetExplosionResolvedFlagTo(true);
             explosionUI.SetActive(false);
+        }
     }
     public void AddExplosionAlert(GameObject explosionList, Soldier hitByExplosion, Vector3 explosionLocation, Soldier explodedBy, int damage, int stunRounds)
     {
