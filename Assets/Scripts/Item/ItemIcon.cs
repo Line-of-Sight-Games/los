@@ -26,12 +26,8 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         originalInventoryObject = originalSlot.linkedInventoryObject;
         item.markedForAction = string.Empty;
 
-        return this;
-    }
-    private void Update()
-    {
         transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(this.gameObject.name);
-        if (item.owner is Soldier linkedSoldier && linkedSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
+        if (menu.activeSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
             transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{1}";
         else
             transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{item.weight}";
@@ -40,7 +36,10 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             transform.Find("Ammo").gameObject.SetActive(true);
             transform.Find("Ammo").GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
         }
+
+        return this;
     }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         canvasGroup.alpha = 0.6f;
@@ -75,8 +74,27 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                         SetCurrentSlot(targetSlot.AssignItemIcon(this));
 
                         targetSlotName = targetSlot.name;
-                        if (targetSlot.linkedInventoryObject != null)
+
+                        InventoryDisplayPanelSoldier soldierInventory = targetSlot.GetComponentInParent<InventoryDisplayPanelSoldier>();
+                        if (targetSlotName.Contains("Backpack"))
+                            targetInventoryId = soldierInventory.GetItemInSlot("Back").Id;
+                        else if (targetSlotName.Contains("LeftBrace"))
+                        {
+                            targetInventoryId = soldierInventory.GetItemInSlot("LeftLeg").Id;
+                            targetSlotName = "Brace1";
+                        } 
+                        else if (targetSlotName.Contains("RightBrace"))
+                        {
+                            targetInventoryId = soldierInventory.GetItemInSlot("RightLeg").Id;
+                            targetSlotName = "Brace1";
+                        }
+                        else if (targetSlotName.Contains("BArmour") || targetSlotName.Contains("JArmour"))
+                            targetInventoryId = soldierInventory.GetItemInSlot("Chest").Id;
+                        else if (targetSlotName.Contains("Bag"))
+                            targetInventoryId = soldierInventory.GetItemInSlot("Posterior").Id;
+                        else
                             targetInventoryId = targetSlot.linkedInventoryObject.Id;
+                        
                         if (targetSlot == originalSlot)
                             item.markedForAction = string.Empty;
                         else
@@ -127,40 +145,38 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.overrideView)
         {
-            if (item.owner is Soldier linkedSoldier /*&& linkedSoldier.IsAbleToSee()*/)
+            print($"{menu.activeSoldier.soldierName}");
+            int ap = item.usageAP;
+            //adept ability
+            if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
+                ap--;
+            //gunner ability
+            if (menu.activeSoldier.IsGunner() && item.IsAmmo())
+                ap = 1;
+
+            if (menu.activeSoldier.game.CheckAP(ap))
             {
-                int ap = item.usageAP;
-                //adept ability
-                if (linkedSoldier.IsAdept() && item.usageAP > 1)
-                    ap--;
-                //gunner ability
-                if (linkedSoldier.IsGunner() && item.IsAmmo())
-                    ap = 1;
-
-                if (linkedSoldier.game.CheckAP(ap))
+                if (item.IsUsable())
                 {
-                    if (item.IsUsable())
-                    {
-                        string message = "";
-                        if (linkedSoldier.HasNonWeaponsInBothHands())
-                            message = "Hands Full";
-                        else if (linkedSoldier.IsCarryingRiotShield() && !item.IsRiotShield())
-                            message = "Riot Shield Blocking";
-                        else if (linkedSoldier.IsWearingJuggernautArmour(false) && !(item.IsGun() || item.IsGrenade() || item.IsRiotShield()))
-                            message = "Juggernaut Armour Blocking";
+                    string message = "";
+                    if (menu.activeSoldier.HasNonWeaponsInBothHands())
+                        message = "Hands Full";
+                    else if (menu.activeSoldier.IsCarryingRiotShield() && !item.IsRiotShield())
+                        message = "Riot Shield Blocking";
+                    else if (menu.activeSoldier.IsWearingJuggernautArmour(false) && !(item.IsGun() || item.IsGrenade() || item.IsRiotShield()))
+                        message = "Juggernaut Armour Blocking";
 
-                        if (message == "")
-                        {
-                            if (linkedSoldier.HasNothingInBothHands() || linkedSoldier.HasSingleWeaponInEitherHand()) //if hands empty or holding single weapon
-                                menu.OpenUseItemUI(item, transform.parent.name, this, ap);
-                            else if (linkedSoldier.HasSingleNonWeaponInEitherHand() && transform.parent.name.Contains("Hand")) //if holding single non weapon and the item for use is that item in hand
-                                menu.OpenUseItemUI(item, transform.parent.name, this, ap);
-                            else
-                                menu.OpenCannotUseItemUI("Hands Full");
-                        }
+                    if (message == "")
+                    {
+                        if (menu.activeSoldier.HasNothingInBothHands() || menu.activeSoldier.HasSingleWeaponInEitherHand()) //if hands empty or holding single weapon
+                            menu.OpenUseItemUI(item, transform.parent.name, this, ap);
+                        else if (menu.activeSoldier.HasSingleNonWeaponInEitherHand() && transform.parent.name.Contains("Hand")) //if holding single non weapon and the item for use is that item in hand
+                            menu.OpenUseItemUI(item, transform.parent.name, this, ap);
                         else
-                            menu.OpenCannotUseItemUI(message);
+                            menu.OpenCannotUseItemUI("Hands Full");
                     }
+                    else
+                        menu.OpenCannotUseItemUI(message);
                 }
             }
         }
@@ -169,11 +185,8 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.overrideView)
         {
-            if (item.owner is Soldier linkedSoldier /*&& linkedSoldier.IsAbleToSee()*/)
-            {
-                if (linkedSoldier.game.CheckAP(1))
-                    menu.OpenDropThrowItemUI(item, transform.parent.name, this);
-            }
+            if (menu.activeSoldier.game.CheckAP(1))
+                menu.OpenDropThrowItemUI(item, transform.parent.name, this);
         }
     }
     public bool CheckValidSlot(ItemSlot targetSlot)

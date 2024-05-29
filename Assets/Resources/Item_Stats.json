@@ -3,103 +3,97 @@
     {
       "Name": "Ammo_AR",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 2,
-      "Ammo": 8,
+      "Ammo": 5,
       "LoudRadius": 22,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Ammo_LMG",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 3,
-      "Ammo": 10,
+      "Ammo": 12,
       "LoudRadius": 34,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Ammo_Pi",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "Ammo": 6,
       "LoudRadius": 22,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Ammo_Ri",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
-      "Ammo": 6,
+      "Ammo": 5,
       "LoudRadius": 22,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Ammo_Sh",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 34,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Ammo_SMG",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 2,
       "Ammo": 4,
       "LoudRadius": 22,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Ammo_Sn",
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 2,
       "Weight": 2,
-      "Ammo": 4,
+      "Ammo": 5,
       "LoudRadius": 24,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "AR_ACOG_FAL",
       "Traits": [ "Gun", "Assault Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 2,
       "Ammo": 10,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 10,
-        "BaseMaxClip": 10,
         "Damage": 4,
         "CritDamage": 6,
         "CQBU": 15,
@@ -122,19 +116,18 @@
         "ShortCovDamage": 2,
         "MedCovDamage": 2,
         "LongCovDamage": 2
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "AR_AK_47",
       "Traits": [ "Gun", "Assault Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 3,
       "Ammo": 5,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 5,
-        "BaseMaxClip": 5,
         "Damage": 5,
         "CritDamage": 7,
         "CQBU": 25,
@@ -157,19 +150,18 @@
         "ShortCovDamage": 3,
         "MedCovDamage": 3,
         "LongCovDamage": 3
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "AR_M_16",
       "Traits": [ "Gun", "Assault Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 3,
       "Ammo": 6,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 6,
-        "BaseMaxClip": 6,
         "Damage": 5,
         "CritDamage": 6,
         "CQBU": 25,
@@ -192,232 +184,235 @@
         "ShortCovDamage": 2,
         "MedCovDamage": 2,
         "LongCovDamage": 2
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Armour_Body",
       "Traits": [ "Armour", "Ablative", "Unbreakable", "Storage" ],
+      "EquippableSlots": [ "Chest" ],
+      "WhereEquipped": "",
       "Weight": 4,
       "AblativeHealth": 4,
-      "GunTraits": {},
-      "EquippableSlots": [ "Chest" ],
-      "WhereEquipped": ""
+      "inventorySlots": {
+        "BArmour1": "",
+        "BArmour2": ""
+      }
     },
     {
       "Name": "Armour_Exo",
       "Traits": [ "Armour" ],
-      "Weight": 3,
-      "GunTraits": {},
       "EquippableSlots": [ "Head" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 3
     },
     {
       "Name": "Armour_Ghillie",
       "Traits": [ "Armour", "Unbreakable" ],
-      "Weight": 1,
-      "GunTraits": {},
       "EquippableSlots": [ "Head" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 1
     },
     {
       "Name": "Armour_Juggernaut",
       "Traits": [ "Armour", "Ablative", "Unbreakable", "Storage" ],
+      "EquippableSlots": [ "Head" ],
+      "WhereEquipped": "",
       "Weight": 14,
       "AblativeHealth": 18,
-      "GunTraits": {},
-      "EquippableSlots": [ "Head" ],
-      "WhereEquipped": ""
+      "inventorySlots": {
+        "JArmour1": "",
+        "JArmour2": "",
+        "JArmour3": "",
+        "JArmour4": ""
+      }
     },
     {
       "Name": "Armour_Stimulant",
       "Traits": [ "Armour" ],
-      "Weight": 2,
-      "GunTraits": {},
       "EquippableSlots": [ "Head" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 2
     },
     {
       "Name": "Backpack",
       "Traits": [ "Storage" ],
-      "Weight": 4,
-      "GunTraits": {},
       "EquippableSlots": [ "Back" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 4,
+      "inventorySlots": {
+        "Backpack1": "",
+        "Backpack2": "",
+        "Backpack3": "",
+        "BackpackMedS": "",
+        "BackpackMedM": ""
+      }
     },
     {
       "Name": "Bag",
       "Traits": [ "Storage" ],
-      "Weight": 2,
-      "GunTraits": {},
       "EquippableSlots": [ "Posterior" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 2,
+      "inventorySlots": { 
+        "BagMedM": ""
+      }
     },
     {
       "Name": "Binoculars",
       "Traits": [ "Usable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 2,
       "Weight": 1,
-      "MeleeDamage": 0,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "MeleeDamage": 0
     },
     {
       "Name": "Brace",
       "Traits": [ "Storage", "Throwable" ],
-      "Weight": 1,
-      "GunTraits": {},
       "EquippableSlots": [ "Leg" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 1,
+      "inventorySlots": { 
+        "Brace1": "",
+        "BraceMedS": ""
+      }
     },
     {
       "Name": "Claymore",
       "Traits": [ "Usable", "Consumable", "Fragile", "Placeable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 2,
       "Weight": 2,
       "LoudRadius": 10,
-      "MeleeDamage": 0,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "MeleeDamage": 0
     },
     {
       "Name": "Deployment_Beacon",
       "Traits": [ "Usable", "Consumable", "Fragile", "Placeable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 2,
       "LoudRadius": 10,
-      "MeleeDamage": 0,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour" ],
-      "WhereEquipped": ""
+      "MeleeDamage": 0
     },
     {
       "Name": "E_Tool",
       "Traits": [ "Usable", "Weapon"],
+      "EquippableSlots": [ "Backpack", "Posterior", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 2,
       "Weight": 2,
       "LoudRadius": 18,
-      "MeleeDamage": 3,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "MeleeDamage": 3
     },
     {
       "Name": "Food_Pack",
       "Traits": [ "Usable", "Consumable", "Poisonable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 1,
       "LoudRadius": 8,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Grenade_Flashbang",
       "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Grenade_Frag",
       "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Grenade_Smoke",
       "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Grenade_Tabun",
       "Traits": [ "Usable", "Fragile", "Consumable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Knife",
       "Traits": [ "Weapon", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 1,
       "MeleeDamage": 5,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "BlockedByPosterior": "Back",
       "BlockedByLateral": "LeftBrace"
     },
     {
       "Name": "Medkit_Large",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "EquippableSlots": [ "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 6,
       "HPGranted": 20,
       "LoudRadius": 24,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Medkit_Medium",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "EquippableSlots": [ "MedM" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 0,
       "HPGranted": 4,
       "LoudRadius": 24,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Misc" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Medkit_Small",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
+      "EquippableSlots": [ "MedS" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 0,
       "HPGranted": 2,
       "LoudRadius": 24,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Misc" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "LMG_LSW",
       "Traits": [ "Gun", "Light Machine Gun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 5,
       "Ammo": 16,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 16,
-        "BaseMaxClip": 16,
         "Damage": 6,
         "CritDamage": 9,
         "CQBU": 20,
@@ -440,19 +435,18 @@
         "ShortCovDamage": 4,
         "MedCovDamage": 4,
         "LongCovDamage": 4
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "LMG_M_60",
       "Traits": [ "Gun", "Light Machine Gun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 6,
       "Ammo": 16,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 16,
-        "BaseMaxClip": 16,
         "Damage": 6,
         "CritDamage": 10,
         "CQBU": 25,
@@ -475,19 +469,18 @@
         "ShortCovDamage": 3,
         "MedCovDamage": 3,
         "LongCovDamage": 3
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "LMG_SAW",
       "Traits": [ "Gun", "Light Machine Gun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 6,
       "Ammo": 12,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 12,
-        "BaseMaxClip": 12,
         "Damage": 5,
         "CritDamage": 8,
         "CQBU": 15,
@@ -510,27 +503,25 @@
         "ShortCovDamage": 3,
         "MedCovDamage": 3,
         "LongCovDamage": 3
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Logistics_Belt",
       "Traits": [],
-      "Weight": 2,
-      "GunTraits": {},
       "EquippableSlots": [ "Posterior" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 2
     },
     {
       "Name": "Pi_357",
       "Traits": [ "Gun", "Pistol", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 1,
       "Ammo": 6,
       "MeleeDamage": 0,
       "GunTraits": {
         "MaxClip": 6,
-        "BaseMaxClip": 6,
         "Damage": 3,
         "CritDamage": 6,
         "CQBU": 20,
@@ -553,19 +544,18 @@
         "ShortCovDamage": 1,
         "MedCovDamage": 1,
         "LongCovDamage": 1
-      },
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Pi_Glock",
       "Traits": [ "Gun", "Pistol", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 1,
       "Ammo": 8,
       "MeleeDamage": 0,
       "GunTraits": {
         "MaxClip": 8,
-        "BaseMaxClip": 8,
         "Damage": 1,
         "CritDamage": 3,
         "CQBU": 40,
@@ -588,19 +578,18 @@
         "ShortCovDamage": 0,
         "MedCovDamage": 0,
         "LongCovDamage": 0
-      },
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Pi_Sidearm",
       "Traits": [ "Gun", "Pistol", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 1,
       "Ammo": 6,
       "MeleeDamage": 0,
       "GunTraits": {
         "MaxClip": 6,
-        "BaseMaxClip": 6,
         "Damage": 2,
         "CritDamage": 3,
         "CQBU": 50,
@@ -623,31 +612,29 @@
         "ShortCovDamage": 1,
         "MedCovDamage": 1,
         "LongCovDamage": 1
-      },
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Poison_Satchel",
       "Traits": [ "Usable", "Consumable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "LoudRadius": 6,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Ri_Arisaka",
       "Traits": [ "Gun", "Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 2,
       "Ammo": 5,
       "MeleeDamage": 4,
       "GunTraits": {
         "MaxClip": 5,
-        "BaseMaxClip": 5,
         "Damage": 5,
         "CritDamage": 9,
         "CQBU": 10,
@@ -670,19 +657,18 @@
         "ShortCovDamage": 1,
         "MedCovDamage": 1,
         "LongCovDamage": 1
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Ri_Carbine",
       "Traits": [ "Gun", "Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 2,
       "Ammo": 8,
       "MeleeDamage": 4,
       "GunTraits": {
         "MaxClip": 8,
-        "BaseMaxClip": 8,
         "Damage": 5,
         "CritDamage": 8,
         "CQBU": 15,
@@ -705,19 +691,18 @@
         "ShortCovDamage": 2,
         "MedCovDamage": 2,
         "LongCovDamage": 2
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Ri_M1_Garand",
       "Traits": [ "Gun", "Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 2,
       "Ammo": 7,
       "MeleeDamage": 4,
       "GunTraits": {
         "MaxClip": 7,
-        "BaseMaxClip": 7,
         "Damage": 5,
         "CritDamage": 7,
         "CQBU": 10,
@@ -740,28 +725,26 @@
         "ShortCovDamage": 2,
         "MedCovDamage": 2,
         "LongCovDamage": 2
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Riot_Shield",
       "Traits": [ "Usable", "Unbreakable" ],
-      "Weight": 8,
-      "MeleeDamage": 0,
-      "GunTraits": {},
       "EquippableSlots": [ "Hand" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 8,
+      "MeleeDamage": 0
     },
     {
       "Name": "Sh_Ithaca",
       "Traits": [ "Gun", "Shotgun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 3,
       "Ammo": 6,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 6,
-        "BaseMaxClip": 6,
         "Damage": 6,
         "CritDamage": 8,
         "CQBU": 60,
@@ -784,19 +767,18 @@
         "ShortCovDamage": 2,
         "MedCovDamage": 1,
         "LongCovDamage": 0
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Sh_Olympus",
       "Traits": [ "Gun", "Shotgun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 3,
       "Ammo": 4,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 4,
-        "BaseMaxClip": 4,
         "Damage": 6,
         "CritDamage": 8,
         "CQBU": 50,
@@ -819,19 +801,18 @@
         "ShortCovDamage": 1,
         "MedCovDamage": 0,
         "LongCovDamage": 0
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Sh_SPAS_12",
       "Traits": [ "Gun", "Shotgun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 2,
       "Ammo": 6,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 6,
-        "BaseMaxClip": 6,
         "Damage": 8,
         "CritDamage": 10,
         "CQBU": 70,
@@ -854,19 +835,18 @@
         "ShortCovDamage": 2,
         "MedCovDamage": 1,
         "LongCovDamage": 0
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "SMG_P_90",
       "Traits": [ "Gun", "Sub-Machine Gun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 2,
-      "Ammo": 5,
+      "Ammo": 4,
       "MeleeDamage": 2,
       "GunTraits": {
-        "MaxClip": 5,
-        "BaseMaxClip": 5,
+        "MaxClip": 4,
         "Damage": 3,
         "CritDamage": 5,
         "CQBU": 55,
@@ -889,19 +869,18 @@
         "ShortCovDamage": 1,
         "MedCovDamage": 1,
         "LongCovDamage": 1
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "SMG_Thompson",
       "Traits": [ "Gun", "Sub-Machine Gun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 3,
       "Ammo": 4,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 4,
-        "BaseMaxClip": 4,
         "Damage": 4,
         "CritDamage": 5,
         "CQBU": 40,
@@ -924,19 +903,18 @@
         "ShortCovDamage": 1,
         "MedCovDamage": 1,
         "LongCovDamage": 1
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "SMG_UMP_40",
       "Traits": [ "Gun", "Sub-Machine Gun", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 2,
-      "Ammo": 6,
+      "Ammo": 5,
       "MeleeDamage": 2,
       "GunTraits": {
-        "MaxClip": 6,
-        "BaseMaxClip": 6,
+        "MaxClip": 5,
         "Damage": 3,
         "CritDamage": 4,
         "CQBU": 50,
@@ -959,19 +937,18 @@
         "ShortCovDamage": 1,
         "MedCovDamage": 1,
         "LongCovDamage": 1
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Sn_Barrett",
       "Traits": [ "Gun", "Sniper Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 5,
       "Ammo": 6,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 6,
-        "BaseMaxClip": 6,
         "Damage": 10,
         "CritDamage": 14,
         "CQBU": 10,
@@ -994,19 +971,18 @@
         "ShortCovDamage": 4,
         "MedCovDamage": 4,
         "LongCovDamage": 4
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Sn_Dragunov",
       "Traits": [ "Gun", "Sniper Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 4,
       "Ammo": 8,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 8,
-        "BaseMaxClip": 8,
         "Damage": 8,
         "CritDamage": 12,
         "CQBU": 15,
@@ -1029,19 +1005,18 @@
         "ShortCovDamage": 2,
         "MedCovDamage": 2,
         "LongCovDamage": 2
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Sn_Intervention",
       "Traits": [ "Gun", "Sniper Rifle", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "Weight": 4,
       "Ammo": 5,
       "MeleeDamage": 2,
       "GunTraits": {
         "MaxClip": 5,
-        "BaseMaxClip": 5,
         "Damage": 9,
         "CritDamage": 14,
         "CQBU": 15,
@@ -1064,180 +1039,163 @@
         "ShortCovDamage": 4,
         "MedCovDamage": 4,
         "LongCovDamage": 4
-      },
-      "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      }
     },
     {
       "Name": "Suppressor",
       "Traits": [ "Throwable" ],
-      "Weight": 1,
-      "GunTraits": {},
       "EquippableSlots": [ "Misc" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 1
     },
     {
       "Name": "Syringe_Amphetamine",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Androstenedione",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Cannabinoid",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Danazol",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Glucocorticoid",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Modafinil",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Shard",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Trenbolone",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Syringe_Unlabelled",
       "Traits": [ "Usable", "Consumable", "Fragile", "Poisonable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
       "MeleeDamage": 0,
       "Charges": 1,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     },
     {
       "Name": "Thermal_Camera",
       "Traits": [ "Usable", "Consumable", "Fragile", "Placeable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 2,
       "LoudRadius": 10,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "Thermal_Goggles",
       "Traits": [ "Fragile" ],
-      "Weight": 1,
-      "GunTraits": {},
       "EquippableSlots": [ "Head" ],
-      "WhereEquipped": ""
+      "WhereEquipped": "",
+      "Weight": 1
     },
     {
       "Name": "UHF_Radio",
       "Traits": [ "Usable", "Consumable", "Fragile" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 1,
       "LoudRadius": 14,
       "MeleeDamage": 0,
-      "Charges": 1,
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "Charges": 1
     },
     {
       "Name": "ULF_Radio",
       "Traits": [ "Usable", "Fragile" ],
+      "EquippableSlots": [ "Back" ],
+      "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 5,
-      "LoudRadius": 24,
-      "GunTraits": {},
-      "EquippableSlots": [ "Back" ],
-      "WhereEquipped": ""
+      "LoudRadius": 24
     },
     {
       "Name": "Water_Canteen",
       "Traits": [ "Usable", "Consumable", "Poisonable", "Throwable" ],
+      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
+      "WhereEquipped": "",
       "UsageAP": 2,
       "Weight": 4,
       "LoudRadius": 8,
       "MeleeDamage": 0,
       "Charges": 4,
-      "PoisonedBy": "",
-      "GunTraits": {},
-      "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
-      "WhereEquipped": ""
+      "PoisonedBy": ""
     }
   ]
 }

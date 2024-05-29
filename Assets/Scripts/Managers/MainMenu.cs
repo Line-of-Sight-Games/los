@@ -2255,7 +2255,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         shotUI.gunImage.sprite = shooter.EquippedGun.itemImage;
 
         //block suppression option if gun does not have enough ammo
-        if (!shooter.EquippedGun.CheckSpecificAmmo(shooter.EquippedGun.gunTraits.SuppressDrain, true))
+        if (!shooter.EquippedGun.CheckSpecificAmmo(shooter.EquippedGun.gunTraits["SuppressDrain"], true))
             shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression Shot");
 
         //if soldier engaged in melee block force unaimed shot

@@ -18,9 +18,4 @@ public class POI : PhysicalObject, IDataPersistence
     {
 
     }
-
-    public string Id
-    {
-        get { return id; }
-    }
 }

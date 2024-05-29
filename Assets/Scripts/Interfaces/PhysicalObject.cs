@@ -25,7 +25,11 @@ public class PhysicalObject : MonoBehaviour
         //print("Mapped physical position");
         transform.position = new Vector3(x - 0.5f, z, y - 0.5f);
     }
-
+    public string Id
+    {
+        get { return id; }
+        set { id = value; }
+    }
     public int X
     {
         get { return x; }

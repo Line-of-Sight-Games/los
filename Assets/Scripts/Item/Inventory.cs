@@ -20,28 +20,45 @@ public class Inventory
     }
     public Item GetItemInSlot(string slotName)
     {
-        if (linkedInventoryObject is Soldier linkedSoldier)
+        if (linkedInventoryObject != null)
+        {
             foreach (Item i in itemList)
-                if (i.id == linkedSoldier.inventorySlots[linkedSoldier.inventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key])
+            {
+                if (i.Id == linkedInventoryObject.InventorySlots[linkedInventoryObject.InventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key])
                     return i;
+            }
+        }
+
         return null;
     }
     public void AddItemToSlot(Item item, string slotName)
     {
-        if (linkedInventoryObject is Soldier linkedSoldier)
+        if (!HasItem(item.id))
         {
             AddItem(item);
-            linkedSoldier.inventorySlots[slotName] = item.id;
             item.whereEquipped = slotName;
+
+            if (linkedInventoryObject != null && linkedInventoryObject.InventorySlots != null)
+            {
+                linkedInventoryObject.InventorySlots[slotName] = item.Id;
+                if (linkedInventoryObject is Soldier linkedSoldier)
+                    item.RunPickupEffect(linkedSoldier);
+            }
         }
     }
     public void RemoveItemFromSlot(Item item, string slotName)
     {
-        if (linkedInventoryObject is Soldier linkedSoldier)
+        if (HasItem(item.id))
         {
             RemoveItem(item);
-            linkedSoldier.inventorySlots[slotName] = "";
             item.whereEquipped = "";
+
+            if (linkedInventoryObject != null && linkedInventoryObject.InventorySlots != null)
+            {
+                linkedInventoryObject.InventorySlots[slotName] = "";
+                if (linkedInventoryObject is Soldier linkedSoldier)
+                    item.RunDropEffect(linkedSoldier);
+            }
         }
     }
     public void ConsumeItemInSlot(Item item, string slotName)
@@ -55,7 +72,7 @@ public class Inventory
     public void AddItem(Item item)
     {
         itemList.Add(item);
-        itemIds.Add(item.id);
+        itemIds.Add(item.Id);
         item.transform.SetParent(linkedInventoryObject.GameObject.transform, true);
         item.transform.localPosition = new Vector3(0, 0, 0);
         item.owner = linkedInventoryObject;
@@ -64,7 +81,7 @@ public class Inventory
     {
         //print("ran remove item");
         itemList.Remove(item);
-        itemIds.Remove(item.id);
+        itemIds.Remove(item.Id);
         item.transform.SetParent(null, true);
         item.owner = null;
     }
@@ -72,7 +89,7 @@ public class Inventory
     public bool HasItem(string id)
     {
         foreach (Item i in itemList)
-            if (i.id == id)
+            if (i.Id == id)
                 return true;
 
         return false;

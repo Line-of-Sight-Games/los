@@ -26069,7 +26069,6 @@ MonoBehaviour:
   endSoldierTurnAlertUI: {fileID: 0}
   playdeadAlertUI: {fileID: 0}
   coverAlertUI: {fileID: 0}
-  externalItemSourcesUI: {fileID: 0}
   inventorySourceIconsUI: {fileID: 0}
   detectionAlertPrefab: {fileID: 0}
   detectionAlertClaymorePrefab: {fileID: 0}
@@ -26110,6 +26109,9 @@ MonoBehaviour:
   itemIconPrefab: {fileID: 0}
   cannotUseItemUI: {fileID: 0}
   useItemUI: {fileID: 0}
+  dropThrowItemUI: {fileID: 0}
+  dropUI: {fileID: 0}
+  throwUI: {fileID: 0}
   etoolResultUI: {fileID: 0}
   grenadeUI: {fileID: 0}
   claymoreUI: {fileID: 0}
@@ -26144,9 +26146,10 @@ MonoBehaviour:
   detectionResolvedFlag: 0
   meleeResolvedFlag: 0
   shotResolvedFlag: 0
+  explosionResolvedFlag: 0
   inspirerResolvedFlag: 0
-  clearDamageEventFlag: 0
   xpResolvedFlag: 0
+  clearDamageEventFlag: 0
   teamTurnOverFlag: 0
   teamTurnStartFlag: 0
   onItemUseScreen: 0
@@ -28392,7 +28395,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This will randomise everything remaining in this team.
+  m_text: This will randomise everyone remaining in this team.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

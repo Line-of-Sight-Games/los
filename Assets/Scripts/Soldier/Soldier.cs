@@ -33,9 +33,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public BoxCollider bodyCollider;
     public Dictionary<string, string> inventorySlots = new()
     {
-        { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }, { "LeftBrace", "" },
-        { "RightBrace", "" }, { "Backpack1", "" }, { "Backpack2", "" }, { "Backpack3", "" }, { "Armour1", "" }, { "Armour2", "" }, { "Armour3", "" }, { "Armour4", "" }, { "Misc1", "" }, { "Misc2", "" },
-        { "Misc3", "" }, { "Misc4", "" }, { "Misc5", "" }, { "Misc6", "" }, { "Misc7", "" }, { "Misc8", "" }
+        { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }
     };
     public string madeUnconBy;
     public List<string> madeUnconBydamageList;
@@ -496,28 +494,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
             return false;
     }
-    
     public int RoundByResilience(float numberToRound)
     {
         if (ResilienceCheck())
             return Mathf.FloorToInt(numberToRound);
         return Mathf.CeilToInt(numberToRound);
-    }
-    public void PickUpItemToSlot(Item item, string slotName)
-    {
-        if (!Inventory.HasItem(item.id))
-        {
-            Inventory.AddItemToSlot(item, slotName);
-            item.RunPickupEffect(slotName);
-        }
-    }
-    public void DropItemFromSlot(Item item, string slotName)
-    {
-        if (Inventory.HasItem(item.id))
-        {
-            item.RunDropEffect(slotName);
-            Inventory.RemoveItemFromSlot(item, slotName);
-        }
     }
     public void FrozenMultiShot()
     {
@@ -541,13 +522,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         foreach (Item item in Inventory.AllItems)
             if (!item.itemName.Contains("Armour"))
                 itemList.Add(item);
-        foreach (KeyValuePair<string, string> kvp in inventorySlots)
+        foreach (KeyValuePair<string, string> kvp in InventorySlots)
             itemSlots.Add(kvp.Key, kvp.Value);
 
         foreach (Item item in itemList)
             foreach (KeyValuePair<string, string> kvp in itemSlots)
                 if (kvp.Value == item.id)
-                    DropItemFromSlot(item, kvp.Key);
+                    Inventory.RemoveItemFromSlot(item, kvp.Key);
     }
     public int GetFullHP()
     {
@@ -663,16 +644,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 CheckSightRadius();
             }
         }
-    }
-    public void AssignItemToSlot(Item item)
-    {
-        Dictionary<string, Item> itemsToInsert = new();
-        foreach (KeyValuePair<string, string> kvp in inventorySlots)
-            if (kvp.Value == item.id)
-                itemsToInsert.Add(kvp.Key, item);
-        
-        foreach (KeyValuePair<string, Item> kvp in itemsToInsert)
-            Inventory.AddItemToSlot(kvp.Value, kvp.Key);
     }
     public void CalculateActiveStats()
     {
@@ -2489,9 +2460,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         Item leftHand = Inventory.GetItemInSlot("LeftHand"), rightHand = Inventory.GetItemInSlot("RightHand");
 
         if (leftHand != null)
-            DropItemFromSlot(leftHand, "LeftHand");
+            Inventory.RemoveItemFromSlot(leftHand, "LeftHand");
         if (rightHand != null)
-            DropItemFromSlot(rightHand, "RightHand");
+            Inventory.RemoveItemFromSlot(rightHand, "RightHand");
     }
     public void SetStunned(int stunRounds)
     {
@@ -4062,7 +4033,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         get 
         {
-            inventorySlots.TryGetValue("LeftHand", out string leftHand);
+            InventorySlots.TryGetValue("LeftHand", out string leftHand);
             return itemManager.FindItemById(leftHand);
         }
     }
@@ -4070,7 +4041,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         get
         {
-            inventorySlots.TryGetValue("RightHand", out string rightHand);
+            InventorySlots.TryGetValue("RightHand", out string rightHand);
             return itemManager.FindItemById(rightHand);
         }
     }
@@ -4092,13 +4063,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (rightMelee > leftMelee)
             {
                 if (LeftHandItem != null)
-                    DropItemFromSlot(LeftHandItem, "LeftHand");
+                    Inventory.RemoveItemFromSlot(LeftHandItem, "LeftHand");
                 return RightHandItem;
             }
             else
             {
                 if (RightHandItem != null)
-                    DropItemFromSlot(RightHandItem, "RightHand");
+                    Inventory.RemoveItemFromSlot(RightHandItem, "RightHand");
                 return LeftHandItem;
             }
         }
@@ -4116,18 +4087,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return gunEquipped;
         }
     }
-    public Inventory Inventory
-    { get { return inventory; } }
-    public string Id
-    { get { return id; } }
-    public GameObject GameObject
-    { get { return gameObject; } }
+    public Inventory Inventory { get { return inventory; } }
+    public GameObject GameObject { get { return gameObject; } }
     public List<string> InventoryList { get { return inventoryList; } }
-
-    public int ActiveC
-    { get { return stats.C.Val; } }
-    public int ActiveF
-    { get { return stats.F.Val; } }
+    public Dictionary<string, string> InventorySlots { get { return inventorySlots; } }
+    public int ActiveC { get { return stats.C.Val; } }
+    public int ActiveF { get { return stats.F.Val; } }
 
     public int AvoidanceActiveStat(string statName)
     {

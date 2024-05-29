@@ -77,4 +77,5 @@ public class GoodyBox : POI, IDataPersistence, IHaveInventory
     public Inventory Inventory { get { return inventory; } }
     public GameObject GameObject { get { return gameObject; } }
     public List<string> InventoryList { get { return inventoryList; } }
+    public Dictionary<string, string> InventorySlots { get { return null; } }
 }

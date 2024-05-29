@@ -113,12 +113,9 @@ public class ItemManager : MonoBehaviour, IDataPersistence
                 {
                     foreach (Item item in allItems)
                     {
-                        if (item.id == itemId)
+                        if (item.Id == itemId)
                         {
-                            if (inventoryObject is Soldier inventorySoldier)
-                                inventorySoldier.AssignItemToSlot(item);
-                            else
-                                inventoryObject.Inventory.AddItem(item);
+                            inventoryObject.Inventory.AddItemToSlot(item, item.whereEquipped);
                         }
                     }
                 }
@@ -144,6 +141,22 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     public Item SpawnItem(string itemName)
     {
         var item = Instantiate(itemPrefab).Init(itemName);
+
+        //spawn small medkit inside brace
+        if (itemName == "Brace")
+            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Small"), "BraceMedS");
+
+        //spawn med medkit in bag
+        if (itemName == "Bag")
+            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Medium"), "BagMedM");
+
+        //spawn small & med medkit in backpack
+        if (itemName == "Backpack")
+        {
+            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Medium"), "BackpackMedM");
+            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Small"), "BackpackMedS");
+        }
+
         RefreshItemList();
 
         return item;

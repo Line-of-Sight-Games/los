@@ -6,11 +6,6 @@ public class Coverman : PhysicalObject, IAmShootable
     {
         id = "coverman";
     }
-    public string Id
-    {
-        get { return id; }
-    }
-
     public void SetCovermanLocation(Vector3 location)
     {
         X = (int)location.x;
