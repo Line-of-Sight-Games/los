@@ -2204,7 +2204,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else
                     {
-                        //melee attack proceeds
+                        //drop weaker melee weapons
+                        attacker.DropOtherMeleeWeapon();
+                        defender.DropOtherMeleeWeapon();
+
                         if (meleeDamage > 0)
                         {
                             //play success sound
@@ -2913,6 +2916,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (CheckAP(3))
         {
+            menu.FreezeTime();
             DeductAP(3);
             bool terminalDisabled = false;
             int passCount = 0;

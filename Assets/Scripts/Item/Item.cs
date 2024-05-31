@@ -840,9 +840,15 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
+    public bool IsLargeMedkit()
+    {
+        if (name.Equals("Medkit_Large"))
+            return true;
+        return false;
+    }
     public bool IsWeapon()
     {
-        if (IsGun() || traits.Contains("Weapon"))
+        if (traits.Contains("Weapon"))
             return true;
         return false;
     }
@@ -920,13 +926,13 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool IsBodyArmour()
     {
-        if (name.Contains("Body_Armour"))
+        if (name.Contains("Armour_Body"))
             return true;
         return false;
     }
     public bool IsJuggernautArmour()
     {
-        if (name.Contains("Juggernaut_Armour"))
+        if (name.Contains("Armour_Juggernaut"))
             return true;
         return false;
     }

@@ -8,6 +8,8 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
+using UnityEditor.VersionControl;
+using UnityEditor;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable, IAmDetectable
 {
@@ -1135,7 +1137,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to shot damage
         if (damageSource.Contains("Shot"))
         {
-            if (damagedBy != null && HasActiveRiotShield(new(riotXPoint, riotYPoint), new(damagedBy.X, damagedBy.Y), new(X, Y)))
+            if (damagedBy != null && IsActiveRiotShield(new(riotXPoint, riotYPoint), new(damagedBy.X, damagedBy.Y), new(X, Y)))
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Riot Shield.", true, false);
                 damage = 0;
@@ -1637,6 +1639,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierUI.transform.Find("AP").gameObject.GetComponent<TextMeshProUGUI>().text = "AP:" + ap;
         soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>().text = "MA:" + mp;
         soldierUI.transform.Find("Location").gameObject.GetComponent<TextMeshProUGUI>().text = "X:" + x + "   Y:" + y + "   Z:" + z;
+    }
+    public int AvoidanceActiveStat(string statName)
+    {
+        if (statName == "C")
+            return ActiveC;
+        else if (statName == "F")
+            return ActiveF;
+
+        return 0;
+    }
+    public int DetectionActiveStat(int multiplier)
+    {
+        return stats.P.Val * multiplier;
     }
     public void CheckRevealed()
     {
@@ -2882,7 +2897,28 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         return false;
     }
+    public bool HandsFreeToUseItem(Item item)
+    {
+        string message = "";
+        if (IsWearingJuggernautArmour(false) && !(item.IsGun() || item.IsGrenade() || item.IsRiotShield()))
+            message = "Juggernaut Armour Blocking";
+        else if (item.IsRiotShield() && !HasAHandFree(true))
+            message = "Hands Full";
+        else if (item.IsLargeMedkit() && !HasAHandFree(true))
+            message = "Hands Full";
+        else if (!IsValidLoadout())
+        {
+            if (!(HasAHandFree(false) && item.whereEquipped.Contains("Hand")))
+                message = "Hands Full";
+        }
 
+        if (message == "")
+            return true;
+        else
+            menu.OpenCannotUseItemUI(message);
+
+        return false;
+    }
 
 
 
@@ -3045,94 +3081,29 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
 
     //item checks
-    public bool HasNothingInBothHands()
+    public bool HasAHandFree(bool fullyFree)
     {
-        if (RightHandItem == null && LeftHandItem == null)
-            return true;
-        return false;
-    }
-    public bool HasWeaponInRightHand()
-    {
-        if (RightHandItem != null && RightHandItem.IsWeapon())
-            return true;
-        return false;
-    }
-    public bool HasWeaponInRightHandOnly()
-    {
-        if (HasWeaponInRightHand() && LeftHandItem == null)
-            return true;
-        return false;
-    }
-    public bool HasWeaponInLeftHand()
-    {
-        if (LeftHandItem != null && LeftHandItem.IsWeapon())
-            return true;
-        return false;
-    }
-    public bool HasWeaponInLeftHandOnly()
-    {
-        if (HasWeaponInLeftHand() && RightHandItem == null)
-            return true;
-        return false;
-    }
-    public bool HasNonWeaponInRightHand()
-    {
-        if (RightHandItem != null && !RightHandItem.IsWeapon())
-            return true;
-        return false;
-    }
-    public bool HasNonWeaponInRightHandOnly()
-    {
-        if (HasNonWeaponInRightHand() && LeftHandItem == null)
-            return true;
-        return false;
-    }
-    public bool HasNonWeaponInLeftHand()
-    {
-        if (LeftHandItem != null && !LeftHandItem.IsWeapon())
-            return true;
-        return false;
-    }
-    public bool HasNonWeaponInLeftHandOnly()
-    {
-        if (HasNonWeaponInLeftHand() && RightHandItem == null)
-            return true;
-        return false;
-    }
-    public bool HasWeaponsInBothHands()
-    {
-        if (HasWeaponInLeftHand() && HasWeaponInRightHand())
-            return true;
-        return false;
-    }
-    public bool HasNonWeaponsInBothHands()
-    {
-        if (HasNonWeaponInLeftHand() && HasNonWeaponInRightHand())
-            return true;
-        return false;
-    }
-    public bool HasSingleWeaponInEitherHand()
-    {
-        if (HasWeaponInLeftHandOnly() || HasWeaponInRightHandOnly())
-            return true;
-        return false;
-    }
-    public bool HasSingleNonWeaponInEitherHand()
-    {
-        if (HasNonWeaponInLeftHandOnly() || HasNonWeaponInRightHandOnly())
-            return true;
-        return false;
-    }
-    public bool HasWeaponInLeftHandAndNonWeaponInRightHand()
-    {
-        if (HasWeaponInLeftHand() && HasNonWeaponInRightHand())
-            return true;
-        return false;
-    }
-    public bool HasNonWeaponInLeftHandAndWeaponInRightHand()
-    {
-        if (HasNonWeaponInLeftHand() && HasWeaponInRightHand())
-            return true;
+        if (fullyFree)
+        {
+            print("checking hands fully free");
+            if (LeftHandItem == null && RightHandItem == null)
+                return true;
+            else if (LeftHandItem != null && RightHandItem == null)
+                return true;
+            else if (RightHandItem != null && LeftHandItem == null)
+                return true;
+        }
+        else
+        {
+            print("checking hands free");
+            if (LeftHandItem == null && RightHandItem == null)
+                return true;
+            else if (LeftHandItem != null && (RightHandItem == null || RightHandItem.IsWeapon() || RightHandItem.IsSMG() || RightHandItem.IsPistol()))
+                return true;
+            else if (RightHandItem != null && (LeftHandItem == null || LeftHandItem.IsWeapon() || LeftHandItem.IsSMG() || LeftHandItem.IsPistol()))
+                return true;
+        }
+        
         return false;
     }
     public bool HasGunEquipped()
@@ -3146,18 +3117,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (HasGunEquipped())
             if (EquippedGun.IsPistol() || EquippedGun.IsSMG())
                 return true;
-        return false;
-    }
-    public bool HasSMGOrPistolInBothHands()
-    {
-        if (HasWeaponsInBothHands() && (LeftHandItem.IsSMG() || LeftHandItem.IsPistol()) && (RightHandItem.IsSMG() || RightHandItem.IsPistol()))
-            return true;
-        return false;
-    }
-    public bool IsDualWielding()
-    {
-        if (HasWeaponsInBothHands() || HasNonWeaponsInBothHands() || HasNonWeaponInLeftHandAndWeaponInRightHand() || HasWeaponInLeftHandAndNonWeaponInRightHand())
-            return true;
         return false;
     }
     public bool HasArmourIntegrity()
@@ -3218,9 +3177,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
-    public bool HasActiveRiotShield(Vector3 riotShieldOrientation, Vector3 pointB, Vector3 riotShieldBearerLocation)
+    public bool IsActiveRiotShield(Vector3 riotShieldOrientation, Vector3 pointB, Vector3 riotShieldBearerLocation)
     {
-        if (IsCarryingRiotShield() && !IsDualWielding() && HelperFunctions.IsWithinAngle(riotShieldOrientation, pointB, riotShieldBearerLocation, 67.5f))
+        if (IsCarryingRiotShield() && !HasAHandFree(true) && HelperFunctions.IsWithinAngle(riotShieldOrientation, pointB, riotShieldBearerLocation, 67.5f))
             return true;
         return false;
     }
@@ -3230,7 +3189,30 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool IsValidLoadout()
+    {
+        // Check if both hands are empty
+        if (LeftHandItem == null && RightHandItem == null)
+            return true;
 
+        // Check if one hand is a gun and the other is empty
+        if ((LeftHandItem != null && LeftHandItem.IsGun() && RightHandItem == null) || (RightHandItem != null && RightHandItem.IsGun() && LeftHandItem == null))
+            return true;
+
+        // Check if a weapon is equipped in either hand and the other hand is empty or contains a pistol, SMG or weapon
+        if ((LeftHandItem != null && LeftHandItem.IsWeapon() && (RightHandItem == null || RightHandItem.IsPistol() || RightHandItem.IsSMG() || RightHandItem.IsWeapon())) || (RightHandItem != null && RightHandItem.IsWeapon() && (LeftHandItem == null || LeftHandItem.IsPistol() || LeftHandItem.IsSMG() || LeftHandItem.IsWeapon())))
+            return true;
+
+        // Check if a pistol is equipped in either hand and the other hand is empty or contains a pistol, SMG or weapon
+        if ((LeftHandItem != null && LeftHandItem.IsPistol() && (RightHandItem == null || RightHandItem.IsPistol() || RightHandItem.IsSMG() || RightHandItem.IsWeapon())) || (RightHandItem != null && RightHandItem.IsPistol() && (LeftHandItem == null || LeftHandItem.IsPistol() || LeftHandItem.IsSMG() || LeftHandItem.IsWeapon())))
+            return true;
+
+        // Check if an SMG is equipped in either hand and the other hand is empty or contains a pistol, SMG or weapon
+        if ((LeftHandItem != null && LeftHandItem.IsSMG() && (RightHandItem == null || RightHandItem.IsPistol() || RightHandItem.IsSMG() || RightHandItem.IsWeapon())) || (RightHandItem != null && RightHandItem.IsSMG() && (LeftHandItem == null || LeftHandItem.IsPistol() || LeftHandItem.IsSMG() || LeftHandItem.IsWeapon())))
+            return true;
+
+        return false;
+    }
 
 
 
@@ -3977,6 +3959,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return instantSpeed; 
         }
     }
+    public int ThrowRadius
+    {
+        get { return 10 * stats.Str.Val; }
+    }
     public int RoundsWithoutFood
     {
         get { return roundsWithoutFood; }
@@ -4061,19 +4047,36 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 rightMelee = RightHandItem.meleeDamage;
 
             if (rightMelee > leftMelee)
-            {
-                if (LeftHandItem != null)
-                    Inventory.RemoveItemFromSlot(LeftHandItem, "LeftHand");
                 return RightHandItem;
-            }
             else
-            {
-                if (RightHandItem != null)
-                    Inventory.RemoveItemFromSlot(RightHandItem, "RightHand");
                 return LeftHandItem;
-            }
         }
     }
+    public void DropOtherMeleeWeapon()
+    {
+        int leftMelee, rightMelee;
+        if (LeftHandItem == null)
+            leftMelee = 1;
+        else
+            leftMelee = LeftHandItem.meleeDamage;
+
+        if (RightHandItem == null)
+            rightMelee = 1;
+        else
+            rightMelee = RightHandItem.meleeDamage;
+
+        if (rightMelee > leftMelee)
+        {
+            if (LeftHandItem != null && !IsValidLoadout())
+                Inventory.RemoveItemFromSlot(LeftHandItem, "LeftHand");
+        }
+        else
+        {
+            if (RightHandItem != null && !IsValidLoadout())
+                Inventory.RemoveItemFromSlot(RightHandItem, "RightHand");
+        }
+    }
+                    
     public Item EquippedGun
     {
         get
@@ -4093,22 +4096,4 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public Dictionary<string, string> InventorySlots { get { return inventorySlots; } }
     public int ActiveC { get { return stats.C.Val; } }
     public int ActiveF { get { return stats.F.Val; } }
-
-    public int AvoidanceActiveStat(string statName)
-    {
-        if (statName == "C")
-            return ActiveC;
-        else if (statName == "F")
-            return ActiveF;
-
-        return 0;
-    }
-    public int ThrowRadius()
-    {
-        return 10 * stats.Str.Val;
-    }
-    public int DetectionActiveStat(int multiplier)
-    {
-        return stats.P.Val * multiplier;
-    }
 }

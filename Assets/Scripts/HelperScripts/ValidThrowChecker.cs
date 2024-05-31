@@ -26,7 +26,7 @@ public class ValidThrowChecker : MonoBehaviour
 
         if (!pressedOnce.activeInHierarchy)
         {
-            if (GetThrowLocation(out Vector3 throwLocation) && !menu.soldierManager.FindSoldierById(menu.activeSoldier.Id).PhysicalObjectWithinRadius(throwLocation, menu.activeSoldier.ThrowRadius()))
+            if (GetThrowLocation(out Vector3 throwLocation) && !menu.soldierManager.FindSoldierById(menu.activeSoldier.Id).PhysicalObjectWithinRadius(throwLocation, menu.activeSoldier.ThrowRadius))
                 invalidThrow.SetActive(true);
         }
     }

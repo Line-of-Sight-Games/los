@@ -79,6 +79,15 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         AddItemIconInSlot(s.Inventory.GetItemInSlot("RightHand"), "RightHand");
 
         //show items attached to other items
+
+        if (s.Inventory.GetItemInSlot("Head") is Item headItem && headItem.IsJuggernautArmour())
+        {
+            LinkSlots(new () { "JArmour1", "JArmour2", "JArmour3", "JArmour4" }, headItem);
+            AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour1"), "JArmour1");
+            AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour2"), "JArmour2");
+            AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour3"), "JArmour3");
+            AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour4"), "JArmour4");
+        }
         if (s.Inventory.GetItemInSlot("Back") is Item backItem && backItem.IsBackpack())
         {
             LinkSlots(new() { "Backpack1", "Backpack2", "Backpack3", "BackpackMedM", "BackpackMedS" }, backItem);
@@ -88,29 +97,17 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
             AddItemIconInSlot(backItem.Inventory.GetItemInSlot("BackpackMedM"), "BackpackMedM");
             AddItemIconInSlot(backItem.Inventory.GetItemInSlot("BackpackMedS"), "BackpackMedS");
         }
-        if (s.Inventory.GetItemInSlot("Chest") is Item armour)
+        if (s.Inventory.GetItemInSlot("Chest") is Item chestItem && chestItem.IsBodyArmour())
         {
-            if (armour.IsBodyArmour())
-            {
-                LinkSlots(new() { "BArmour1", "BArmour2" }, armour);
-                AddItemIconInSlot(armour.Inventory.GetItemInSlot("BArmour1"), "BArmour1");
-                AddItemIconInSlot(armour.Inventory.GetItemInSlot("BArmour2"), "BArmour2");
-            }
-            else if (armour.IsJuggernautArmour())
-            {
-                LinkSlots(new() { "JArmour1", "JArmour2", "JArmour3", "JArmour4" }, armour);
-                AddItemIconInSlot(armour.Inventory.GetItemInSlot("JArmour1"), "JArmour1");
-                AddItemIconInSlot(armour.Inventory.GetItemInSlot("JArmour2"), "JArmour2");
-                AddItemIconInSlot(armour.Inventory.GetItemInSlot("JArmour3"), "JArmour3");
-                AddItemIconInSlot(armour.Inventory.GetItemInSlot("JArmour4"), "JArmour4");
-            }
+            LinkSlots(new() { "BArmour1", "BArmour2" }, chestItem);
+            AddItemIconInSlot(chestItem.Inventory.GetItemInSlot("BArmour1"), "BArmour1");
+            AddItemIconInSlot(chestItem.Inventory.GetItemInSlot("BArmour2"), "BArmour2");
         }
         if (s.Inventory.GetItemInSlot("Posterior") is Item posteriorItem && posteriorItem.IsBag())
         {
             LinkSlots(new() { "BagMedM" }, posteriorItem);
             AddItemIconInSlot(posteriorItem.Inventory.GetItemInSlot("BagMedM"), "BagMedM");
         }
-            
         if (s.Inventory.GetItemInSlot("LeftLeg") is Item leftBrace && leftBrace.IsBrace())
         {
             LinkSlots(new() { "LeftBrace", "LeftBraceMedS" }, leftBrace);

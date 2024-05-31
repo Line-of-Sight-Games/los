@@ -36,7 +36,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideTimeStopIndicator, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -398,11 +398,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void FreezeTime()
     {
         print("Tried to freeze time");
+        timeStopIcon.SetActive(true);
         Time.timeScale = 0f;
     }
     public void UnfreezeTime()
     {
         print("Tried to unfreeze time");
+        timeStopIcon.SetActive(false);
         Time.timeScale = 1.0f;
     }
     public void SetDetectionResolvedFlagTo(bool value)
@@ -651,7 +653,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             ToggleOverrideView();
             endTurnButton.SetActive(true);
             overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Override";
-            overrideTimeStopIndicator.SetActive(false);
             overrideVersionDisplay.SetActive(false);
             overrideVisibilityDropdown.SetActive(false);
             overrideInsertObjectsButton.SetActive(false);
@@ -678,7 +679,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soundManager.PlayOverrideAlarm();
             endTurnButton.SetActive(false);
             overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Resume";
-            overrideTimeStopIndicator.SetActive(true);
             overrideVersionDisplay.SetActive(true);
             overrideVisibilityDropdown.SetActive(true);
             overrideInsertObjectsButton.SetActive(true);
@@ -1205,6 +1205,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(shotButton, "No Gun");
             else if (!activeSoldier.IsAbleToSee())
                 buttonStates.Add(shotButton, "Blind");
+            else if (!activeSoldier.IsValidLoadout())
+                buttonStates.Add(shotButton, "Hands Full");
             else if (!activeSoldier.EquippedGun.CheckAnyAmmo())
                 buttonStates.Add(shotButton, "Gun Empty");
             else if (activeSoldier.IsMeleeControlling())
@@ -1235,10 +1237,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(overwatchButton, "No Gun");
             else if (!activeSoldier.IsAbleToSee())
                 buttonStates.Add(overwatchButton, "Blind");
+            else if (!activeSoldier.IsValidLoadout())
+                buttonStates.Add(overwatchButton, "Hands Full");
             else if (!activeSoldier.EquippedGun.CheckAnyAmmo())
                 buttonStates.Add(overwatchButton, "Gun Empty");
-            else if (activeSoldier.IsDualWielding())
-                buttonStates.Add(overwatchButton, "Dual Wield");
             else if (activeSoldier.IsMeleeControlling())
                 buttonStates.Add(overwatchButton, "<color=green>Melee Controlling</color>");
 
@@ -2165,7 +2167,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
 
             //riot shield block
-            if (hitByExplosion.HasActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
+            if (hitByExplosion.IsActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
             {
                 damage /= 2;
                 stunRounds = 0;
@@ -2218,7 +2220,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (itemHit.owner is not GoodyBox)
         {
             //riot shield block
-            if (itemHit.owner is Soldier hitByExplosion && hitByExplosion.HasActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
+            if (itemHit.owner is Soldier hitByExplosion && hitByExplosion.IsActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
                 damage /= 2;
 
             if ((itemHit.IsBreakable() && damage >= 5) || (itemHit.IsFragile() && damage > 0))
@@ -3039,6 +3041,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (OverrideKey())
         {
+            UnfreezeTime();
             ClearDipelecResultUI();
             dipelecResultUI.SetActive(false);
         }
@@ -3136,6 +3139,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //damage event functions - menu
     public void OpenDamageEventUI()
     {
+        FreezeTime();
         damageEventUI.damageEventTypeDropdown.ClearOptions();
 
         //generate damage event type dropdown
@@ -3178,6 +3182,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CloseDamageEventUI()
     {
+        UnfreezeTime();
         ClearDamageEventUI();
         damageEventUI.gameObject.SetActive(false);
     }
@@ -3755,7 +3760,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenDropThrowItemUI(Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon)
     {
         if (itemThrown.IsThrowable())
-            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item (up to {activeSoldier.ThrowRadius()}cm)?";
+            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item (up to {activeSoldier.ThrowRadius}cm)?";
         else
             dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Cannot throw, drop item (up to 3cm)?";
 

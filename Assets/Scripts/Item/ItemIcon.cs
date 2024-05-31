@@ -88,8 +88,10 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                             targetInventoryId = soldierInventory.GetItemInSlot("RightLeg").Id;
                             targetSlotName = "Brace1";
                         }
-                        else if (targetSlotName.Contains("BArmour") || targetSlotName.Contains("JArmour"))
+                        else if (targetSlotName.Contains("BArmour"))
                             targetInventoryId = soldierInventory.GetItemInSlot("Chest").Id;
+                        else if (targetSlotName.Contains("JArmour"))
+                            targetInventoryId = soldierInventory.GetItemInSlot("Head").Id;
                         else if (targetSlotName.Contains("Bag"))
                             targetInventoryId = soldierInventory.GetItemInSlot("Posterior").Id;
                         else
@@ -145,38 +147,20 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.overrideView)
         {
-            print($"{menu.activeSoldier.soldierName}");
-            int ap = item.usageAP;
-            //adept ability
-            if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
-                ap--;
-            //gunner ability
-            if (menu.activeSoldier.IsGunner() && item.IsAmmo())
-                ap = 1;
-
-            if (menu.activeSoldier.game.CheckAP(ap))
+            if (item.IsUsable())
             {
-                if (item.IsUsable())
-                {
-                    string message = "";
-                    if (menu.activeSoldier.HasNonWeaponsInBothHands())
-                        message = "Hands Full";
-                    else if (menu.activeSoldier.IsCarryingRiotShield() && !item.IsRiotShield())
-                        message = "Riot Shield Blocking";
-                    else if (menu.activeSoldier.IsWearingJuggernautArmour(false) && !(item.IsGun() || item.IsGrenade() || item.IsRiotShield()))
-                        message = "Juggernaut Armour Blocking";
+                int ap = item.usageAP;
+                //adept ability
+                if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
+                    ap--;
+                //gunner ability
+                if (menu.activeSoldier.IsGunner() && item.IsAmmo())
+                    ap = 1;
 
-                    if (message == "")
-                    {
-                        if (menu.activeSoldier.HasNothingInBothHands() || menu.activeSoldier.HasSingleWeaponInEitherHand()) //if hands empty or holding single weapon
-                            menu.OpenUseItemUI(item, transform.parent.name, this, ap);
-                        else if (menu.activeSoldier.HasSingleNonWeaponInEitherHand() && transform.parent.name.Contains("Hand")) //if holding single non weapon and the item for use is that item in hand
-                            menu.OpenUseItemUI(item, transform.parent.name, this, ap);
-                        else
-                            menu.OpenCannotUseItemUI("Hands Full");
-                    }
-                    else
-                        menu.OpenCannotUseItemUI(message);
+                if (menu.activeSoldier.game.CheckAP(ap))
+                {
+                    if (menu.activeSoldier.HandsFreeToUseItem(item))
+                        menu.OpenUseItemUI(item, transform.parent.name, this, ap);
                 }
             }
         }
@@ -186,7 +170,10 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         if (menu.onItemUseScreen && !menu.overrideView)
         {
             if (menu.activeSoldier.game.CheckAP(1))
-                menu.OpenDropThrowItemUI(item, transform.parent.name, this);
+            {
+                if (menu.activeSoldier.HandsFreeToUseItem(item))
+                    menu.OpenDropThrowItemUI(item, transform.parent.name, this);
+            }  
         }
     }
     public bool CheckValidSlot(ItemSlot targetSlot)
