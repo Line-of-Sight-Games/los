@@ -2254,7 +2254,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         shotUI.shooterID.text = shooter.Id;
 
         //generate gun image
-        shotUI.gunImage.sprite = shooter.EquippedGun.itemImage;
+        if (shooter.HasTwoGunsEquipped())
+        {
+            foreach (TMP_Dropdown.OptionData option in shotUI.comboGunsDropdown.options)
+                if (option.text.Contains(shooter.LeftHandItem.itemName) && option.text.Contains(shooter.RightHandItem.itemName))
+                    shotUI.gunImage.sprite = option.image;
+
+            /*shotUI.aimTypeDropdown.value = 0;*/
+        }
+        else
+            shotUI.gunImage.sprite = shooter.EquippedGun.itemImage;
 
         //block suppression option if gun does not have enough ammo
         if (!shooter.EquippedGun.CheckSpecificAmmo(shooter.EquippedGun.gunTraits["SuppressDrain"], true))

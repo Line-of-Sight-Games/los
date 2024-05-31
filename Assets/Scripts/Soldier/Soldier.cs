@@ -3189,6 +3189,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool HasTwoGunsEquipped()
+    {
+        if (LeftHandItem != null && LeftHandItem.IsGun() && RightHandItem != null && RightHandItem.IsGun())
+            return true;
+        return false;
+    }
     public bool IsValidLoadout()
     {
         // Check if both hands are empty
@@ -3213,7 +3219,30 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
+    public void DropOtherMeleeWeapon()
+    {
+        int leftMelee, rightMelee;
+        if (LeftHandItem == null)
+            leftMelee = 1;
+        else
+            leftMelee = LeftHandItem.meleeDamage;
 
+        if (RightHandItem == null)
+            rightMelee = 1;
+        else
+            rightMelee = RightHandItem.meleeDamage;
+
+        if (rightMelee > leftMelee)
+        {
+            if (LeftHandItem != null && !IsValidLoadout())
+                Inventory.RemoveItemFromSlot(LeftHandItem, "LeftHand");
+        }
+        else
+        {
+            if (RightHandItem != null && !IsValidLoadout())
+                Inventory.RemoveItemFromSlot(RightHandItem, "RightHand");
+        }
+    }
 
 
 
@@ -4051,32 +4080,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             else
                 return LeftHandItem;
         }
-    }
-    public void DropOtherMeleeWeapon()
-    {
-        int leftMelee, rightMelee;
-        if (LeftHandItem == null)
-            leftMelee = 1;
-        else
-            leftMelee = LeftHandItem.meleeDamage;
-
-        if (RightHandItem == null)
-            rightMelee = 1;
-        else
-            rightMelee = RightHandItem.meleeDamage;
-
-        if (rightMelee > leftMelee)
-        {
-            if (LeftHandItem != null && !IsValidLoadout())
-                Inventory.RemoveItemFromSlot(LeftHandItem, "LeftHand");
-        }
-        else
-        {
-            if (RightHandItem != null && !IsValidLoadout())
-                Inventory.RemoveItemFromSlot(RightHandItem, "RightHand");
-        }
-    }
-                    
+    }                  
     public Item EquippedGun
     {
         get
