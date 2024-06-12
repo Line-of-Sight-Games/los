@@ -1035,10 +1035,10 @@
         "MedSupPen": 15,
         "LongSupPen": 30,
         "CorSupPen": 20,
-        "CQBCovDamage": 3,
-        "ShortCovDamage": 3,
-        "MedCovDamage": 3,
-        "LongCovDamage": 3
+        "CQBCovDamage": 4,
+        "ShortCovDamage": 4,
+        "MedCovDamage": 4,
+        "LongCovDamage": 4
       }
     },
     {
