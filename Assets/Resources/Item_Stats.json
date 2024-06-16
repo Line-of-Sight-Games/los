@@ -376,7 +376,7 @@
       "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 6,
-      "HPGranted": 20,
+      "HPGranted": 100,
       "LoudRadius": 24,
       "MeleeDamage": 0,
       "Charges": 1

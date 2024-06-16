@@ -817,17 +817,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (target is Coverman)
         {
             shotUI.coverLocationUI.SetActive(true);
+            shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
         }
         else if (target is ExplosiveBarrel targetBarrel)
         {
             shotUI.barrelLocation.text = $"X:{targetBarrel.X} Y:{targetBarrel.Y} Z:{targetBarrel.Z}";
             shotUI.barrelLocationUI.SetActive(true);
+            shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
         }
         else if (target is Soldier targetSoldier)
         {
             if (targetSoldier.IsInCover())
                 shotUI.coverLevelUI.SetActive(true);
-                
+
+            shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Remove("Suppression");
             UpdateTargetFlanking(shooter, targetSoldier);
         }
     }

@@ -26,6 +26,16 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         originalInventoryObject = originalSlot.linkedInventoryObject;
         item.markedForAction = string.Empty;
 
+        return this;
+    }
+
+    private void Update()
+    {
+        DisplayWeaponDetails();
+    }
+
+    public void DisplayWeaponDetails()
+    {
         transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(this.gameObject.name);
         if (menu.activeSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
             transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{1}";
@@ -37,9 +47,24 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             transform.Find("Ammo").GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
         }
 
-        return this;
+        if (menu.overrideView)
+        {
+            transform.Find("OverrideAmmo").gameObject.SetActive(true);
+            transform.Find("OverrideAmmo").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
+        }
+        else
+            transform.Find("OverrideAmmo").gameObject.SetActive(false);
     }
+    public void ChangeAmmo()
+    {
+        TMP_InputField ammoInput = transform.Find("OverrideAmmo").GetComponent<TMP_InputField>();
 
+        if (int.TryParse(ammoInput.text, out int newAmmo))
+            if (newAmmo >= 0)
+                item.ammo = newAmmo;
+
+        ammoInput.text = "";
+    }
     public void OnBeginDrag(PointerEventData eventData)
     {
         canvasGroup.alpha = 0.6f;

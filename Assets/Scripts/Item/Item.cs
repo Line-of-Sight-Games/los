@@ -6,7 +6,6 @@ using System.Linq;
 using UnityEditor;
 using TMPro;
 using Newtonsoft.Json;
-using UnityEditor.Animations;
 
 [System.Serializable]
 public class Item : PhysicalObject, IDataPersistence, IHaveInventory

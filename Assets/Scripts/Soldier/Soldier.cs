@@ -8,7 +8,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
-using UnityEditor.VersionControl;
 using UnityEditor;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable, IAmDetectable
