@@ -31,7 +31,7 @@ public class Statline
         stats.Add(new Stat(this, "Str", "Strength", "ability to carry more and throw further", 1, 1));
         stats.Add(new Stat(this, "Dip", "Diplomacy", "ability to positively interact with NPC's and radios", 1, 1));
         stats.Add(new Stat(this, "Elec", "Electronics", "ability to positively interact with terminals and radios", 1, 1));
-        stats.Add(new Stat(this, "Heal", "Healing", "ability to use MedKits to heal allies", 0, 1));
+        stats.Add(new Stat(this, "Heal", "Healing", "ability to use Medikits to heal allies", 0, 1));
     }
 
     public Stat GetStat(string code)

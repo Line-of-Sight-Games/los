@@ -3535,9 +3535,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Grenade_Frag" => "Throw frag?",
             "Grenade_Smoke" => "Throw smoke?",
             "Grenade_Tabun" => "Throw tabun?",
-            "Medkit_Large" => "Use Large Medkit?",
-            "Medkit_Medium" => "Use Medium Medkit?",
-            "Medkit_Small" => "Use Small Medkit?",
+            "Medikit_Large" => "Use Large Medikit?",
+            "Medikit_Medium" => "Use Medium Medikit?",
+            "Medikit_Small" => "Use Small Medikit?",
             "Poison_Satchel" => "Administer Posion?",
             "Riot_Shield" => "Orient riot shield?",
             "Syringe_Amphetamine" => "Administer Amphetamine?",
@@ -3557,7 +3557,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         };
         useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
 
-        if (itemUsed.itemName.Contains("Medkit"))
+        if (itemUsed.itemName.Contains("Medikit"))
         {
             foreach (Soldier s in game.AllSoldiers())
             {
@@ -3766,16 +3766,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         useItemUI.SetActive(false);
     }
-    public void OpenDropThrowItemUI(Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon)
+    public void OpenDropThrowItemUI(Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon, int ap)
     {
+        
         if (itemThrown.IsThrowable())
             dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item (up to {activeSoldier.ThrowRadius}cm)?";
         else
-            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Cannot throw, drop item (up to 3cm)?";
+            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Cannot throw, discard item (up to 3cm)?";
 
         dropThrowItemUI.GetComponent<UseItemUI>().itemUsed = itemThrown;
         dropThrowItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
         dropThrowItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemThrownFromSlotName;
+        dropThrowItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
         dropThrowItemUI.SetActive(true);
     }
     public void CloseDropThrowItemUI()

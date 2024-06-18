@@ -2533,7 +2533,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void MakeUnconscious(Soldier damagedBy, List<string> damageSource)
     {
-        bleedoutTurns = (stats.H.Val + stats.R.Val) / 3;
+        bleedoutTurns = 2 * ((stats.H.Val + stats.R.Val) / 3);
 
         ClearHealthState();
         SetState("Unconscious");
@@ -2903,7 +2903,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             message = "Juggernaut Armour Blocking";
         else if (item.IsRiotShield() && !HasAHandFree(true))
             message = "Hands Full";
-        else if (item.IsLargeMedkit() && !HasAHandFree(true))
+        else if (item.IsLargeMedikit() && !HasAHandFree(true))
             message = "Hands Full";
         else if (!IsValidLoadout())
         {

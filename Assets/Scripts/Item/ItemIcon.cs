@@ -25,18 +25,18 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         currentSlot = originalSlot;
         originalInventoryObject = originalSlot.linkedInventoryObject;
         item.markedForAction = string.Empty;
+        transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(item.itemName);
 
         return this;
     }
 
     private void Update()
     {
-        DisplayWeaponDetails();
+        DisplayItemDetails();
     }
 
-    public void DisplayWeaponDetails()
+    public void DisplayItemDetails()
     {
-        transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(this.gameObject.name);
         if (menu.activeSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
             transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{1}";
         else
@@ -194,11 +194,25 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.overrideView)
         {
-            if (menu.activeSoldier.game.CheckAP(1))
+            int ap = 0;
+            if (item.IsThrowable())
+                ap++;
+            else
             {
-                if (menu.activeSoldier.HandsFreeToUseItem(item))
-                    menu.OpenDropThrowItemUI(item, transform.parent.name, this);
-            }  
+                if (!item.whereEquipped.Contains("Hand"))
+                    ap++;
+            }
+
+            if (menu.activeSoldier.game.CheckAP(ap))
+            {
+                if (item.IsThrowable())
+                {
+                    if (menu.activeSoldier.HandsFreeToUseItem(item))
+                        menu.OpenDropThrowItemUI(item, transform.parent.name, this, ap);
+                }
+                else
+                    menu.OpenDropThrowItemUI(item, transform.parent.name, this, ap);
+            }
         }
     }
     public bool CheckValidSlot(ItemSlot targetSlot)

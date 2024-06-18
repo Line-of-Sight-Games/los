@@ -142,19 +142,19 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     {
         var item = Instantiate(itemPrefab).Init(itemName);
 
-        //spawn small medkit inside brace
+        //spawn small medikit inside brace
         if (itemName == "Brace")
-            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Small"), "BraceMedS");
+            item.Inventory.AddItemToSlot(SpawnItem("Medikit_Small"), "BraceMedS");
 
-        //spawn med medkit in bag
+        //spawn med medikit in bag
         if (itemName == "Bag")
-            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Medium"), "BagMedM");
+            item.Inventory.AddItemToSlot(SpawnItem("Medikit_Medium"), "BagMedM");
 
-        //spawn small & med medkit in backpack
+        //spawn small & med medikit in backpack
         if (itemName == "Backpack")
         {
-            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Medium"), "BackpackMedM");
-            item.Inventory.AddItemToSlot(SpawnItem("Medkit_Small"), "BackpackMedS");
+            item.Inventory.AddItemToSlot(SpawnItem("Medikit_Medium"), "BackpackMedM");
+            item.Inventory.AddItemToSlot(SpawnItem("Medikit_Small"), "BackpackMedS");
         }
 
         RefreshItemList();

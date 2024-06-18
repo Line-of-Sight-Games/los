@@ -39,9 +39,9 @@ public class ItemAssets : MonoBehaviour
     public Sprite Grenade_Smoke;
     public Sprite Grenade_Tabun;
     public Sprite Knife;
-    public Sprite Medkit_Large;
-    public Sprite Medkit_Medium;
-    public Sprite Medkit_Small;
+    public Sprite Medikit_Large;
+    public Sprite Medikit_Medium;
+    public Sprite Medikit_Small;
     public Sprite LMG_LSW;
     public Sprite LMG_M_60;
     public Sprite LMG_SAW;

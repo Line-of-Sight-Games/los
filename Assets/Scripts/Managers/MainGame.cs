@@ -2266,18 +2266,21 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
 
                 //add xp for successful melee attack
-                if (meleeUI.meleeTypeDropdown.value == 0 && !damageMessage.Contains("No Damage"))
+                if (meleeUI.meleeTypeDropdown.value == 0)
                 {
-                    if (counterattack)
-                        menu.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
+                    if (!damageMessage.Contains("No Damage"))
+                    {
+                        if (counterattack)
+                            menu.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
+                        else
+                            menu.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
+                    }
                     else
                     {
                         if (meleeDamage == 0)
                             menu.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
-                        else
-                            menu.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
                     }
-                }
+                } 
 
                 //kill if instantKill
                 if (instantKill)
@@ -2452,9 +2455,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Grenade_Tabun":
                 menu.OpenGrenadeUI(useItemUI);
                 break;
-            case "Medkit_Small":
-            case "Medkit_Medium":
-            case "Medkit_Large":
+            case "Medikit_Small":
+            case "Medikit_Medium":
+            case "Medikit_Large":
                 itemUsed.UseItem(linkedIcon, null, soldierUsedOn);
                 break;
             case "Riot_Shield":

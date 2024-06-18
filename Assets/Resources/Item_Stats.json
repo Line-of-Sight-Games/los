@@ -370,7 +370,7 @@
       "BlockedByLateral": "LeftBrace"
     },
     {
-      "Name": "Medkit_Large",
+      "Name": "Medikit_Large",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
       "EquippableSlots": [ "Hand" ],
       "WhereEquipped": "",
@@ -382,7 +382,7 @@
       "Charges": 1
     },
     {
-      "Name": "Medkit_Medium",
+      "Name": "Medikit_Medium",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
       "EquippableSlots": [ "MedM" ],
       "WhereEquipped": "",
@@ -393,7 +393,7 @@
       "Charges": 1
     },
     {
-      "Name": "Medkit_Small",
+      "Name": "Medikit_Small",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
       "EquippableSlots": [ "MedS" ],
       "WhereEquipped": "",

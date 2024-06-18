@@ -137,9 +137,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             "Grenade_Smoke" => 25,
             "Grenade_Tabun" => 26,
             "Knife" => 27,
-            "Medkit_Large" => 28,
-            "Medkit_Medium" => 29,
-            "Medkit_Small" => 30,
+            "Medikit_Large" => 28,
+            "Medikit_Medium" => 29,
+            "Medikit_Small" => 30,
             "LMG_LSW" => 31,
             "LMG_M_60" => 32,
             "LMG_SAW" => 33,
@@ -211,9 +211,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             "Grenade_Smoke" => ItemAssets.Instance.Grenade_Smoke,
             "Grenade_Tabun" => ItemAssets.Instance.Grenade_Tabun,
             "Knife" => ItemAssets.Instance.Knife,
-            "Medkit_Large" => ItemAssets.Instance.Medkit_Large,
-            "Medkit_Medium" => ItemAssets.Instance.Medkit_Medium,
-            "Medkit_Small" => ItemAssets.Instance.Medkit_Small,
+            "Medikit_Large" => ItemAssets.Instance.Medikit_Large,
+            "Medikit_Medium" => ItemAssets.Instance.Medikit_Medium,
+            "Medikit_Small" => ItemAssets.Instance.Medikit_Small,
             "LMG_LSW" => ItemAssets.Instance.LMG_LSW,
             "LMG_M_60" => ItemAssets.Instance.LMG_M_60,
             "LMG_SAW" => ItemAssets.Instance.LMG_SAW,
@@ -548,9 +548,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     else
                         linkedSoldier.TakePoisoning(poisonedBy, true);
                     break;
-                case "Medkit_Small":
-                case "Medkit_Medium":
-                case "Medkit_Large":
+                case "Medikit_Small":
+                case "Medikit_Medium":
+                case "Medikit_Large":
                     if (poisonedBy == null || poisonedBy == "")
                         soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
                     else
@@ -839,9 +839,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
-    public bool IsLargeMedkit()
+    public bool IsLargeMedikit()
     {
-        if (name.Equals("Medkit_Large"))
+        if (name.Equals("Medikit_Large"))
             return true;
         return false;
     }
