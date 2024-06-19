@@ -2166,37 +2166,36 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             GameObject explosionAlert = Instantiate(explosionAlertPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
 
+            explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, hitByExplosion);
+            explosionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(hitByExplosion);
+
             //riot shield block
-            if (hitByExplosion.IsActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
+            if (hitByExplosion.HasActiveAndCorrectlyAngledRiotShield(explosionLocation))
             {
                 damage /= 2;
                 stunRounds = 0;
                 explosionAlert.transform.Find("RiotShield").gameObject.SetActive(true);
             }
 
-            explosionAlert.transform.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
-            explosionAlert.transform.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{stunRounds}";
-            explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, hitByExplosion);
-            explosionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(hitByExplosion);
+            //JA block
+            if (hitByExplosion.IsWearingJuggernautArmour(true))
+            {
+                damage /= 2;
+                stunRounds = 0;
+                explosionAlert.transform.Find("JA").gameObject.SetActive(true);
+            }
 
             //display item destroyed indicators
-            if (damage >= 5)
-            {
-                explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
-                explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Breakable Items Destroyed";
-            }
-            else if (damage > 0)
-            {
-                explosionAlert.transform.Find("ItemDestruction").gameObject.SetActive(true);
-                explosionAlert.transform.Find("ItemDestruction").GetComponent<TextMeshProUGUI>().text = "+ All Fragile Items Destroyed";
-            }
-
             if (damage > 0)
-                explosionAlert.transform.Find("Damage").gameObject.SetActive(true);
-            if (stunRounds > 0)
-                explosionAlert.transform.Find("Stun").gameObject.SetActive(true);
+                explosionAlert.transform.Find("FragileDestroyed").gameObject.SetActive(true);
+            if (damage >= 5)
+                explosionAlert.transform.Find("BreakableDestroyed").gameObject.SetActive(true);
 
-            //delete the alert if target is already dead, or if there's no damage and no stun
+            //display damage and stun
+            explosionAlert.transform.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
+            explosionAlert.transform.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{stunRounds}";
+
+            //delete if there's no damage and no stun
             if (damage <= 0 && stunRounds <= 0)
                 Destroy(explosionAlert);
         }
@@ -2217,21 +2216,24 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddExplosionAlertItem(GameObject explosionList, Item itemHit, Vector3 explosionLocation, Soldier explodedBy, int damage)
     {
-        if (itemHit.owner is not GoodyBox)
+        if (!itemHit.IsNestedInGoodyBox())
         {
-            //riot shield block
-            if (itemHit.owner is Soldier hitByExplosion && hitByExplosion.IsActiveRiotShield(new(hitByExplosion.riotXPoint, hitByExplosion.riotYPoint), explosionLocation, new(hitByExplosion.X, hitByExplosion.Y)))
-                damage /= 2;
-
-            if ((itemHit.IsBreakable() && damage >= 5) || (itemHit.IsFragile() && damage > 0))
+            if (!itemHit.IsTriggered())
             {
-                if (!itemHit.IsTriggered())
+                //riot shield block
+                if (itemHit.IsNestedOnSoldier() && itemHit.SoldierNestedOn().HasActiveAndCorrectlyAngledRiotShield(explosionLocation))
+                    damage /= 2;
+
+                if ((itemHit.IsBreakable() && damage >= 5) || (itemHit.IsFragile() && damage > 0))
                 {
                     GameObject explosionAlert = Instantiate(explosionAlertItemPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
                     explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, itemHit);
-
                     explosionAlert.transform.Find("ItemPortrait").GetComponent<ItemPortrait>().Init(itemHit);
-                    explosionAlert.transform.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
+                    explosionAlert.transform.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
+
+                    //show riot shield block
+                    if (itemHit.IsNestedOnSoldier() && itemHit.SoldierNestedOn().HasActiveAndCorrectlyAngledRiotShield(explosionLocation))
+                        explosionAlert.transform.Find("RiotShield").gameObject.SetActive(true);
                 }
             }
         }

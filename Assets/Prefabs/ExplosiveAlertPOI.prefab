@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 9047198959824982720}
   - component: {fileID: 5613761442732879667}
   m_Layer: 5
-  m_Name: DamageToggle
+  m_Name: IsAffected
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -629,7 +629,7 @@ GameObject:
   - component: {fileID: 2486834703889620057}
   - component: {fileID: 638308051853955374}
   m_Layer: 5
-  m_Name: DamageQuestion
+  m_Name: Question
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -4,6 +4,7 @@ public static class HelperFunctions
 {
     public static bool IsWithinAngle(Vector3 pointA, Vector3 pointB, Vector3 centralPoint, float angleThreshold)
     {
+        Debug.Log($"Checking is within angle: {angleThreshold}");
         return CalculateAngle180(pointA, pointB, centralPoint) <= angleThreshold;
     }
 
@@ -11,7 +12,7 @@ public static class HelperFunctions
     {
         Vector2 directionA = new Vector2(pointA.x - centralPoint.x, pointA.y - centralPoint.y).normalized;
         Vector2 directionB = new Vector2(pointB.x - centralPoint.x, pointB.y - centralPoint.y).normalized;
-
+        Debug.Log($"angle is {Vector2.Angle(directionA, directionB)}");
         return Vector2.Angle(directionA, directionB);
     }
 

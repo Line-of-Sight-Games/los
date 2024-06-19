@@ -8,10 +8,10 @@ public class ItemPortrait : MonoBehaviour
     public void Init(Item item)
     {
         GetComponent<Image>().sprite = item.itemImage;
-        if (item.owner is Soldier linkedSoldier) 
+        if (item.IsNestedOnSoldier()) 
         {
             transform.Find("SoldierPortrait").gameObject.SetActive(true);
-            transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
+            transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(item.SoldierNestedOn());
         }
         else if (item.owner is null)
         {

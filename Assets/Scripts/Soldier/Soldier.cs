@@ -909,7 +909,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             stats.P.Val -= 2;
         }
 
-        if (IsCarryingRiotShield())
+        if (HasActiveRiotShield())
         {
             stats.C.Val = 0;
             stats.F.Val = 0;
@@ -1136,7 +1136,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to shot damage
         if (damageSource.Contains("Shot"))
         {
-            if (damagedBy != null && IsActiveRiotShield(new(riotXPoint, riotYPoint), new(damagedBy.X, damagedBy.Y), new(X, Y)))
+            if (damagedBy != null && HasActiveAndCorrectlyAngledRiotShield(new(damagedBy.X, damagedBy.Y)))
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Riot Shield.", true, false);
                 damage = 0;
@@ -1342,7 +1342,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 {
                     //apply stun affect from tranquiliser
                     if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
-                        MakeStunned(1);
+                        TakeStun(1);
                 }
             }
         }
@@ -2493,17 +2493,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
         }
     }
-    public void MakeStunned(int stunRounds)
+    public void TakeStun(int stunRounds)
     {
-        if (ResilienceCheck())
+        if (stunRounds > 0)
         {
-            menu.AddDamageAlert(this, $"Resisted a {stunRounds} round stun.", true, true);
-            menu.AddXpAlert(this, 1, "Resisted stunning.", true);
-        }
-        else
-        {
-            menu.AddDamageAlert(this, $"Suffered a {stunRounds} round stun.", false, true);
-            SetStunned(stunRounds);
+            if (ResilienceCheck())
+            {
+                menu.AddDamageAlert(this, $"Resisted a {stunRounds} round stun.", true, true);
+                menu.AddXpAlert(this, 1, "Resisted stunning.", true);
+            }
+            else
+            {
+                menu.AddDamageAlert(this, $"Suffered a {stunRounds} round stun.", false, true);
+                SetStunned(stunRounds);
+            }
         }
     }
     public void ClearHealthState()
@@ -3176,9 +3179,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
-    public bool IsActiveRiotShield(Vector3 riotShieldOrientation, Vector3 pointB, Vector3 riotShieldBearerLocation)
+    public bool HasActiveRiotShield()
     {
-        if (IsCarryingRiotShield() && !HasAHandFree(true) && HelperFunctions.IsWithinAngle(riotShieldOrientation, pointB, riotShieldBearerLocation, 67.5f))
+        if (IsCarryingRiotShield() && HasAHandFree(true))
+            return true;
+        return false;
+    }
+    public bool HasActiveAndCorrectlyAngledRiotShield(Vector3 damageOriginPoint)
+    {
+        if(HasActiveRiotShield() && HelperFunctions.IsWithinAngle(new(riotXPoint, riotYPoint), damageOriginPoint, new(X, Y), 67.5f))
             return true;
         return false;
     }

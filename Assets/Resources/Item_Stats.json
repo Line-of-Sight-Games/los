@@ -218,7 +218,7 @@
       "EquippableSlots": [ "Head" ],
       "WhereEquipped": "",
       "Weight": 14,
-      "AblativeHealth": 18,
+      "AblativeHealth": 20,
       "inventorySlots": {
         "JArmour1": "",
         "JArmour2": "",
@@ -235,7 +235,7 @@
     },
     {
       "Name": "Backpack",
-      "Traits": [ "Storage" ],
+      "Traits": [ "Storage", "Protecting" ],
       "EquippableSlots": [ "Back" ],
       "WhereEquipped": "",
       "Weight": 4,
@@ -249,7 +249,7 @@
     },
     {
       "Name": "Bag",
-      "Traits": [ "Storage" ],
+      "Traits": [ "Storage", "Protecting" ],
       "EquippableSlots": [ "Posterior" ],
       "WhereEquipped": "",
       "Weight": 2,
@@ -268,7 +268,7 @@
     },
     {
       "Name": "Brace",
-      "Traits": [ "Storage", "Throwable" ],
+      "Traits": [ "Storage", "Throwable", "Protecting" ],
       "EquippableSlots": [ "Leg" ],
       "WhereEquipped": "",
       "Weight": 1,

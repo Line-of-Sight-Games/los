@@ -39,9 +39,9 @@ public class ExplosionList : MonoBehaviour
 
                     if (hitByExplosion is Item item)
                     {
-                        if (int.TryParse(child.Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage))
+                        if (int.TryParse(child.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage))
                         {
-                            if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
+                            if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
                             {
                                 print($"{item.itemName} | {item.id} flagged for taking damage.");
                                 if (item.IsGrenade() || item.IsClaymore())
@@ -56,52 +56,34 @@ public class ExplosionList : MonoBehaviour
                     }
                     else if (hitByExplosion is ExplosiveBarrel hitBarrel) //mark barrels for explosion
                     {
-                        if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
+                        if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
                             hitBarrel.triggered = true;
                     }
                     else if (hitByExplosion is Claymore hitClaymore) //mark claymore for explosion
                     {
-                        if (child.Find("DamageToggle").GetComponent<Toggle>().isOn)
+                        if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
                             hitClaymore.triggered = true;
                     }
                     else if (hitByExplosion is Terminal terminal)
                     {
-                        //set terminal destroyer to 3 hp
-                        if (explodedBy.hp > 3)
-                            explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" });
-                        menu.poiManager.DestroyPOI(terminal);
+                        if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
+                        {
+                            //set terminal destroyer to 3 hp
+                            if (explodedBy.hp > 3)
+                                explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" });
+                            menu.poiManager.DestroyPOI(terminal);
+                        }
                     }
                     else if (hitByExplosion is DeploymentBeacon deploymentBeacon)
                     {
-                        menu.poiManager.DestroyPOI(deploymentBeacon);
+                        if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
+                            menu.poiManager.DestroyPOI(deploymentBeacon);
                     }
                     else if (hitByExplosion is Soldier hitSoldier)
                     {
-                        if (int.TryParse(child.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage))
+                        if (int.TryParse(child.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage) && int.TryParse(child.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int stun))
                         {
-                            if (child.Find("Damage").Find("DamageToggle").GetComponent<Toggle>().isOn)
-                            {
-                                if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Claymore")) //if it's a claymore
-                                {
-                                    if (hitSoldier.IsUnconscious() || hitSoldier.IsLastStand() || hitSoldier.IsWearingExoArmour() || hitSoldier.IsWearingGhillieArmour() || hitSoldier.IsWearingStimulantArmour())
-                                        damage = hitSoldier.GetFullHP();
-                                    else if (hitSoldier.IsWearingBodyArmour(false))
-                                        damage = hitSoldier.GetFullHP() - 1;
-                                }
-                                hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
-
-                                //do xp calculations, enemy - friendly damage
-                                if (hitSoldier.IsOppositeTeamAs(explodedBy))
-                                    posDamage += damage;
-                                else
-                                    negDamage += damage;
-                            }
-                        }
-                        print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) ({explodedBy.soldierName} {explodedBy.soldierTeam}) Tested {hitSoldier.soldierName} {hitSoldier.soldierTeam} - {posDamage + posStun}, {negDamage + negStun}");
-
-                        if (int.TryParse(child.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int stun))
-                        {
-                            if (child.Find("Stun").Find("StunToggle").GetComponent<Toggle>().isOn)
+                            if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
                             {
                                 if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
                                 {
@@ -111,7 +93,15 @@ public class ExplosionList : MonoBehaviour
                                         hitSoldier.SetStunned(stun); //non-resistable stunnage on flashbang grenades only   
                                 }
                                 else
-                                    hitSoldier.MakeStunned(stun);
+                                    hitSoldier.TakeStun(stun);
+
+                                hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
+
+                                //do xp calculations, enemy - friendly damage
+                                if (hitSoldier.IsOppositeTeamAs(explodedBy))
+                                    posDamage += damage;
+                                else
+                                    negDamage += damage;
 
                                 //add xp for stunning Flashbang only
                                 if (explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
@@ -123,6 +113,7 @@ public class ExplosionList : MonoBehaviour
                                         negStun += stun;
                                 }
                             }
+                            print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) ({explodedBy.soldierName} {explodedBy.soldierTeam}) Tested {hitSoldier.soldierName} {hitSoldier.soldierTeam} - {posDamage + posStun}, {negDamage + negStun}");
                         }
                     }
                 }

@@ -141,11 +141,11 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
             if (PhysicalObjectWithinClaymoreCone(obj, arc))
             {
                 if (obj is Item hitItem)
-                    menu.AddExplosionAlertItem(explosionList, hitItem, new(X, Y, Z), explodedBy, 10);
+                    menu.AddExplosionAlertItem(explosionList, hitItem, new(X, Y, Z), explodedBy, 8);
                 else if (obj is POI hitPoi && hitPoi != this)
-                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, 10);
+                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, 8);
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y, Z), explodedBy, hitSoldier.hp, 0);
+                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y, Z), explodedBy, hitSoldier.hp, 8);
             }
         }
 

@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEditor;
 using TMPro;
 using Newtonsoft.Json;
+using UnityEngine.PlayerLoop;
 
 [System.Serializable]
 public class Item : PhysicalObject, IDataPersistence, IHaveInventory
@@ -328,7 +329,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
         data.allItemDetails.Add(id, details);
     }
-
     public void RunPickupEffect(Soldier linkedSoldier)
     {
         if (linkedSoldier != null)
@@ -731,9 +731,51 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
+    public bool IsNestedInGoodyBox()
+    {
+        if (owner != null)
+        {
+            if (owner is GoodyBox)
+                return true;
+            else if (owner is Item owningItem)
+            {
+                if (owningItem.owner is GoodyBox)
+                    return true;
+            }
+        }
+        return false;
+    }
+    public bool IsNestedOnSoldier()
+    {
+        if (owner != null)
+        {
+            if (owner is Soldier)
+                return true;
+            else if (owner is Item owningItem)
+            {
+                if (owningItem.owner is Soldier)
+                    return true;
+            }
+        }
+        return false;
+    }
+    public Soldier SoldierNestedOn()
+    {
+        if (owner != null)
+        {
+            if (owner is Soldier owningSoldier)
+                return owningSoldier;
+            else if (owner is Item owningItem)
+            {
+                if (owningItem.owner is Soldier owningSoldier2)
+                    return owningSoldier2;
+            }
+        }
+        return null;
+    }
     public bool IsFragile()
     {
-        if (traits.Contains("Fragile"))
+        if (traits.Contains("Fragile") && !(owner != null && owner is Item parentItem && parentItem.IsProtecting()))
             return true;
         return false;
     }
@@ -746,6 +788,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public bool IsUsable()
     {
         if (traits.Contains("Usable"))
+            return true;
+        return false;
+    }
+    public bool IsProtecting()
+    {
+        if (traits.Contains("Protecting"))
             return true;
         return false;
     }
