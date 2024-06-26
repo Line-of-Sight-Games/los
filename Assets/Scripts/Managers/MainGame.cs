@@ -2606,17 +2606,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmGrenade(UseItemUI useGrenade)
     {
         string grenadeName = useGrenade.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text;
-        TMP_InputField targetX = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetY = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetZ = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        ValidThrowChecker throwTarget = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").GetComponent<ValidThrowChecker>();
         GameObject invalidThrow = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("InvalidThrow").gameObject;
         GameObject totalMiss = useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
 
         if (!useGrenade.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
+            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !invalidThrow.activeInHierarchy)
             {
                 int newX, newY;
+                throwTarget.GetThrowLocation(out Vector3 throwLocation);
+                int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), throwLocation));
                 int scatterDegree = RandomNumber(0, 360);
                 int scatterDistance = activeSoldier.StrengthCheck() switch
                 {
@@ -2624,14 +2624,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     _ => -1,
                 };
 
-                if (scatterDistance == -1 || (x == activeSoldier.X && y == activeSoldier.Y))
+                if (scatterDistance == -1 || throwDistance <= 3)
                     useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("PreciseThrow").gameObject.SetActive(true);
                 else
                 {
                     (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
-                    targetX.text = $"{newX}";
-                    targetY.text = $"{newY}";
+                    throwTarget.XPos.text = $"{newX}";
+                    throwTarget.YPos.text = $"{newY}";
 
                     if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
                         totalMiss.SetActive(true);
@@ -2644,7 +2644,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else //second press
         {
-            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
+            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z))
             {
                 useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
                 useGrenade.itemUsed.CheckExplosionGrenade(activeSoldier, new Vector3(x, y, z));
@@ -2659,18 +2659,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmThrow(UseItemUI throwItemUI)
     {
-        TMP_InputField targetX = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetY = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetZ = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        ValidThrowChecker throwTarget = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").GetComponent<ValidThrowChecker>();
         GameObject invalidThrow = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("InvalidThrow").gameObject;
         GameObject totalMiss = throwItemUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
         GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ItemWillBreak").gameObject;
 
         if (!throwItemUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
+            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !invalidThrow.activeInHierarchy)
             {
                 int newX, newY;
+                throwTarget.GetThrowLocation(out Vector3 throwLocation);
+                int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), throwLocation));
                 int scatterDegree = RandomNumber(0, 360);
                 int scatterDistance = activeSoldier.StrengthCheck() switch
                 {
@@ -2678,14 +2678,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     _ => -1,
                 };
 
-                if (scatterDistance == -1 || (x == activeSoldier.X && y == activeSoldier.Y))
+                if (scatterDistance == -1 || throwDistance <= 3)
                     throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(true);
                 else
                 {
                     (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
-                    targetX.text = $"{newX}";
-                    targetY.text = $"{newY}";
+                    throwTarget.XPos.text = $"{newX}";
+                    throwTarget.YPos.text = $"{newY}";
 
                     if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
                         totalMiss.SetActive(true);
@@ -2698,7 +2698,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else //second press
         {
-            if ((menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z)))
+            if ((menu.ValidateIntInput(throwTarget.YPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z)))
             {
                 if (itemWillBreak.activeInHierarchy)
                 {
