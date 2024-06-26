@@ -49,8 +49,11 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
         if (menu.overrideView)
         {
-            transform.Find("OverrideAmmo").gameObject.SetActive(true);
-            transform.Find("OverrideAmmo").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
+            if (item.IsGun() || item.IsAmmo())
+            {
+                transform.Find("OverrideAmmo").gameObject.SetActive(true);
+                transform.Find("OverrideAmmo").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
+            }
         }
         else
             transform.Find("OverrideAmmo").gameObject.SetActive(false);

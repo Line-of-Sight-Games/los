@@ -2625,12 +2625,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 };
 
                 if (scatterDistance == -1 || (x == activeSoldier.X && y == activeSoldier.Y))
-                {
-                    targetX.interactable = false;
-                    targetY.interactable = false;
-                    targetZ.interactable = false;
                     useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("PreciseThrow").gameObject.SetActive(true);
-                }
                 else
                 {
                     (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
@@ -2684,12 +2679,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 };
 
                 if (scatterDistance == -1 || (x == activeSoldier.X && y == activeSoldier.Y))
-                {
-                    targetX.interactable = false;
-                    targetY.interactable = false;
-                    targetZ.interactable = false;
                     throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(true);
-                }
                 else
                 {
                     (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);

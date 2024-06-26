@@ -152,24 +152,8 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
     public void DisplayAvailableSlots()
     {
         //hide extra slots
-        HideSlot("Backpack1");
-        HideSlot("Backpack2");
-        HideSlot("Backpack3");
-        HideSlot("BackpackMedM");
-        HideSlot("BackpackMedS");
-        HideSlot("BArmour1");
-        HideSlot("BArmour2");
-        HideSlot("JArmour1");
-        HideSlot("JArmour2");
-        HideSlot("JArmour3");
-        HideSlot("JArmour4");
         HideSlot("ArmourLine");
-        HideSlot("LeftBrace");
-        HideSlot("LeftBraceMedS");
-        HideSlot("RightBrace");
-        HideSlot("RightBraceMedS");
-        HideSlot("BagMedM");
-
+        
         //conditionally reveal
         if (CheckSlotContains("Back", "Backpack"))
         {
@@ -179,12 +163,27 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
             RevealSlot("BackpackMedM");
             RevealSlot("BackpackMedS");
         }
+        else
+        {
+            HideSlot("Backpack1");
+            HideSlot("Backpack2");
+            HideSlot("Backpack3");
+            HideSlot("BackpackMedM");
+            HideSlot("BackpackMedS");
+        }
+
         if (CheckSlotContains("Chest", "Armour_Body"))
         {
             RevealSlot("BArmour1");
             RevealSlot("BArmour2");
             RevealSlot("ArmourLine");
         }
+        else
+        {
+            HideSlot("BArmour1");
+            HideSlot("BArmour2");
+        }
+
         if (CheckSlotContains("Head", "Armour_Juggernaut"))
         {
             RevealSlot("JArmour1");
@@ -193,18 +192,40 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
             RevealSlot("JArmour4");
             RevealSlot("ArmourLine");
         }
+        else
+        {
+            HideSlot("JArmour1");
+            HideSlot("JArmour2");
+            HideSlot("JArmour3");
+            HideSlot("JArmour4");
+        }
+
         if (CheckSlotContains("LeftLeg", "Brace"))
         {
             RevealSlot("LeftBrace");
             RevealSlot("LeftBraceMedS");
         }
+        else
+        {
+            HideSlot("LeftBrace");
+            HideSlot("LeftBraceMedS");
+        }
+
         if (CheckSlotContains("RightLeg", "Brace"))
         {
             RevealSlot("RightBrace");
             RevealSlot("RightBraceMedS");
         }
+        else
+        {
+            HideSlot("RightBrace");
+            HideSlot("RightBraceMedS");
+        }
+
         if (CheckSlotContains("Posterior", "Bag"))
             RevealSlot("BagMedM");
+        else
+            HideSlot("BagMedM");
 
         //dynamic slot blocking
         UnblockAllSlots();
