@@ -22,7 +22,7 @@ public class InputController : MonoBehaviour
     }
     public void CheckInput()
     {
-        if (Regex.Match(textInput.text, @"^[0-9]+$").Success && int.Parse(textInput.text) >= min && int.Parse(textInput.text) <= max)
+        if (Regex.Match(textInput.text, @"^-?\d+$").Success && int.Parse(textInput.text) >= min && int.Parse(textInput.text) <= max)
             textInput.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color = normalColour;
         else
             textInput.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color = Color.red;

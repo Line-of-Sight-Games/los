@@ -2508,6 +2508,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetX = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField targetZ = useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        GameObject totalMiss = useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
         TMP_Dropdown strikeOption = useUHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>();
 
         if (int.TryParse(strikeOption.captionText.text.Split('(', ')')[1], out int dipelecScore))
@@ -2571,7 +2572,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else //second press
             {
-                if (useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.activeInHierarchy)
+                if (totalMiss.activeInHierarchy)
                 {
                     menu.CloseUHFUI();
                     useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
@@ -2607,12 +2608,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         string grenadeName = useGrenade.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text;
         ValidThrowChecker throwTarget = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").GetComponent<ValidThrowChecker>();
-        GameObject invalidThrow = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("InvalidThrow").gameObject;
+        GameObject throwBeyondRadius = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ThrowBeyondRadius").gameObject;
+        GameObject throwBeyondBlindRadius = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ThrowBeyondBlindRadius").gameObject;
         GameObject totalMiss = useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
 
         if (!useGrenade.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !invalidThrow.activeInHierarchy)
+            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
             {
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
@@ -2640,33 +2642,39 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
 
                 useGrenade.transform.Find("PressedOnce").gameObject.SetActive(true);
+                useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<LocationInputController>().SetMin(1);
+                useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<LocationInputController>().SetMin(1);
             }
         }
         else //second press
         {
-            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z))
-            {
-                useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
-                useGrenade.itemUsed.CheckExplosionGrenade(activeSoldier, new Vector3(x, y, z));
-                menu.CloseGrenadeUI();
-            }
-            else if (totalMiss.activeInHierarchy)
+            if (totalMiss.activeInHierarchy)
             {
                 activeSoldier.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
                 menu.CloseGrenadeUI();
+            }
+            else 
+            {
+                if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z))
+                {
+                    useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
+                    useGrenade.itemUsed.CheckExplosionGrenade(activeSoldier, new Vector3(x, y, z));
+                    menu.CloseGrenadeUI();
+                }
             }
         }
     }
     public void ConfirmThrow(UseItemUI throwItemUI)
     {
         ValidThrowChecker throwTarget = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").GetComponent<ValidThrowChecker>();
-        GameObject invalidThrow = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("InvalidThrow").gameObject;
+        GameObject throwBeyondRadius = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ThrowBeyondRadius").gameObject;
+        GameObject throwBeyondBlindRadius = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ThrowBeyondBlindRadius").gameObject;
         GameObject totalMiss = throwItemUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
         GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ItemWillBreak").gameObject;
 
         if (!throwItemUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !invalidThrow.activeInHierarchy)
+            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
             {
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
@@ -2694,29 +2702,34 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
 
                 throwItemUI.transform.Find("PressedOnce").gameObject.SetActive(true);
+                throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<LocationInputController>().SetMin(1);
+                throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<LocationInputController>().SetMin(1);
             }
         }
         else //second press
         {
-            if ((menu.ValidateIntInput(throwTarget.YPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z)))
+            if (totalMiss.activeInHierarchy)
             {
-                if (itemWillBreak.activeInHierarchy)
-                {
-                    throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
-                }
-                else
-                {
-                    activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
-                    throwItemUI.itemUsed.X = x;
-                    throwItemUI.itemUsed.Y = y;
-                    throwItemUI.itemUsed.Z = z;
-                }
+                activeSoldier.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
                 menu.CloseThrowUI();
             }
             else
             {
-                activeSoldier.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
-                menu.CloseThrowUI();
+                if (menu.ValidateIntInput(throwTarget.YPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z))
+                {
+                    if (itemWillBreak.activeInHierarchy)
+                    {
+                        throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+                    }
+                    else
+                    {
+                        activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                        throwItemUI.itemUsed.X = x;
+                        throwItemUI.itemUsed.Y = y;
+                        throwItemUI.itemUsed.Z = z;
+                    }
+                    menu.CloseThrowUI();
+                }
             }
         }
     }
@@ -3937,17 +3950,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (arrowType == "detection2Way" && movingSoldier.RevealedBySoldiers.Contains(detecteeSoldier.id) && detecteeSoldier.RevealedBySoldiers.Contains(movingSoldier.id))
                         {
                             addDetection = false;
-                            //print(arrowType + ": soldiers can already see each other");
+                            print(arrowType + ": soldiers can already see each other");
                         }
                         else if (arrowType == "detection1WayRight" && detecteeSoldier.RevealedBySoldiers.Contains(movingSoldier.id))
                         {
                             addDetection = false;
-                            //print(arrowType + ": onturn can see offturn (1 way)");
+                            print(arrowType + ": onturn can see offturn (1 way)");
                         }
                         else if (arrowType == "detection1WayLeft" && movingSoldier.RevealedBySoldiers.Contains(detecteeSoldier.id))
                         {
                             addDetection = false;
-                            //print(arrowType + ": offturn can see onturn (1 way)");
+                            print(arrowType + ": offturn can see onturn (1 way)");
                         }
                     }
 

@@ -3468,6 +3468,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         throwUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text = $"Throwing {useItemUI.itemUsed.itemName} from {useItemUI.itemUsedFromSlotName} slot.";
         throwUI.SetActive(true);
+
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<LocationInputController>().SetMin(-activeSoldier.ThrowRadius);
+        throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<LocationInputController>().SetMin(-activeSoldier.ThrowRadius);
     }
     public void ClearThrowUI()
     {
@@ -3772,9 +3775,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         
         if (itemThrown.IsThrowable())
-            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item (up to {activeSoldier.ThrowRadius}cm)?";
+        {
+            if (activeSoldier.IsAbleToSee())
+                dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item up to {activeSoldier.ThrowRadius}cm?";
+            else
+                dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item up to 3cm (<color=red>Blind</color>)?";
+        }
         else
-            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Cannot throw, discard item (up to 3cm)?";
+            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Cannot throw, discard item up to 3cm?";
 
         dropThrowItemUI.GetComponent<UseItemUI>().itemUsed = itemThrown;
         dropThrowItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
@@ -3861,9 +3869,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         grenadeUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
         grenadeUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
-
         grenadeUI.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text = useItemUI.itemUsed.itemName;
+
         grenadeUI.SetActive(true);
+
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<LocationInputController>().SetMin(-activeSoldier.ThrowRadius);
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<LocationInputController>().SetMin(-activeSoldier.ThrowRadius);
     }
     public void ClearGrenadeUI()
     {

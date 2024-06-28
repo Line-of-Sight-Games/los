@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class LocationInputController : InputController
 {
-    private void Start()
+    private void OnEnable()
     {
         if (textInput.transform.name.Contains("X"))
         {
@@ -22,5 +22,15 @@ public class LocationInputController : InputController
             min = 0;
             max = game.maxZ;
         }
+    }
+
+    public void SetMin(int min)
+    {
+        this.min = min;
+    }
+
+    public void SetMax(int max)
+    {
+        this.max = max;
     }
 }
