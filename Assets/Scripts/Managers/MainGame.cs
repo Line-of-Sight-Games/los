@@ -2761,6 +2761,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         throwItemUI.itemUsed.Y = y;
                         throwItemUI.itemUsed.Z = z;
                     }
+                    activeSoldier.PerformLoudAction(5);
                     menu.CloseThrowUI();
                 }
             }
@@ -2785,6 +2786,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 throwItemUI.itemUsed.Y = y;
                 throwItemUI.itemUsed.Z = z;
             }
+            activeSoldier.PerformLoudAction(5);
             menu.CloseDropUI();
         }
     }
@@ -2805,6 +2807,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
                 Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(activeSoldier.stats.F.Val, activeSoldier.stats.C.Val, fx, fy, activeSoldier.Id)).PlaceClaymore();
 
+                activeSoldier.PerformLoudAction(10);
                 menu.CloseClaymoreUI();
             }
             else
@@ -2825,6 +2828,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
                 Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), activeSoldier.Id);
 
+                activeSoldier.PerformLoudAction(10);
                 menu.CloseDeploymentBeaconUI();
             }
             else
@@ -2847,6 +2851,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(fx, fy, activeSoldier.Id));
 
+                activeSoldier.PerformLoudAction(10);
                 menu.CloseThermalCamUI();
             }
             else
