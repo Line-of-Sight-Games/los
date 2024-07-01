@@ -8,8 +8,10 @@ public class ShotUI : MonoBehaviour
 {
     public TextMeshProUGUI shooterID;
     public TMP_Dropdown shotTypeDropdown;
-    public Image gunImage;
+    public TMP_Dropdown gunDropdown;
+    public TMP_Dropdown gunsEmptyDropdown;
     public TMP_Dropdown comboGunsDropdown;
+    public TMP_Dropdown comboGunsEmptyDropdown;
     public TMP_Dropdown aimTypeDropdown;
     public TMP_Dropdown targetDropdown;
     public TMP_Dropdown coverLevelDropdown;

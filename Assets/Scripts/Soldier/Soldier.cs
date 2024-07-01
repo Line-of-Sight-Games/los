@@ -503,7 +503,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void FrozenMultiShot()
     {
-        if (HasGunEquipped() && EquippedGun.CheckAnyAmmo() && !IsMeleeControlled())
+        if (HasAnyAmmo() && !IsMeleeControlled())
             game.StartFrozenTurn(this);
     }
 
@@ -2180,7 +2180,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void SetSuppression(int suppression)
     {
-        suppressionValue = Mathf.RoundToInt((1 - ((100 - suppressionValue)/100f)*((100 - suppression)/100f))*100);
+        suppressionValue = HelperFunctions.CalculateSuppression(suppressionValue, suppression);
     }
     public void UnsetSuppression()
     {
@@ -3108,18 +3108,50 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         
         return false;
     }
-    public bool HasGunEquipped()
+    public bool HasGunsEquipped()
     {
-        if (EquippedGun != null)
+        if (EquippedGuns.Any())
             return true;
         return false;
     }
-    public bool HasSMGOrPistolEquipped()
+    public bool HasSingleGunEquipped()
     {
-        if (HasGunEquipped())
-            if (EquippedGun.IsPistol() || EquippedGun.IsSMG())
-                return true;
+        if (HasGunsEquipped() && EquippedGuns.Count == 1)
+            return true;
         return false;
+    }
+    public bool HasTwoGunsEquipped()
+    {
+        if (HasGunsEquipped() && EquippedGuns.Count == 2)
+            return true;
+        return false;
+    }
+    public Item GetEquippedGun(string gunName)
+    {
+        foreach (Item gun in EquippedGuns)
+            if (gun.itemName.Equals(gunName))
+                return gun;
+        return null;
+    }
+    public bool HasAnyAmmo()
+    {
+        if (EquippedGuns.Any())
+        {
+            foreach (Item gun in EquippedGuns)
+                if (gun.CheckAnyAmmo())
+                    return true;
+        }
+        return false;
+    }
+    public bool HasSMGsOrPistolsEquipped()
+    {
+        if (HasGunsEquipped())
+        {
+            foreach (Item gun in EquippedGuns)
+                if (!gun.IsPistol() && !gun.IsSMG())
+                    return false;
+        }
+        return true;
     }
     public bool HasArmourIntegrity()
     {
@@ -3197,12 +3229,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
-    public bool HasTwoGunsEquipped()
-    {
-        if (LeftHandItem != null && LeftHandItem.IsGun() && RightHandItem != null && RightHandItem.IsGun())
-            return true;
-        return false;
-    }
     public bool IsValidLoadout()
     {
         // Check if both hands are empty
@@ -3270,6 +3296,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsConscious())
             if (soldierAbilities.Contains("Adept"))
+                return true;
+
+        return false;
+    }
+    public bool IsAvenger()
+    {
+        if (IsConscious())
+            if (soldierAbilities.Contains("Avenger"))
                 return true;
 
         return false;
@@ -4089,17 +4123,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 return LeftHandItem;
         }
     }                  
-    public Item EquippedGun
+    public List<Item> EquippedGuns
     {
         get
         {
-            Item gunEquipped = null;
+            List<Item> gunsEquipped = new();
             if (LeftHandItem != null && LeftHandItem.IsGun())
-                gunEquipped = LeftHandItem;
+                gunsEquipped.Add(LeftHandItem);
             if (RightHandItem != null && RightHandItem.IsGun())
-                gunEquipped = RightHandItem;
+                gunsEquipped.Add(RightHandItem);
 
-            return gunEquipped;
+            return gunsEquipped;
         }
     }
     public Inventory Inventory { get { return inventory; } }

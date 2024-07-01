@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public static class HelperFunctions
@@ -27,5 +28,12 @@ public static class HelperFunctions
             angle += 360;
 
         return angle;
+    }
+    public static int CalculateSuppression(int existingSup, int addingSup)
+    {
+        float fExistingSup = existingSup / 100f, fAddingSup = addingSup / 100f;
+        Debug.Log($"{fExistingSup}|{fAddingSup}");
+
+        return Mathf.RoundToInt(100 * (1 - (1 - fExistingSup) * (1 - fAddingSup)));
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using static ItemReader;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -790,11 +791,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     ap++;
                 else
                 {
-                    ap += shooter.EquippedGun.SpecialityTag() switch
-                    {
-                        "Sniper Rifle" or "Light Machine Gun" => 2,
-                        _ => 1,
-                    };
+                    bool hasLMGOrSniper = false;
+                    foreach (Item gun in shooter.EquippedGuns)
+                        if (gun.SpecialityTag().Equals("Sniper Rifle") || gun.SpecialityTag().Equals("Light Machine Gun"))
+                            hasLMGOrSniper = true;
+
+                    if (hasLMGOrSniper)
+                        ap += 2;
+                    else
+                        ap++;
                 }
             }
         }
@@ -830,23 +835,37 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (targetSoldier.IsInCover())
                 shotUI.coverLevelUI.SetActive(true);
 
-            shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Remove("Suppression");
             UpdateTargetFlanking(shooter, targetSoldier);
         }
     }
     public void UpdateSuppressionValue(Soldier shooter)
     {
-        Item gun = shooter.EquippedGun;
+        int suppressionValue = 0;
         IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
-
-        int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
+        string suppressionBracket = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
         {
-            "Melee" or "CQB" => gun.gunTraits["CQBSupPen"],
-            "Short" => gun.gunTraits["ShortSupPen"],
-            "Medium" => gun.gunTraits["MedSupPen"],
-            "Long" or "Coriolis" => gun.gunTraits["LongSupPen"],
-            _ => 0,
+            "Melee" or "CQB" => "CQBSupPen",
+            "Short" => "ShortSupPen",
+            "Medium" => "MedSupPen",
+            "Long" or "Coriolis" => "LongSupPen",
+            _ => "",
         };
+
+        print($"{suppressionBracket}");
+        if (shotUI.gunDropdown.value == 0)
+            suppressionValue = shooter.EquippedGuns[0].gunTraits[suppressionBracket];
+        else if (shotUI.gunDropdown.value == 1)
+            suppressionValue = shooter.EquippedGuns[1].gunTraits[suppressionBracket];
+        else if (shotUI.gunDropdown.value == 2)
+        {
+            foreach (Item gun in shooter.EquippedGuns)
+            {
+                print($"{gun.itemName}");
+                print($"pre {suppressionValue}");
+                suppressionValue = HelperFunctions.CalculateSuppression(suppressionValue, gun.gunTraits[suppressionBracket]);
+                print($"post {suppressionValue}");
+            }
+        }
 
         shotUI.suppressionValue.text = suppressionValue.ToString();
     }
@@ -1412,7 +1431,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         Soldier shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
         IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
-        Item gun = shooter.EquippedGun;
+        Item gun = null;
+        bool runSecondShot = false;
+        print(menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text);
+        if (menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Contains("|"))
+        {
+            string[] guns = menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Split('|');
+            gun = shooter.GetEquippedGun(guns[0]);
+            menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text = guns[1];
+            runSecondShot = true;
+        }
+        else
+            gun = shooter.GetEquippedGun(menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text);
+
         int.TryParse(shotUI.apCost.text, out int ap);
         int actingHitChance;
         bool resistSuppression;
@@ -1422,8 +1453,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
 
         tempShooterTarget = Tuple.Create(shooter, target);
+        if (runSecondShot || retry) { }
+        else
+            DeductAP(ap);
+
         menu.SetShotResolvedFlagTo(false);
-        DeductAP(ap);
 
         if (shotUI.shotTypeDropdown.value == 0) //standard shot
         {
@@ -1483,7 +1517,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
-
                 }
                 else
                 {
@@ -1573,7 +1606,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                     //show avenger retry if opponent has killed
-                    if (targetSoldier.hasKilled && shooter.EquippedGun.CheckAnyAmmo() && !retry && !targetSoldier.IsRevoker())
+                    if (shooter.IsAvenger() && targetSoldier.hasKilled && gun.CheckAnyAmmo() && !retry && !targetSoldier.IsRevoker())
                         menu.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
 
                     //paying xp for dodge
@@ -1610,7 +1643,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //trigger loud action
         shooter.PerformLoudAction();
 
-        menu.OpenShotResultUI();
+        menu.OpenShotResultUI(runSecondShot);
         menu.CloseShotUI();
     }
 

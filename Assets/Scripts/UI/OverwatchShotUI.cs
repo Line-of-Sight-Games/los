@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,7 +53,7 @@ public class OverwatchShotUI : MonoBehaviour
         aimDropdown.interactable = false;
 
         //generate gun image
-        gunImage.sprite = shooter.EquippedGun.itemImage;
+        gunImage.sprite = shooter.EquippedGuns.First().itemImage;
 
         //set target
         TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait);
@@ -71,7 +72,7 @@ public class OverwatchShotUI : MonoBehaviour
     {
         Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
         IAmShootable target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
-        Item gun = shooter.EquippedGun;
+        Item gun = shooter.EquippedGuns.First();
         int actingHitChance;
         menu.SetShotResolvedFlagTo(false);
 
@@ -184,7 +185,7 @@ public class OverwatchShotUI : MonoBehaviour
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                     //show guardsman retry if gun has ammo
-                    if (shooter.IsGuardsman() && shooter.EquippedGun.CheckAnyAmmo() && !retry && !targetSoldier.IsRevoker())
+                    if (shooter.IsGuardsman() && shooter.HasAnyAmmo() && !retry && !targetSoldier.IsRevoker())
                         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
                     else
                         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
@@ -205,7 +206,7 @@ public class OverwatchShotUI : MonoBehaviour
                 //trigger loud action
                 shooter.PerformLoudAction();
 
-                menu.OpenShotResultUI();
+                menu.OpenShotResultUI(false);
 
                 //refresh detections (potentially trigger more overwatch)
                 game.StartCoroutine(game.DetectionAlertSingle(targetSoldier, "losChange", Vector3.zero, string.Empty, true));
@@ -226,7 +227,7 @@ public class OverwatchShotUI : MonoBehaviour
             GameObject shotConfirmUI = transform.Find("ConfirmShotUI").gameObject;
             Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
             Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
-            Item gun = shooter.EquippedGun;
+            Item gun = shooter.EquippedGuns.First();
             Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
 
             //only shot suppression hit chance if suppressed

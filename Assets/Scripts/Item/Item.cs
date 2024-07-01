@@ -399,7 +399,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         return false;
     }
-
     public bool CheckSpecificAmmo(int ammo, bool fromSuppression)
     {
         if (linkedSoldier != null)
