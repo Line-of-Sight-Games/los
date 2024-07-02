@@ -23,6 +23,10 @@ public class InventorySourcePanel : MonoBehaviour
         {
             AddGBInventoryContents(linkedGoodyBox);
         }
+        else if (linkedInventorySource is DrugCabinet linkedDrugCabinet)
+        {
+            AddGBInventoryContents(linkedDrugCabinet);
+        }
 
 
         return this;
@@ -43,6 +47,14 @@ public class InventorySourcePanel : MonoBehaviour
         foreach (Item i in gb.Inventory.AllItems)
         {
             ItemSlot itemSlot = Instantiate(itemSlotPrefab, transform.Find("Viewport").Find("Contents")).Init(gb);
+            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
+        }
+    }
+    public void AddGBInventoryContents(DrugCabinet dc)
+    {
+        foreach (Item i in dc.Inventory.AllItems)
+        {
+            ItemSlot itemSlot = Instantiate(itemSlotPrefab, transform.Find("Viewport").Find("Contents")).Init(dc);
             itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
         }
     }

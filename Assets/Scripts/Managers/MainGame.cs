@@ -59,6 +59,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return FindObjectsOfType<GoodyBox>().ToList();
     }
+    public List<DrugCabinet> AllDrugCabinets()
+    {
+        return FindObjectsOfType<DrugCabinet>().ToList();
+    }
     public int RandomNumber(int min, int max)
     {
         return UnityEngine.Random.Range(min, max + 1);
@@ -4021,8 +4025,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
 
+            //check for illusionist ability
+            bool triggersIllusionist = false;
+            if (triggersOverwatch && causeOfLosCheck.Equals("losChange"))
+                triggersIllusionist = true;
+
+            //finish detection by opening alert
             if (showDetectionUI)
-                menu.OpenGMAlertDetectionUI();
+                menu.OpenGMAlertDetectionUI(triggersIllusionist);
             else
                 menu.ConfirmDetections(); //required to kill old LOS if soldier moves out of everyone's vis
 
@@ -4160,6 +4170,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 Instantiate(poiManager.terminalPrefab).Init(spawnLocation, insertObjectsUI.terminalTypeDropdown.captionText.text);
             else if (insertObjectsUI.objectTypeDropdown.value == 3)
                 Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
+            else if (insertObjectsUI.objectTypeDropdown.value == 4)
+            {
+                DrugCabinet dc = Instantiate(poiManager.drugCabinetPrefab).Init(spawnLocation);
+                //fill dc with items
+                foreach (Transform child in insertObjectsUI.dcItemsPanel)
+                {
+                    ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
+                    if (itemIcon != null && itemIcon.pickupNumber > 0)
+                        for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
+                            dc.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+                }
+            }
 
             menu.CloseOverrideInsertObjectsUI();
         }
@@ -4191,6 +4213,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else if (insertObjectsUI.objectTypeDropdown.value == 2)
         {
             insertObjectsUI.terminalTypeUI.SetActive(true);
+        }
+        else if (insertObjectsUI.objectTypeDropdown.value == 4)
+        {
+            insertObjectsUI.allDrugsPanelUI.SetActive(true);
+            activeItemPanel = insertObjectsUI.allDrugsPanelUI.transform;
         }
     }
 

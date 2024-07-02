@@ -13,7 +13,9 @@ public class InsertObjectsUI : MonoBehaviour
     public TMP_Dropdown terminalTypeDropdown;
 
     public Transform gbItemsPanel;
+    public Transform dcItemsPanel;
 
     public GameObject terminalTypeUI;
     public GameObject allItemsPanelUI;
+    public GameObject allDrugsPanelUI;
 }
