@@ -73,4 +73,17 @@ public class SoldierUI : MonoBehaviour
         Transform soldierBanner = menu.soldierOptionsUI.transform.Find("SoldierBanner");
         soldierBanner.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
     }
+    public void DeathRoll()
+    {
+        if (menu.overrideView && menu.DeathKey())
+        {
+            if (game.DiceRoll() == 1)
+            {
+                print("Died from Deathroll");
+                linkedSoldier.InstantKill(null, new() { "Deathroll" });
+            } 
+            else
+                print("Survived Deathroll");
+        }
+    }
 }

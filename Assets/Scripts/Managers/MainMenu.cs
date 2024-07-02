@@ -16,6 +16,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //secret override key
     public KeyCode overrideKey = KeyCode.LeftShift;
     public KeyCode secondOverrideKey = KeyCode.Space;
+    public KeyCode deathKey = KeyCode.D;
 
     public SoldierManager soldierManager;
     public ItemManager itemManager;
@@ -258,6 +259,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public bool SecondOverrideKeyUp()
     {
         if (Input.GetKeyUp(secondOverrideKey))
+            return true;
+        return false;
+    }
+    public bool DeathKey()
+    {
+        if (Input.GetKey(deathKey))
             return true;
         return false;
     }

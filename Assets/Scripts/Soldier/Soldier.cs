@@ -1360,7 +1360,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         StartCoroutine(menu.OpenDamageList());
     }
 
-
     public void TabunTraumaCheck()
     {
         menu.AddTraumaAlert(this, 1, "Tabun exposure.", stats.R.Val + stats.Heal.Val, 1, "");
