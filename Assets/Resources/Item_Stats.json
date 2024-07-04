@@ -29,12 +29,12 @@
       "Traits": [ "Ammo", "Usable", "Consumable", "Fragile" ],
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": "",
-      "UsageAP": 199,
-      "Weight": 991,
-      "Ammo": 699,
-      "LoudRadius": 2299,
-      "MeleeDamage": 099,
-      "Charges": 199
+      "UsageAP": 1,
+      "Weight": 1,
+      "Ammo": 6,
+      "LoudRadius": 22,
+      "MeleeDamage": 0,
+      "Charges": 1
     },
     {
       "Name": "Ammo_Ri",

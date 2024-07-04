@@ -3664,7 +3664,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_Pi" => "Reload Pistol?",
             "Ammo_Ri" => "Reload Rifle?",
             "Ammo_Sh" => "Reload Shotgun?",
-            "Ammo_SMG" => "Reload Sub-Machine Gun?",
+            "Ammo_SMG" => "Reload Sub-Machine Gun or Pistol?",
             "Ammo_Sn" => "Reload Sniper?",
             "Claymore" => "Place Claymore?",
             "Deployment_Beacon" => "Place Deployment Beacon?",
@@ -3793,25 +3793,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     useItemUI.SetActive(true);
                 }
             }
-            else if (itemUsed.itemName.Contains("Pi"))
-            {
-                foreach (Item i in itemUsed.owner.Inventory.AllItems)
-                {
-                    TMP_Dropdown.OptionData targetOptionData = null;
-                    if (i.IsPistol())
-                        targetOptionData = new(i.id, i.itemImage);
-
-                    if (targetOptionData != null)
-                        targetOptionDataList.Add(targetOptionData);
-                }
-                targetDropdown.AddOptions(targetOptionDataList);
-
-                if (targetOptionDataList.Count > 0)
-                {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
-                    useItemUI.SetActive(true);
-                }
-            }
             else if (itemUsed.itemName.Contains("Ri"))
             {
                 foreach (Item i in itemUsed.owner.Inventory.AllItems)
@@ -3855,7 +3836,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 foreach (Item i in itemUsed.owner.Inventory.AllItems)
                 {
                     TMP_Dropdown.OptionData targetOptionData = null;
-                    if (i.IsSMG())
+                    if (i.IsSMG() || i.IsPistol())
                         targetOptionData = new(i.id, i.itemImage);
 
                     if (targetOptionData != null)
