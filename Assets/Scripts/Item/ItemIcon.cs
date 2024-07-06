@@ -18,14 +18,14 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         this.item = item;
         gameObject.name = item.itemName;
-        menu = FindObjectOfType<MainMenu>();
+        menu = FindFirstObjectByType<MainMenu>();
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         originalSlot = transform.parent.GetComponent<ItemSlot>();
         currentSlot = originalSlot;
         originalInventoryObject = originalSlot.linkedInventoryObject;
         item.markedForAction = string.Empty;
-        transform.Find("ItemImage").GetComponent<Image>().sprite = FindObjectOfType<ItemAssets>().GetSprite(item.itemName);
+        transform.Find("ItemImage").GetComponent<Image>().sprite = FindFirstObjectByType<ItemAssets>().GetSprite(item.itemName);
 
         return this;
     }

@@ -48,10 +48,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     private void Awake()
     {
-        game = FindObjectOfType<MainGame>();
-        menu = FindObjectOfType<MainMenu>();
-        soldierManager = FindObjectOfType<SoldierManager>();
-        itemManager = FindObjectOfType<ItemManager>();
+        game = FindFirstObjectByType<MainGame>();
+        menu = FindFirstObjectByType<MainMenu>();
+        soldierManager = FindFirstObjectByType<SoldierManager>();
+        itemManager = FindFirstObjectByType<ItemManager>();
     }
 
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability)
@@ -273,7 +273,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         witnessStoredAbilities = (details["witnessStoredAbilities"] as JArray).Select(token => token.ToString()).ToList();
 
         //link to maingame object
-        game = FindObjectOfType<MainGame>();
+        game = FindFirstObjectByType<MainGame>();
     }
     public Soldier LinkWithUI(GameObject displayPanel)
     {
@@ -1834,7 +1834,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public Sprite LoadPortrait(string portraitName)
     {
-        TMP_Dropdown allPortraits = FindObjectOfType<AllPortraits>().allPortraitsDropdown;
+        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsDropdown;
         return portraitName switch
         {
             "Alpine_Commander" => allPortraits.options[0].image,
@@ -1874,7 +1874,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadPortraitTeamsight(string portraitName)
     {
-        TMP_Dropdown allPortraits = FindObjectOfType<AllPortraits>().allPortraitsTeamsightDropdown;
+        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsTeamsightDropdown;
         return portraitName switch
         {
             "Alpine_Commander" => allPortraits.options[0].image,
@@ -1914,7 +1914,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadPortraitJammed(string portraitName)
     {
-        TMP_Dropdown allPortraits = FindObjectOfType<AllPortraits>().allPortraitsJammedDropdown;
+        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsJammedDropdown;
         return portraitName switch
         {
             "Alpine_Commander" => allPortraits.options[0].image,
@@ -1954,7 +1954,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadInsignia(string rank)
     {
-        TMP_Dropdown allInsignia = FindObjectOfType<AllInsignia>().allInsigniaDropdown;
+        TMP_Dropdown allInsignia = FindFirstObjectByType<AllInsignia>().allInsigniaDropdown;
         return rank switch
         {
             "Private" => allInsignia.options[1].image,
@@ -1974,7 +1974,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadPosition(string position)
     {
-        TMP_Dropdown allPositions = FindObjectOfType<AllPositions>().allPositionsDropdown;
+        TMP_Dropdown allPositions = FindFirstObjectByType<AllPositions>().allPositionsDropdown;
         return position switch
         {
             "Last Stand" => allPositions.options[1].image,
@@ -2715,7 +2715,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool TerminalInRange()
     {
-        foreach (Terminal t in FindObjectsOfType<Terminal>())
+        foreach (Terminal t in FindObjectsByType<Terminal>(default))
             if (PhysicalObjectWithinMeleeRadius(t))
                 return true;
         return false;
@@ -2726,7 +2726,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             List<Tuple<float, Terminal>> soldierDistanceToTerminals = new();
 
-            foreach (Terminal t in FindObjectsOfType<Terminal>())
+            foreach (Terminal t in FindObjectsByType<Terminal>(default))
                 soldierDistanceToTerminals.Add(Tuple.Create(game.CalculateRange(this, t), t));
 
             soldierDistanceToTerminals = soldierDistanceToTerminals.OrderBy(t => t.Item1).ToList();
@@ -2808,7 +2808,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool CheckSmokeClouds()
     {
-        SmokeCloud[] allSmokeClouds = FindObjectsOfType<SmokeCloud>();
+        SmokeCloud[] allSmokeClouds = FindObjectsByType<SmokeCloud>(default);
         if (allSmokeClouds.Length > 0)
         {
             if (IsAlive())
@@ -2852,7 +2852,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool CheckTabunClouds()
     {
-        TabunCloud[] allTabunClouds = FindObjectsOfType<TabunCloud>();
+        TabunCloud[] allTabunClouds = FindObjectsByType<TabunCloud>(default);
         print($"running function checktabunclouds for {this.soldierName}");
         if (allTabunClouds.Length > 0)
         {

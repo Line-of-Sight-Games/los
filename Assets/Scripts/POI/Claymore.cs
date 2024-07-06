@@ -16,9 +16,9 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
     private void Start()
     {
         poiType = "claymore";
-        menu = FindObjectOfType<MainMenu>();
-        game = FindObjectOfType<MainGame>();
-        poiManager = FindObjectOfType<POIManager>();
+        menu = FindFirstObjectByType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
+        poiManager = FindFirstObjectByType<POIManager>();
     }
     private void Update()
     {
@@ -136,7 +136,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
         else
             arc = 60f;
 
-        foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
         {
             if (PhysicalObjectWithinClaymoreCone(obj, arc))
             {

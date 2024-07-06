@@ -10,7 +10,7 @@ public class ClaymoreAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public Claymore claymore;
     private void Awake()
     {
-        menu = FindObjectOfType<MainMenu>();
+        menu = FindFirstObjectByType<MainMenu>();
     }
     public void SetSoldierAndClaymore(Soldier initSoldier, Claymore initClaymore)
     {

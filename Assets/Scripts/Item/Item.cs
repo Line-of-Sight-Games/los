@@ -46,10 +46,10 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
     private void Awake()
     {
-        game = FindObjectOfType<MainGame>();
-        menu = FindObjectOfType<MainMenu>();
-        reader = FindObjectOfType<ItemReader>();
-        itemManager = FindObjectOfType<ItemManager>();
+        game = FindFirstObjectByType<MainGame>();
+        menu = FindFirstObjectByType<MainMenu>();
+        reader = FindFirstObjectByType<ItemReader>();
+        itemManager = FindFirstObjectByType<ItemManager>();
     }
     private void Update()
     {
@@ -648,7 +648,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
         if (IsFrag())
         {
-            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+            foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
             {
                 int damage = 0;
                 if (obj.PhysicalObjectWithinRadius(position, 3))
@@ -671,7 +671,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         else if (IsFlashbang())
         {
-            foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+            foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
             {
                 int damage = 0, stun = 0;
                 if (obj.PhysicalObjectWithinRadius(position, 0))

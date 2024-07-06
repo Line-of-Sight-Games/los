@@ -12,7 +12,7 @@ public class ExplosionList : MonoBehaviour
     public MainMenu menu;
     private void Awake()
     {
-        menu = FindObjectOfType<MainMenu>();
+        menu = FindFirstObjectByType<MainMenu>();
     }
     public ExplosionList Init(string explosionMessage)
     {

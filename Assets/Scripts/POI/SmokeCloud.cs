@@ -19,9 +19,9 @@ public class SmokeCloud : POI, IDataPersistence
     private void Start()
     {
         poiType = "smoke";
-        menu = FindObjectOfType<MainMenu>();
-        game = FindObjectOfType<MainGame>();
-        poiManager = FindObjectOfType<POIManager>();
+        menu = FindFirstObjectByType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
+        poiManager = FindFirstObjectByType<POIManager>();
     }
 
     public SmokeCloud Init(Tuple<Vector3, string> location, string thrownBy)

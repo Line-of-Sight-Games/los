@@ -9,7 +9,7 @@ public class InventorySourceIcon : MonoBehaviour
 
     public void Start()
     {
-        menu = FindObjectOfType<MainMenu>();
+        menu = FindFirstObjectByType<MainMenu>();
     }
 
     public InventorySourceIcon Init(GameObject linkedPanel)

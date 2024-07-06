@@ -46,7 +46,7 @@ public class ValidDropChecker : MonoBehaviour
                 if (s.IsAbleToSee() && s.IsSameTeamAs(menu.activeSoldier) && s.PhysicalObjectWithinRadius(throwLocation, 3))
                 {
                     if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
-                        catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait) });
+                        catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, default) });
                 }
             }
 

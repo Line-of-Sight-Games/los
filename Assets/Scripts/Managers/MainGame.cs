@@ -49,19 +49,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public List<IAmDetectable> AllDetectable()
     {
-        return FindObjectsOfType<MonoBehaviour>().OfType<IAmDetectable>().ToList();
+        return FindObjectsByType<MonoBehaviour>(default).OfType<IAmDetectable>().ToList();
     }
     public List<IAmShootable> AllShootable()
     {
-        return FindObjectsOfType<MonoBehaviour>().OfType<IAmShootable>().ToList();
+        return FindObjectsByType<MonoBehaviour>(default).OfType<IAmShootable>().ToList();
     }
     public List<GoodyBox> AllGoodyBoxes()
     {
-        return FindObjectsOfType<GoodyBox>().ToList();
+        return FindObjectsByType<GoodyBox>(default).ToList();
     }
     public List<DrugCabinet> AllDrugCabinets()
     {
-        return FindObjectsOfType<DrugCabinet>().ToList();
+        return FindObjectsByType<DrugCabinet>(default).ToList();
     }
     public int RandomNumber(int min, int max)
     {
@@ -144,7 +144,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public IHaveInventory FindHasInventoryById(string id)
     {
-        foreach (IHaveInventory hasInventory in FindObjectsOfType<MonoBehaviour>().OfType<IHaveInventory>())
+        foreach (IHaveInventory hasInventory in FindObjectsByType<MonoBehaviour>(default).OfType<IHaveInventory>())
             if (hasInventory.Id == id)
                 return hasInventory;
         return null;
@@ -645,7 +645,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         movingSoldier.UnsetSuppression();
 
         //blow up claymores
-        foreach (Claymore claymore in FindObjectsOfType<Claymore>())
+        foreach (Claymore claymore in FindObjectsByType<Claymore>(default))
             claymore.MoveOverClaymore(movingSoldier);
 
         //check for smoke clouds
@@ -684,7 +684,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void CheckDeploymentBeacons(Soldier fieldedSoldier)
     {
-        foreach (DeploymentBeacon beacon in FindObjectsOfType<DeploymentBeacon>())
+        foreach (DeploymentBeacon beacon in FindObjectsByType<DeploymentBeacon>(default))
             if (beacon.placedBy.IsSameTeamAs(fieldedSoldier) && fieldedSoldier.X == beacon.X && fieldedSoldier.Y == beacon.Y && fieldedSoldier.Z == beacon.Z)
                 menu.AddXpAlert(beacon.placedBy, 1, $"Ally ({fieldedSoldier.soldierName}) deployed through beacon at ({beacon.X}, {beacon.Y}, {beacon.Z})", true);
     }
@@ -736,13 +736,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (s.IsAlive() && shooter.IsOppositeTeamAs(s) && s.IsRevealed())
             {
                 if (shooter.CanSeeInOwnRight(s))
-                    targetOptionData = new(s.Id, s.soldierPortrait);
+                    targetOptionData = new(s.Id, s.soldierPortrait, default);
                 else
                 {
                     if (s.IsJammer() && !shooter.IsRevoker())
-                        targetOptionData = new(s.Id, s.LoadPortraitJammed(s.soldierPortraitText));
+                        targetOptionData = new(s.Id, s.LoadPortraitJammed(s.soldierPortraitText), default);
                     else
-                        targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText));
+                        targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText), default);
                 }
                     
             }
@@ -762,18 +762,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
             shotUI.aimTypeUI.SetActive(true);
 
             //add explosive barrels to target list
-            foreach (ExplosiveBarrel b in FindObjectsOfType<ExplosiveBarrel>())
+            foreach (ExplosiveBarrel b in FindObjectsByType<ExplosiveBarrel>(default))
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (shooter.PhysicalObjectIsRevealed(b))
-                    targetOptionData = new(b.Id, menu.explosiveBarrelSprite);
+                    targetOptionData = new(b.Id, menu.explosiveBarrelSprite, default);
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
             }
 
             //add coverman
-            targetOptionDataList.Add(new("coverman", menu.covermanSprite));
+            targetOptionDataList.Add(new("coverman", menu.covermanSprite, default));
         }
         else if (shotUI.shotTypeDropdown.value == 1)
             shotUI.suppressionValueUI.SetActive(true);
@@ -2421,7 +2421,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public List<Item> FindNearbyItems()
     {
         List<Item> nearbyItems = new();
-        foreach (Item i in FindObjectsOfType<Item>())
+        foreach (Item i in FindObjectsByType<Item>(default))
             if (activeSoldier.PhysicalObjectWithinItemRadius(i))
                 nearbyItems.Add(i);
 
@@ -2879,7 +2879,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
-        foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
         {
             float damagef = 0;
             if (obj.PhysicalObjectWithinRadius(position, radius / 2))
@@ -2915,9 +2915,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void IncreaseRoundsActiveAllClouds()
     {
-        foreach (SmokeCloud cloud in FindObjectsOfType<SmokeCloud>())
+        foreach (SmokeCloud cloud in FindObjectsByType<SmokeCloud>(default))
             cloud.TurnsUntilDissipation--;
-        foreach (TabunCloud cloud in FindObjectsOfType<TabunCloud>())
+        foreach (TabunCloud cloud in FindObjectsByType<TabunCloud>(default))
             cloud.TurnsUntilDissipation--;
     }
 

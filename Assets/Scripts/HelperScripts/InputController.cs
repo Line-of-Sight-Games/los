@@ -12,7 +12,7 @@ public class InputController : MonoBehaviour
     private void Awake()
     {
         textInput = GetComponent<TMP_InputField>();
-        game = FindObjectOfType<MainGame>();
+        game = FindFirstObjectByType<MainGame>();
         normalColour = game.menu.normalTextColour;
     }
 

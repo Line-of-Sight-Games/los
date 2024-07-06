@@ -10,8 +10,8 @@ public class InventorySourcePanel : MonoBehaviour
 
     public InventorySourcePanel Init(IHaveInventory inventorySource)
     {
-        soundManager = FindObjectOfType<SoundManager>();
-        menu = FindObjectOfType<MainMenu>();
+        soundManager = FindFirstObjectByType<SoundManager>();
+        menu = FindFirstObjectByType<MainMenu>();
         linkedInventorySource = inventorySource;
 
         if (linkedInventorySource is Soldier linkedSoldier)

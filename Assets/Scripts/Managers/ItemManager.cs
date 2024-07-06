@@ -70,7 +70,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         //destroy items ready to be regenerated
-        IEnumerable<Item> allItems = FindObjectsOfType<Item>();
+        IEnumerable<Item> allItems = FindObjectsByType<Item>(default);
         foreach (Item item in allItems)
             if (item != null)
             Destroy(item.gameObject);
@@ -91,7 +91,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         allItemIds.Clear();
         data.allItemIds.Clear();
 
-        IEnumerable<Item> allItems = FindObjectsOfType<Item>();
+        IEnumerable<Item> allItems = FindObjectsByType<Item>(default);
         foreach (Item item in allItems)
             if (!allItemIds.Contains(item.id))
                 allItemIds.Add(item.id);
@@ -101,8 +101,8 @@ public class ItemManager : MonoBehaviour, IDataPersistence
 
     public void AssignItemsToOwners()
     {
-        IEnumerable<Item> allItems = FindObjectsOfType<Item>();
-        IEnumerable<MonoBehaviour> allObjects = FindObjectsOfType<MonoBehaviour>();
+        IEnumerable<Item> allItems = FindObjectsByType<Item>(default);
+        IEnumerable<MonoBehaviour> allObjects = FindObjectsByType<MonoBehaviour>(default);
 
         // Filter objects that implement IHaveInventory interface
         foreach (MonoBehaviour obj in allObjects)
@@ -168,7 +168,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     }
     public void RefreshItemList()
     {
-        allItems = FindObjectsOfType<Item>().ToList();
+        allItems = FindObjectsByType<Item>(default).ToList();
     }
     public Item FindItemById(string searchId)
     {
