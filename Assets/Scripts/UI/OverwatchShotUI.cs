@@ -24,8 +24,8 @@ public class OverwatchShotUI : MonoBehaviour
 
     private void Awake()
     {
-        game = FindObjectOfType<MainGame>();
-        menu = FindObjectOfType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
+        menu = FindFirstObjectByType<MainMenu>();
     }
     public OverwatchShotUI Init(Soldier shooter, Soldier target)
     {
@@ -56,7 +56,7 @@ public class OverwatchShotUI : MonoBehaviour
         gunImage.sprite = shooter.EquippedGuns.First().itemImage;
 
         //set target
-        TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait);
+        TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait, default);
         targetDetails.Add(option);
         targetDropdown.AddOptions(targetDetails);
         targetDropdown.interactable = false;

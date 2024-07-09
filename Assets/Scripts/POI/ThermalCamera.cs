@@ -14,9 +14,9 @@ public class ThermalCamera : POI, IDataPersistence
     {
         poiType = "thermalcam";
         active = true;
-        menu = FindObjectOfType<MainMenu>();
-        game = FindObjectOfType<MainGame>();
-        poiManager = FindObjectOfType<POIManager>();
+        menu = FindFirstObjectByType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
+        poiManager = FindFirstObjectByType<POIManager>();
     }
 
     private void Update()

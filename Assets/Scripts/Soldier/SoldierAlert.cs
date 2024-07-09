@@ -51,7 +51,7 @@ public class SoldierAlert : MonoBehaviour
 
     private void Start()
     {
-        noisePlayerSoldierAlert = FindObjectOfType<AudioSource>();
+        noisePlayerSoldierAlert = FindFirstObjectByType<AudioSource>();
     }
 
     public void PlayButtonPress()
@@ -275,7 +275,7 @@ public class SoldierAlert : MonoBehaviour
 
     public void OpenSoldierSnapshot(TextMeshProUGUI snappedSoldierID)
     {
-        MainMenu menu = FindObjectOfType<MainMenu>();
+        MainMenu menu = FindFirstObjectByType<MainMenu>();
         Soldier snapshotSoldier = menu.soldierManager.FindSoldierById(snappedSoldierID.text); 
         if (snapshotSoldier != null)
         {

@@ -154,7 +154,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 	public void SaveData(ref GameData data)
 	{
-		IEnumerable<Soldier> allSoldiers = FindObjectsOfType<Soldier>();
+		IEnumerable<Soldier> allSoldiers = FindObjectsByType<Soldier>(default);
 		foreach (Soldier soldier in allSoldiers)
 			allSoldierIds.Add(soldier.id);
 

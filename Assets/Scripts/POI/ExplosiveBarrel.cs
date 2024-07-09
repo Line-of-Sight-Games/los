@@ -12,9 +12,9 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     private void Start()
     {
         poiType = "barrel";
-        menu = FindObjectOfType<MainMenu>();
-        game = FindObjectOfType<MainGame>();
-        poiManager = FindObjectOfType<POIManager>();
+        menu = FindFirstObjectByType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
+        poiManager = FindFirstObjectByType<POIManager>();
     }
 
     public ExplosiveBarrel Init(Tuple<Vector3, string> location)
@@ -66,7 +66,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel | Detonated: {this.X},{this.Y},{this.Z}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
-        foreach (PhysicalObject obj in FindObjectsOfType<PhysicalObject>())
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
         {
             int damage = 0;
             if (obj.PhysicalObjectWithinRadius(this, 3))

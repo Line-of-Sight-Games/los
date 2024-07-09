@@ -9,7 +9,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public Soldier s1, s2;
     private void Awake()
     {
-        menu = FindObjectOfType<MainMenu>();
+        menu = FindFirstObjectByType<MainMenu>();
     }
     public void SetSoldiers(Soldier initS1, Soldier initS2)
     {

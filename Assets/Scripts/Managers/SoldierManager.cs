@@ -13,7 +13,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         //destroy existing soldiers ready to regenerate them
-        IEnumerable<Soldier> allSoldiersInst = FindObjectsOfType<Soldier>();
+        IEnumerable<Soldier> allSoldiersInst = FindObjectsByType<Soldier>(default);
         foreach (Soldier soldier in allSoldiersInst)
         {
             Destroy(soldier.soldierUI);
@@ -36,7 +36,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
 
     public void SaveData(ref GameData data)
     {
-        IEnumerable<Soldier> allSoldiers = FindObjectsOfType<Soldier>();
+        IEnumerable<Soldier> allSoldiers = FindObjectsByType<Soldier>(default);
         foreach (Soldier soldier in allSoldiers)
             if (!allSoldierIds.Contains(soldier.id))
                 allSoldierIds.Add(soldier.id);
@@ -46,7 +46,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
 
     public void RefreshSoldierList()
     {
-        allSoldiers = FindObjectsOfType<Soldier>().ToList();
+        allSoldiers = FindObjectsByType<Soldier>(default).ToList();
     }
     public Soldier FindSoldierByName(string name)
     {

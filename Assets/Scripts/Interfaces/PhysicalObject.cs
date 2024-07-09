@@ -12,8 +12,8 @@ public class PhysicalObject : MonoBehaviour
 
     private void Awake()
     {
-        game = FindObjectOfType<MainGame>();
-        menu = FindObjectOfType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
+        menu = FindFirstObjectByType<MainMenu>();
     }
     public string GenerateGuid()
     {

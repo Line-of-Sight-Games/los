@@ -15,9 +15,9 @@ public class SoldierUI : MonoBehaviour
 
     private void Start()
     {
-        noisePlayerSoldierUI = FindObjectOfType<AudioSource>();
-        menu = FindObjectOfType<MainMenu>();
-        game = FindObjectOfType<MainGame>();
+        noisePlayerSoldierUI = FindFirstObjectByType<AudioSource>();
+        menu = FindFirstObjectByType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
     }
 
     public void PlayButtonPress()
