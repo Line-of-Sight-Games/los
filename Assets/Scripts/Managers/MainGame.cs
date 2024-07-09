@@ -2549,80 +2549,78 @@ public class MainGame : MonoBehaviour, IDataPersistence
         GameObject totalMiss = useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
         TMP_Dropdown strikeOption = useUHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>();
 
-        if (int.TryParse(strikeOption.captionText.text.Split('(', ')')[1], out int dipelecScore))
+        int dipelecScore = itemManager.scoreTable[activeSoldier.stats.Dip.Val, activeSoldier.stats.Elec.Val];
+        Tuple<int, string, int, int, int> strike = itemManager.GetStrike(dipelecScore);
+        int rolls = strike.Item4;
+        int radius = strike.Item3;
+        int damage = strike.Item5;
+
+        if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            Tuple<int, string, int, int, int> strike = itemManager.GetStrike(dipelecScore);
-            int rolls = strike.Item4;
-            int radius = strike.Item3;
-            int damage = strike.Item5;
-
-            if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
-            {
                 
-                if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y))
+            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y))
+            {
+                int highestRoll = 0, newX, newY;
+                float scatterDistance;
+                int scatterDegree = RandomNumber(0, 360);
+                for (int i = 0; i < rolls; i++)
                 {
-                    int highestRoll = 0, newX, newY;
-                    float scatterDistance;
-                    int scatterDegree = RandomNumber(0, 360);
-                    for (int i = 0; i < rolls; i++)
-                    {
-                        int roll = DiceRoll();
-                        if (roll > highestRoll)
-                            highestRoll = roll;
-                    }
+                    int roll = DiceRoll();
+                    if (roll > highestRoll)
+                        highestRoll = roll;
+                }
 
-                    scatterDistance = highestRoll switch
-                    {
-                        2 => radius + 1,
-                        3 => 0.75f * radius + 1,
-                        4 => 0.5f * radius + 1,
-                        5 => 0.25f * radius + 1,
-                        6 => 0,
-                        _ => -1,
-                    };
+                scatterDistance = highestRoll switch
+                {
+                    2 => radius + 1,
+                    3 => 0.75f * radius + 1,
+                    4 => 0.5f * radius + 1,
+                    5 => 0.25f * radius + 1,
+                    6 => 0,
+                    _ => -1,
+                };
 
-                    if (scatterDistance != -1)
-                    {
-                        (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
+                if (scatterDistance != -1)
+                {
+                    (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
-                        if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
-                        {
-                            targetX.text = $"{newX}";
-                            targetX.interactable = false;
-                            targetY.text = $"{newY}";
-                            targetY.interactable = false;
-                            useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZLabel").gameObject.SetActive(true);
-                            useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").gameObject.SetActive(true);
-                        }
-                        else
-                        {
-                            useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattered off map";
-                            useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
-                        }
+                    if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
+                    {
+                        targetX.text = $"{newX}";
+                        targetX.interactable = false;
+                        targetY.text = $"{newY}";
+                        targetY.interactable = false;
+                        useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZLabel").gameObject.SetActive(true);
+                        useUHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").gameObject.SetActive(true);
                     }
                     else
                     {
-                        useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Total Missfire";
+                        useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Scattered off map";
                         useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
                     }
-                    useUHFUI.transform.Find("PressedOnce").gameObject.SetActive(true);
-                }
-            }
-            else //second press
-            {
-                if (totalMiss.activeInHierarchy)
-                {
-                    menu.CloseUHFUI();
-                    useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
                 }
                 else
                 {
-                    if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
-                    {
-                        menu.CloseUHFUI();
-                        useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
-                        CheckExplosionUHF(activeSoldier, new Vector3(x, y, z), radius, damage);
-                    }
+                    useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Total Missfire";
+                    useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
+                }
+                useUHFUI.transform.Find("PressedOnce").gameObject.SetActive(true);
+            }
+        }
+        else //second press
+        {
+            if (totalMiss.activeInHierarchy)
+            {
+                menu.CloseUHFUI();
+                useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+            }
+            else
+            {
+                if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
+                {
+                    menu.CloseUHFUI();
+                    useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
+                    CheckExplosionUHF(activeSoldier, new Vector3(x, y, z), radius, damage);
                 }
             }
         }
