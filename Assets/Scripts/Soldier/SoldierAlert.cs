@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEditor.Playables;
 
 public class SoldierAlert : MonoBehaviour
 {
@@ -114,6 +115,8 @@ public class SoldierAlert : MonoBehaviour
                             if (chance == 0)
                             {
                                 transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Failed to upgrade, no ability gained.";
+                                FileUtility.WriteToReport($"{soldier.soldierName} failed ability upgrade, no ability granted");
+
                                 promotionComplete = true;
 
                                 soldier.game.soundManager.PlayFailedUpgrade();
@@ -128,6 +131,7 @@ public class SoldierAlert : MonoBehaviour
 
                                 string ability = localAbilities[Random.Range(0, localAbilities.Length)][0];
                                 transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Granted random ability: " + ability;
+                                FileUtility.WriteToReport($"{soldier.soldierName} granted random ability: {ability}");
 
                                 //actually do the upgrade
                                 soldier.soldierAbilities.Add(ability);
@@ -145,6 +149,7 @@ public class SoldierAlert : MonoBehaviour
                                 string[][] localAbilities = abilities;
                                 localAbilities = localAbilities.Where(val => val[0] == soldier.soldierAbilities.First()).ToArray();
                                 transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Ability upgraded: " + localAbilities[0][1];
+                                FileUtility.WriteToReport($"{soldier.soldierName} upgraded ability: {localAbilities[0][1]}");
 
                                 //actually do the upgrade
                                 soldier.soldierAbilities.Remove(localAbilities[0][0]);
@@ -187,6 +192,7 @@ public class SoldierAlert : MonoBehaviour
             transform.Find("AbilityDropdown").gameObject.SetActive(false);
             transform.Find("ConfirmButton2").gameObject.SetActive(false);
             transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Ability gained: " + abilityDropdown.captionText.text;
+            FileUtility.WriteToReport($"{soldier.soldierName} granted chosen ability: {abilityDropdown.captionText.text}");
             promotionComplete = true;
 
             //soldier.game.soundManager.PlayPromotion();

@@ -9,6 +9,8 @@ using static ItemReader;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
+    private bool gameRunning;
+
     public MainMenu menu;
     public ItemManager itemManager;
     public SoldierManager soldierManager;
