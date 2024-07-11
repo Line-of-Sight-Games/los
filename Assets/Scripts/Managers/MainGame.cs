@@ -19,7 +19,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public DipelecGen dipelec;
     public SoundManager soundManager;
 
-    public MoveUI moveUI; 
+    public MoveUI moveUI;
     public ShotUI shotUI;
     public MeleeUI meleeUI;
     public ConfigureUI configUI;
@@ -43,6 +43,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public UnitDisplayPanel displayPanel;
     public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI;
     public Soldier activeSoldier;
+
+    public MainGame Init()
+    {
+        gameRunning = true;
+        return this;
+    }
 
     //helper functions - game
     public List<Soldier> AllSoldiers()
@@ -231,7 +237,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 menu.SetTeamTurnOverFlagTo(false);
 
                 EndTeamTurn();
-                
+
                 yield return new WaitUntil(() => menu.teamTurnOverFlag == true);
 
                 currentTurn++;
@@ -322,7 +328,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     s.loudActionRoundsVulnerable--;
             }
             //run things that trigger at the end of any team turn
-            
+
         }
 
         menu.CheckXP();
@@ -475,7 +481,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             menu.CloseOverwatchUI();
         }
-        
+
     }
 
 
@@ -619,7 +625,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         FileUtility.WriteToReport($"{movingSoldier.soldierName} moved to {moveToLocation}");
 
-        int.TryParse(fallDistance, out int fallDistanceInt); 
+        int.TryParse(fallDistance, out int fallDistanceInt);
         string launchMelee = string.Empty;
         DeductAP(ap);
         if (!freeMove)
@@ -746,7 +752,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     else
                         targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText), default);
                 }
-                    
+
             }
 
             if (targetOptionData != null)
@@ -814,7 +820,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //set ap to 0 for overwatch
         if (shooter.soldierTeam != currentTeam)
             ap = 0;
-        
+
         shotUI.apCost.text = ap.ToString();
     }
     public void UpdateTarget(Soldier shooter)
@@ -1257,7 +1263,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float targetHealthMod = 0;
         if (target is Soldier targetSoldier)
         {
-            
+
             if (targetSoldier.IsLastStand())
                 targetHealthMod = -0.4f;
             else if (targetSoldier.hp <= targetSoldier.stats.H.Val / 2)
@@ -1381,7 +1387,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public int ShooterSuppressionMod(Soldier shooter)
     {
         int suppressionMod = shooter.GetSuppression();
-        
+
         //report parameters
         shotParameters.Add(Tuple.Create("suppression", $"{suppressionMod}"));
 
@@ -1692,7 +1698,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (meleeUI.meleeTypeDropdown.options[0].text.Contains("Charge"))
             meleeUI.apCost.text = "0";
-        else 
+        else
         {
             if (attacker.IsFighter())
                 meleeUI.apCost.text = "1";
@@ -2031,7 +2037,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             meleeParameters.Add(Tuple.Create("bloodrage", $"{bloodrageMultiplier}"));
             meleeDamage *= bloodrageMultiplier;
-            
+
 
             //rounding based on R
             if (attacker.stats.R.Val > defender.stats.R.Val)
@@ -2198,7 +2204,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}");
 
                 //determine if damage is from melee or melee charge
-                List<string> damageType = new() { "Melee"};
+                List<string> damageType = new() { "Melee" };
                 if (ap == 0)
                     damageType.Add("Charge");
 
@@ -2295,7 +2301,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             soundManager.PlayMeleeResolution("breakeven");
 
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
-                            
+
                             //push the no damage attack through for abilities trigger
                             defender.TakeDamage(attacker, meleeDamage, true, damageType);
                         }
@@ -2320,7 +2326,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (meleeDamage == 0)
                             menu.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
                     }
-                } 
+                }
 
                 //kill if instantKill
                 if (instantKill)
@@ -2432,7 +2438,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmConfigure()
     {
         int ap = UpdateConfigureAP();
-        if (CheckAP(ap)) 
+        if (CheckAP(ap))
         {
             DeductAP(ap);
             foreach (ItemIcon itemIcon in configUI.GetComponentsInChildren<ItemIcon>(true))
@@ -2559,7 +2565,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-                
+
             if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y))
             {
                 int highestRoll = 0, newX, newY;
@@ -2691,7 +2697,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 activeSoldier.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
                 menu.CloseGrenadeUI();
             }
-            else 
+            else
             {
                 if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z))
                 {
@@ -2803,7 +2809,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_Dropdown terrainOn = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
         TMP_InputField facingX = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField facingY = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
-        
+
 
         if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy) && terrainOn.value != 0)
         {
@@ -3014,7 +3020,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("RewardPanel").Find("Scroll").Find("View").Find("Content"));
                         TextMeshProUGUI textComponent = dipelecReward.GetComponentInChildren<TextMeshProUGUI>();
 
-                        textComponent.text = (resultString == "Hack") ? dipelec.GetLevelElec(i+1) : dipelec.GetLevelDip(i+1);
+                        textComponent.text = (resultString == "Hack") ? dipelec.GetLevelElec(i + 1) : dipelec.GetLevelDip(i + 1);
                     }
                 }
                 else
@@ -3275,7 +3281,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (child.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text.Contains("GAINED"))
                     {
                         Soldier traumatisedSoldier = child.GetComponent<SoldierAlert>().soldier;
-                        int.TryParse(child .Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text, out int trauma);
+                        int.TryParse(child.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text, out int trauma);
 
                         // Check if the soldier is already in the dictionary
                         if (soldiersToTraumatise.ContainsKey(traumatisedSoldier))
@@ -3395,7 +3401,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (friendly.IsAbleToSee() && inspirer.IsSameTeamAs(friendly) && friendly.PhysicalObjectWithinMaxRadius(inspirer) && !friendly.IsRevoker())
             {
                 menu.AddInspirerAlert(friendly, "An Inspirer (" + inspirer.soldierName + ") is within SR range of " + friendly.soldierName + ". Is LOS present?");
-                openInspirerUI = true; 
+                openInspirerUI = true;
             }
         }
 
@@ -3699,7 +3705,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (movingSoldier.PhysicalObjectWithinMinRadius(detecteeSoldier))
                         {
                             addDetection = true;
-                            
+
                             if (detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat) > movingSoldier.DetectionActiveStat(movingSoldierMultipliers[0]))
                             {
                                 detectorLabel += CreateDetectionMessage("avoidance", "3cm", detecteeActiveStat, detecteeSoldier.AvoidanceActiveStat(detecteeActiveStat), movingSoldierMultipliers[0], movingSoldier.stats.P.Val);
@@ -3918,7 +3924,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                     counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne, boundCrossTwo);
                                 else
                                     counterLabel += CreateDetectionMessage("overwatch", "full SR", movingSoldierActiveStat, movingSoldier.AvoidanceActiveStat(movingSoldierActiveStat), detecteeMultipliers[2], detecteeSoldier.stats.P.Val, boundCrossOne);
-                                    
+
                                 overwatchLeft = true;
                             }
                             else
@@ -4079,7 +4085,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         part1 = $"(Until: {boundCrossOne.x}, {boundCrossOne.y}, {boundCrossOne.z})\n(within {distance} {activeStatName}={activeStatValue}";
         part2 = $"{perceptivenessMultiplier}P={soldierPerceptiveness * perceptivenessMultiplier})";
-        
+
         if (type.Contains("avoidance"))
         {
             title = "<color=green>RETREAT AVOIDANCE</color>\n";
@@ -4223,7 +4229,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
 
 
-
+    public bool GameRunning 
+    {
+        get {  return gameRunning; } set { gameRunning = value; }
+    }
 
 
     public void LoadData(GameData data)

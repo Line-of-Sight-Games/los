@@ -54,7 +54,7 @@ public class Stat
         set
         {
             baseValue = value;
-            if (statlineBelongsTo.soldierBelongsTo != null && statlineBelongsTo.soldierBelongsTo.game != null)
+            if (statlineBelongsTo.soldierBelongsTo != null && statlineBelongsTo.soldierBelongsTo.game.GameRunning)
             {
                 statlineBelongsTo.soldierBelongsTo.CalculateActiveStats();
                 if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str"))
