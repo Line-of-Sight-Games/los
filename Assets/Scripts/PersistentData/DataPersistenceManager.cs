@@ -72,7 +72,9 @@ public class DataPersistenceManager : MonoBehaviour
     {
         coreDataHandler = new FileDataHandler(Application.persistentDataPath, coreFileName);
         LoadGame();
-        game.Init();
+
+        if (game != null)
+            game.Init();
     }
 
     private List<IDataPersistence> FindAllDataPersistenceObjects()
