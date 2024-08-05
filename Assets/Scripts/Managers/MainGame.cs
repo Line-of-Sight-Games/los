@@ -836,12 +836,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             shotUI.coverLocationUI.SetActive(true);
             shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
+            menu.ClearFlankersUI(menu.flankersShotUI);
         }
         else if (target is ExplosiveBarrel targetBarrel)
         {
             shotUI.barrelLocation.text = $"X:{targetBarrel.X} Y:{targetBarrel.Y} Z:{targetBarrel.Z}";
             shotUI.barrelLocationUI.SetActive(true);
             shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
+            menu.ClearFlankersUI(menu.flankersShotUI);
         }
         else if (target is Soldier targetSoldier)
         {

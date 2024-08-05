@@ -82,8 +82,6 @@ public class ItemManager : MonoBehaviour, IDataPersistence
             newItem.id = id;
             newItem.LoadData(data);
         }
-
-        AssignItemsToOwners();
     }
 
     public void SaveData(ref GameData data)

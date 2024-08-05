@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class DataPersistenceManager : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class DataPersistenceManager : MonoBehaviour
     private List<IDataPersistence> dataPersistanceObjects;
     private FileDataHandler coreDataHandler;
     private MainGame game;
+    private ItemManager itemManager;
 
     public static DataPersistenceManager Instance { get; private set; }
 
@@ -23,7 +25,11 @@ public class DataPersistenceManager : MonoBehaviour
         }
         Instance = this;
 
-        game = FindFirstObjectByType<MainGame>();
+        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
+        {
+            game = FindFirstObjectByType<MainGame>();
+            itemManager = FindFirstObjectByType<ItemManager>();
+        }
     }
 
     public void NewGame()
@@ -46,6 +52,9 @@ public class DataPersistenceManager : MonoBehaviour
         {
             dataPersistenceObj.LoadData(gameData);
         }
+
+        if (itemManager != null)
+            itemManager.AssignItemsToOwners();
     }
 
     public void SaveGame()
