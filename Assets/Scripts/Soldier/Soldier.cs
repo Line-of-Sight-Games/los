@@ -3720,14 +3720,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string GetHealthState()
     {
-        if (hp > stats.H.Val)
-            return "<color=green>Overhealth</color>";
-        else if (hp == stats.H.Val)
+        
+        if (hp == stats.H.Val)
             return "Full Health";
-        else if (hp <= 0)
+        else if (hp == 0)
             return "<color=red>Dead</color>";
-        else if (hp <= stats.H.Val / 3)
+        else if (hp == 1)
             return "<color=red>Critically Injured</color>";
+        else if (hp > stats.H.Val)
+            return "<color=green>Overhealth</color>";
         else if (hp <= stats.H.Val / 2)
             return "<color=orange>Severely Injured</color>";
         else
