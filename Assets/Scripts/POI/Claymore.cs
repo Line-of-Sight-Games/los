@@ -145,7 +145,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
                 else if (obj is POI hitPoi && hitPoi != this)
                     menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, 8);
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y, Z), explodedBy, hitSoldier.hp, 8);
+                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y, Z), explodedBy, 8, 0);
             }
         }
 

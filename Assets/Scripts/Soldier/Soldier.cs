@@ -1457,12 +1457,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //don't heal if already desensitised or commited
         if (tp < 5 && tp > 0)
         {
-            actualTraumaHeal = traumaHeal;
-            tp -= traumaHeal;
+            actualTraumaHeal = Mathf.Min(traumaHeal, tp);
+            tp -= actualTraumaHeal;
         }
-        //correct negatives
-        if (tp < 0)
-            tp = 0;
+        
         return actualTraumaHeal;
     }
 
