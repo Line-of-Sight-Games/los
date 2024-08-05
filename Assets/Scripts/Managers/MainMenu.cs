@@ -2271,7 +2271,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (shooter.LeftHandItem != null)
         {
             if (shooter.LeftHandItem.CheckAnyAmmo())
-                gunOptionData = new(shooter.LeftHandItem.itemName, shooter.LeftHandItem.itemImage, default);
+                gunOptionData = new(shooter.LeftHandItem.itemName, shooter.LeftHandItem.itemImage, Color.white);
             else
             {
                 gunOptionData = shotUI.gunsEmptyDropdown.options[shotUI.gunsEmptyDropdown.options.FindIndex(option => option.text.Contains($"{shooter.LeftHandItem.itemName}"))];
@@ -2282,7 +2282,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (shooter.RightHandItem != null) 
         {
             if (shooter.RightHandItem.CheckAnyAmmo())
-                gunOptionData = new(shooter.RightHandItem.itemName, shooter.RightHandItem.itemImage, default);
+                gunOptionData = new(shooter.RightHandItem.itemName, shooter.RightHandItem.itemImage, Color.white);
             else
             {
                 gunOptionData = shotUI.gunsEmptyDropdown.options[shotUI.gunsEmptyDropdown.options.FindIndex(option => option.text.Contains($"{shooter.RightHandItem.itemName}"))];
@@ -2614,9 +2614,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (s.IsAlive() && attacker.IsOppositeTeamAs(s) && s.IsRevealed() && attacker.PhysicalObjectWithinMeleeRadius(s))
             {
                 if (attacker.CanSeeInOwnRight(s))
-                    defender = new(s.soldierName, s.soldierPortrait, default);
+                    defender = new(s.soldierName, s.soldierPortrait, Color.white);
                 else
-                    defender = new(s.soldierName, s.LoadPortraitTeamsight(s.soldierPortraitText), default);
+                    defender = new(s.soldierName, s.LoadPortraitTeamsight(s.soldierPortraitText), Color.white);
 
                 defenderDetails.Add(defender);
             }
@@ -3702,7 +3702,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (activeSoldier.IsSameTeamAsIncludingSelf(s) && (s.IsInjured() || s.IsTraumatised()) && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
-                    targetOptionData = new(s.Id, s.soldierPortrait, default);
+                    targetOptionData = new(s.Id, s.soldierPortrait, Color.white);
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
@@ -3721,7 +3721,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (s.IsAlive() && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
-                    targetOptionData = new(s.Id, s.soldierPortrait, default);
+                    targetOptionData = new(s.Id, s.soldierPortrait, Color.white);
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
@@ -3740,7 +3740,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (i.IsPoisonable())
-                    targetOptionData = new(i.id, i.itemImage, default);
+                    targetOptionData = new(i.id, i.itemImage, Color.white);
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
@@ -3761,7 +3761,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 {
                     TMP_Dropdown.OptionData targetOptionData = null;
                     if (i.IsAssaultRifle())
-                        targetOptionData = new(i.id, i.itemImage, default);
+                        targetOptionData = new(i.id, i.itemImage, Color.white);
 
                     if (targetOptionData != null)
                         targetOptionDataList.Add(targetOptionData);
@@ -3780,7 +3780,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 {
                     TMP_Dropdown.OptionData targetOptionData = null;
                     if (i.IsLMG())
-                        targetOptionData = new(i.id, i.itemImage, default);
+                        targetOptionData = new(i.id, i.itemImage, Color.white);
 
                     if (targetOptionData != null)
                         targetOptionDataList.Add(targetOptionData);
@@ -3799,7 +3799,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 {
                     TMP_Dropdown.OptionData targetOptionData = null;
                     if (i.IsRifle())
-                        targetOptionData = new(i.id, i.itemImage, default);
+                        targetOptionData = new(i.id, i.itemImage, Color.white);
 
                     if (targetOptionData != null)
                         targetOptionDataList.Add(targetOptionData);
@@ -3818,7 +3818,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 {
                     TMP_Dropdown.OptionData targetOptionData = null;
                     if (i.IsShotgun())
-                        targetOptionData = new(i.id, i.itemImage, default);
+                        targetOptionData = new(i.id, i.itemImage, Color.white);
 
                     if (targetOptionData != null)
                         targetOptionDataList.Add(targetOptionData);
@@ -3837,7 +3837,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 {
                     TMP_Dropdown.OptionData targetOptionData = null;
                     if (i.IsSMG() || i.IsPistol())
-                        targetOptionData = new(i.id, i.itemImage, default);
+                        targetOptionData = new(i.id, i.itemImage, Color.white);
 
                     if (targetOptionData != null)
                         targetOptionDataList.Add(targetOptionData);
@@ -3856,7 +3856,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 {
                     TMP_Dropdown.OptionData targetOptionData = null;
                     if (i.IsSniper())
-                        targetOptionData = new(i.id, i.itemImage, default);
+                        targetOptionData = new(i.id, i.itemImage, Color.white);
 
                     if (targetOptionData != null)
                         targetOptionDataList.Add(targetOptionData);

@@ -744,13 +744,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (s.IsAlive() && shooter.IsOppositeTeamAs(s) && s.IsRevealed())
             {
                 if (shooter.CanSeeInOwnRight(s))
-                    targetOptionData = new(s.Id, s.soldierPortrait, default);
+                    targetOptionData = new(s.Id, s.soldierPortrait, Color.white);
                 else
                 {
                     if (s.IsJammer() && !shooter.IsRevoker())
-                        targetOptionData = new(s.Id, s.LoadPortraitJammed(s.soldierPortraitText), default);
+                        targetOptionData = new(s.Id, s.LoadPortraitJammed(s.soldierPortraitText), Color.white);
                     else
-                        targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText), default);
+                        targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText), Color.white);
                 }
 
             }
@@ -774,14 +774,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (shooter.PhysicalObjectIsRevealed(b))
-                    targetOptionData = new(b.Id, menu.explosiveBarrelSprite, default);
+                    targetOptionData = new(b.Id, menu.explosiveBarrelSprite, Color.white);
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
             }
 
             //add coverman
-            targetOptionDataList.Add(new("coverman", menu.covermanSprite, default));
+            targetOptionDataList.Add(new("coverman", menu.covermanSprite, Color.white));
         }
         else if (shotUI.shotTypeDropdown.value == 1)
             shotUI.suppressionValueUI.SetActive(true);

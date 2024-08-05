@@ -3725,7 +3725,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return "Full Health";
         else if (hp == 0)
             return "<color=red>Dead</color>";
-        else if (hp == 1)
+        else if (hp == 3)
             return "<color=red>Critically Injured</color>";
         else if (hp > stats.H.Val)
             return "<color=green>Overhealth</color>";
