@@ -109,10 +109,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		"Electronics","Healing","Hercules","Diplomat","Technician","Medic","Jesus","Heyzeus","Allah","Alah","Alla","Ala","Asspipe","Niga","Nigga","Adept","Aficionado","Avenger","Exactor",
 		"Masochist","Bull","Colossus","Calculator","Daredevil","Spider","Dissuader","Chemist","Fighter","Pugilist","Guardsman","Sentinel","Gunner","Cannoneer","Ghost","Informer","Double Agent",
 		"Inspirer","Galvaniser","Insulator","Absorber","Jammer","Corrupter","Learner","Mastermind","Locater","Patriot","Zealot","Planner","Prophet","Politician","Revoker","Pacifier","Shadow",
-		"Deadeye","Spotter","Tracker","Sprinter","Olympian","Tactician","Creator","Vaulter","Acrobat","Witness","Hypnotist","Excelsior","Boogie-Knees","Bessie","Heisenberg","Tungsten",
-		"Casper","Boudica","Raphael","Egersund","Sgt. Chinkara","Nyctea","Eyewall","Keys","Bartholemew","Fiddlesticks","Spike","Destiny","Richtor","Slice","Tramp","Rome","Sassari","Verona",
-		"Milan","Bologna","Rumble","Conan","Lillehammer","Atlas","Florence","Smithy","Bighammer","Thorny","Wraith","Sharticus","Turnip","Jazzhands","Ivan","Kamrov","Price","Amun","Wick",
-		"Leespatz"
+		"Deadeye","Spotter","Tracker","Sprinter","Olympian","Tactician","Creator","Vaulter","Acrobat","Witness","Hypnotist"
     };
 	public List<string> selectedPortraits;
 	public List<string> selectedCommanderTerrains;
@@ -130,9 +127,9 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		"Chaney","Martins","Villa","Mills","Stephens","Houston","Phoenix","Buxton","Downes","Vu","Burks","Lim","West","Jensen","Hartley","Naylor","Wang","Coles","Peterson",
 		"Shepherd","Marsh","Bane","Ritter","Gallagher","Mcfarland","Justice","Oconnor","Fletcher","Hahn","Caleb","Robles","Griffiths","Sears","Espinosa","Edwards","Bird",
 		"Driscoll","Bell","Davies","Mcneill","Franks","Millington","Mclean","Moon","Frank","Martinez","Shannon","Irwin","Neale","Mellor","Armitage","Finch","Small",
-		"Hubert","Freeman","Baker","Carrillo","Timms","Thomas","Watkins","Stafford","Mckenzie","Goddard","Maddox","Simpson","Wooten","Mathis","Stamp","Banubis"
+		"Hubert","Freeman","Baker","Carrillo","Timms","Thomas","Watkins","Stafford","Mckenzie","Goddard","Maddox","Simpson","Wooten","Mathis","Stamp", "Banubis"
 	};
-	private readonly int[,] teamBreakdown = 
+	private readonly int[,] teamBreakdown =
 	{
 		{ 1, 1, 1 },
 		{ 2, 1, 1 },
