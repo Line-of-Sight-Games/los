@@ -25,7 +25,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public DipelecGen dipelec;
     public POIManager poiManager;
     public SoundManager soundManager;
-    public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, weatherIndicator, turnTitle;
+    public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 
     public MoveUI moveUI;
     public ShotUI shotUI;
@@ -37,7 +37,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
 
-    public GameObject menuUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -161,6 +161,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //check you are in corrrect scene
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
         {
+            UnfreezeTime();
             //check the game has started and weather exists
             if (game.currentRound > 0 && weather.savedWeather.Count > 0)
             {
@@ -182,7 +183,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 {
                     playTimeTotal += Time.unscaledDeltaTime;
                     turnTime += Time.deltaTime;
-                    weatherIndicator.text = DisplayWeather();
+                    DisplayWeather();
                 }
                 if (!game.gameOver)
                 {
@@ -948,7 +949,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //display functions - menu
-    public string DisplayWeather()
+    /*public string DisplayWeather()
     {
         string displayWeather = "";
 
@@ -959,6 +960,129 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 displayWeather += "\n<color=green>" + weather.NextTurnWeather + "</color>";
 
         return displayWeather;
+    }*/
+    public void DisplayWeather()
+    {
+        TMP_Dropdown allVis = FindFirstObjectByType<AllWeatherIcons>().allVisIcons;
+        TMP_Dropdown allWind = FindFirstObjectByType<AllWeatherIcons>().allWindIcons;
+        TMP_Dropdown allWindDirection = FindFirstObjectByType<AllWeatherIcons>().allWindDirectionIcons;
+        TMP_Dropdown allRain = FindFirstObjectByType<AllWeatherIcons>().allRainIcons;
+
+        Transform weatherIcons = weatherUI.transform.Find("WeatherIcons");
+        Transform experimentalistWeatherIcons = weatherUI.transform.Find("ExperimentalistWeatherIcons");
+
+        weatherIcons.Find("Vis").GetComponent<Image>().sprite = weather.CurrentVis switch
+        {
+            "Zero" => allVis.options[0].image,
+            "Poor" => allVis.options[1].image,
+            "Moderate" => allVis.options[2].image,
+            "Good" => allVis.options[3].image,
+            "Full" or _ => allVis.options[4].image,
+        };
+
+        weatherIcons.Find("Wind").GetComponent<Image>().sprite = weather.CurrentWindSpeed switch
+        {
+            "Strong" => allWind.options[0].image,
+            "Moderate" => allWind.options[1].image,
+            "Light" => allWind.options[2].image,
+            "Zero" or _ => allWind.options[3].image,
+        };
+
+        weatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(true);
+        if (weather.CurrentWeather.Contains("Eastern"))
+        {
+            if (weather.CurrentWeather.Contains("North"))
+                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[0].image;
+            else if (weather.CurrentWeather.Contains("South"))
+                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[1].image;
+            else
+                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[2].image;
+        }
+        else if (weather.CurrentWeather.Contains("Western"))
+        {
+            if (weather.CurrentWeather.Contains("North"))
+                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[3].image;
+            else if (weather.CurrentWeather.Contains("South"))
+                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[4].image;
+            else
+                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[5].image;
+        }
+        else if (weather.CurrentWeather.Contains("Northern"))
+            weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[6].image;
+        else if (weather.CurrentWeather.Contains("Southern"))
+            weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[7].image;
+        else
+            weatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(false);
+
+        weatherIcons.Find("Rain").GetComponent<Image>().sprite = weather.CurrentRain switch
+        {
+            "Torrential" => allRain.options[0].image,
+            "Heavy" => allRain.options[1].image,
+            "Moderate" => allRain.options[2].image,
+            "Light" => allRain.options[3].image,
+            "Zero" or _ => allRain.options[4].image,
+        };
+
+        experimentalistWeatherIcons.gameObject.SetActive(false);
+        foreach (Soldier s in game.AllSoldiers())
+        {
+            if (s.IsOnturnAndAlive() && s.IsExperimentalist())
+            {
+                experimentalistWeatherIcons.Find("Vis").GetComponent<Image>().sprite = weather.NextTurnVis switch
+                {
+                    "Zero" => allVis.options[0].image,
+                    "Poor" => allVis.options[1].image,
+                    "Moderate" => allVis.options[2].image,
+                    "Good" => allVis.options[3].image,
+                    "Full" or _ => allVis.options[4].image,
+                };
+
+                experimentalistWeatherIcons.Find("Wind").GetComponent<Image>().sprite = weather.NextTurnWindSpeed switch
+                {
+                    "Strong" => allWind.options[0].image,
+                    "Moderate" => allWind.options[1].image,
+                    "Light" => allWind.options[2].image,
+                    "Zero" or _ => allWind.options[3].image,
+                };
+
+                experimentalistWeatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(true);
+                if (weather.NextTurnWeather.Contains("Eastern"))
+                {
+                    if (weather.NextTurnWeather.Contains("North"))
+                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[0].image;
+                    else if (weather.NextTurnWeather.Contains("South"))
+                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[1].image;
+                    else
+                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[2].image;
+                }
+                else if (weather.NextTurnWeather.Contains("Western"))
+                {
+                    if (weather.NextTurnWeather.Contains("North"))
+                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[3].image;
+                    else if (weather.NextTurnWeather.Contains("South"))
+                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[4].image;
+                    else
+                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[5].image;
+                }
+                else if (weather.NextTurnWeather.Contains("Northern"))
+                    experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[6].image;
+                else if (weather.NextTurnWeather.Contains("Southern"))
+                    experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[7].image;
+                else
+                    experimentalistWeatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(false);
+
+                experimentalistWeatherIcons.Find("Rain").GetComponent<Image>().sprite = weather.NextTurnRain switch
+                {
+                    "Torrential" => allRain.options[0].image,
+                    "Heavy" => allRain.options[1].image,
+                    "Moderate" => allRain.options[2].image,
+                    "Light" => allRain.options[3].image,
+                    "Zero" or _ => allRain.options[4].image,
+                };
+
+                experimentalistWeatherIcons.gameObject.SetActive(true);
+            }
+        }
     }
     
     public void DisplaySoldiers()

@@ -56,7 +56,7 @@ public class OverwatchShotUI : MonoBehaviour
         gunImage.sprite = shooter.EquippedGuns.First().itemImage;
 
         //set target
-        TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait, default);
+        TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait, Color.white);
         targetDetails.Add(option);
         targetDropdown.AddOptions(targetDetails);
         targetDropdown.interactable = false;
