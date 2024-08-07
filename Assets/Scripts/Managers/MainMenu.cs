@@ -1452,13 +1452,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void UnGrey(Button button, string reason)
     {
         button.interactable = true;
-        button.transform.Find("Reason").GetComponent<TextMeshProUGUI>().text = reason;
+        button.transform.Find("Reason").gameObject.SetActive(false);
     }
 
     public void GreyOut(Button button, string reason)
     {
         button.interactable = false;
-        button.transform.Find("Reason").GetComponent<TextMeshProUGUI>().text = reason;
+        button.transform.Find("Reason").gameObject.SetActive(true);
+        button.transform.Find("Reason").GetComponentInChildren<TextMeshProUGUI>().text = reason;
     }
     public void DisplayActiveSoldier()
     {
