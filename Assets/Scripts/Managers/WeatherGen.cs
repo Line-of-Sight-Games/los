@@ -42,6 +42,18 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         {3, "Heavy"},
         {4, "Torrential"}
     };
+    public Dictionary<string, Vector2> windDirectionVectors = new()
+    {
+        {"Northern", new(0, 1)},
+        {"North-Eastern", new(1, 1)},
+        {"Eastern", new(1, 0)},
+        {"South-Eastern", new(1, -1)},
+        {"Southern", new(0, -1)},
+        {"South-Western", new(-1, -1)},
+        {"Western", new(-1, 0)},
+        {"North-Western", new(-1, 1)},
+        {"Zero", new(0, 0)}
+    };
 
     public List<string> savedWeather = new();
     private int vis, sp, dir, rn;
@@ -76,15 +88,8 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
                 }
                 string weatherString = "";
                 weatherString += visibility[vis] + " visibility, ";
-                if (sp == 0)
-                {
-                    weatherString += "no wind, ";
-                }
-                else
-                {
-                    weatherString += windSpeed[sp] + " ";
-                    weatherString += windDirection[dir] + " wind, ";
-                }
+                weatherString += windSpeed[sp] + " ";
+                weatherString += windDirection[dir] + " wind, ";
                 weatherString += rain[rn] + " rain.";
                 savedWeather.Add(weatherString);
                 k++;
@@ -285,7 +290,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         }
         set 
         { 
-            CurrentWeather = CurrentWeather.Replace(CurrentVis + " visibility", value);
+            CurrentWeather = CurrentWeather.Replace($"{CurrentVis} visibility", $"{value} visibility");
         }
     }
     public string NextTurnVis
@@ -335,6 +340,10 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
             else
                 return "Zero";
         }
+        set
+        {
+            CurrentWeather = CurrentWeather.Replace($"{CurrentRain} rain", $"{value} rain");
+        }
     }
     public string NextTurnRain
     {
@@ -352,94 +361,105 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
                 return "Zero";
         }
     }
-    public Vector2 LastTurnWindDirection
+    public string LastTurnWindDirection
     {
         get
         {
             if (LastTurnWeather.Contains("Eastern"))
             {
                 if (LastTurnWeather.Contains("North"))
-                    return new(1, 1);
+                    return "North-Eastern";
                 else if (LastTurnWeather.Contains("South"))
-                    return new(1, -1);
+                    return "South-Eastern";
                 else
-                    return new(1, 0);
+                    return "Eastern";
             }
             else if (LastTurnWeather.Contains("Western"))
             {
                 if (LastTurnWeather.Contains("North"))
-                    return new(-1, 1);
+                    return "North-Western";
                 else if (LastTurnWeather.Contains("South"))
-                    return new(-1, -1);
+                    return "South-Western";
                 else
-                    return new(-1, 0);
+                    return "Western";
             }
             else if (LastTurnWeather.Contains("Northern"))
-                return new(0, 1);
+                return "Northern";
             else if (LastTurnWeather.Contains("Southern"))
-                return new(0, -1);
+                return "Southern";
             else
-                return new(0, 0);
+                return "Zero";
         }
     }
-    public Vector2 CurrentWindDirection
+    public string CurrentWindDirection
     {
         get
         {
             if (CurrentWeather.Contains("Eastern"))
             {
                 if (CurrentWeather.Contains("North"))
-                    return new(1, 1);
+                    return "North-Eastern";
                 else if (CurrentWeather.Contains("South"))
-                    return new(1, -1);
+                    return "South-Eastern";
                 else
-                    return new(1, 0);
+                    return "Eastern";
             }
             else if (CurrentWeather.Contains("Western"))
             {
                 if (CurrentWeather.Contains("North"))
-                    return new(-1, 1);
+                    return "North-Western";
                 else if (CurrentWeather.Contains("South"))
-                    return new(-1, -1);
+                    return "South-Western";
                 else
-                    return new(-1, 0);
+                    return "Western";
             }
             else if (CurrentWeather.Contains("Northern"))
-                return new(0, 1);
+                return "Northern";
             else if (CurrentWeather.Contains("Southern"))
-                return new(0, -1);
+                return "Southern";
             else
-                return new(0, 0);
+                return "Zero";
+        }
+        set
+        {
+            CurrentWeather = CurrentWeather.Replace($"{CurrentWindSpeed} {CurrentWindDirection} wind", $"{CurrentWindSpeed} {value} wind");
         }
     }
-    public Vector2 NextTurnWindDirection
+    public Vector2 CurrentWindDirectionVector
+    {
+        get
+        {
+            return windDirectionVectors[CurrentWindDirection];
+        }
+    }
+    public string NextTurnWindDirection
     {
         get
         {
             if (NextTurnWeather.Contains("Eastern"))
             {
                 if (NextTurnWeather.Contains("North"))
-                    return new(1, 1);
+                    return "North-Eastern";
                 else if (NextTurnWeather.Contains("South"))
-                    return new(1, -1);
+                    return "South-Eastern";
                 else
-                    return new(1, 0);
+                    return "Eastern";
             }
             else if (NextTurnWeather.Contains("Western"))
             {
                 if (NextTurnWeather.Contains("North"))
-                    return new(-1, 1);
+                    return "North-Western";
                 else if (NextTurnWeather.Contains("South"))
-                    return new(-1, -1);
+                    return "South-Western";
                 else
-                    return new(-1, 0);
+                    return "Western";
             }
             else if (NextTurnWeather.Contains("Northern"))
-                return new(0, 1);
+                return "Northern";
             else if (NextTurnWeather.Contains("Southern"))
-                return new(0, -1);
+                return "Southern";
             else
-                return new(0, 0);
+                return "Zero";
         }
     }
     public string LastTurnWindSpeed
@@ -468,6 +488,11 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
                 return "Light";
             else
                 return "Zero";
+        }
+        set
+        {
+            print($"OLD:({CurrentWindSpeed} {CurrentWindDirection} wind)\nNEW:({value} {CurrentWindDirection} wind)");
+            CurrentWeather = CurrentWeather.Replace($"{CurrentWindSpeed} {CurrentWindDirection} wind", $"{value} {CurrentWindDirection} wind");
         }
     }
     public string NextTurnWindSpeed

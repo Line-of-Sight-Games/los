@@ -528,6 +528,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             switch (itemName)
             {
                 case "E_Tool":
+                    print("tried to use etool");
                     menu.OpenEtoolResultUI();
                     break;
                 case "Ammo_AR":

@@ -2912,6 +2912,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 message = "Hands Full";
         }
 
+        print(message);
+
         if (message == "")
             return true;
         else

@@ -37,14 +37,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, soldierOptionsAdditionalUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public SightRadiusCircle sightRadiusCirclePrefab;
     public List<Button> actionButtons;
     public List<Sprite> insignia;
-    public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, additionalOptionsButton;
+    public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton;
     private float playTimeTotal;
     public float turnTime;
     public string meleeChargeIndicator;
@@ -662,8 +662,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             endTurnButton.SetActive(true);
             overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Override";
             overrideVersionDisplay.SetActive(false);
-            overrideVisibilityDropdown.SetActive(false);
             overrideInsertObjectsButton.SetActive(false);
+            HideOverrideWeather();
         }
         else
             overrideUI.SetActive(true);
@@ -688,9 +688,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             endTurnButton.SetActive(false);
             overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Resume";
             overrideVersionDisplay.SetActive(true);
-            overrideVisibilityDropdown.SetActive(true);
             overrideInsertObjectsButton.SetActive(true);
-            GetOverrideVisibility();
+            GetOverrideWeather();
         }
     }
     public void GetOverrideHealthState(Transform soldierStatsUI)
@@ -741,10 +740,29 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else if (dropdown.value == 3)
             activeSoldier.terrainOn = "Urban";
     }
+    public void HideOverrideWeather()
+    {
+        overrideVisibilityDropdown.SetActive(false);
+        overrideWindSpeedDropdown.SetActive(false);
+        overrideWindDirectionDropdown.SetActive(false);
+        overrideRainDropdown.SetActive(false);
+    }
+    public void GetOverrideWeather()
+    {
+        overrideVisibilityDropdown.SetActive(true);
+        overrideWindSpeedDropdown.SetActive(true);
+        overrideWindDirectionDropdown.SetActive(true);
+        overrideRainDropdown.SetActive(true);
+
+        GetOverrideVisibility();
+        GetOverrideWindSpeed();
+        GetOverrideWindDirection();
+        GetOverrideRain();
+    }
     public void GetOverrideVisibility()
     {
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
-
+        dropdown.captionText.text = weather.CurrentVis;
         dropdown.value = weather.CurrentVis switch
         {
             "Full" => 0,
@@ -755,24 +773,73 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             _ => 0,
         };
     }
+    public void GetOverrideWindSpeed()
+    {
+        TMP_Dropdown dropdown = overrideWindSpeedDropdown.GetComponent<TMP_Dropdown>();
+        dropdown.captionText.text = weather.CurrentWindSpeed;
+        dropdown.value = weather.CurrentWindSpeed switch
+        {
+            "Strong" => 0,
+            "Moderate" => 1,
+            "Light" => 2,
+            "Zero" or _ => 3,
+        };
+
+    }
+    public void GetOverrideWindDirection()
+    {
+        TMP_Dropdown dropdown = overrideWindDirectionDropdown.GetComponent<TMP_Dropdown>();
+        dropdown.captionText.text = weather.CurrentWindDirection;
+        dropdown.value = weather.CurrentWindDirection switch
+        {
+            "North-Eastern" => 0,
+            "South-Eastern" => 1,
+            "Eastern" => 2,
+            "North-Western" => 3,
+            "South-Western" => 4,
+            "Western" => 5,
+            "Northern" => 6,
+            "Southern" => 7,
+            "Zero" or _ => 8,
+        };
+    }
+    public void GetOverrideRain()
+    {
+        TMP_Dropdown dropdown = overrideRainDropdown.GetComponent<TMP_Dropdown>();
+        dropdown.captionText.text = weather.CurrentRain;
+        dropdown.value = weather.CurrentRain switch
+        {
+            "Torrential" => 0,
+            "Heavy" => 1,
+            "Moderate" => 2,
+            "Light" => 3,
+            "Zero" or _ => 4,
+        };
+    }
     public void SetOverrideVisibility()
     {
-        //print("setoverridevis");
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
         string oldVis = weather.CurrentVis;
 
-        weather.CurrentVis = dropdown.value switch
-        {
-            0 => "Full visibility",
-            1 => "Good visibility",
-            2 => "Moderate visibility",
-            3 => "Poor visibility",
-            4 => "Zero visibility",
-            _ => "",
-        };
+        weather.CurrentVis = dropdown.captionText.text;
 
         if (game.CheckWeatherChange(oldVis, weather.CurrentVis) != "false")
             StartCoroutine(game.DetectionAlertAll("statChange", false));
+    }
+    public void SetOverrideWindSpeed()
+    {
+        TMP_Dropdown dropdown = overrideWindSpeedDropdown.GetComponent<TMP_Dropdown>();
+        weather.CurrentWindSpeed = dropdown.captionText.text;
+    }
+    public void SetOverrideWindDirection()
+    {
+        TMP_Dropdown dropdown = overrideWindDirectionDropdown.GetComponent<TMP_Dropdown>();
+        weather.CurrentWindDirection = dropdown.captionText.text;
+    }
+    public void SetOverrideRain()
+    {
+        TMP_Dropdown dropdown = overrideRainDropdown.GetComponent<TMP_Dropdown>();
+        weather.CurrentRain = dropdown.captionText.text;
     }
     public void ChangeHP()
     {
@@ -949,18 +1016,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //display functions - menu
-    /*public string DisplayWeather()
-    {
-        string displayWeather = "";
-
-        displayWeather += weather.CurrentWeather;
-
-        foreach (Soldier s in game.AllSoldiers())
-            if (s.IsOnturnAndAlive() && s.IsExperimentalist())
-                displayWeather += "\n<color=green>" + weather.NextTurnWeather + "</color>";
-
-        return displayWeather;
-    }*/
     public void DisplayWeather()
     {
         TMP_Dropdown allVis = FindFirstObjectByType<AllWeatherIcons>().allVisIcons;
@@ -980,6 +1035,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Full" or _ => allVis.options[4].image,
         };
 
+        weatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(true);
         weatherIcons.Find("Wind").GetComponent<Image>().sprite = weather.CurrentWindSpeed switch
         {
             "Strong" => allWind.options[0].image,
@@ -987,32 +1043,23 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Light" => allWind.options[2].image,
             "Zero" or _ => allWind.options[3].image,
         };
-
-        weatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(true);
-        if (weather.CurrentWeather.Contains("Eastern"))
-        {
-            if (weather.CurrentWeather.Contains("North"))
-                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[0].image;
-            else if (weather.CurrentWeather.Contains("South"))
-                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[1].image;
-            else
-                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[2].image;
-        }
-        else if (weather.CurrentWeather.Contains("Western"))
-        {
-            if (weather.CurrentWeather.Contains("North"))
-                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[3].image;
-            else if (weather.CurrentWeather.Contains("South"))
-                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[4].image;
-            else
-                weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[5].image;
-        }
-        else if (weather.CurrentWeather.Contains("Northern"))
-            weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[6].image;
-        else if (weather.CurrentWeather.Contains("Southern"))
-            weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[7].image;
-        else
+        if (weather.CurrentWindSpeed.Equals("Zero"))
             weatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(false);
+        else
+        {
+            weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = weather.CurrentWindDirection switch
+            {
+                "North-Eastern" => allWindDirection.options[0].image,
+                "South-Eastern" => allWindDirection.options[1].image,
+                "Eastern" => allWindDirection.options[2].image,
+                "North-Western" => allWindDirection.options[3].image,
+                "South-Western" => allWindDirection.options[4].image,
+                "Western" => allWindDirection.options[5].image,
+                "Northern" => allWindDirection.options[6].image,
+                "Southern" => allWindDirection.options[7].image,
+                "Zero" or _ => allWindDirection.options[8].image,
+            };
+        }
 
         weatherIcons.Find("Rain").GetComponent<Image>().sprite = weather.CurrentRain switch
         {
@@ -1045,31 +1092,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     "Zero" or _ => allWind.options[3].image,
                 };
 
-                experimentalistWeatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(true);
-                if (weather.NextTurnWeather.Contains("Eastern"))
+                experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = weather.NextTurnWindDirection switch
                 {
-                    if (weather.NextTurnWeather.Contains("North"))
-                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[0].image;
-                    else if (weather.NextTurnWeather.Contains("South"))
-                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[1].image;
-                    else
-                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[2].image;
-                }
-                else if (weather.NextTurnWeather.Contains("Western"))
-                {
-                    if (weather.NextTurnWeather.Contains("North"))
-                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[3].image;
-                    else if (weather.NextTurnWeather.Contains("South"))
-                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[4].image;
-                    else
-                        experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[5].image;
-                }
-                else if (weather.NextTurnWeather.Contains("Northern"))
-                    experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[6].image;
-                else if (weather.NextTurnWeather.Contains("Southern"))
-                    experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = allWindDirection.options[7].image;
-                else
-                    experimentalistWeatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(false);
+                    "North-Eastern" => allWindDirection.options[0].image,
+                    "South-Eastern" => allWindDirection.options[1].image,
+                    "Eastern" => allWindDirection.options[2].image,
+                    "North-Western" => allWindDirection.options[3].image,
+                    "South-Western" => allWindDirection.options[4].image,
+                    "Western" => allWindDirection.options[5].image,
+                    "Northern" => allWindDirection.options[6].image,
+                    "Southern" => allWindDirection.options[7].image,
+                    "Zero" or _ => allWindDirection.options[8].image,
+                };
 
                 experimentalistWeatherIcons.Find("Rain").GetComponent<Image>().sprite = weather.NextTurnRain switch
                 {
@@ -1245,17 +1279,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         onItemUseScreen = false;
         soldierStatsUI.SetActive(false);
     }
-    public void ToggleAdditionalActionMenu()
-    {
-        if (soldierOptionsAdditionalUI.activeSelf)
-            soldierOptionsAdditionalUI.SetActive(false);
-        else
-            soldierOptionsAdditionalUI.SetActive(true);
-    }
-    public void CloseAdditionalActionMenu()
-    {
-        soldierOptionsAdditionalUI.SetActive(false);
-    }
     public Dictionary<Button, string> AddAllButtons(Dictionary<Button, string> buttonStates)
     {
         foreach (Button b in actionButtons)
@@ -1411,13 +1434,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         foreach (Button b in actionButtons)
             GreyOut(b, "");
-
-        GreyOut(additionalOptionsButton, "");
     }
 
     public void GreyOutButtons(Dictionary<Button, string> buttonStates, string multiButtonReason)
     {
-        soldierOptionsUI.transform.Find("SoldierActions").Find("AllReason").GetComponent<TextMeshProUGUI>().text = multiButtonReason;
+        soldierOptionsUI.transform.Find("AllReason").GetComponent<TextMeshProUGUI>().text = multiButtonReason;
 
         if (buttonStates.Count > 0)
         {
@@ -1429,10 +1450,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     GreyOut(b, bValue);
                 }
                 else
-                {
                     UnGrey(b, "");
-                    UnGrey(additionalOptionsButton, "");
-                }
             }
         }
         else
@@ -1445,8 +1463,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         foreach (Button b in actionButtons)
             UnGrey(b, "");
-
-        UnGrey(additionalOptionsButton, "");
     }
 
     public void UnGrey(Button button, string reason)
@@ -2395,25 +2411,31 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         bool leftGrey = false, rightGrey = false;
         if (shooter.LeftHandItem != null)
         {
-            if (shooter.LeftHandItem.CheckAnyAmmo())
-                gunOptionData = new(shooter.LeftHandItem.itemName, shooter.LeftHandItem.itemImage, Color.white);
-            else
+            if (shooter.LeftHandItem.IsGun())
             {
-                gunOptionData = shotUI.gunsEmptyDropdown.options[shotUI.gunsEmptyDropdown.options.FindIndex(option => option.text.Contains($"{shooter.LeftHandItem.itemName}"))];
-                leftGrey = true;
+                if (shooter.LeftHandItem.CheckAnyAmmo())
+                    gunOptionData = new(shooter.LeftHandItem.itemName, shooter.LeftHandItem.itemImage, Color.white);
+                else
+                {
+                    gunOptionData = shotUI.gunsEmptyDropdown.options[shotUI.gunsEmptyDropdown.options.FindIndex(option => option.text.Contains($"{shooter.LeftHandItem.itemName}"))];
+                    leftGrey = true;
+                }
+                gunOptionDataList.Add(gunOptionData);
             }
-            gunOptionDataList.Add(gunOptionData);
         }
         if (shooter.RightHandItem != null) 
         {
-            if (shooter.RightHandItem.CheckAnyAmmo())
-                gunOptionData = new(shooter.RightHandItem.itemName, shooter.RightHandItem.itemImage, Color.white);
-            else
+            if (shooter.RightHandItem.IsGun())
             {
-                gunOptionData = shotUI.gunsEmptyDropdown.options[shotUI.gunsEmptyDropdown.options.FindIndex(option => option.text.Contains($"{shooter.RightHandItem.itemName}"))];
-                rightGrey = true;
+                if (shooter.RightHandItem.CheckAnyAmmo())
+                    gunOptionData = new(shooter.RightHandItem.itemName, shooter.RightHandItem.itemImage, Color.white);
+                else
+                {
+                    gunOptionData = shotUI.gunsEmptyDropdown.options[shotUI.gunsEmptyDropdown.options.FindIndex(option => option.text.Contains($"{shooter.RightHandItem.itemName}"))];
+                    rightGrey = true;
+                }
+                gunOptionDataList.Add(gunOptionData);
             }
-            gunOptionDataList.Add(gunOptionData);
         }
         if (gunOptionDataList.Count > 1)
         {
@@ -3998,13 +4020,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
         {
             useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(false);
-            if (itemUsed.itemName.Equals("E_Tool"))
-            {
-                if (activeSoldier.TerrainOn != "Urban")
-                    useItemUI.SetActive(true);
-            }
-            else
-                useItemUI.SetActive(true);
+            useItemUI.SetActive(true);
         }
     }
     public void CloseUseItemUI()

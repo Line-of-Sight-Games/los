@@ -1200,7 +1200,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         Vector2 shotLine = new(target.X - shooter.X, target.Y - shooter.Y);
         shotLine.Normalize();
-        Vector2 windLine = weather.CurrentWindDirection;
+        Vector2 windLine = weather.CurrentWindDirectionVector;
         float shotAngleRelativeToWind = Vector2.Angle(shotLine, windLine);
         //print("WIND: " + windLine + " SHOT: " + shotLine + "ANGLE: " + shotAngleRelativeToWind);
 
