@@ -1279,19 +1279,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                             Kill(damagedBy, damageSource);
                         else if (IsLastStand())
                         {
-                            if (!ResilienceCheck())
-                                MakeUnconscious(damagedBy, damageSource);
-                            else
+                            if (ResilienceCheck())
                             {
                                 menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
                                 menu.AddDamageAlert(this, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", true, true);
                             }
+                            else
+                                MakeUnconscious(damagedBy, damageSource);
                         }
                         else
                         {
                             if (hp == 1)
                             {
-                                if (!ResilienceCheck())
+                                if (ResilienceCheck())
                                 {
                                     MakeLastStand();
                                     menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
@@ -1302,13 +1302,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                             }
                             else if (hp == 2)
                             {
-                                if (!ResilienceCheck())
-                                    MakeLastStand();
-                                else
+                                if (ResilienceCheck())
                                 {
                                     menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
                                     menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
                                 }
+                                else
+                                    MakeLastStand();
                             }
                             else if (hp == 3)
                             {
@@ -1320,13 +1320,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                                         pass = true;
                                 }
 
-                                if (!pass)
-                                    MakeLastStand();
-                                else
+                                if (pass)
                                 {
                                     menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
                                     menu.AddDamageAlert(this, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", true, true);
                                 }
+                                else
+                                    MakeLastStand();
                             }
                         }
                     }
@@ -1632,7 +1632,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void DisplayStats()
     {
         soldierUI.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(this);
-        soldierUI.transform.Find("HP").gameObject.GetComponent<TextMeshProUGUI>().text = "HP:" + GetFullHP();
         soldierUI.transform.Find("AP").gameObject.GetComponent<TextMeshProUGUI>().text = "AP:" + ap;
         soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>().text = "MA:" + mp;
         soldierUI.transform.Find("Location").gameObject.GetComponent<TextMeshProUGUI>().text = "X:" + x + "   Y:" + y + "   Z:" + z;
