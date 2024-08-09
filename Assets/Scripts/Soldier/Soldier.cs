@@ -3164,24 +3164,30 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
-    public bool IsWearingBodyArmour(bool hasIntegrity)
+    public bool IsWearingBodyArmour(bool requiresIntegrity)
     {
-        if (Inventory.HasItemOfType("Armour_Body"))
+        if (requiresIntegrity)
         {
-            if (hasIntegrity && Inventory.GetItem("Armour_Body").ablativeHealth > 0)
+            if (Inventory.HasItemOfType("Armour_Body") && Inventory.GetItem("Armour_Body").ablativeHealth > 0)
                 return true;
-            else
+        }
+        else
+        {
+            if (Inventory.HasItemOfType("Armour_Body"))
                 return true;
         }
         return false;
     }
-    public bool IsWearingJuggernautArmour(bool hasIntegrity)
+    public bool IsWearingJuggernautArmour(bool requiresIntegrity)
     {
-        if (Inventory.HasItemOfType("Armour_Juggernaut"))
+        if (requiresIntegrity)
         {
-            if (hasIntegrity && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0)
+            if (Inventory.HasItemOfType("Armour_Juggernaut") && Inventory.GetItem("Armour_Juggernaut").ablativeHealth > 0)
                 return true;
-            else
+        }
+        else
+        {
+            if (Inventory.HasItemOfType("Armour_Juggernaut"))
                 return true;
         }
         return false;

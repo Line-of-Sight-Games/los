@@ -9,6 +9,7 @@ public class SoldierPortrait : MonoBehaviour
     public Image portrait;
     public Image soldierRank;
     public Image armourImage;
+    public Image brokenArmourImage;
     public TextMeshProUGUI hpDisplay;
     public Image soldierPosition;
     public TextMeshProUGUI soldierName;
@@ -36,8 +37,11 @@ public class SoldierPortrait : MonoBehaviour
 
             //load hp
             armourImage.gameObject.SetActive(false);
-            if (linkedSoldier.GetArmourHP() > 0)
+            brokenArmourImage.gameObject.SetActive(false);
+            if (linkedSoldier.IsWearingBodyArmour(true) || linkedSoldier.IsWearingJuggernautArmour(true))
                 armourImage.gameObject.SetActive(true);
+            else if (linkedSoldier.IsWearingBodyArmour(false) || linkedSoldier.IsWearingJuggernautArmour(false))
+                brokenArmourImage.gameObject.SetActive(true);
             hpDisplay.text = $"{linkedSoldier.GetFullHP()}";
 
             //load position
