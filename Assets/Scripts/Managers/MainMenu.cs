@@ -1376,11 +1376,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(meleeButton, "Blind");
 
             //block dipelec button
-            //if (activeSoldier.stats.SR.Val == 0) { }
-            //buttonStates.Add(dipElecButton, "Blind");
-            /*else*/
             if (!activeSoldier.TerminalInRange())
                 buttonStates.Add(dipElecButton, "No Terminal");
+            else if (!activeSoldier.IsAbleToSee())
+                buttonStates.Add(dipElecButton, "Blind");
             else if (!activeSoldier.ClosestTerminal().terminalEnabled)
                 buttonStates.Add(dipElecButton, "Terminal Disabled");
             else if (activeSoldier.IsMeleeControlling())
