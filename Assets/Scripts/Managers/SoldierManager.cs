@@ -31,6 +31,9 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
                 newSoldier.LinkWithUI(game.displayPanel.gameObject);
         }
 
+        //order soldiers by display priority
+        SetSiblingIndexByPriority();
+
         RefreshSoldierList();
     }
 
@@ -48,6 +51,23 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     {
         allSoldiers = FindObjectsByType<Soldier>(default).ToList();
     }
+
+    public void SetSiblingIndexByPriority()
+    {
+        // Get all sibling components
+        Soldier[] allSoldiers = FindObjectsByType<Soldier>(default);
+
+        // Sort siblings by soldierDisplayPriority in ascending order
+        System.Array.Sort(allSoldiers, (x, y) => x.soldierDisplayPriority.CompareTo(y.soldierDisplayPriority));
+
+        // Set the sibling index of the soldiers and their linkedUI based on the sorted order
+        for (int i = 0; i < allSoldiers.Length; i++)
+        {
+            allSoldiers[i].transform.SetSiblingIndex(i);
+            allSoldiers[i].soldierUI.transform.SetSiblingIndex(i);
+        }
+    }
+
     public Soldier FindSoldierByName(string name)
     {
         foreach (Soldier s in allSoldiers)

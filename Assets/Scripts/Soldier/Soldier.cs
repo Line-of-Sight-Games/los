@@ -60,7 +60,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierName = name;
         soldierTeam = team;
         soldierSpeciality = speciality;
-        soldierDisplayPriority = CheckSpecialityIndex(speciality);
+        soldierDisplayPriority = CheckSpecialityIndex(speciality) + soldierTeam*100;
         soldierTerrain = terrain;
         soldierPortrait = portrait;
         soldierPortraitText = portraitText;
@@ -279,7 +279,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         soldierUI = Instantiate(soldierUIPrefab, displayPanel.transform);
         soldierUI.GetComponent<SoldierUI>().linkedSoldier = this;
-        soldierUI.transform.SetAsFirstSibling();
         CheckSpecialityColor(soldierSpeciality);
 
         return this;
