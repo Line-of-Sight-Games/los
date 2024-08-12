@@ -27,7 +27,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
-    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, isSpottedBy;
+    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
     public Item itemPrefab;
     private JArray statsJArray;
     public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
@@ -170,7 +170,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "isSpotting", isSpotting },
             { "isSpottedBy", isSpottedBy },
             { "overwatchFirstShotUsed", overwatchFirstShotUsed },
-            { "witnessStoredAbilities", witnessStoredAbilities }
+            { "witnessStoredAbilities", witnessStoredAbilities },
+            { "plannerGunsBlessed", plannerGunsBlessed },
+            { "gunnerGunsBlessed", gunnerGunsBlessed }
         };
 
         //add the soldier in
@@ -271,6 +273,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         isSpotting = (string)details["isSpotting"];
         isSpottedBy = (details["isSpottedBy"] as JArray).Select(token => token.ToString()).ToList();
         witnessStoredAbilities = (details["witnessStoredAbilities"] as JArray).Select(token => token.ToString()).ToList();
+        plannerGunsBlessed = (details["plannerGunsBlessed"] as JArray).Select(token => token.ToString()).ToList();
+        gunnerGunsBlessed = (details["gunnerGunsBlessed"] as JArray).Select(token => token.ToString()).ToList();
 
         //link to maingame object
         game = FindFirstObjectByType<MainGame>();
@@ -736,15 +740,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void ApplyTerrainMods()
     {
         if (IsOnNativeTerrain())
-        {
             stats.C.Val++;
-            stats.F.Val++;
-        }
         else if (IsOnOppositeTerrain())
-        {
             stats.C.Val--;
-            stats.F.Val--;
-        }
     }
     public void ApplyAbilityMods()
     {
@@ -772,10 +770,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsShadow())
         {
-            Tuple<int, string>[] stealthPerceptionCamo = { Tuple.Create(stats.F.BaseVal, stats.F.Name), Tuple.Create(stats.P.BaseVal, stats.P.Name), Tuple.Create(stats.C.BaseVal, stats.C.Name) };
-            Array.Sort(stealthPerceptionCamo);
+            Tuple<int, string>[] perceptionCamo = { Tuple.Create(stats.P.BaseVal, stats.P.Name), Tuple.Create(stats.C.BaseVal, stats.C.Name) };
+            Array.Sort(perceptionCamo);
 
-            stats.GetStat(stealthPerceptionCamo[0].Item2).Val = stealthPerceptionCamo[2].Item1;
+            // if less than half of the greater, set to half of the greater
+            if (stats.GetStat(perceptionCamo[0].Item2).Val < Mathf.CeilToInt(perceptionCamo[1].Item1 / 2.0f))
+                stats.GetStat(perceptionCamo[0].Item2).Val = Mathf.CeilToInt(perceptionCamo[1].Item1 / 2.0f);
         }
     }
     public void ApplyGuardsmanMods()
@@ -787,7 +787,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         int inspirerIncrease = soldierSpeciality switch
         {
-            "Leadership" or "Health" or "Resilience" or "Evasion" or "Stealth" or "Perceptiveness" or "Camouflage" => 1,
+            "Leadership" or "Health" or "Resilience" or "Evasion" or "Fight" or "Perceptiveness" or "Camouflage" => 1,
             "Speed" => 6,
             "Sight Radius" => 10,
             _ => 0,
@@ -827,7 +827,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             stats.SR.Val = 0;
             stats.E.Val = 0;
-            stats.F.Val = 0;
             stats.C.Val = 0;
             stats.M.Val = 0;
         }
@@ -861,7 +860,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsInTabun())
         {
             stats.C.Val = 0;
-            stats.F.Val = 0;
             stats.P.Val = 0;
 
             if (CheckTabunEffectLevel(100))
@@ -884,43 +882,30 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void ApplyItemMods()
     {
         if (IsWearingBodyArmour(false))
-        {
             stats.C.Val--;
-            stats.F.Val--;
-        }
 
         if (IsWearingGhillieArmour())
-        {
             stats.C.Val += 4;
-            stats.F.Val += 4;
-        }
 
         if (IsWearingExoArmour())
         {
-            stats.F.Val = 0;
+            stats.C.Val = 0;
             stats.Str.Val *= 3;
         }
 
         if (IsWearingJuggernautArmour(false))
         {
             stats.C.Val = 0;
-            stats.F.Val = 0;
             stats.P.Val -= 2;
         }
 
         if (HasActiveRiotShield())
-        {
             stats.C.Val = 0;
-            stats.F.Val = 0;
-        }
     }
     public void ApplyLoudActionMods()
     {
         if (loudActionRoundsVulnerable > 0)
-        {
             stats.C.Val = 0;
-            stats.F.Val = 0;
-        }
     }
     public void CorrectNegatives()
     {
@@ -983,8 +968,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         SetState("Playdead");
 
         stats.L.BaseVal = 0;
-        stats.Elec.BaseVal = 0;
+        stats.F.BaseVal = 0;
         stats.Dip.BaseVal = 0;
+        stats.Elec.BaseVal = 0;
 
         //remove all engagements
         if (IsMeleeEngaged())
@@ -1067,10 +1053,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (effect)
                     stats.P.BaseVal *= 2;
                 if (sideEffect)
-                {
-                    stats.F.BaseVal = 0;
                     stats.C.BaseVal = 0;
-                }
                 break;
             case "Danazol":
                 if (effect)
@@ -1635,15 +1618,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>().text = "MA:" + mp;
         soldierUI.transform.Find("Location").gameObject.GetComponent<TextMeshProUGUI>().text = "X:" + x + "   Y:" + y + "   Z:" + z;
     }
-    public int AvoidanceActiveStat(string statName)
-    {
-        if (statName == "C")
-            return ActiveC;
-        else if (statName == "F")
-            return ActiveF;
-
-        return 0;
-    }
     public int DetectionActiveStat(int multiplier)
     {
         return stats.P.Val * multiplier;
@@ -1667,6 +1641,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void PerformLoudAction(int loudActionRadius)
     {
         int vulnerableTurns = 0;
+
+        //shadow ability
+        if (IsShadow())
+            loudActionRadius = Mathf.CeilToInt(loudActionRadius / 2.0f);
 
         foreach (Soldier s in game.AllSoldiers())
         {
@@ -1983,7 +1961,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         string[] stats =
         {
-            "Leadership", "Health", "Resilience", "Speed", "Evasion", "Stealth", "Perceptiveness", "Camouflage", "Sight Radius", 
+            "Leadership", "Health", "Resilience", "Speed", "Evasion", "Fight", "Perceptiveness", "Camouflage", "Sight Radius", 
             "Rifle", "Assault Rifle", "Light Machine Gun", "Sniper Rifle", "Sub-Machine Gun", "Shotgun", "Melee",
             "Strength", "Diplomacy", "Electronics", "Healing"
         };
@@ -1996,7 +1974,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         int num1 = -1, num2 = -1, num3 = -1;
         string[] stats =
         {
-            "Leadership", "Health", "Resilience", "Speed", "Evasion", "Stealth", "Perceptiveness", "Camouflage", "Sight Radius",
+            "Leadership", "Health", "Resilience", "Speed", "Evasion", "Fight", "Perceptiveness", "Camouflage", "Sight Radius",
             "Rifle", "Assault Rifle", "Light Machine Gun", "Sniper Rifle", "Sub-Machine Gun", "Shotgun", "Melee",
             "Strength", "Diplomacy", "Electronics", "Healing"
         };
@@ -2035,7 +2013,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Resilience" => "R: +" + stats.R.Increment(),
             "Speed" => "S: +" + stats.S.Increment(),
             "Evasion" => "E: +" + stats.E.Increment(),
-            "Stealth" => "F: +" + stats.F.Increment(),
+            "Fight" => "F: +" + stats.F.Increment(),
             "Perceptiveness" => "P: +" + stats.P.Increment(),
             "Camouflage" => "C: +" + stats.C.Increment(),
             "Sight Radius" => "SR: +" + stats.SR.Increment(),
@@ -2077,7 +2055,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     case "Resilience":
                     case "Speed":
                     case "Evasion":
-                    case "Stealth":
+                    case "Fight":
                     case "Perceptiveness":
                     case "Camouflage":
                     case "Sight Radius":
@@ -2117,7 +2095,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Resilience" => 3,
             "Speed" => 4,
             "Evasion" => 5,
-            "Stealth" => 6,
+            "Fight" => 6,
             "Perceptiveness" => 7,
             "Camouflage" => 8,
             "Sight Radius" => 9,
@@ -2624,7 +2602,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         else
                             menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
-                        killedBy.FighterMeleeKillReward(damageSource);
+                        killedBy.BrawlerMeleeKillReward(damageSource);
                     }
                     else if (damageSource.Contains("Poison"))
                         menu.AddXpAlert(killedBy, 10 + this.stats.R.Val, $"Killed {soldierName} by poisoning.", false);
@@ -3389,25 +3367,25 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return 0;
     }
-    public bool IsFighter()
+    public bool IsBrawler()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Fighter"))
+            if (soldierAbilities.Contains("Brawler"))
                 return true;
 
         return false;
     }
-    public void FighterMeleeHitReward()
+    public void BrawlerMeleeHitReward()
     {
-        if (IsFighter())
+        if (IsBrawler())
         {
             stats.SR.BaseVal += 5;
             stats.S.BaseVal += 3;
         }
     }
-    public void FighterMeleeKillReward(List<string> damageSource)
+    public void BrawlerMeleeKillReward(List<string> damageSource)
     {
-        if (IsFighter())
+        if (IsBrawler())
         {
             ap += 3;
             if (damageSource.Contains("Charge"))
@@ -3601,6 +3579,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (soldierAbilities.Contains("Shadow"))
                 return true;
         return false;
+    }
+    public int ShadowXpBonus()
+    {
+        if (IsShadow())
+            return 1;
+
+        return 0;
     }
     public bool IsSharpshooter()
     {
@@ -4146,5 +4131,4 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public List<string> InventoryList { get { return inventoryList; } }
     public Dictionary<string, string> InventorySlots { get { return inventorySlots; } }
     public int ActiveC { get { return stats.C.Val; } }
-    public int ActiveF { get { return stats.F.Val; } }
 }

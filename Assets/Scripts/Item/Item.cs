@@ -67,6 +67,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         owner = null;
         itemIndex = GetIndex(name);
         itemImage = GetSprite(name);
+        print(itemIndex);
 
         id = GenerateGuid();
         this.name = name;
@@ -358,25 +359,32 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             {
                 if (linkedSoldier.IsGunner())
                 {
-                    /*
-                    //one time 1.5 bonus to max clip and ammo
-                    if (gunTraits.MaxClip == gunTraits.BaseMaxClip)
+                    //gunner ability
+                    if (!linkedSoldier.gunnerGunsBlessed.Contains(this.Id))
                     {
-                        gunTraits.MaxClip = Mathf.FloorToInt(gunTraits.MaxClip * 1.5f);
+                        //one time 1.5 bonus to max clip and ammo
+                        gunTraits["MaxClip"] = Mathf.FloorToInt(gunTraits["MaxClip"] * 1.5f);
                         ammo = Mathf.FloorToInt(ammo * 1.5f);
-                    }
 
-                    //add 1 round to empty guns
-                    if (ammo == 0)
-                        ammo++;
-                    */
+                        //add 1 round to empty guns
+                        if (ammo == 0)
+                            ammo++;
+
+                        linkedSoldier.gunnerGunsBlessed.Add(this.Id);
+                    }
                 }
 
+                //planner ability
                 if (linkedSoldier.IsPlanner())
                 {
-                    ammo += game.DiceRoll();
-                    if (ammo > gunTraits["MaxClip"])
-                        ammo = gunTraits["MaxClip"];
+                    if (!linkedSoldier.plannerGunsBlessed.Contains(this.Id))
+                    {
+                        ammo += game.DiceRoll();
+                        if (ammo > gunTraits["MaxClip"])
+                            ammo = gunTraits["MaxClip"];
+
+                        linkedSoldier.plannerGunsBlessed.Add(this.Id);
+                    }
                 }
             }
         }

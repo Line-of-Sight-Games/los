@@ -9,5 +9,4 @@ public interface IAmDetectable
     public int Z { get; set; }
 
     public int ActiveC { get; }
-    public int ActiveF { get; }
 }

@@ -17,7 +17,7 @@ public class Statline
         stats.Add(new Stat(this, "R", "Resilience", "ability to resist adverse effects", 1, 1));
         stats.Add(new Stat(this, "S", "Speed", "maximum movement", 30, 6));
         stats.Add(new Stat(this, "E", "Evasion", "ability to dodge projectiles", 1, 1));
-        stats.Add(new Stat(this, "F", "Stealth", "ability to avoid detection on your turn", 1, 1));
+        stats.Add(new Stat(this, "F", "Fight", "ability to fight harder when disadvantaged", 1, 1));
         stats.Add(new Stat(this, "P", "Perceptiveness", "ability to detect hidden enemies", 1, 1));
         stats.Add(new Stat(this, "C", "Camouflage", "ability to avoid detection on enemy turn", 1, 1));
         stats.Add(new Stat(this, "SR", "Sight Radius", "maximum sight radius", 100, 10));

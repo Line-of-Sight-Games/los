@@ -63,7 +63,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         new string[] { "R", "Resilience" },
         new string[] { "S", "Speed" },
         new string[] { "E", "Evasion" },
-        new string[] { "F", "Stealth" },
+        new string[] { "F", "Fight" },
         new string[] { "P", "Perceptiveness" },
         new string[] { "C", "Camouflage" },
         new string[] { "SR", "Sight Radius" },
@@ -90,7 +90,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         new string[] { "Daredevil", "Spider" },
         new string[] { "Dissuader", "Omen of Death" },
         new string[] { "Experimentalist", "Chemist" },
-        new string[] { "Fighter", "Pugilist" },
+        new string[] { "Brawler", "Pugilist" },
         new string[] { "Guardsman", "Sentinel" },
         new string[] { "Gunner", "Cannoneer" },
         new string[] { "Illusionist", "Ghost" },
@@ -120,7 +120,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         { "Survivor (R)", "Resilience", "R"},
         { "Runner (S)", "Speed", "S" },
         { "Evader (E)", "Evasion", "E" },
-        { "Assassin (F)", "Stealth", "F" },
+        { "Assassin (F)", "Fight", "F" },
         { "Seeker (P)", "Perceptiveness", "P" },
         { "Chameleon (C)", "Camouflage", "C" },
         { "Scout (SR)", "Sight Radius", "SR" },
@@ -1637,8 +1637,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //detection functions - menu
-    public void OpenGMAlertDetectionUI(bool triggersIllusionist)
+    public void OpenGMAlertDetectionUI(string causeOfLosCheck, bool triggersIllusionist)
     {
+        //type of los check
+        detectionAlertUI.transform.Find("OptionPanel").Find("Reason").GetComponentInChildren<TextMeshProUGUI>().text = $"({causeOfLosCheck})";
+
         detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
         detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(false);
         int childCount = 0, overwatchCount = 0;
@@ -1887,16 +1890,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 allSoldiersNotRevealing[counter.id].Add(detector.id);
                             }
 
-                            if (detector.IsOnturnAndAlive())
-                            {
-                                if (detector.stats.F.Val > 2)
-                                    AddXpAlert(counter, detector.stats.F.Val, $"Detected stealthed soldier ({detector.soldierName}) with F > 2.", true);
-                            }
-                            else
-                            {
-                                if (detector.stats.C.Val > 2)
-                                    AddXpAlert(counter, detector.stats.C.Val, $"Detected camouflaged soldier ({detector.soldierName}) with C > 2.", true);
-                            }
+                            //check for xp
+                            if (detector.ActiveC > 2)
+                                AddXpAlert(counter, detector.ActiveC + counter.ShadowXpBonus(), $"Detected soldier ({detector.soldierName}) with C > 2.", true);
 
                             //check for overwatch shot
                             if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch") && child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
@@ -1905,10 +1901,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         else
                         {
                             allSoldiersNotRevealing[counter.id].Add(detector.id);
-                            if (detector.IsOnturnAndAlive())
-                                AddXpAlert(detector, 2, $"Avoided stealth detection ({counter.soldierName}).", true);
-                            else
-                                AddXpAlert(detector, 1, $"Avoided camouflage detection ({counter.soldierName}).", true);
+
+                            //check for xp
+                            AddXpAlert(detector, 1 + detector.ShadowXpBonus(), $"Avoided detection ({counter.soldierName}).", true);
                         }
                     }
                     else
@@ -1927,25 +1922,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 StartCoroutine(OpenLostLOSList());
                                 allSoldiersNotRevealing[detector.id].Add(counter.id);
                             }
-
-                            if (counter.IsOnturnAndAlive())
-                            {
-                                if (counter.stats.F.Val > 2)
-                                    AddXpAlert(detector, counter.stats.F.Val, $"Detected stealthed soldier ({counter.soldierName}) with F > 2.", true);
-                            }
-                            else
-                            {
-                                if (counter.stats.C.Val > 2)
-                                    AddXpAlert(detector, counter.stats.C.Val, $"Detected camouflaged soldier ({counter.soldierName}) with C > 2.", true);
-                            }
+                            
+                            //check for xp
+                            if (counter.ActiveC > 2)
+                                AddXpAlert(detector, counter.ActiveC + detector.ShadowXpBonus(), $"Detected soldier ({counter.soldierName}) with C > 2.", true);
                         }
                         else
                         {
                             allSoldiersNotRevealing[detector.id].Add(counter.id);
-                            if (counter.IsOnturnAndAlive())
-                                AddXpAlert(counter, 1, $"Avoided stealth detection ({detector.soldierName}).", true);
-                            else
-                                AddXpAlert(counter, 1, $"Avoided camouflage detection ({detector.soldierName}).", true);
+
+                            //check for xp
+                            AddXpAlert(counter, 1 + counter.ShadowXpBonus(), $"Avoided detection ({detector.soldierName}).", true);
                         }
                     }
                     else
@@ -2186,7 +2173,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Resilience" => "+1 R",
             "Speed" => "+6 S",
             "Evasion" => "+1 E",
-            "Stealth" => "+1 F",
+            "Fight" => "+1 F",
             "Perceptiveness" => "+1 P",
             "Camouflage" => "+1 C",
             "Sight Radius" => "+10 SR",
@@ -3335,6 +3322,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             UnfreezeTime();
             ClearDipelecResultUI();
             dipelecResultUI.SetActive(false);
+            activeSoldier.PerformLoudAction(30);
         }
     }
     
@@ -3569,6 +3557,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     xpAlert.transform.Find("XpToggle").GetComponent<Toggle>().interactable = false;
                 }
 
+                //learner ability
                 if (learnerEnabled && soldier.IsLearner())
                 {
                     xpAlert.transform.Find("LearnerIndicator").gameObject.SetActive(true);
@@ -4163,6 +4152,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("Terrain").GetComponentInChildren<TMP_Dropdown>().value = 0;
         claymoreUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
     }

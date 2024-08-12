@@ -25,7 +25,7 @@ public class SoldierAlert : MonoBehaviour
         new string[] { "Daredevil", "Spider" },
         new string[] { "Dissuader", "Omen of Death" },
         new string[] { "Experimentalist", "Chemist" },
-        new string[] { "Fighter", "Pugilist" },
+        new string[] { "Brawler", "Pugilist" },
         new string[] { "Guardsman", "Sentinel" },
         new string[] { "Gunner", "Cannoneer" },
         new string[] { "Illusionist", "Ghost" },

@@ -388,7 +388,7 @@
       "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 0,
-      "HPGranted": 4,
+      "HPGranted": 3,
       "LoudRadius": 24,
       "Charges": 1
     },
@@ -399,7 +399,7 @@
       "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 0,
-      "HPGranted": 2,
+      "HPGranted": 1,
       "LoudRadius": 24,
       "Charges": 1
     },

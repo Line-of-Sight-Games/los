@@ -10,7 +10,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
     public bool triggered;
     public bool revealed;
     public bool exploded;
-    public int f, c, facingX, facingY;
+    public int c, facingX, facingY;
     public string placedById;
     public Soldier placedBy;
     private void Start()
@@ -26,7 +26,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
         if (Exploded)
             poiManager.DestroyPOI(this);
     }
-    public Claymore Init(Tuple<Vector3, string> location, Tuple<int, int, int, int, string> otherDetails)
+    public Claymore Init(Tuple<Vector3, string> location, Tuple<int, int, int, string> otherDetails)
     {
         id = GenerateGuid();
         x = (int)location.Item1.x;
@@ -35,11 +35,10 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
         terrainOn = location.Item2;
         MapPhysicalPosition(x, y, z);
 
-        f = otherDetails.Item1;
-        c = otherDetails.Item2;
-        facingX = otherDetails.Item3;
-        facingY = otherDetails.Item4;
-        placedById = otherDetails.Item5;
+        c = otherDetails.Item1;
+        facingX = otherDetails.Item2;
+        facingY = otherDetails.Item3;
+        placedById = otherDetails.Item4;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
         return this;
@@ -56,7 +55,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
             terrainOn = (string)details["terrainOn"];
             MapPhysicalPosition(x, y, z);
 
-            f = Convert.ToInt32(details["f"]);
             c = Convert.ToInt32(details["c"]);
             facingX = Convert.ToInt32(details["facingX"]);
             facingY = Convert.ToInt32(details["facingY"]);
@@ -74,7 +72,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
             { "y", y },
             { "z", z },
             { "terrainOn", terrainOn },
-            { "f", f },
             { "c", c },
             { "facingX", facingX },
             { "facingY", facingY },
@@ -170,8 +167,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
     }
     public int ActiveC
     { get { return c; } }
-    public int ActiveF
-    { get { return f; } }
 
     public bool Triggered 
     { get { return triggered; } set { triggered = value; } }
