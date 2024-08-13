@@ -57,10 +57,10 @@ public class Stat
             if (statlineBelongsTo.soldierBelongsTo != null && statlineBelongsTo.soldierBelongsTo.game != null && statlineBelongsTo.soldierBelongsTo.game.GameRunning)
             {
                 statlineBelongsTo.soldierBelongsTo.CalculateActiveStats();
-                if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str"))
+                if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str" || Name == "F"))
                     statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
-                else if (Name == "SR" || Name == "C" || Name == "F" || Name == "P")
-                    statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetectionAlertSingle(statlineBelongsTo.soldierBelongsTo, "statChange", Vector3.zero, string.Empty, false));
+                else if (Name == "SR" || Name == "C" || Name == "P")
+                    statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetectionAlertSingle(statlineBelongsTo.soldierBelongsTo, $"statChange({Name})|baseStatChange", Vector3.zero, string.Empty)); //losCheck
             }
         }
     }

@@ -824,7 +824,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         weather.CurrentVis = dropdown.captionText.text;
 
         if (game.CheckWeatherChange(oldVis, weather.CurrentVis) != "false")
-            StartCoroutine(game.DetectionAlertAll("statChange", false));
+            StartCoroutine(game.DetectionAlertAll("statChange(SR)|weatherChange(override)")); //losCheckAll
     }
     public void SetOverrideWindSpeed()
     {
@@ -922,12 +922,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //recalculate stats
             activeSoldier.CalculateActiveStats();
 
-            //run detection alert if SR, C, F, P is changed
-            if (code == "SR" || code == "C" || code == "F" || code == "P")
-                StartCoroutine(game.DetectionAlertSingle(activeSoldier, "statChange", Vector3.zero, string.Empty, false));
+            //run detection alert if P, C, SR is changed
+            if (code == "P" | code == "C" || code == "SR")
+                StartCoroutine(game.DetectionAlertSingle(activeSoldier, $"statChange({code})|baseStatChange(override)", Vector3.zero, string.Empty)); //losCheck
 
-            //run melee control re-eval if R, Str, M is changed
-            if (activeSoldier.IsMeleeEngaged() && (code == "R" || code == "Str" || code == "M"))
+            //run melee control re-eval if R, Str, M, F is changed
+            if (activeSoldier.IsMeleeEngaged() && (code == "R" || code == "Str" || code == "M" || code == "F"))
                 StartCoroutine(game.DetermineMeleeControllerMultiple(activeSoldier));
         }
 
@@ -969,7 +969,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 else
                     activeSoldier.Z = newlocationInput;
 
-                StartCoroutine(game.DetectionAlertSingle(activeSoldier, "losChange", Vector3.zero, string.Empty, true));
+                StartCoroutine(game.DetectionAlertSingle(activeSoldier, "losChange|move(override)", Vector3.zero, string.Empty)); //losCheck
             }
         }
 
@@ -1653,8 +1653,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //detection functions - menu
-    public void OpenGMAlertDetectionUI(string causeOfLosCheck, bool triggersIllusionist)
+    public void OpenGMAlertDetectionUI(string causeOfLosCheck)
     {
+        CloseSoldierStatsUI();
+
         //type of los check
         detectionAlertUI.transform.Find("OptionPanel").Find("Reason").GetComponentInChildren<TextMeshProUGUI>().text = $"({causeOfLosCheck})";
 
@@ -1681,7 +1683,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //illusionist ability
             if (activeSoldier != null)
             {
-                if (triggersIllusionist && activeSoldier.IsIllusionist() && activeSoldier.IsHidden() && !activeSoldier.illusionedThisMove)
+                if (causeOfLosCheck.Contains("move") && activeSoldier.IsIllusionist() && activeSoldier.IsHidden() && !activeSoldier.illusionedThisMove)
                 {
                     detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(true);
                     detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(true);
@@ -1908,7 +1910,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                             //check for xp
                             if (detector.ActiveC > 2)
-                                AddXpAlert(counter, detector.ActiveC + counter.ShadowXpBonus(), $"Detected soldier ({detector.soldierName}) with C > 2.", true);
+                                AddXpAlert(counter, detector.ActiveC + counter.ShadowXpBonus(detector.IsRevoker()), $"Detected soldier ({detector.soldierName}) with C > 2.", true);
 
                             //check for overwatch shot
                             if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch") && child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
@@ -1919,7 +1921,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                             allSoldiersNotRevealing[counter.id].Add(detector.id);
 
                             //check for xp
-                            AddXpAlert(detector, 1 + detector.ShadowXpBonus(), $"Avoided detection ({counter.soldierName}).", true);
+                            AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true);
                         }
                     }
                     else
@@ -1941,14 +1943,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                             
                             //check for xp
                             if (counter.ActiveC > 2)
-                                AddXpAlert(detector, counter.ActiveC + detector.ShadowXpBonus(), $"Detected soldier ({counter.soldierName}) with C > 2.", true);
+                                AddXpAlert(detector, counter.ActiveC + detector.ShadowXpBonus(counter.IsRevoker()), $"Detected soldier ({counter.soldierName}) with C > 2.", true);
                         }
                         else
                         {
                             allSoldiersNotRevealing[detector.id].Add(counter.id);
 
                             //check for xp
-                            AddXpAlert(counter, 1 + counter.ShadowXpBonus(), $"Avoided detection ({detector.soldierName}).", true);
+                            AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true);
                         }
                     }
                     else

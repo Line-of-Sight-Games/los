@@ -398,8 +398,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
         menu.CheckXP();
-        StartCoroutine(DetectionAlertAll("statChange", false));
-        DataPersistenceManager.Instance.SaveGame();
+
+        //run los checks only if weather changes
+        if (CheckWeatherChange(weather.LastTurnVis, weather.CurrentVis) != "false")
+            StartCoroutine(DetectionAlertAll("statChange(SR)|weatherChange")); //losCheckAll
     }
     public void StartRound()
     {
@@ -682,7 +684,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //check broken soldier leaving field
         CheckBrokenFlee(movingSoldier);
 
-        StartCoroutine(DetectionAlertSingle(movingSoldier, "losChange", oldPos, launchMelee, true));
+        StartCoroutine(DetectionAlertSingle(movingSoldier, "losChange|move", oldPos, launchMelee)); //losCheck
     }
     public void CheckBrokenFlee(Soldier movingSoldier)
     {
@@ -3686,9 +3688,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return Mathf.RoundToInt(Vector3.Distance(new Vector3(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), moveToLocation));
     }
-    public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee, bool triggersOverwatch)
+    public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee)
     {
         int[] pMultipliers = { 3, 2, 1 };
+
+        //check if this detection will trigger overwatch
+        bool triggersOverwatch = false;
+        if (causeOfLosCheck.Contains("losChange") || causeOfLosCheck.Contains("loudAction"))
+            triggersOverwatch = true;
 
         yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true && menu.overrideView == false);
 
@@ -4003,7 +4010,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
 
                     //suppress detection alerts that evaluate the same as prior state on stat changes which can not affect LOS
-                    if (causeOfLosCheck.Equals("statChange"))
+                    if (causeOfLosCheck.Contains("statChange"))
                     {
                         if (arrowType == "detection2Way" && movingSoldier.RevealedBySoldiers.Contains(detecteeSoldier.id) && detecteeSoldier.RevealedBySoldiers.Contains(movingSoldier.id))
                         {
@@ -4041,14 +4048,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
 
-            //check for illusionist ability
-            bool triggersIllusionist = false;
-            if (triggersOverwatch && causeOfLosCheck.Equals("losChange"))
-                triggersIllusionist = true;
-
             //finish detection by opening alert
             if (showDetectionUI)
-                menu.OpenGMAlertDetectionUI(causeOfLosCheck, triggersIllusionist);
+                menu.OpenGMAlertDetectionUI(causeOfLosCheck);
             else
                 menu.ConfirmDetections(); //required to kill old LOS if soldier moves out of everyone's vis
 
@@ -4141,9 +4143,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
     public void DetectionAlertAllNonCoroutine()
     {
-        StartCoroutine(DetectionAlertAll("losChange", true));
+        StartCoroutine(DetectionAlertAll("losChange|losCheck")); //losCheckAll
     }
-    public IEnumerator DetectionAlertAll(string causeOfLosCheck, bool triggersOverwatch)
+    public IEnumerator DetectionAlertAll(string causeOfLosCheck)
     {
         yield return new WaitUntil(() => menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true);
 
@@ -4152,7 +4154,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (s.IsOnturnAndAlive())
             {
                 //print("Running detection alert for " + s.soldierName);
-                StartCoroutine(DetectionAlertSingle(s, causeOfLosCheck, Vector3.zero, string.Empty, triggersOverwatch));
+                StartCoroutine(DetectionAlertSingle(s, causeOfLosCheck, Vector3.zero, string.Empty)); //losCheck
             }
         }
         menu.ConfirmDetections();

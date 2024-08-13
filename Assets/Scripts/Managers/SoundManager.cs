@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SoundManager : MonoBehaviour
 {
@@ -10,69 +11,92 @@ public class SoundManager : MonoBehaviour
     public AudioSource noisePlayer;
     public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
     public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
-    public bool banzaiPlayed;
+    public bool banzaiPlayed, isPlaying;
+
+    private float soundDuration = 0f;
+    private float soundEndTime = 0f;
+
+    public void PlaySound(AudioClip clip)
+    {
+        if (!isPlaying)
+        {
+            noisePlayer.PlayOneShot(clip);
+            isPlaying = true;
+            soundDuration = clip.length;
+            soundEndTime = Time.time + soundDuration;
+        }
+    }
+
+    void Update()
+    {
+        // Unlock if the sound duration has passed
+        if (isPlaying && Time.time >= soundEndTime)
+        {
+            isPlaying = false;
+        }
+    }
 
     public void PlayBanzai()
     {
         if (!banzaiPlayed)
         {
             //print("played banzai");
-            noisePlayer.PlayOneShot(banzai);
+            PlaySound(banzai);
             banzaiPlayed = true;
         }
     }
     public void PlayOverrideAlarm()
     {
         //print("played override alarm");
-        noisePlayer.PlayOneShot(overrideAlarm);
+        PlaySound(overrideAlarm);
     }
     public void PlayDetectionAlarm()
     {
         //print("played detection alarm");
-        noisePlayer.PlayOneShot(detectionAlarm);
+        PlaySound(detectionAlarm);
     }
     public void PlayButtonPress()
     {
         //print("played button press");
-        noisePlayer.PlayOneShot(buttonPress);
+        PlaySound(buttonPress);
     }
 
     public void PlayPromotion()
     {
-        noisePlayer.PlayOneShot(levelUp);
+        PlaySound(levelUp);
     }
 
     public void PlayOvermoveAlarm()
     {
-        noisePlayer.PlayOneShot(overmoveAlarm);
+        PlaySound(overmoveAlarm);
     }
 
     public void PlayGameOverMusic()
     {
-        noisePlayer.PlayOneShot(gameOverMusic);
+        PlaySound(gameOverMusic);
     }
 
     public void PlayFailedUpgrade()
     {
-        noisePlayer.PlayOneShot(failAbilityUpgrade);
+        PlaySound(failAbilityUpgrade);
     }
     public void PlaySucceededUpgrade()
     {
-        noisePlayer.PlayOneShot(succeedAbilityUpgrade);
+        PlaySound(succeedAbilityUpgrade);
     }
     public void PlayNewAbility()
     {
-        noisePlayer.PlayOneShot(newAbilityUpgrade);
+        PlaySound(newAbilityUpgrade);
     }
     public void PlayMeleeResolution(string result)
     {
         if (result.Equals("counter"))
-            noisePlayer.PlayOneShot(meleeCounter);
+            PlaySound(meleeCounter);
         else if (result.Equals("breakeven"))
-            noisePlayer.PlayOneShot(meleeBreakeven);
+            PlaySound(meleeBreakeven);
         else if (result.Equals("successStatic"))
-            noisePlayer.PlayOneShot(meleeSuccessStatic);
+            PlaySound(meleeSuccessStatic);
         else if (result.Equals("successCharge"))
-            noisePlayer.PlayOneShot(meleeSuccessCharge);
+            PlaySound(meleeSuccessCharge);
     }
 }

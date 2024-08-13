@@ -976,13 +976,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange|statChange(SR)(C)|playdeadActive", Vector3.zero, string.Empty)); //losCheck
     }
 
     public void UnsetPlaydead()
     {
         UnsetState("Playdead");
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange|statChange(SR)(C)|playdeadDeactive", Vector3.zero, string.Empty)); //losCheck
     }
     public void TakeDrug(string drugName, Soldier administeredBy)
     {
@@ -1662,11 +1663,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
 
-        //rerun detection alerts if loud action performed for first time
         if (vulnerableTurns > 0)
         {
+            //run detection alerts if loud action performed for first time
             if (loudActionRoundsVulnerable == 0)
-                StartCoroutine(game.DetectionAlertSingle(this, "statChange", Vector3.zero, string.Empty, true));
+                StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudAction", Vector3.zero, string.Empty)); //loscheck
 
             if (vulnerableTurns > loudActionRoundsVulnerable)
                 SetLoudRevealed(vulnerableTurns);
@@ -1692,11 +1693,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
 
-        //rerun detection alerts if loud action performed for first time
         if (vulnerableTurns > 0)
         {
+            //run detection alerts if loud action performed for first time
             if (loudActionRoundsVulnerable == 0)
-                StartCoroutine(game.DetectionAlertSingle(this, "statChange", Vector3.zero, string.Empty, true));
+                StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudAction", Vector3.zero, string.Empty)); //losCheck
 
             if (vulnerableTurns > loudActionRoundsVulnerable)
                 SetLoudRevealed(vulnerableTurns);
@@ -2349,17 +2350,23 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             menu.AddXpAlert(this, 1, $"Partially resisted tabun gas.", false);
             SetTabunEffectLevel(50);
             menu.AddDamageAlert(this, $"Suffered <color=orange>Moderate</color> effects from tabun gas.", false, true);
+
+            StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(C)(SR)|tabunActive(half)", Vector3.zero, string.Empty)); //losCheck
         }
         else
         {
             SetTabunEffectLevel(100);
             menu.AddDamageAlert(this, $"Suffered <color=red>Severe</color> effects from tabun gas.", false, true);
+
+            StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(C)(SR)|tabunActive(full)", Vector3.zero, string.Empty)); //losCheck
         }
     }
     public void UnsetTabun()
     {
         state.RemoveAll(e => e.Contains("Tabun"));
         TabunTraumaCheck();
+
+        StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(C)(SR)|tabunDeactive", Vector3.zero, string.Empty)); //losCheck
     }
     public void SetOverwatch(int x, int y, int r, int a)
     {
@@ -2370,7 +2377,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         guardsmanRetryUsed = false;
         overwatchShotCounter = 1;
         SetState("Overwatch");
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange|overwatchActive", Vector3.zero, string.Empty)); //losCheck
     }
     public void DecrementOverwatch()
     {
@@ -2391,7 +2399,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             overwatchConeRadius = 0;
             overwatchConeArc = 0;
             UnsetState("Overwatch");
-            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+
+            StartCoroutine(game.DetectionAlertSingle(this, "losChange|overwatchDeactive", Vector3.zero, string.Empty)); //losCheck
         }
     }
     public bool IsBloodRaged()
@@ -2464,7 +2473,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (IsMeleeEngaged())
                 StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+            StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)(SR)|stunActive", Vector3.zero, string.Empty)); //losCheck
         }
     }
     public void TakeStun(int stunRounds)
@@ -2494,7 +2503,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         ClearHealthState();
         SetState("Active");
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange|healthState(active)", Vector3.zero, string.Empty)); //losCheck
     }
     public void MakeLastStand()
     {
@@ -2505,7 +2515,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             ClearHealthState();
             SetState("Last Stand");
             menu.AddDamageAlert(this, $"{soldierName} fell into <color=red>Last Stand</color>.", false, true);
-            StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+
+            StartCoroutine(game.DetectionAlertSingle(this, "losChange|healthState(lastStand)", Vector3.zero, string.Empty)); //losCheck
         }
     }
     public void MakeUnconscious(Soldier damagedBy, List<string> damageSource)
@@ -2529,7 +2540,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange|statChange(C)(SR)|healthState(unconscious)", Vector3.zero, string.Empty)); //losCheck
     }
     public void Resurrect(int hp)
     {
@@ -2538,7 +2549,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         CheckSpecialityColor(soldierSpeciality);
         TakeHeal(null, hp, 0, true, false);
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange", Vector3.zero, string.Empty, false));
+        StartCoroutine(game.DetectionAlertSingle(this, "losChange|healthState(active)", Vector3.zero, string.Empty));
     }
 
     public void InstantKill(Soldier killedBy, List<string> damageSource)
@@ -3580,10 +3591,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 return true;
         return false;
     }
-    public int ShadowXpBonus()
+    public int ShadowXpBonus(bool revoked)
     {
-        if (IsShadow())
-            return 1;
+        if (!revoked)
+        {
+            if (IsShadow())
+                return 1;
+        }
 
         return 0;
     }

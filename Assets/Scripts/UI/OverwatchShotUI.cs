@@ -169,7 +169,7 @@ public class OverwatchShotUI : MonoBehaviour
                     }
                     else
                     {
-                        //overwatch daze kill ap
+                        //overwatch daze ap
                         targetSoldier.ap = 0;
                         menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} suffered overwatch daze at X: {targetSoldier.X}, Y: {targetSoldier.Y}, Z: {targetSoldier.Z}, Ter: {targetSoldier.terrainOn}.", false, true);
                     }
@@ -209,7 +209,7 @@ public class OverwatchShotUI : MonoBehaviour
                 menu.OpenShotResultUI(false);
 
                 //refresh detections (potentially trigger more overwatch)
-                game.StartCoroutine(game.DetectionAlertSingle(targetSoldier, "losChange", Vector3.zero, string.Empty, true));
+                game.StartCoroutine(game.DetectionAlertSingle(targetSoldier, "losChange|postOverwatch", Vector3.zero, string.Empty)); //losCheck
 
                 CloseOverwatchShotUI();
             }
