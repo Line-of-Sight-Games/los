@@ -9771,7 +9771,7 @@ MonoBehaviour:
     - m_Text: Evader (E)
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Assassin (F)
+    - m_Text: Reservist (F)
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
     - m_Text: Seeker (P)

@@ -1556,13 +1556,29 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             soldierStatsUI.Find("General").Find("Name").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierName;
             soldierStatsUI.Find("General").Find("Rank").GetComponent<TextMeshProUGUI>().text = activeSoldier.rank;
-            soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierTerrain;
             soldierStatsUI.Find("General").Find("Specialty").GetComponent<TextMeshProUGUI>().text = activeSoldier.PrintSoldierSpeciality();
             soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = PrintList(activeSoldier.soldierAbilities);
             soldierStatsUI.Find("General").Find("Location").Find("LocationX").GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationY").GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationZ").GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
             soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().text = activeSoldier.TerrainOn;
+            soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierTerrain;
+            //colour terrain text native or opposite
+            if (activeSoldier.IsOnNativeTerrain())
+            {
+                soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().color = Color.green;
+                soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().color = Color.green;
+            }
+            else if (activeSoldier.IsOnOppositeTerrain())
+            {
+                soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().color = Color.red;
+                soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().color = Color.red;
+            }
+            else
+            {
+                soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().color = Color.white;
+                soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().color = Color.white;
+            }
             soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().text = activeSoldier.RoundsWithoutFood.ToString();
             soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
         }
