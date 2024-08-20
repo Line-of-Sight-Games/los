@@ -10,7 +10,7 @@ public class SightRadiusCircle : LOSGizmo
     {
         transform.position = from.transform.position;
         if (from.IsOnOverwatch())
-            GenerateArcSectorMesh(from.overwatchConeRadius, from.overwatchConeArc, new (from.overwatchXPoint, 0f, from.overwatchYPoint));
+            GenerateArcSectorMesh(from.overwatchConeRadius, from.overwatchConeArc, new (from.overwatchYPoint, 0f, from.overwatchXPoint));
         else
             GenerateCircleMesh(from.stats.SR.Val);
 

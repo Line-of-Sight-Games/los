@@ -1673,7 +1673,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (childCount > 0)
         {
             SetDetectionResolvedFlagTo(false);
-            FreezeTime();
 
             if (overwatchCount > 1) //more than a single overwatch line detected
                 detectionUI.transform.Find("MultiOverwatchAlert").gameObject.SetActive(true);

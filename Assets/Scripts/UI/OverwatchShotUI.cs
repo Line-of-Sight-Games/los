@@ -181,6 +181,7 @@ public class OverwatchShotUI : MonoBehaviour
                 {
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {game.RandomShotScatterDistance()}cm {game.RandomShotScatterHorizontal()}, {game.RandomShotScatterDistance()}cm {game.RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits["Damage"]}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+
                     //show los check button if shot doesn't hit
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
@@ -195,6 +196,12 @@ public class OverwatchShotUI : MonoBehaviour
                         menu.AddXpAlert(targetSoldier, 1, "Dodged overwatch shot from " + shooter.soldierName + ".", false);
                     else
                         menu.AddXpAlert(targetSoldier, 10, "Dodged overwatch shot with a " + chances.Item1 + "% chance from " + shooter.soldierName + "!", false);
+
+                    //restore actual position of move
+                    targetSoldier.X = finalLocation.Item1;
+                    targetSoldier.Y = finalLocation.Item2;
+                    targetSoldier.Z = finalLocation.Item3;
+                    targetSoldier.terrainOn = finalLocation.Item4;
 
                     //push the no damage attack through for abilities trigger
                     targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });

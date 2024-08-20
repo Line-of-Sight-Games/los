@@ -51,24 +51,22 @@ public class Stat
     public int BaseVal
     {
         get { return baseValue; }
-        set
-        {
-            baseValue = value;
-            if (statlineBelongsTo.soldierBelongsTo != null && statlineBelongsTo.soldierBelongsTo.game != null && statlineBelongsTo.soldierBelongsTo.game.GameRunning)
-            {
-                statlineBelongsTo.soldierBelongsTo.CalculateActiveStats();
-                if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str" || Name == "F"))
-                    statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
-                else if (Name == "SR" || Name == "C" || Name == "P")
-                    statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetectionAlertSingle(statlineBelongsTo.soldierBelongsTo, $"statChange({Name})|baseStatChange", Vector3.zero, string.Empty)); //losCheck
-            }
-        }
+        set { baseValue = value; }
     }
     public int Increment()
     {
         BaseVal += ReadIncrement;
-        if (statlineBelongsTo.soldierBelongsTo.game != null && Name == "H")
-            statlineBelongsTo.soldierBelongsTo.TakeHeal(null, 1, 0, false, false);
+        if (statlineBelongsTo.soldierBelongsTo != null && statlineBelongsTo.soldierBelongsTo.game != null && statlineBelongsTo.soldierBelongsTo.game.GameRunning) 
+        {
+            statlineBelongsTo.soldierBelongsTo.CalculateActiveStats();
+
+            if (Name == "H")
+                statlineBelongsTo.soldierBelongsTo.TakeHeal(null, 1, 0, false, false);
+            else if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str" || Name == "F"))
+                statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
+            else if (Name == "SR" || Name == "C" || Name == "P")
+                statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetectionAlertSingle(statlineBelongsTo.soldierBelongsTo, $"statChange({Name})|baseStatChange", Vector3.zero, string.Empty)); //losCheck
+        }
 
         return ReadIncrement;
     }

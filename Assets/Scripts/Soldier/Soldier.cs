@@ -698,9 +698,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void CheckSightRadius()
     {
+        //reflect changes to colliders
+        SRColliderMin.radius = Mathf.Min(3, stats.SR.Val);
+        SRColliderHalf.radius = Mathf.Max(SRColliderMin.radius, (stats.SR.Val / 2));
+        SRColliderMax.radius = Mathf.Max(SRColliderMin.radius, stats.SR.Val);
+
+        //check if soldier becomes blind
         if (stats.SR.Val == 0)
         {
             game.BreakAllControllingMeleeEngagments(this);
+            UnsetOverwatch();
         }
     }
     public void ApplyVisMods()
@@ -715,13 +722,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 stats.SR.Val -= 70;
             else if (game.weather.CurrentWeather.Contains("Good visibility"))
                 stats.SR.Val -= 40;
-        }
-
-        if (SRColliderMax != null)
-        {
-            SRColliderMax.radius = stats.SR.Val;
-            SRColliderHalf.radius = stats.SR.Val / 2;
-            SRColliderMin.radius = 3;
         }
     }
     public void ApplyTrenboloneMods()
@@ -3828,7 +3828,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetOverwatchState()
     {
         if (IsOnOverwatch())
-            return ", <color=green>Overwatch</color>";
+            return $", <color=green>Overwatch ({overwatchXPoint},{overwatchYPoint})</color>";
         return "";
     }
     public string GetLoudDetectedState()
