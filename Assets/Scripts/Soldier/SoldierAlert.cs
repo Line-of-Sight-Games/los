@@ -89,6 +89,7 @@ public class SoldierAlert : MonoBehaviour
                     transform.Find("CaptaincyToggle").gameObject.SetActive(false);
 
                     stats = soldier.Promote(choiceStat);
+                    FileUtility.WriteToReport($"{soldier.soldierName} promotion: choice ({stats[0]}), specialty ({stats[1]}), random ({stats[2]})");
 
                     transform.Find("SpecialtyStat").gameObject.SetActive(true);
                     transform.Find("ChoiceStat").gameObject.SetActive(true);
