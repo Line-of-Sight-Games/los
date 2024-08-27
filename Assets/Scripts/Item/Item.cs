@@ -334,24 +334,28 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         if (linkedSoldier != null)
         {
             //unset cover for JA wearers
-            if (itemName == "Armour_Juggernaut")
+            if (itemName.Equals("Armour_Juggernaut"))
                 linkedSoldier.UnsetCover();
 
             //take exo armour health
-            if (itemName == "Armour_Exo")
+            if (itemName.Equals("Armour_Exo"))
             {
                 linkedSoldier.stats.H.BaseVal -= 3;
                 linkedSoldier.TakeDamage(null, 3, true, new() { "Exo" });
             }
 
             //reset sustenance for stim armour
-            if (itemName == "Armour_Stimulant")
+            if (itemName.Equals("Armour_Stimulant"))
             {
                 linkedSoldier.ResetRoundsWithoutFood();
                 for (int i = 0; i < itemManager.drugTable.Length; i++)
                     linkedSoldier.UnsetOnDrug(itemManager.drugTable[i]);
                 linkedSoldier.UnsetTabun();
             }
+
+            //add ap for logistics belt
+            if (itemName.Equals("Logistics_Belt"))
+                linkedSoldier.ap++;
 
             //perform ability effects
             if (IsGun())
@@ -963,7 +967,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool IsPoisonSatchel()
     {
-        if (itemName == "Poison_Satchel")
+        if (itemName.Equals("Poison_Satchel"))
             return true;
         return false;
     }
