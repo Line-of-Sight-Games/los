@@ -49,8 +49,12 @@ public class SoldierUI : MonoBehaviour
                 linkedSoldier.fielded = true;
                 linkedSoldier.CheckSpecialityColor(linkedSoldier.soldierSpeciality);
                 transform.Find("PopupBox").gameObject.SetActive(false);
-                game.PerformMove(linkedSoldier, 0, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text), false, false, string.Empty, true);
                 game.CheckDeploymentBeacons(linkedSoldier);
+
+                //deploy the soldier
+                game.PerformMove(linkedSoldier, 0, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text), false, false, string.Empty, true);
+                //patriot ability
+                linkedSoldier.SetPatriotic();
             }
         }
     }
