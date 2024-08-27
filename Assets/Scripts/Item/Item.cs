@@ -6,7 +6,6 @@ using System.Linq;
 using UnityEditor;
 using TMPro;
 using Newtonsoft.Json;
-using UnityEngine.PlayerLoop;
 
 [System.Serializable]
 public class Item : PhysicalObject, IDataPersistence, IHaveInventory
@@ -735,7 +734,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void DestroyItem(Soldier destroyedBy)
     {
-        if (linkedSoldier != null)
+        if (owner != null && owner is Soldier linkedSoldier)
             menu.AddDamageAlert(linkedSoldier, $"{linkedSoldier.soldierName} had {this.itemName} ({this.X},{this.Y},{this.Z}) destroyed.", false, true);
 
         ConsumeItem();
