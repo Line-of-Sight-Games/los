@@ -41,8 +41,8 @@ public class Inventory
             if (linkedInventoryObject != null && linkedInventoryObject.InventorySlots != null)
             {
                 linkedInventoryObject.InventorySlots[slotName] = item.Id;
-                if (linkedInventoryObject is Soldier linkedSoldier)
-                    item.RunPickupEffect(linkedSoldier);
+                if (item.IsNestedOnSoldier())
+                    item.RunPickupEffect(item.SoldierNestedOn());
             }
         }
     }
