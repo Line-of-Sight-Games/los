@@ -1068,6 +1068,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         return 1 - tabunMod;
     }
+    public int ShooterFightMod(Soldier shooter)
+    {
+        int fightMod = 0;
+
+        if (shooter.FightActive())
+            fightMod = 5 * shooter.stats.F.Val;
+
+        //report parameters
+        shotParameters.Add(Tuple.Create("fight", $"{fightMod}"));
+
+        return fightMod;
+    }
     public float RelevantWeaponSkill(Soldier shooter, Item gun)
     {
         int juggernautBonus = 0, stimBonus = 0;
@@ -1407,7 +1419,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (target is Coverman || target is ExplosiveBarrel) //shooting at objects
         {
             //calculate base shot chance
-            hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun)) * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * ShooterTerrainMod(shooter) * ElevationMod(shooter, target) * ShooterSmokeMod(shooter) * ShooterTabunMod(shooter));
+            hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun)) * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * ShooterTerrainMod(shooter) * ElevationMod(shooter, target) * ShooterSmokeMod(shooter) * ShooterTabunMod(shooter)) + ShooterFightMod(shooter);
 
             //calculate critical shot chance
             critChance = Mathf.RoundToInt((Mathf.Pow(RelevantWeaponSkill(shooter, gun), 2) * (hitChance / 100.0f)));
@@ -1415,7 +1427,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else //shooting at soldier
         {
             //calculate base shot chance
-            hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * TargetHealthMod(target) * ShooterTerrainMod(shooter) * TargetTerrainMod(target) * ElevationMod(shooter, target) * KdMod(shooter) * OverwatchMod(shooter) * FlankingMod(target) * StealthMod(shooter) * ShooterSmokeMod(shooter) * ShooterTabunMod(shooter));
+            hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * TargetHealthMod(target) * ShooterTerrainMod(shooter) * TargetTerrainMod(target) * ElevationMod(shooter, target) * KdMod(shooter) * OverwatchMod(shooter) * FlankingMod(target) * StealthMod(shooter) * ShooterSmokeMod(shooter) * ShooterTabunMod(shooter)) + ShooterFightMod(shooter);
 
             //calculate critical shot chance
             critChance = Mathf.RoundToInt((Mathf.Pow(RelevantWeaponSkill(shooter, gun), 2) * (hitChance / 100.0f)) - TargetEvasion(target));
@@ -2015,6 +2027,26 @@ public class MainGame : MonoBehaviour, IDataPersistence
         meleeParameters.Add(Tuple.Create("dSuppression", $"{1 - suppressionMod}"));
         return 1 - suppressionMod;
     }
+    public float AttackerFightMod(Soldier soldier)
+    {
+        float fightMod = 0;
+
+        if (soldier.FightActive())
+            fightMod += 0.5f * soldier.stats.F.Val;
+
+        meleeParameters.Add(Tuple.Create("aFight", $"{fightMod}"));
+        return fightMod;
+    }
+    public float DefenderFightMod(Soldier soldier)
+    {
+        float fightMod = 0;
+
+        if (soldier.FightActive())
+            fightMod += 0.5f * soldier.stats.F.Val;
+
+        meleeParameters.Add(Tuple.Create("dFight", $"{fightMod}"));
+        return fightMod;
+    }
     public int CalculateMeleeResult(Soldier attacker, Soldier defender)
     {
         //destroy old melee parameters
@@ -2029,7 +2061,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //if it's a normal attack
         if (meleeUI.meleeTypeDropdown.value == 0)
         {
-            meleeDamage = (AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * KdMod(attacker) * FlankingAgainstAttackerMod() * AttackerSuppressionMod(attacker) + AttackerStrengthMod(attacker) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * DefenderSuppressionMod(defender) + DefenderStrengthMod(defender));
+            meleeDamage = (AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * KdMod(attacker) * FlankingAgainstAttackerMod() * AttackerSuppressionMod(attacker) + AttackerStrengthMod(attacker) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * DefenderSuppressionMod(defender) + DefenderStrengthMod(defender)) - DefenderFightMod(defender) + AttackerFightMod(attacker);
 
             print($"attacker: {(AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * KdMod(attacker) * FlankingAgainstAttackerMod() * AttackerSuppressionMod(attacker) + AttackerStrengthMod(attacker)}");
 

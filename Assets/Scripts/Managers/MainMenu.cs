@@ -514,7 +514,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Tuple<string,string> param in game.shotParameters)
         {
 
-            if (param.Item1 == "accuracy" || param.Item1 == "sharpshooter" || param.Item1 == "inspired" || param.Item1 == "WS" || param.Item1 == "stim" || param.Item1 == "juggernaut")
+            if (param.Item1 == "accuracy" || param.Item1 == "sharpshooter" || param.Item1 == "inspired" || param.Item1 == "WS" || param.Item1 == "stim" || param.Item1 == "juggernaut" || param.Item1 == "fight")
             {
                 if (float.Parse(param.Item2) > 0)
                     colouredParameters.Add($"<color=green>{param}</color>");
@@ -567,7 +567,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 $"| {colouredParameters.Find(str => str.Contains("stealth"))} " +
                 $"| {colouredParameters.Find(str => str.Contains("smoke"))} " +
                 $"| {colouredParameters.Find(str => str.Contains("tabun"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("suppression"))}";
+                $"| {colouredParameters.Find(str => str.Contains("suppression"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("fight"))}";
     }
     public string DisplayMeleeParameters()
     {
@@ -575,7 +576,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Tuple<string, string> param in game.meleeParameters)
         {
 
-            if (param.Item1 == "aM" || param.Item1 == "aJuggernaut" || param.Item1 == "aInspirer" || param.Item1 == "aWep" || param.Item1 == "aStr")
+            if (param.Item1 == "aM" || param.Item1 == "aJuggernaut" || param.Item1 == "aInspirer" || param.Item1 == "aWep" || param.Item1 == "aStr" || param.Item1 == "aFight")
             {
                 if (float.Parse(param.Item2) > 0)
                     colouredParameters.Add($"<color=green>{param}</color>");
@@ -584,7 +585,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 else
                     colouredParameters.Add($"{param}");
             }
-            else if (param.Item1 == "dM" || param.Item1 == "dJuggernaut" || param.Item1 == "dWep" || param.Item1 == "charge" || param.Item1 == "dStr")
+            else if (param.Item1 == "dM" || param.Item1 == "dJuggernaut" || param.Item1 == "dWep" || param.Item1 == "charge" || param.Item1 == "dStr" || param.Item1 == "dFight")
             {
                 if (float.Parse(param.Item2) > 0)
                     colouredParameters.Add($"<color=red>{param}</color>");
@@ -635,6 +636,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 $"| {colouredParameters.Find(str => str.Contains("dFlank"))} " +
                 $"| {colouredParameters.Find(str => str.Contains("dSuppression"))} " +
                 $"| {colouredParameters.Find(str => str.Contains("dStr"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("dFight"))} " +
+                $"| {colouredParameters.Find(str => str.Contains("aFight"))} " +
                 $"| {colouredParameters.Find(str => str.Contains("bloodrage"))}";
     }
 

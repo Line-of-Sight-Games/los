@@ -1451,7 +1451,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsAbleToWalk())
         {
-            instantSpeed = (int)((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove() * ApplySmokeModsMove() * ApplyTabunModsMove()) + stats.Str.Val;
+            instantSpeed = (int)((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove() * ApplySmokeModsMove() * ApplyTabunModsMove()) + stats.Str.Val + ApplyFightModsMove();
 
             //halve movement for team 1 on first turn
             if (soldierTeam == 1 && game.currentRound == 1)
@@ -1558,21 +1558,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //print("Trauma Mod Move: " + traumaModMove);
         return 1 - traumaModMove;
     }
-
-    public int GetKd() 
-    {
-        int kd = 0;
-        foreach (Soldier s in game.AllSoldiers())
-        {
-            if (this.IsOppositeTeamAs(s) && s.IsDead())
-                kd++;
-            else if (this.IsSameTeamAs(s) && s.IsDead())
-                kd--;
-        }
-
-        return kd;
-    }
-
     public float ApplyKdModsMove()
     {
         float kdModMove = (2 * GetKd() / 100f);
@@ -1604,6 +1589,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
 
         return 1 - tabunModMove;
+    }
+    public int ApplyFightModsMove()
+    {
+        int fightModMove = 0;
+
+        if (FightActive())
+            fightModMove = 5 * stats.F.Val;
+        
+        return fightModMove;
     }
     public float ApplySuppressionModsMove()
     {
@@ -3058,7 +3052,25 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public int GetKd()
+    {
+        int kd = 0;
+        foreach (Soldier s in game.AllSoldiers())
+        {
+            if (this.IsOppositeTeamAs(s) && s.IsDead())
+                kd++;
+            else if (this.IsSameTeamAs(s) && s.IsDead())
+                kd--;
+        }
 
+        return kd;
+    }
+    public bool FightActive()
+    {
+        if (GetKd() < 0)
+            return true;
+        return false;
+    }
 
 
 
@@ -3755,6 +3767,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return $", <color=green>Armoured({GetArmourHP()})</color>";
         return "";
     }
+    public string GetFightState()
+    {
+        if (FightActive())
+            return $", <color=green>Fight Active({stats.F.Val})</color>";
+        return "";
+    }
     public string GetTraumaState()
     {
         return tp switch
@@ -3964,6 +3982,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetConsciousState();
             status += GetArmourState();
             status += GetTraumaState();
+            status += GetFightState();
             status += GetStunnedState();
             status += GetHungerState();
             status += GetLoudDetectedState();
