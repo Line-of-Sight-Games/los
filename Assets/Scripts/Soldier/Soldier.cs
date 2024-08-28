@@ -3098,7 +3098,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool AvengingActive()
     {
-        if (!FightActive() && IsAvenging() && stats.F.Val > 2)
+        if (!FightActive() && IsAvenging() && stats.F.Val > 1)
             return true;
 
         return false;
