@@ -1599,8 +1599,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (FightActive())
             fightModMove = 5 * stats.F.Val;
         else if (AvengingActive()) //avenger ability
-            fightModMove = 5 * stats.F.Val - 1;
-        
+            fightModMove = 5 * (stats.F.Val - 1);
+
+        //print("Fight Mod Move: " + fightModMove);
         return fightModMove;
     }
     public float ApplySuppressionModsMove()

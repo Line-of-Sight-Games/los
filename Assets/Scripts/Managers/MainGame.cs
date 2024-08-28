@@ -1085,7 +1085,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (shooter.FightActive())
             fightMod = 5 * shooter.stats.F.Val;
         else if (shooter.AvengingActive()) //avenger ability
-            fightMod = 5 * shooter.stats.F.Val - 1;
+            fightMod = 5 * (shooter.stats.F.Val - 1);
 
         //report parameters
         shotParameters.Add(Tuple.Create("fight", $"{fightMod}"));
@@ -2046,7 +2046,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (soldier.FightActive())
             fightMod += 0.5f * soldier.stats.F.Val;
         else if (soldier.AvengingActive()) //avenger ability
-            fightMod += 0.5f * soldier.stats.F.Val - 1;
+            fightMod += 0.5f * (soldier.stats.F.Val - 1);
 
         meleeParameters.Add(Tuple.Create("aFight", $"{fightMod}"));
         return fightMod;
@@ -2058,7 +2058,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (soldier.FightActive())
             fightMod += 0.5f * soldier.stats.F.Val;
         else if (soldier.AvengingActive()) //avenger ability
-            fightMod += 0.5f * soldier.stats.F.Val - 1;
+            fightMod += 0.5f * (soldier.stats.F.Val - 1);
 
         meleeParameters.Add(Tuple.Create("dFight", $"{fightMod}"));
         return fightMod;
