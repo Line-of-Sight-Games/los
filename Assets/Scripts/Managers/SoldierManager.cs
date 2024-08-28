@@ -27,8 +27,8 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
             newSoldier.id = id;
             newSoldier.LoadData(data);
 
-            if (game.displayPanel != null)
-                newSoldier.LinkWithUI(game.displayPanel.gameObject);
+            if (game.soldierDisplayPanelUI != null)
+                newSoldier.LinkWithUI(game.soldierDisplayPanelUI);
         }
 
         //order soldiers by display priority

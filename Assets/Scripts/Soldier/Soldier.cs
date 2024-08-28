@@ -23,7 +23,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
-        plannerDonatedMove, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
+        plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
@@ -166,6 +166,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "bloodLettedThisTurn", bloodLettedThisTurn },
             { "illusionedThisMove", illusionedThisMove },
             { "hasKilled", hasKilled },
+            { "turnsAvenging", turnsAvenging },
             { "guardsmanRetryUsed", guardsmanRetryUsed },
             { "isSpotting", isSpotting },
             { "isSpottedBy", isSpottedBy },
@@ -268,6 +269,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         patriotic = (bool)details["patriotic"];
         illusionedThisMove = (bool)details["illusionedThisMove"];
         hasKilled = (bool)details["hasKilled"];
+        turnsAvenging = Convert.ToInt32(details["turnsAvenging"]);
         overwatchFirstShotUsed = (bool)details["overwatchFirstShotUsed"];
         guardsmanRetryUsed = (bool)details["guardsmanRetryUsed"];
         isSpotting = (string)details["isSpotting"];
@@ -279,9 +281,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //link to maingame object
         game = FindFirstObjectByType<MainGame>();
     }
-    public Soldier LinkWithUI(GameObject displayPanel)
+    public Soldier LinkWithUI(Transform displayPanel)
     {
-        soldierUI = Instantiate(soldierUIPrefab, displayPanel.transform);
+        soldierUI = Instantiate(soldierUIPrefab, displayPanel);
         soldierUI.GetComponent<SoldierUI>().linkedSoldier = this;
         CheckSpecialityColor(soldierSpeciality);
 
@@ -1596,6 +1598,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (FightActive())
             fightModMove = 5 * stats.F.Val;
+        else if (AvengingActive()) //avenger ability
+            fightModMove = 5 * stats.F.Val - 1;
         
         return fightModMove;
     }
@@ -2397,6 +2401,21 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetectionAlertSingle(this, "losChange|overwatchDeactive", Vector3.zero, string.Empty)); //losCheck
         }
     }
+    public bool IsAvenging()
+    {
+        if (CheckState("Avenging"))
+            return true;
+        return false;
+    }
+    public void SetAvenging()
+    {
+        turnsAvenging = 2;
+        SetState("Avenging");
+    }
+    public void UnsetAvenging()
+    {
+        UnsetState("Avenging");
+    }
     public bool IsBloodRaged()
     {
         if (CheckState("Bloodrage"))
@@ -2616,6 +2635,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     if (this.IsOppositeTeamAs(killedBy))
                         killedBy.hasKilled = true;
                 }
+
+                //set fight flags for allied avenger(s)
+                foreach (Soldier s in game.AllSoldiers())
+                    if (this.IsSameTeamAs(s) && s.IsAvenger())
+                        s.SetAvenging();
             }
         }
     }
@@ -3069,6 +3093,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (GetKd() < 0)
             return true;
+
+        return false;
+    }
+    public bool AvengingActive()
+    {
+        if (!FightActive() && IsAvenging() && stats.F.Val > 2)
+            return true;
+
         return false;
     }
 
@@ -3770,7 +3802,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetFightState()
     {
         if (FightActive())
-            return $", <color=green>Fight Active({stats.F.Val})</color>";
+            return $", <color=green>Fighting({stats.F.Val})</color>";
+        else if (AvengingActive())
+            return $", <color=green>Avenging({stats.F.Val - 1})</color>";
+
         return "";
     }
     public string GetTraumaState()

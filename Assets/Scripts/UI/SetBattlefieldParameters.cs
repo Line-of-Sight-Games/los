@@ -31,8 +31,6 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
         data.camPosition = cam.transform.position;
         data.camOrthoSize = cam.orthographicSize;
         data.sunPosition = sun.transform.position;
-        data.maxRounds = maxRounds;
-        data.maxTurnTime = maxTurnTime;
     }
 
     private void Start()
