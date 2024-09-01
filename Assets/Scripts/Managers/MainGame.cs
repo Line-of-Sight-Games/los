@@ -310,10 +310,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //increase rounds without food
                 s.IncreaseRoundsWithoutFood();
 
-                //decrement stunnage
-                if (s.stunnedRoundsVulnerable > 0)
-                    s.stunnedRoundsVulnerable--;
-
                 //unset suppression
                 s.UnsetSuppression();
             }
@@ -322,10 +318,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //unset overwatch
                 if (s.IsOnOverwatch())
                     s.UnsetOverwatch();
-
-                //decrement loud action counter
-                if (s.loudActionRoundsVulnerable > 0)
-                    s.loudActionRoundsVulnerable--;
             }
             //run things that trigger at the end of any team turn
 
@@ -337,6 +329,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                     s.UnsetAvenging();
             }
+
+            //decrement stunnage
+            if (s.stunnedTurnsVulnerable > 0)
+                s.stunnedTurnsVulnerable--;
+
+            //decrement loud action counter
+            if (s.loudActionTurnsVulnerable > 0)
+                s.loudActionTurnsVulnerable--;
         }
 
         menu.CheckXP();
@@ -2722,7 +2722,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         ValidThrowChecker throwTarget = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").GetComponent<ValidThrowChecker>();
         GameObject throwBeyondRadius = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ThrowBeyondRadius").gameObject;
         GameObject throwBeyondBlindRadius = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ThrowBeyondBlindRadius").gameObject;
-        GameObject totalMiss = useGrenade.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
+        GameObject scatteredOffMap = useGrenade.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject;
 
         if (!useGrenade.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
@@ -2746,21 +2746,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     throwTarget.XPos.text = $"{newX}";
                     throwTarget.YPos.text = $"{newY}";
-
-                    if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
-                        totalMiss.SetActive(true);
-
                     useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(true);
                 }
 
                 useGrenade.transform.Find("PressedOnce").gameObject.SetActive(true);
-                useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<LocationInputController>().SetMin(1);
-                useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<LocationInputController>().SetMin(1);
             }
         }
         else //second press
         {
-            if (totalMiss.activeInHierarchy)
+            if (scatteredOffMap.activeInHierarchy)
             {
                 activeSoldier.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
                 menu.CloseGrenadeUI();

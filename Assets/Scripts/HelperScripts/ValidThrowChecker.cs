@@ -7,18 +7,26 @@ public class ValidThrowChecker : MonoBehaviour
 {
     public MainMenu menu;
     public TMP_InputField XPos, YPos, ZPos;
-    public GameObject throwBeyondRadius, throwBeyondBlindRadius, pressedOnce, catcher, itemWillBreak;
+    public GameObject throwBeyondRadius, throwBeyondBlindRadius, pressedOnce, catcher, itemWillBreak, scatteredOffMap;
     public TMP_Dropdown catcherDropdown;
     public UseItemUI useItemUI;
 
     private void Update()
     {
         CheckThrowingRange();
+        CheckOffMap();
         if (!useItemUI.name.Contains("Grenade")) //don't run when throwing grenade in anger
         {
             CheckForCatchers();
             CheckForItemBreak();
         }
+    }
+    public void CheckOffMap()
+    {
+        scatteredOffMap.SetActive(false);
+
+        if (GetThrowLocation(out Vector3 throwLocation) && (throwLocation.x <= 0 || throwLocation.x > menu.game.maxX || throwLocation.y <= 0 || throwLocation.y > menu.game.maxY)) //is scattering off map
+            scatteredOffMap.SetActive(true);
     }
     public void CheckThrowingRange()
     {

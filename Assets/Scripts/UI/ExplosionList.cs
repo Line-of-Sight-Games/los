@@ -85,17 +85,16 @@ public class ExplosionList : MonoBehaviour
                         {
                             if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
                             {
-                                if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
+                                /*if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
                                 {
                                     if (stun == 0)
                                         menu.AddXpAlert(hitSoldier, 2, $"Resisted stunning from flashbang.", true);
                                     else
                                         hitSoldier.SetStunned(stun); //non-resistable stunnage on flashbang grenades only   
-                                }
-                                else
-                                    hitSoldier.TakeStun(stun);
-
+                                }*/
+                                
                                 hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
+                                int actualStun = hitSoldier.TakeStun(stun);
 
                                 //do xp calculations, enemy - friendly damage
                                 if (hitSoldier.IsOppositeTeamAs(explodedBy))
@@ -108,9 +107,9 @@ public class ExplosionList : MonoBehaviour
                                 {
                                     //do xp calculations, enemy - friendly stunnage
                                     if (hitSoldier.IsOppositeTeamAs(explodedBy))
-                                        posStun += stun;
+                                        posStun += actualStun;
                                     else
-                                        negStun += stun;
+                                        negStun += actualStun;
                                 }
                             }
                             print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) ({explodedBy.soldierName} {explodedBy.soldierTeam}) Tested {hitSoldier.soldierName} {hitSoldier.soldierTeam} - {posDamage + posStun}, {negDamage + negStun}");

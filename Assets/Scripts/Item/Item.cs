@@ -711,7 +711,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                         if (damage < 0)
                             damage = 0;
 
-                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage, stun - Mathf.CeilToInt(hitSoldier.stats.R.Val / 2.0f));
+                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage, stun);
                     }
                     else if (obj is POI hitPoi && damage > 0)
                         menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);

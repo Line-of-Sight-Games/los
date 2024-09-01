@@ -22,7 +22,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionRoundsVulnerable, stunnedRoundsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, stunnedTurnsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
@@ -132,8 +132,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "revealed", revealed },
             { "usedAP", usedAP },
             { "usedMP", usedMP },
-            { "loudActionRoundsVulnerable", loudActionRoundsVulnerable },
-            { "stunnedRoundsVulnerable", stunnedRoundsVulnerable },
+            { "loudActionTurnsVulnerable", loudActionTurnsVulnerable },
+            { "stunnedTurnsVulnerable", stunnedTurnsVulnerable },
             { "overwatchShotCounter", overwatchShotCounter },
             { "overwatchXPoint", overwatchXPoint },
             { "overwatchYPoint", overwatchYPoint },
@@ -235,8 +235,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         revealed = (bool)details["revealed"];
         usedAP = (bool)details["usedAP"];
         usedMP = (bool)details["usedMP"];
-        loudActionRoundsVulnerable = Convert.ToInt32(details["loudActionRoundsVulnerable"]);
-        stunnedRoundsVulnerable = Convert.ToInt32(details["stunnedRoundsVulnerable"]);
+        loudActionTurnsVulnerable = Convert.ToInt32(details["loudActionTurnsVulnerable"]);
+        stunnedTurnsVulnerable = Convert.ToInt32(details["stunnedTurnsVulnerable"]);
         overwatchShotCounter = Convert.ToInt32(details["overwatchShotCounter"]);
         overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
         overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
@@ -906,7 +906,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void ApplyLoudActionMods()
     {
-        if (loudActionRoundsVulnerable > 0)
+        if (loudActionTurnsVulnerable > 0)
             stats.C.Val = 0;
     }
     public void CorrectNegatives()
@@ -1648,14 +1648,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (Soldier s in game.AllSoldiers())
         {
-            if (s.IsAlive() && this.IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
+            if (s.IsConscious() && this.IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
             {
-                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 3)
-                    vulnerableTurns = 3;
-                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 2)
+                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 6)
+                    vulnerableTurns = 6;
+                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 4)
+                    vulnerableTurns = 4;
+                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 2)
                     vulnerableTurns = 2;
-                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 1)
-                    vulnerableTurns = 1;
 
                 if (s.IsSpotter() && IsHidden())
                     s.SetSpotting(this);
@@ -1665,10 +1665,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (vulnerableTurns > 0)
         {
             //run detection alerts if loud action performed for first time
-            if (loudActionRoundsVulnerable == 0)
+            if (loudActionTurnsVulnerable == 0)
                 StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudAction", Vector3.zero, string.Empty)); //loscheck
 
-            if (vulnerableTurns > loudActionRoundsVulnerable)
+            if (vulnerableTurns > loudActionTurnsVulnerable)
                 SetLoudRevealed(vulnerableTurns);
         }
     }
@@ -1680,25 +1680,25 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (s.IsConscious() && this.IsOppositeTeamAs(s))
             {
-                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 3)
-                    vulnerableTurns = 3;
-                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 2)
+                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 6)
+                    vulnerableTurns = 6;
+                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 4)
+                    vulnerableTurns = 4;
+                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 2)
                     vulnerableTurns = 2;
-                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 1)
-                    vulnerableTurns = 1;
 
                 if (s.IsSpotter() && IsHidden())
                     s.SetSpotting(this);
             }
         }
-
+        
         if (vulnerableTurns > 0)
         {
             //run detection alerts if loud action performed for first time
-            if (loudActionRoundsVulnerable == 0)
+            if (loudActionTurnsVulnerable == 0)
                 StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudAction", Vector3.zero, string.Empty)); //losCheck
 
-            if (vulnerableTurns > loudActionRoundsVulnerable)
+            if (vulnerableTurns > loudActionTurnsVulnerable)
                 SetLoudRevealed(vulnerableTurns);
         }
     }
@@ -2122,10 +2122,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         RoundsWithoutFood = 0;
     }
-    public void SetLoudRevealed(int rounds)
+    public void SetLoudRevealed(int turns)
     {
-        loudActionRoundsVulnerable = rounds;
-        print(soldierName + " is vulnerable to detection for " + rounds + " rounds.");
+        loudActionTurnsVulnerable = turns;
+        print($"{soldierName} is vulnerable to detection for {turns} turns.");
     }
 
     public bool IsSuppressed()
@@ -2163,7 +2163,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public bool IsStunned()
     {
-        if (stunnedRoundsVulnerable > 0)
+        if (stunnedTurnsVulnerable > 0)
             return true;
         else
             return false;
@@ -2475,11 +2475,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (rightHand != null)
             Inventory.RemoveItemFromSlot(rightHand, "RightHand");
     }
-    public void SetStunned(int stunRounds)
+    public void SetStunned(int stunTurns)
     {
-        if (stunRounds > stunnedRoundsVulnerable)
+        if (stunTurns > stunnedTurnsVulnerable)
         {
-            stunnedRoundsVulnerable = stunRounds;
+            stunnedTurnsVulnerable = stunTurns;
 
             DropHandheldItems();
 
@@ -2490,21 +2490,32 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)(SR)|stunActive", Vector3.zero, string.Empty)); //losCheck
         }
     }
-    public void TakeStun(int stunRounds)
+    public int TakeStun(int stunRounds)
     {
         if (stunRounds > 0)
         {
-            if (ResilienceCheck())
+            int resistedRounds = 0;
+            for (int i = 0; i < stunRounds; i++)
             {
-                menu.AddDamageAlert(this, $"Resisted a {stunRounds} round stun.", true, true);
-                menu.AddXpAlert(this, 1, "Resisted stunning.", true);
+                if (ResilienceCheck())
+                    resistedRounds++;
             }
-            else
+
+            if (resistedRounds > 0)
+            {                
+                menu.AddDamageAlert(this, $"Resisted stun ({resistedRounds} rounds).", true, true);
+                menu.AddXpAlert(this, resistedRounds, $"Resisted stun ({resistedRounds} rounds).", true);
+            }
+            if (resistedRounds < stunRounds)
             {
-                menu.AddDamageAlert(this, $"Suffered a {stunRounds} round stun.", false, true);
-                SetStunned(stunRounds);
+                menu.AddDamageAlert(this, $"Suffered stun ({stunRounds - resistedRounds} rounds).", false, true);
+                SetStunned(stunRounds * 2);
             }
+
+            return stunRounds - resistedRounds;
         }
+
+        return 0;
     }
     public void ClearHealthState()
     {
@@ -3824,7 +3835,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetStunnedState()
     {
         if (IsStunned())
-            return $", <color=red>Stunned({stunnedRoundsVulnerable})</color>";
+            return $", <color=red>Stunned({stunnedTurnsVulnerable})</color>";
         return "";
     }
 
@@ -3887,8 +3898,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string GetLoudDetectedState()
     {
-        //if (loudActionRoundsVulnerable > 0)
-        //    return $", <color=red>Vulnerable({loudActionRoundsVulnerable})</color>";
+        if (loudActionTurnsVulnerable > 0)
+            return $", <color=red>Vulnerable({loudActionTurnsVulnerable})</color>";
         return "";
     }
 
