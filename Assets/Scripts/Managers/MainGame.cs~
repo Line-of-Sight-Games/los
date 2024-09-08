@@ -2677,7 +2677,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
-                    useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Total Misfire";
+                    useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").Find("Text").GetComponent<TextMeshProUGUI>().text = "Total Missfire";
                     useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(true);
                 }
                 useUHFUI.transform.Find("PressedOnce").gameObject.SetActive(true);
