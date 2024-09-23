@@ -61,7 +61,7 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "Entire team's Dip and Elec skills are added together to deliver a UHF strike. If Negotiator is sole survivor, his skill points will be doubled. If no enemies are killed by this strike, it may be redone (once, XP given)",
         "Player never leaves the Command Zone and all enemy radio communications are permanently disabled. (Opponent informed)",
         "All enemies must pass a deathroll to survive (no XP). If they all survive, all except the lowest ranked (Opponent chooses sole survivor if there are ties) will be executed (Opponent informed)",
-        "Disable two of either shooting, melee attack or explosive use for the enemy (Oppponent informed)",
+        "Disable two of either shooting, melee or explosives for the enemy (Oppponent informed)",
     };
     private readonly string[] l6Dip =
     {
