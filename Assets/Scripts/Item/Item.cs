@@ -66,7 +66,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         owner = null;
         itemIndex = GetIndex(name);
         itemImage = GetSprite(name);
-        print(itemIndex);
+        //print(itemIndex);
 
         id = GenerateGuid();
         this.name = name;

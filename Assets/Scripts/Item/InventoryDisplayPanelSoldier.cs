@@ -79,7 +79,6 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         AddItemIconInSlot(s.Inventory.GetItemInSlot("RightHand"), "RightHand");
 
         //show items attached to other items
-
         if (s.Inventory.GetItemInSlot("Head") is Item headItem && headItem.IsJuggernautArmour())
         {
             LinkSlots(new () { "JArmour1", "JArmour2", "JArmour3", "JArmour4" }, headItem);
