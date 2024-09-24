@@ -3805,7 +3805,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
         throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
         throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        throwUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject.SetActive(false);
+        throwUI.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject.SetActive(false);
         throwUI.transform.Find("PressedOnce").gameObject.SetActive(false);
         throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("FinalPosition").gameObject.SetActive(false);
         throwUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(false);

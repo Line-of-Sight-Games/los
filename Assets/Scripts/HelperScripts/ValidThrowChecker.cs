@@ -60,6 +60,7 @@ public class ValidThrowChecker : MonoBehaviour
     }
     public void CheckForCatchers()
     {
+        print("running");
         catcher.SetActive(false);
         catcherDropdown.ClearOptions();
 
@@ -67,7 +68,7 @@ public class ValidThrowChecker : MonoBehaviour
         {
             foreach (Soldier s in menu.game.AllSoldiers())
             {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(menu.activeSoldier) && s.PhysicalObjectWithinRadius(throwLocation, 3))
+                if (s.IsAbleToSee() && s.IsSameTeamAs(menu.activeSoldier) && s.PhysicalObjectWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
                 {
                     if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
                         catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });

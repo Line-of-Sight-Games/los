@@ -2828,8 +2828,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         ValidThrowChecker throwTarget = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").GetComponent<ValidThrowChecker>();
         GameObject throwBeyondRadius = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ThrowBeyondRadius").gameObject;
         GameObject throwBeyondBlindRadius = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ThrowBeyondBlindRadius").gameObject;
-        GameObject totalMiss = throwItemUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
+        GameObject scatteredOffMap = throwItemUI.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject;
         GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ItemWillBreak").gameObject;
+        GameObject catcher = throwItemUI.transform.Find("OptionPanel").Find("Catcher").gameObject;
 
         if (!throwItemUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
@@ -2855,7 +2856,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     throwTarget.YPos.text = $"{newY}";
 
                     if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
-                        totalMiss.SetActive(true);
+                        scatteredOffMap.SetActive(true);
 
                     throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("FinalPosition").gameObject.SetActive(true);
                 }
@@ -2867,7 +2868,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else //second press
         {
-            if (totalMiss.activeInHierarchy)
+            if (scatteredOffMap.activeInHierarchy)
             {
                 activeSoldier.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
                 menu.CloseThrowUI();
@@ -2879,6 +2880,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (itemWillBreak.activeInHierarchy)
                     {
                         throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+                    }
+                    else if (catcher.activeInHierarchy)
+                    {
+                        Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
+
+                        //if soldier has left hand free catch it there, otherwise catch in right hand
+                        if (catchingSoldier.LeftHandItem == null)
+                            throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                        else
+                            throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
                     }
                     else
                     {
@@ -2900,11 +2911,22 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetZ = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>();
         GameObject invalidThrow = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("InvalidThrow").gameObject;
         GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ItemWillBreak").gameObject;
+        GameObject catcher = throwItemUI.transform.Find("OptionPanel").Find("Catcher").gameObject;
 
         if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
         {
             if (itemWillBreak.activeInHierarchy)
                 throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+            else if (catcher.activeInHierarchy)
+            {
+                Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
+
+                //if soldier has left hand free catch it there, otherwise catch in right hand
+                if (catchingSoldier.LeftHandItem == null)
+                    throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                else
+                    throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+            }
             else
             {
                 activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
