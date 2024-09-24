@@ -389,11 +389,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (stats.SR.Val > 0)
                 return true;
-            else
-                return false;
         }
-        else
-            return false;
+        return false;
     }
     public bool IsPlayingDead()
     {
@@ -2943,8 +2940,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 message = "Hands Full";
         }
 
-        print(message);
-
         if (message == "")
             return true;
         else
@@ -2952,7 +2947,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
+    public bool HandsFreeToThrowItem(Item item)
+    {
+        string message = "";
+        if (!IsValidLoadout())
+        {
+            if (!(HasAHandFree(false) && item.whereEquipped.Contains("Hand")))
+                message = "Hands Full";
+        }
 
+        if (message == "")
+            return true;
+
+        return false;
+    }
 
 
 

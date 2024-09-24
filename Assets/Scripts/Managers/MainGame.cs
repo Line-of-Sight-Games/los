@@ -2654,7 +2654,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmDropThrowItem(UseItemUI useItemUI)
     {
         int.TryParse(useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
-        if (useItemUI.itemUsed.IsThrowable())
+        if (useItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Throw"))
             menu.OpenThrowUI(useItemUI);
         else
             menu.OpenDropUI(useItemUI);
@@ -2893,7 +2893,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else
                     {
-                        activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                        throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
                         throwItemUI.itemUsed.X = x;
                         throwItemUI.itemUsed.Y = y;
                         throwItemUI.itemUsed.Z = z;
@@ -2929,7 +2929,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else
             {
-                activeSoldier.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
                 throwItemUI.itemUsed.X = x;
                 throwItemUI.itemUsed.Y = y;
                 throwItemUI.itemUsed.Z = z;

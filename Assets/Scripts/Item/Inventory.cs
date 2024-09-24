@@ -52,12 +52,11 @@ public class Inventory
         {
             RemoveItem(item);
             item.whereEquipped = "";
-
             if (linkedInventoryObject != null && linkedInventoryObject.InventorySlots != null)
             {
                 linkedInventoryObject.InventorySlots[slotName] = "";
-                if (linkedInventoryObject is Soldier linkedSoldier)
-                    item.RunDropEffect(linkedSoldier);
+                if (item.IsNestedOnSoldier())
+                    item.RunDropEffect(item.SoldierNestedOn());
             }
         }
     }
@@ -89,8 +88,18 @@ public class Inventory
     public bool HasItem(string id)
     {
         foreach (Item i in itemList)
+        {
             if (i.Id == id)
                 return true;
+            else if (i.HasInventory())
+            {
+                foreach (Item i2 in i.Inventory.itemList)
+                {
+                    if (i2.Id == id)
+                        return true;
+                }
+            }
+        }
 
         return false;
     }

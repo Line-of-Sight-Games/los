@@ -13,6 +13,12 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     private CanvasGroup canvasGroup;
     public ItemSlot originalSlot, currentSlot;
     public IHaveInventory originalInventoryObject;
+    public DropthrowPopup dropThrowPopup;
+
+    void Start()
+    {
+        dropThrowPopup = FindFirstObjectByType<DropthrowPopup>(FindObjectsInactive.Include);
+    }
 
     public ItemIcon Init(Item item)
     {
@@ -193,28 +199,28 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             }
         }
     }
-    public void ThrowItem()
+    public void DropThrowItem()
     {
         if (menu.onItemUseScreen && !menu.overrideView)
         {
-            int ap = 0;
             if (item.IsThrowable())
-                ap++;
+            {
+                Vector2 mousePosition = Input.mousePosition;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    dropThrowPopup.transform.parent.GetComponent<RectTransform>(),
+                    mousePosition,
+                    null,
+                    out Vector2 localPoint
+                );
+
+                dropThrowPopup.itemToDropThrow = item;
+                dropThrowPopup.itemIconToDropThrow = this;
+                dropThrowPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                dropThrowPopup.ShowDropThrowPopup();
+            }
             else
             {
-                if (!item.whereEquipped.Contains("Hand"))
-                    ap++;
-            }
-
-            if (menu.activeSoldier.game.CheckAP(ap))
-            {
-                if (item.IsThrowable())
-                {
-                    if (menu.activeSoldier.HandsFreeToUseItem(item))
-                        menu.OpenDropThrowItemUI(item, transform.parent.name, this, ap);
-                }
-                else
-                    menu.OpenDropThrowItemUI(item, transform.parent.name, this, ap);
+                menu.OpenDropThrowItemUI("drop", item, transform.parent.name, this);
             }
         }
     }

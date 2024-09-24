@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -3861,10 +3862,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Deployment_Beacon" => "Place Deployment Beacon?",
             "E_Tool" => "Dig?",
             "Food_Pack" => "Consume food pack?",
-            "Grenade_Flashbang" => "Throw flashbang?",
-            "Grenade_Frag" => "Throw frag?",
-            "Grenade_Smoke" => "Throw smoke?",
-            "Grenade_Tabun" => "Throw tabun?",
+            "Grenade_Flashbang" => "Remove pin and throw flashbang?",
+            "Grenade_Frag" => "Remove pin and throw frag?",
+            "Grenade_Smoke" => "Remove pin and throw smoke?",
+            "Grenade_Tabun" => "Remove pin and throw tabun?",
             "Medikit_Large" => "Use Large Medikit?",
             "Medikit_Medium" => "Use Medium Medikit?",
             "Medikit_Small" => "Use Small Medikit?",
@@ -4071,24 +4072,30 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         useItemUI.SetActive(false);
     }
-    public void OpenDropThrowItemUI(Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon, int ap)
+    public void OpenDropThrowItemUI(string throwOrDrop, Item itemThrown, string itemThrownFromSlotName, ItemIcon linkedIcon)
     {
-        
-        if (itemThrown.IsThrowable())
-        {
-            if (activeSoldier.IsAbleToSee())
-                dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item up to {activeSoldier.ThrowRadius}cm?";
-            else
-                dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item up to 3cm (<color=red>Blind</color>)?";
-        }
-        else
-            dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Cannot throw, discard item up to 3cm?";
+        int ap = 0;
+        if (throwOrDrop.Equals("throw") || (throwOrDrop.Equals("drop") && !itemThrown.whereEquipped.Contains("Hand")))
+            ap++;
 
-        dropThrowItemUI.GetComponent<UseItemUI>().itemUsed = itemThrown;
-        dropThrowItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
-        dropThrowItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemThrownFromSlotName;
-        dropThrowItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
-        dropThrowItemUI.SetActive(true);
+        if (activeSoldier.game.CheckAP(ap))
+        {
+            if (throwOrDrop.Equals("throw"))
+            {
+                if (activeSoldier.IsAbleToSee())
+                    dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Throw item up to {activeSoldier.ThrowRadius}cm?";
+            }
+            else if (throwOrDrop.Equals("drop"))
+            {
+                dropThrowItemUI.transform.Find("OptionPanel").Find("Message").GetComponentInChildren<TextMeshProUGUI>().text = $"Drop item up to 3cm?";
+            }
+
+            dropThrowItemUI.GetComponent<UseItemUI>().itemUsed = itemThrown;
+            dropThrowItemUI.GetComponent<UseItemUI>().itemUsedIcon = linkedIcon;
+            dropThrowItemUI.GetComponent<UseItemUI>().itemUsedFromSlotName = itemThrownFromSlotName;
+            dropThrowItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
+            dropThrowItemUI.SetActive(true);
+        }
     }
     public void CloseDropThrowItemUI()
     {
