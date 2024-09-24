@@ -63,6 +63,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return FindObjectsByType<MonoBehaviour>(default).OfType<IAmShootable>().ToList();
     }
+    public List<IHaveInventory> AllHasInventory()
+    {
+        return FindObjectsByType<MonoBehaviour>(default).OfType<IHaveInventory>().ToList();
+    }
+    public List<IAmDisarmable> AllDisarmable()
+    {
+        return FindObjectsByType<MonoBehaviour>(default).OfType<IAmDisarmable>().ToList();
+    }
     public List<GoodyBox> AllGoodyBoxes()
     {
         return FindObjectsByType<GoodyBox>(default).ToList();
@@ -152,12 +160,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public IHaveInventory FindHasInventoryById(string id)
     {
-        foreach (IHaveInventory hasInventory in FindObjectsByType<MonoBehaviour>(default).OfType<IHaveInventory>())
+        foreach (IHaveInventory hasInventory in AllHasInventory())
             if (hasInventory.Id == id)
                 return hasInventory;
         return null;
     }
-
+    public IAmDisarmable FindDisarmableById(string id)
+    {
+        foreach (IAmDisarmable disarmable in AllDisarmable())
+            if (disarmable.Id == id)
+                return disarmable;
+        return null;
+    }
 
 
 
@@ -2523,6 +2537,45 @@ public class MainGame : MonoBehaviour, IDataPersistence
             menu.CloseConfigureUI();
         }
     }
+    //disarm function
+    public void ConfirmDisarm()
+    {
+        if (CheckAP(1))
+        {
+            DeductAP(1);
+
+            POI poiToDisarm = poiManager.FindPOIById(menu.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            Item disarmedItem = null;
+
+            if (poiToDisarm is Claymore)
+                disarmedItem = itemManager.SpawnItem("Claymore");
+            else if (poiToDisarm is DeploymentBeacon)
+                disarmedItem = itemManager.SpawnItem("Deployment_Beacon");
+            else if (poiToDisarm is ThermalCamera)
+                disarmedItem = itemManager.SpawnItem("Thermal_Camera");
+
+            //set item to same position as poi and destroy poi
+            disarmedItem.X = poiToDisarm.X;
+            disarmedItem.Y = poiToDisarm.Y;
+            disarmedItem.Z = poiToDisarm.Z;
+            menu.poiManager.DestroyPOI(poiToDisarm);
+
+            activeSoldier.PerformLoudAction(6);
+            menu.CloseDisarmUI();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     //item functions
     public void ConfirmUseItem(UseItemUI useItemUI)
     {

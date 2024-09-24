@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
+public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDisarmable
 {
     public bool triggered;
     public bool revealed;
@@ -13,6 +13,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
     public int c, facingX, facingY;
     public string placedById;
     public Soldier placedBy;
+
     private void Start()
     {
         poiType = "claymore";
@@ -41,6 +42,8 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
         placedById = otherDetails.Item4;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
+        poiPortrait = LoadPortrait(poiType);
+
         return this;
     }
     public override void LoadData(GameData data)
@@ -49,6 +52,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
         {
             //load position
             poiType = (string)details["poiType"];
+            poiPortrait = LoadPortrait(poiType);
             x = Convert.ToInt32(details["x"]);
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
@@ -172,4 +176,5 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable
     { get { return triggered; } set { triggered = value; } }
     public bool Exploded
     { get { return exploded; } set { exploded = value; } }
+    public Sprite DisarmImage { get { return poiPortrait; } }
 }

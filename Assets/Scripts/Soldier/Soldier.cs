@@ -2729,27 +2729,41 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
-    public bool TerminalInRange()
+    public bool TerminalInRange(bool isActive = false)
     {
-        foreach (Terminal t in FindObjectsByType<Terminal>(default))
-            if (PhysicalObjectWithinMeleeRadius(t))
+        if (!isActive)
+        {
+            foreach (Terminal t in FindObjectsByType<Terminal>(default))
+                if (PhysicalObjectWithinMeleeRadius(t))
+                    return true;
+        }
+        else
+        {
+            foreach (Terminal t in FindObjectsByType<Terminal>(default))
+                if (PhysicalObjectWithinMeleeRadius(t) && t.terminalEnabled)
+                    return true;
+        }
+        return false;
+    }
+    public bool DisarmableInRange()
+    {
+        foreach (IAmDisarmable d in game.AllDisarmable())
+            if (PhysicalObjectWithinMeleeRadius((PhysicalObject)d))
                 return true;
+
         return false;
     }
     public Terminal ClosestTerminal()
     {
-        if (TerminalInRange())
-        {
-            List<Tuple<float, Terminal>> soldierDistanceToTerminals = new();
+        List<Tuple<float, Terminal>> soldierDistanceToTerminals = new();
 
-            foreach (Terminal t in FindObjectsByType<Terminal>(default))
-                soldierDistanceToTerminals.Add(Tuple.Create(game.CalculateRange(this, t), t));
+        foreach (Terminal t in FindObjectsByType<Terminal>(default))
+            soldierDistanceToTerminals.Add(Tuple.Create(game.CalculateRange(this, t), t));
 
-            soldierDistanceToTerminals = soldierDistanceToTerminals.OrderBy(t => t.Item1).ToList();
+        soldierDistanceToTerminals = soldierDistanceToTerminals.OrderBy(t => t.Item1).ToList();
 
-            if (soldierDistanceToTerminals.Count > 0)
-                return soldierDistanceToTerminals[0].Item2;
-        }
+        if (soldierDistanceToTerminals.Count > 0)
+            return soldierDistanceToTerminals[0].Item2;
 
         return null;
     }

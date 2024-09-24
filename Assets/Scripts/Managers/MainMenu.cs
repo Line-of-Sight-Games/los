@@ -34,14 +34,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public SightRadiusCircle sightRadiusCirclePrefab;
     public List<Button> actionButtons;
     public List<Sprite> insignia;
-    public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton;
+    public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton;
     private float playTimeTotal;
     public float turnTime;
     public string meleeChargeIndicator;
@@ -1376,11 +1376,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(meleeButton, "Blind");
 
             //block dipelec button
-            if (!activeSoldier.TerminalInRange())
+            if (!activeSoldier.TerminalInRange(default))
                 buttonStates.Add(dipElecButton, "No Terminal");
             else if (!activeSoldier.IsAbleToSee())
                 buttonStates.Add(dipElecButton, "Blind");
-            else if (!activeSoldier.ClosestTerminal().terminalEnabled)
+            else if (!activeSoldier.TerminalInRange(true))
                 buttonStates.Add(dipElecButton, "Terminal Disabled");
             else if (activeSoldier.IsMeleeControlling())
                 buttonStates.Add(dipElecButton, "<color=green>Melee Controlling</color>");
@@ -1412,6 +1412,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(playdeadButton, "Juggernaut");
             else if (activeSoldier.IsMeleeControlling())
                 buttonStates.Add(playdeadButton, "<color=green>Melee Controlling</color>");
+
+            //block disarm button
+            if (!activeSoldier.DisarmableInRange())
+                buttonStates.Add(disarmButton, "No Devices");
+            else if (!activeSoldier.IsAbleToSee())
+                buttonStates.Add(disarmButton, "Blind");
 
             GreyOutButtons(buttonStates, "");
         }
@@ -2357,7 +2363,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (poiHit is not GoodyBox)
         {
-            if ((poiHit is ExplosiveBarrel barrel && !barrel.triggered) || (poiHit is Claymore claymore && !claymore.triggered) || poiHit is Terminal || poiHit is DeploymentBeacon)
+            if ((poiHit is ExplosiveBarrel barrel && !barrel.triggered) || (poiHit is Claymore claymore && !claymore.triggered) || poiHit is Terminal || poiHit is DeploymentBeacon || poiHit is ThermalCamera)
             {
                 GameObject explosionAlert = Instantiate(explosionAlertPOIPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
                 explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, poiHit);
@@ -3305,7 +3311,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
             dipelecUI.dipElecTypeDropdown.value = 1;
 
-        dipelecUI.apCost.text = "3";
         game.UpdateDipElecUI();
         dipelecUI.gameObject.SetActive(true);
     }
@@ -3424,6 +3429,40 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CloseLastandicideConfirmUI()
     {
         lastandicideConfirmUI.SetActive(false);
+    }
+
+
+
+
+
+
+
+    //disarm functions
+    public void OpenDisarmUI()
+    {
+        List<TMP_Dropdown.OptionData> disarmOptionDataList = new();
+        TMP_Dropdown.OptionData disarmOptionData;
+
+        foreach (IAmDisarmable disarmable in game.AllDisarmable())
+        {
+            if (activeSoldier.PhysicalObjectWithinMeleeRadius((PhysicalObject)disarmable))
+            {
+                disarmOptionData = new(disarmable.Id, disarmable.DisarmImage, Color.white);
+                disarmOptionDataList.Add(disarmOptionData);
+            }
+        }
+
+        disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().AddOptions(disarmOptionDataList);
+        disarmUI.SetActive(true);
+    }
+    public void CloseDisarmUI()
+    {
+        ClearDisarmUI();
+        disarmUI.gameObject.SetActive(false);
+    }
+    public void ClearDisarmUI()
+    {
+        disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
     }
 
 

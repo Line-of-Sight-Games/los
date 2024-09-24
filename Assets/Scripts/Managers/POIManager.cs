@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class POIManager : MonoBehaviour, IDataPersistence
@@ -16,6 +17,8 @@ public class POIManager : MonoBehaviour, IDataPersistence
     public DeploymentBeacon deploymentBeaconPrefab;
     public ThermalCamera thermalCamPrefab;
     public DrugCabinet drugCabinetPrefab;
+
+    public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite, claymoreSprite, deploymentBeaconSprite, thermalCameraSprite, drugCabinetSprite;
 
     public void LoadData(GameData data)
     {

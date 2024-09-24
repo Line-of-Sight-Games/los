@@ -28,6 +28,8 @@ public class Terminal : POI, IDataPersistence
         MapPhysicalPosition(x, y, z);
         terminalType = type;
 
+        poiPortrait = LoadPortrait(poiType);
+
         return this;
     }
 
@@ -36,6 +38,7 @@ public class Terminal : POI, IDataPersistence
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
             poiType = (string)details["poiType"];
+            poiPortrait = LoadPortrait(poiType);
             x = Convert.ToInt32(details["x"]);
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
@@ -61,21 +64,20 @@ public class Terminal : POI, IDataPersistence
 
     public override void SaveData(ref GameData data)
     {
-        details = new();
+        details = new()
+        {
+            { "poiType", poiType },
+            { "x", x },
+            { "y", y },
+            { "z", z },
+            { "terrainOn", terrainOn },
+            { "terminalType", terminalType },
+            { "terminalEnabled", terminalEnabled },
 
-        details.Add("poiType", poiType);
-        details.Add("x", x);
-        details.Add("y", y);
-        details.Add("z", z);
-        details.Add("terrainOn", terrainOn);
-
-        details.Add("terminalType", terminalType);
-        details.Add("terminalEnabled", terminalEnabled);
-
-        //save list of soldiers already interacted
-        details.Add("soldiersAlreadyNegotiated", soldiersAlreadyNegotiated);
-        details.Add("soldiersAlreadyHacked", soldiersAlreadyHacked);
-        
+            //save list of soldiers already interacted
+            { "soldiersAlreadyNegotiated", soldiersAlreadyNegotiated },
+            { "soldiersAlreadyHacked", soldiersAlreadyHacked }
+        };
 
         //add the item in
         if (data.allPOIDetails.ContainsKey(id))

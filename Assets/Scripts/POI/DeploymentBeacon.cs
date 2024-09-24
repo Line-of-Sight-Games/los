@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeploymentBeacon : POI, IDataPersistence
+public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
 {
     public string placedById;
     public Soldier placedBy;
@@ -34,6 +34,8 @@ public class DeploymentBeacon : POI, IDataPersistence
         placedById = placedBySoldierId;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
+        poiPortrait = LoadPortrait(poiType);
+
         return this;
     }
 
@@ -42,6 +44,7 @@ public class DeploymentBeacon : POI, IDataPersistence
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
             poiType = (string)details["poiType"];
+            poiPortrait = LoadPortrait(poiType);
             x = Convert.ToInt32(details["x"]);
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
@@ -72,5 +75,6 @@ public class DeploymentBeacon : POI, IDataPersistence
 
         data.allPOIDetails.Add(id, details);
     }
+    public Sprite DisarmImage { get { return poiPortrait; } }
 }
 

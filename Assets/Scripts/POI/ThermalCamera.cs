@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ThermalCamera : POI, IDataPersistence
+public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
 {
     public string placedById;
     public Soldier placedBy;
@@ -38,6 +38,8 @@ public class ThermalCamera : POI, IDataPersistence
         placedById = otherDetails.Item3;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
+        poiPortrait = LoadPortrait(poiType);
+
         return this;
     }
 
@@ -46,6 +48,7 @@ public class ThermalCamera : POI, IDataPersistence
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
             poiType = (string)details["poiType"];
+            poiPortrait = LoadPortrait(poiType);
             x = Convert.ToInt32(details["x"]);
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
@@ -80,4 +83,5 @@ public class ThermalCamera : POI, IDataPersistence
 
         data.allPOIDetails.Add(id, details);
     }
+    public Sprite DisarmImage { get { return poiPortrait; } }
 }
