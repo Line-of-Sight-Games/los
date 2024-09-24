@@ -1126,20 +1126,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (overrideView)
             {
-                s.soldierUI.SetActive(true);
-                s.soldierUI.transform.Find("ActionButton").GetComponent<Button>().interactable = true;
+                s.soldierUI.gameObject.SetActive(true);
+                s.soldierUI.actionButton.interactable = true;
             }
             else
             {
                 if (s.IsOnturn() || s.IsSpotted())
-                    s.soldierUI.SetActive(true);
+                    s.soldierUI.gameObject.SetActive(true);
                 else
-                    s.soldierUI.SetActive(false);
+                    s.soldierUI.gameObject.SetActive(false);
 
                 if (s.IsOffturn() && s.IsSpotted())
-                    s.soldierUI.transform.Find("ActionButton").GetComponent<Button>().interactable = false;
+                    s.soldierUI.actionButton.interactable = false;
                 else
-                    s.soldierUI.transform.Find("ActionButton").GetComponent<Button>().interactable = true;
+                    s.soldierUI.actionButton.interactable = true;
             }
         }
     }
@@ -1212,7 +1212,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         foreach (Soldier s in game.AllSoldiers())
         {
-            s.soldierUI.SetActive(true);
+            s.soldierUI.gameObject.SetActive(true);
             s.fielded = true;
             s.GetComponent<Renderer>().enabled = true;
             s.CheckSpecialityColor(s.soldierSpeciality);

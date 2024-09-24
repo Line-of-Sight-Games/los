@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class SoldierUI : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class SoldierUI : MonoBehaviour
     public TMP_InputField xSize, ySize, zSize;
     public int x, y, z;
     public TMP_Dropdown terrainDropdown;
+    public GameObject kia, resolveBroken;
+    public Button actionButton, fieldButton;
+    public SoldierPortrait soldierPotrait;
+    public TextMeshProUGUI ap, mp, location; 
 
     private void Start()
     {

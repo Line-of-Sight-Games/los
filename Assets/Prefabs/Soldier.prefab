@@ -31,13 +31,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4380717690802720389}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4380717690802720385
 MeshFilter:
@@ -64,6 +64,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -101,11 +104,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 110805a4a9cd9b145b2c67df48ed4586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectName: 
   id: 0
   terrainOn: 
   x: 0
   y: 0
   z: 0
+  game: {fileID: 0}
+  menu: {fileID: 0}
   soldierName: 
   soldierTerrain: 
   soldierSpeciality: 
@@ -119,11 +125,16 @@ MonoBehaviour:
   revealed: 0
   usedAP: 0
   usedMP: 0
+  patriotic: 0
   bloodLettedThisTurn: 0
   illusionedThisMove: 0
   hasKilled: 0
   overwatchFirstShotUsed: 0
   guardsmanRetryUsed: 0
+  amphStatReduction: 0
+  modaProtect: 0
+  trenXRayEffect: 0
+  trenSRShrinkEffect: 0
   hp: 6
   ap: 0
   mp: 0
@@ -134,14 +145,14 @@ MonoBehaviour:
   roundsFielded: 0
   roundsFieldedConscious: 0
   roundsWithoutFood: 0
-  loudActionRoundsVulnerable: 0
-  stunnedRoundsVulnerable: 0
+  loudActionTurnsVulnerable: 0
+  stunnedTurnsVulnerable: 0
   overwatchShotCounter: 0
   suppressionValue: 0
   healthRemovedFromStarve: 0
-  fighterHitCount: 0
+  bleedoutTurns: 0
   plannerDonatedMove: 0
-  timesBloodlet: 0
+  turnsAvenging: 0
   overwatchXPoint: 0
   overwatchYPoint: 0
   overwatchConeRadius: 0
@@ -149,13 +160,15 @@ MonoBehaviour:
   startX: 0
   startY: 0
   startZ: 0
+  riotXPoint: 0
+  riotYPoint: 0
   revealedByTeam: 
   lastChosenStat: 
   poisonedBy: 
   isSpotting: 
+  glucoState: 
   inventory:
     itemPrefab: {fileID: 0}
-    linkedSoldier: {fileID: 0}
   state: []
   inventoryList: []
   controlledBySoldiersList: []
@@ -163,25 +176,26 @@ MonoBehaviour:
   revealedBySoldiersList: []
   revealingSoldiersList: []
   witnessStoredAbilities: []
-  witnessActiveAbilities: []
   isSpottedBy: []
+  plannerGunsBlessed: []
+  gunnerGunsBlessed: []
   itemPrefab: {fileID: 4690525424084030571, guid: 9861933c9c6ad5c47a543593cd6719de, type: 3}
   SRColliderMax: {fileID: 2230963200744647314}
   SRColliderHalf: {fileID: 4658430169571143711}
   SRColliderMin: {fileID: 8291841830121597931}
   itemCollider: {fileID: 7218961582260931130}
   bodyCollider: {fileID: 2309383051849836535}
+  madeUnconBy: 
+  madeUnconBydamageList: []
   selectedMaterial: {fileID: 2100000, guid: 11f5df4d1eaf47f468e4296dce19665b, type: 2}
   deadMaterial: {fileID: 2100000, guid: df535cf857aaded49849689743f5a5f3, type: 2}
   materials:
   - {fileID: 2100000, guid: 2ce6e73b3cdeb1a419b3fa7d4e0705c7, type: 2}
   - {fileID: 2100000, guid: 6e83e4994daf1bf4bbfa03d6931ddc9c, type: 2}
   - {fileID: 2100000, guid: 5e797a46cd49e1c4a9c6935442ff413d, type: 2}
-  soldierUI: {fileID: 0}
-  soldierUIPrefab: {fileID: 5713749636568449379, guid: 0f3751c0026db9a4982c469260e5f172, type: 3}
   soldierSnapshotAlertPrefab: {fileID: 7610803231150565594, guid: d22a824efc98b3f46ac5dd60c7474fb0, type: 3}
-  game: {fileID: 0}
-  menu: {fileID: 0}
+  soldierUI: {fileID: 0}
+  soldierUIPrefab: {fileID: 1334493526485889466, guid: 0f3751c0026db9a4982c469260e5f172, type: 3}
   soldierManager: {fileID: 0}
   itemManager: {fileID: 0}
 --- !u!135 &2230963200744647314
@@ -192,9 +206,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4380717690802720389}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &4658430169571143711
@@ -205,9 +227,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4380717690802720389}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &8291841830121597931
@@ -218,9 +248,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4380717690802720389}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &7218961582260931130
@@ -231,9 +269,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4380717690802720389}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 4
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &2309383051849836535
@@ -244,8 +290,16 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4380717690802720389}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}

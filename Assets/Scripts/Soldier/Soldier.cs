@@ -41,8 +41,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
 
-    public GameObject soldierUI, soldierUIPrefab, soldierSnapshotAlertPrefab;
-    
+    public GameObject soldierSnapshotAlertPrefab;
+    public SoldierUI soldierUI, soldierUIPrefab;
+
     public SoldierManager soldierManager;
     public ItemManager itemManager;
 
@@ -1610,10 +1611,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void DisplayStats()
     {
-        soldierUI.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(this);
-        soldierUI.transform.Find("AP").gameObject.GetComponent<TextMeshProUGUI>().text = "AP:" + ap;
-        soldierUI.transform.Find("MP").gameObject.GetComponent<TextMeshProUGUI>().text = "MA:" + mp;
-        soldierUI.transform.Find("Location").gameObject.GetComponent<TextMeshProUGUI>().text = "X:" + x + "   Y:" + y + "   Z:" + z;
+        soldierUI.soldierPotrait.Init(this);
+        soldierUI.ap.text = "AP:" + ap;
+        soldierUI.mp.text = "MA:" + mp;
+        soldierUI.location.text = "X:" + x + "   Y:" + y + "   Z:" + z;
     }
     public int DetectionActiveStat(int multiplier)
     {
@@ -2034,17 +2035,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsFielded())
         {
-            soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Button>().enabled = true;
-            soldierUI.transform.Find("FieldButton").gameObject.SetActive(false);
+            soldierUI.actionButton.enabled = true;
+            soldierUI.fieldButton.gameObject.SetActive(false);
 
             if (IsDead())
             {
-                soldierUI.transform.Find("KIA").gameObject.SetActive(true);
-                soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Image>().color = new Color(1, 0, 0, 0.2f);
+                soldierUI.kia.SetActive(true);
+                soldierUI.actionButton.GetComponent<Image>().color = new Color(1, 0, 0, 0.2f);
             }
             else
             {
-                soldierUI.transform.Find("KIA").gameObject.SetActive(false);
+                soldierUI.kia.SetActive(false);
                 switch (speciality)
                 {
                     case "Leadership":
@@ -2056,7 +2057,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     case "Perceptiveness":
                     case "Camouflage":
                     case "Sight Radius":
-                        soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Image>().color = new Color(0, 1, 0, 0.2f);
+                        soldierUI.actionButton.GetComponent<Image>().color = new Color(0, 1, 0, 0.2f);
                         break;
                     case "Rifle":
                     case "Assault Rifle":
@@ -2065,22 +2066,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     case "Sub-Machine Gun":
                     case "Shotgun":
                     case "Melee":
-                        soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Image>().color = new Color(1, 0.92f, 0.016f, 0.2f);
+                        soldierUI.actionButton.GetComponent<Image>().color = new Color(1, 0.92f, 0.016f, 0.2f);
                         break;
                     case "Strength":
                     case "Diplomacy":
                     case "Electronics":
                     case "Healing":
-                        soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Image>().color = new Color(0, 0, 1, 0.2f);
+                        soldierUI.actionButton.GetComponent<Image>().color = new Color(0, 0, 1, 0.2f);
                         break;
                 }
             }
         }
         else
         {
-            soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Image>().color = new Color(0.16f, 0.16f, 0.16f, 0.7f);
-            soldierUI.transform.Find("ActionButton").gameObject.GetComponent<Button>().enabled = false;
-            soldierUI.transform.Find("FieldButton").gameObject.SetActive(true);
+            soldierUI.actionButton.GetComponent<Image>().color = new Color(0.16f, 0.16f, 0.16f, 0.7f);
+            soldierUI.actionButton.enabled = false;
+            soldierUI.fieldButton.gameObject.SetActive(true);
         } 
     }
     public int CheckSpecialityIndex(string speciality)
