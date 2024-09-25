@@ -23,6 +23,8 @@ public class ItemReader : MonoBehaviour
         public int Ammo;
         public string PoisonedBy;
         public int MeleeDamage;
+        public int JammingForTurns;
+        public int SpyingForTurns;
         public Dictionary<string, string> InventorySlots;
         public Dictionary<string, int> GunTraits;
     }

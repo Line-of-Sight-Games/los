@@ -392,7 +392,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (currentTeam == 1)
                 StartRound();
 
-            IncreaseRoundsActiveAllClouds();
+            IncreaseTurnsActiveAllClouds();
+            DecreaseTurnsSpyingJammingAllULFs();
             StartCoroutine(StartTeamTurn());
         }
     }
@@ -2754,6 +2755,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
     }
+    public void ConfirmULF(UseItemUI useULFUI)
+    {
+        if (CheckAP(3))
+        {
+            DeductAP(3);
+            useULFUI.itemUsed.UseULF(useULFUI.itemUsedFromSlotName);
+            menu.CloseUseULFUI();
+        }
+    }
     public void ConfirmRiotShield(UseItemUI useRiotShield)
     {
         TMP_InputField targetX = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("XPos").GetComponent<TMP_InputField>();
@@ -3056,14 +3066,23 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (!s.CheckTabunClouds() && s.IsInTabun())
                 s.UnsetTabun();
     }
-    public void IncreaseRoundsActiveAllClouds()
+    public void IncreaseTurnsActiveAllClouds()
     {
         foreach (SmokeCloud cloud in FindObjectsByType<SmokeCloud>(default))
             cloud.TurnsUntilDissipation--;
         foreach (TabunCloud cloud in FindObjectsByType<TabunCloud>(default))
             cloud.TurnsUntilDissipation--;
     }
-
+    public void DecreaseTurnsSpyingJammingAllULFs()
+    {
+        foreach (Item item in itemManager.allItems)
+        {
+            if (item.IsJamming())
+                item.jammingForTurns--;
+            if (item.IsSpying())
+                item.spyingForTurns--;
+        }
+    }
 
 
 

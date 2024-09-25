@@ -14,10 +14,12 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public ItemSlot originalSlot, currentSlot;
     public IHaveInventory originalInventoryObject;
     public DropthrowPopup dropThrowPopup;
+    public SpyJamPopup spyJamPopup;
 
     void Start()
     {
         dropThrowPopup = FindFirstObjectByType<DropthrowPopup>(FindObjectsInactive.Include);
+        spyJamPopup = FindFirstObjectByType<SpyJamPopup>(FindObjectsInactive.Include);
     }
 
     public ItemIcon Init(Item item)
@@ -183,18 +185,35 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         {
             if (item.IsUsable())
             {
-                int ap = item.usageAP;
-                //adept ability
-                if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
-                    ap--;
-                //gunner ability
-                if (menu.activeSoldier.IsGunner() && item.IsAmmo())
-                    ap = 1;
-
-                if (menu.activeSoldier.game.CheckAP(ap))
+                if (item.IsULF())
                 {
-                    if (menu.activeSoldier.HandsFreeToUseItem(item))
-                        menu.OpenUseItemUI(item, transform.parent.name, this, ap);
+                    Vector2 mousePosition = Input.mousePosition;
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        spyJamPopup.transform.parent.GetComponent<RectTransform>(),
+                        mousePosition,
+                        null,
+                        out Vector2 localPoint
+                    );
+
+                    spyJamPopup.ulfUsed = item;
+                    spyJamPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                    spyJamPopup.ShowSpyJamPopup();
+                }
+                else
+                {
+                    int ap = item.usageAP;
+                    //adept ability
+                    if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
+                        ap--;
+                    //gunner ability
+                    if (menu.activeSoldier.IsGunner() && item.IsAmmo())
+                        ap = 1;
+
+                    if (menu.activeSoldier.game.CheckAP(ap))
+                    {
+                        if (menu.activeSoldier.HandsFreeToUseItem(item))
+                            menu.OpenUseItemUI(item, transform.parent.name, this, ap);
+                    }
                 }
             }
         }

@@ -35,7 +35,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -3898,7 +3898,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "UHF_Radio" => "Call UHF strike?",
             "ULF_Radio" => "Attempt to use ULF radio?",
             "Water_Canteen" => "Drink water?",
-            _ => "Unrecognised item",
+            _ => $"Unrecognised item ({itemUsed.itemName})",
         };
         useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = ap.ToString();
 
@@ -4122,6 +4122,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CloseEtoolResultUI()
     {
         etoolResultUI.SetActive(false);
+    }
+    public void OpenUseULFUI(string effect, Item ulfUsed)
+    {
+        if (game.CheckAP(3))
+        {
+            useULFUI.GetComponent<UseItemUI>().itemUsed = ulfUsed;
+            useULFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = effect;
+            useULFUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = effect switch
+            {
+                "spy" => "Attempt to spy with ULF radio?",
+                "jam" => "Attempt to jam communications with ULF radio?",
+                _ => $"Unrecognised action ({effect})",
+            };
+            useULFUI.SetActive(true);
+        }
+    }
+    public void CloseUseULFUI()
+    {
+        useULFUI.SetActive(false);
     }
     public void OpenULFResultUI(string message)
     {

@@ -32,6 +32,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public int meleeDamage;
     public int charges;
     public string poisonedBy;
+    public int jammingForTurns;
+    public int spyingForTurns;
 
     public Inventory inventory;
     public List<string> inventoryList;
@@ -83,7 +85,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         loudRadius = reader.allItems.items[itemIndex].LoudRadius;
         charges = reader.allItems.items[itemIndex].Charges;
         poisonedBy = reader.allItems.items[itemIndex].PoisonedBy;
-        
+        jammingForTurns = reader.allItems.items[itemIndex].JammingForTurns;
+        spyingForTurns = reader.allItems.items[itemIndex].SpyingForTurns;
+
         if (traits.Contains("Storage"))
         {
             inventory = new Inventory(this);
@@ -271,6 +275,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             ablativeHealth = Convert.ToInt32(details["ablativeHealth"]);
             charges = Convert.ToInt32(details["charges"]);
             poisonedBy = (string)details["poisonedBy"];
+            jammingForTurns = Convert.ToInt32(details["jammingForTurns"]);
+            spyingForTurns = Convert.ToInt32(details["spyingForTurns"]);
 
             //load position
             x = Convert.ToInt32(details["x"]);
@@ -306,6 +312,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             { "poisonedBy", poisonedBy },
             { "equippableSlots", equippableSlots },
             { "whereEquipped", whereEquipped },
+            { "jammingForTurns", jammingForTurns },
+            { "spyingForTurns", spyingForTurns },
 
             //save position
             { "x", x },
@@ -514,7 +522,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         return null;
     }
-    public void UseULF()
+    public void UseULF(string effect)
     {
         if (linkedSoldier != null)
         {
@@ -529,8 +537,17 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             if (game.DiceRoll() <= avgDipElec)
             {
-                menu.AddXpAlert(linkedSoldier, 2, $"{linkedSoldier.soldierName} successfully used a ULF radio.", true);
-                menu.OpenULFResultUI("<color=green>Successful</color> ULF use!");
+                if (effect.Equals("spy"))
+                {
+                    SetSpying();
+                    menu.OpenULFResultUI("<color=green>Spying successful!</color>");
+                }
+                else
+                {
+                    SetJamming();
+                    menu.OpenULFResultUI("<color=green>Jamming successful!</color>");
+                }
+                menu.AddXpAlert(linkedSoldier, 2, $"{linkedSoldier.soldierName} successfully used a ULF radio to {effect}.", true);
             }
             else
                 menu.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
@@ -627,9 +644,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                         soldierUsedOn.TakeDrug(itemManager.drugTable[game.RandomNumber(0, itemManager.drugTable.Length - 1)], linkedSoldier);
                     else
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
-                case "ULF_Radio":
-                    UseULF();
                     break;
                 case "Water_Canteen":
                     if (poisonedBy == null || poisonedBy == "")
@@ -973,6 +987,42 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (itemName.Equals("Poison_Satchel"))
             return true;
+        return false;
+    }
+    public bool IsULF()
+    {
+        if (itemName.Equals("ULF_Radio"))
+            return true;
+        return false;
+    }
+    public void SetSpying()
+    {
+        spyingForTurns = 2;
+    }
+    public bool IsSpying()
+    {
+        if (IsULF() && spyingForTurns > 0)
+            return true;
+        return false;
+    }
+    public void SetJamming()
+    {
+        jammingForTurns = 2;
+    }
+    public bool IsJamming()
+    {
+        if (IsULF() && jammingForTurns > 0)
+            return true;
+        return false;
+    }
+    public bool IsJammed()
+    {
+        if (this.owner is Soldier owningSoldier)
+        {
+            foreach (Item i in itemManager.allItems)
+                if (i.IsJamming() && i.owner is Soldier linkedSoldier && linkedSoldier.IsOppositeTeamAs(owningSoldier))
+                    return true;
+        }
         return false;
     }
     public bool IsBackpack()

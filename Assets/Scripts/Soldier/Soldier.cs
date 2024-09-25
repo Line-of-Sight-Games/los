@@ -3285,6 +3285,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool IsCarryingULF()
+    {
+        if (Inventory.HasItemOfType("ULF_Radio"))
+            return true;
+        return false;
+    }
+    public Item EquippedULF()
+    {
+        return Inventory.GetItem("ULF_Radio");
+    }
     public bool IsCarryingRiotShield()
     {
         if (Inventory.HasItemOfType("Riot_Shield"))
@@ -4008,6 +4018,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return drugState;
     }
+    public string GetULFState()
+    {
+        string ulfState = "";
+
+        if (IsCarryingULF() && EquippedULF().IsJamming())
+            ulfState += ", <color=green>Jamming(ULF)</color>";
+        else if (IsCarryingULF() && EquippedULF().IsSpying())
+            ulfState += ", <color=green>Spying(ULF)</color>";
+
+        return ulfState;
+    }
     public string GetPlannerBuffState()
     {
         if (plannerDonatedMove > 0)
@@ -4073,6 +4094,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetSmokedState();
             status += GetTabunedState();
             status += GetDrugState();
+            status += GetULFState();
 
             status += GetPlannerBuffState();
             status += GetPatriotState();
