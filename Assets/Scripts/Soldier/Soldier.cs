@@ -628,8 +628,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         string[] stats = new string[3];
 
         rank = NextRank();
-        stats[0] = IncrementStat(choiceStat);
-        stats[1] = IncrementSpeciality();
+        stats[0] = IncrementSpeciality(); 
+        stats[1] = IncrementStat(choiceStat);
         stats[2] = IncrementRandom(choiceStat);
         lastChosenStat = choiceStat;
 

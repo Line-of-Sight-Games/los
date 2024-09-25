@@ -43,7 +43,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void DisplayItemDetails()
     {
-        if (menu.activeSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
+        if (item.owner is Soldier linkedSoldier && linkedSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
             transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{1}";
         else
             transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{item.weight}";
