@@ -3093,6 +3093,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool HasUnresolvedBrokenAllies()
+    {
+        foreach (Soldier s in game.AllSoldiers())
+            if (this.IsSameTeamAs(s) && s.IsBroken() && s.ap > 0)
+                return true;
+
+        return false;
+    }
     public bool IsFrozen()
     {
         if (tp == 3)

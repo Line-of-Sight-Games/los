@@ -13,7 +13,7 @@ public class SoldierUI : MonoBehaviour
     public TMP_InputField xSize, ySize, zSize;
     public int x, y, z;
     public TMP_Dropdown terrainDropdown;
-    public GameObject kia, resolveBroken;
+    public GameObject kia, resolveBroken, spotted;
     public Button actionButton, fieldButton;
     public SoldierPortrait soldierPotrait;
     public TextMeshProUGUI ap, mp, location; 
@@ -45,7 +45,6 @@ public class SoldierUI : MonoBehaviour
     {
         if (int.TryParse(xSize.text, out x) && int.TryParse(ySize.text, out y) && int.TryParse(zSize.text, out z) && terrainDropdown.value != 0)
         {
-            //print(x + ":" + linkedSoldier.game.maxX + " " + y + ":" + linkedSoldier.game.maxY + " " + z + ":" + linkedSoldier.game.maxZ);
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
                 linkedSoldier.startX = x;

@@ -1131,15 +1131,29 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
             else
             {
-                if (s.IsOnturn() || s.IsSpotted())
+                //set visibility of button
+                if (s.IsOnturn() || (s.IsOffturn() && s.IsSpotted())) 
                     s.soldierUI.gameObject.SetActive(true);
                 else
                     s.soldierUI.gameObject.SetActive(false);
 
-                if (s.IsOffturn() && s.IsSpotted())
-                    s.soldierUI.actionButton.interactable = false;
-                else
+                //set interactability of buttons 
+                if (s.IsOnturn() && (s.IsBroken() || !s.HasUnresolvedBrokenAllies()))
                     s.soldierUI.actionButton.interactable = true;
+                else
+                    s.soldierUI.actionButton.interactable = false;
+
+                //set spotted message
+                if (s.IsOffturn() && s.IsSpotted())
+                    s.soldierUI.spotted.SetActive(true);
+                else
+                    s.soldierUI.spotted.SetActive(false);
+
+                //set broken message
+                if (!s.IsBroken() && s.HasUnresolvedBrokenAllies())
+                    s.soldierUI.resolveBroken.SetActive(true);
+                else
+                    s.soldierUI.resolveBroken.SetActive(false);
             }
         }
     }
