@@ -698,7 +698,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown dropdown = soldierStatsUI.Find("General").Find("OverrideHealthState").Find("HealthStateDropdown").GetComponent<TMP_Dropdown>();
 
-        if (activeSoldier.IsUnconscious())
+        if (activeSoldier.IsDead())
+            dropdown.value = 3;
+        else if (activeSoldier.IsUnconscious())
             dropdown.value = 2;
         else if (activeSoldier.IsLastStand())
             dropdown.value = 1;
@@ -709,7 +711,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideHealthState").Find("HealthStateDropdown").GetComponent<TMP_Dropdown>();
 
-        if (dropdown.value == 2)
+        if (dropdown.value == 3)
+            activeSoldier.InstantKill(null, new() { "Override" });
+        else if (dropdown.value == 2)
             activeSoldier.MakeUnconscious(null, new() { "Override" });
         else if (dropdown.value == 1)
             activeSoldier.MakeLastStand();
@@ -1592,9 +1596,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("Location").Find("LocationX").GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationY").GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationZ").GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
+
+            //terrain and terrain on
             soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().text = activeSoldier.TerrainOn;
             soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierTerrain;
-            //colour terrain text native or opposite
             if (activeSoldier.IsOnNativeTerrain())
             {
                 soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().color = Color.green;
@@ -1610,8 +1615,24 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 soldierStatsUI.Find("General").Find("TerrainOn").GetComponent<TextMeshProUGUI>().color = Color.white;
                 soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().color = Color.white;
             }
+
+            //rounds without food
             soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().text = activeSoldier.RoundsWithoutFood.ToString();
+            if (activeSoldier.RoundsWithoutFood < 0)
+                soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().color = Color.green;
+            else if (activeSoldier.tp >= 10)
+                soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().color = Color.red;
+            else
+                soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().color = Color.white;
+
+            //trauma
             soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
+            if (activeSoldier.IsDesensitised())
+                soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().color = Color.green;
+            else if (activeSoldier.tp > 0)
+                soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().color = Color.red;
+            else
+                soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().color = Color.white;
         }
     }
 

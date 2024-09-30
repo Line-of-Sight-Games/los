@@ -3304,106 +3304,84 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //print("Trauma check passed wait");
         if (deadSoldier.IsDead())
         {
-            int numberOfPasses;
-            bool showTraumaUI = false, commanderPassFinished = false, lastandicidePassFinished = false;
+            bool showTraumaUI = false;
 
-            //check how many times to loop through checks
-            if (commander && lastandicide)
-                numberOfPasses = 3;
-            else if (commander || lastandicide)
-                numberOfPasses = 2;
-            else
-                numberOfPasses = 1;
-
-            for (int i = 0; i < numberOfPasses; i++)
+            foreach (Soldier friendly in AllSoldiers())
             {
-                foreach (Soldier friendly in AllSoldiers())
+                //print(friendly.soldierName + " trauma check attempting to run");
+
+                if (friendly.IsSameTeamAs(deadSoldier) && friendly.IsAlive())
                 {
-                    //print(friendly.soldierName + " trauma check attempting to run");
-
-                    if (friendly.IsSameTeamAs(deadSoldier))
+                    //print(friendly.soldierName + " trauma check actually running");
+                    //desensitised
+                    if (friendly.IsDesensitised())
+                        menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
+                    else
                     {
-                        //print(friendly.soldierName + " trauma check actually running");
-                        //desensitised
-                        if (friendly.IsDesensitised())
-                            menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
-                        else if (friendly.IsAlive())
+                        //guaranteed trauma from commander death and/or lastandicide
+                        if (commander)
                         {
-                            //guaranteed trauma from commander death and/or lastandicide
-                            if (commander)
+                            menu.AddTraumaAlert(friendly, 1, "Commander died, an automatic trauma point has been accrued.", 0, 0, "");
+                            showTraumaUI = true;
+                        }
+                        if (lastandicide)
+                        {
+                            menu.AddTraumaAlert(friendly, 1, deadSoldier.soldierName + " committed Lastandicide, an automatic trauma point has been accrued.", 0, 0, "");
+                            showTraumaUI = true;
+                        }
+
+                        if (friendly.IsAbleToSee())
+                        {
+                            int rolls = 0, xpOnResist = 0;
+                            if (friendly.PhysicalObjectWithinMaxRadius(deadSoldier))
                             {
-                                menu.AddTraumaAlert(friendly, 1, "Commander died, an automatic trauma point has been accrued.", 0, 0, "");
-                                commanderPassFinished = true;
-                                showTraumaUI = true;
-                            }
-                            else if (lastandicide)
-                            {
-                                menu.AddTraumaAlert(friendly, 1, deadSoldier.soldierName + " committed Lastandicide, an automatic trauma point has been accrued.", 0, 0, "");
-                                lastandicidePassFinished = true;
-                                showTraumaUI = true;
-                            }
-                            else
-                            {
-                                //check friendlies seeing death
-                                if (friendly.IsAbleToSee())
+                                string range = CalculateRangeBracket(CalculateRange(deadSoldier, friendly));
+                                switch (range)
                                 {
-                                    int rolls = 0, xpOnResist = 0;
-                                    if (friendly.PhysicalObjectWithinMaxRadius(deadSoldier))
-                                    {
-                                        string range = CalculateRangeBracket(CalculateRange(deadSoldier, friendly));
-                                        switch (range)
-                                        {
-                                            case "Melee":
-                                                rolls = 0;
-                                                xpOnResist = 5;
-                                                break;
-                                            case "CQB":
-                                                rolls = 0;
-                                                xpOnResist = 4;
-                                                break;
-                                            case "Short":
-                                                rolls = 1;
-                                                xpOnResist = 3;
-                                                break;
-                                            case "Medium":
-                                                rolls = 2;
-                                                xpOnResist = 2;
-                                                break;
-                                            case "Long":
-                                                rolls = 3;
-                                                xpOnResist = 1;
-                                                break;
-                                            default:
-                                                rolls = 3;
-                                                xpOnResist = 1;
-                                                break;
-                                        }
-
-                                        //add rolls for rank differential
-                                        if (deadSoldier.MinXPForRank() > friendly.MinXPForRank())
-                                            rolls += 0;
-                                        else if (deadSoldier.MinXPForRank() == friendly.MinXPForRank())
-                                            rolls += 1;
-                                        else
-                                            rolls += 2;
-
-                                        if (friendly.IsResilient())
-                                            menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is Resilient. Within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
-                                        else
-                                            menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
-
-                                        showTraumaUI = true;
-                                    }
+                                    case "Melee":
+                                        rolls = 0;
+                                        xpOnResist = 5;
+                                        break;
+                                    case "CQB":
+                                        rolls = 0;
+                                        xpOnResist = 4;
+                                        break;
+                                    case "Short":
+                                        rolls = 1;
+                                        xpOnResist = 3;
+                                        break;
+                                    case "Medium":
+                                        rolls = 2;
+                                        xpOnResist = 2;
+                                        break;
+                                    case "Long":
+                                        rolls = 3;
+                                        xpOnResist = 1;
+                                        break;
+                                    default:
+                                        rolls = 3;
+                                        xpOnResist = 1;
+                                        break;
                                 }
+
+                                //add rolls for rank differential
+                                if (deadSoldier.MinXPForRank() > friendly.MinXPForRank())
+                                    rolls += 0;
+                                else if (deadSoldier.MinXPForRank() == friendly.MinXPForRank())
+                                    rolls += 1;
+                                else
+                                    rolls += 2;
+
+                                if (friendly.IsResilient())
+                                    menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is Resilient. Within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
+                                else
+                                    menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
+
+                                showTraumaUI = true;
                             }
                         }
                     }
                 }
-
-                if (commanderPassFinished)
-                    commander = false;
-                if (lastandicidePassFinished)
-                    lastandicide = false;
             }
 
             if (showTraumaUI)

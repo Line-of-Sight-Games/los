@@ -2681,8 +2681,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             else 
             {
                 menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}. He is now <color=red>Dead</color>", false, false);
-                int tp = 1;
-                bool lastandicide = false;
 
                 //make him dead
                 ClearHealthState();
@@ -2695,14 +2693,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 //remove all engagements
                 if (IsMeleeEngaged())
                     StartCoroutine(game.DetermineMeleeControllerMultiple(this));
+
                 //check if critical trauma
+                int tp = 1;
                 if (damageSource.Contains("Critical") || damageSource.Contains("Melee") || damageSource.Contains("Explosive") || damageSource.Contains("Deathroll"))
                     tp++;
-                //check if lastandicide
-                if (damageSource.Contains("Lastandicide"))
-                    lastandicide = true;
                 //run trauma check
-                StartCoroutine(game.TraumaCheck(this, tp, IsCommander(), lastandicide));
+                StartCoroutine(game.TraumaCheck(this, tp, IsCommander(), damageSource.Contains("Lastandicide")));
 
                 //re-render as dead
                 CheckSpecialityColor(soldierSpeciality);
@@ -3905,19 +3902,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string GetHealthState()
     {
-        
-        if (hp == stats.H.Val)
-            return "Full Health";
-        else if (hp == 0)
-            return "<color=red>Dead</color>";
-        else if (hp == 3)
-            return "<color=red>Critically Injured</color>";
-        else if (hp > stats.H.Val)
+        int fullHealth = stats.H.Val;
+        int halfHealth = stats.H.Val / 2;
+        int criticalThreshhold = 3;
+
+        if (hp > fullHealth)
             return "<color=green>Overhealth</color>";
-        else if (hp <= stats.H.Val / 2)
-            return "<color=orange>Severely Injured</color>";
-        else
+        else if (hp == fullHealth)
+            return "Full Health";
+        else if (hp > halfHealth && hp < fullHealth)
             return "<color=yellow>Injured</color>";
+        else if (hp > criticalThreshhold && hp <= halfHealth)
+            return "<color=orange>Severely Injured</color>";
+        else if (hp > 0 && hp <= criticalThreshhold)
+            return "<color=red>Critically Injured</color>";
+        else
+            return "<color=red>Dead</color>";
     }
 
     public string GetConsciousState()
