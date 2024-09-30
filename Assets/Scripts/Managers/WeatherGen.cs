@@ -491,7 +491,6 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         }
         set
         {
-            print($"OLD:({CurrentWindSpeed} {CurrentWindDirection} wind)\nNEW:({value} {CurrentWindDirection} wind)");
             CurrentWeather = CurrentWeather.Replace($"{CurrentWindSpeed} {CurrentWindDirection} wind", $"{value} {CurrentWindDirection} wind");
         }
     }

@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -317,7 +318,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         foreach (Soldier s in game.AllSoldiers())
         {
-            foreach (string id in s.RevealingSoldiers)
+            foreach (string id in s.LOSToTheseSoldiersAndRevealing)
             {
                 LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s, soldierManager.FindSoldierById(id));
                 arrow.transform.SetAsLastSibling();
@@ -1128,11 +1129,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 s.soldierUI.gameObject.SetActive(true);
                 s.soldierUI.actionButton.interactable = true;
+                s.soldierUI.revealed.SetActive(false);
+                s.soldierUI.spotted.SetActive(false);
+                s.soldierUI.resolveBroken.SetActive(false);
             }
             else
             {
                 //set visibility of button
-                if (s.IsOnturn() || (s.IsOffturn() && s.IsSpotted())) 
+                if (s.IsOnturn() || (s.IsOffturn() && s.IsRevealed()) || (s.IsOffturn() && s.IsSpotted())) 
                     s.soldierUI.gameObject.SetActive(true);
                 else
                     s.soldierUI.gameObject.SetActive(false);
@@ -1142,6 +1146,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     s.soldierUI.actionButton.interactable = true;
                 else
                     s.soldierUI.actionButton.interactable = false;
+
+                //set revealed message
+                if (s.IsOffturn() && s.IsRevealed())
+                    s.soldierUI.revealed.SetActive(true);
+                else
+                    s.soldierUI.revealed.SetActive(false);
 
                 //set spotted message
                 if (s.IsOffturn() && s.IsSpotted())
@@ -1881,29 +1891,35 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ConfirmDetections()
     {
-        
         ScrollRect detectionScroller = detectionUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
         if (detectionScroller.verticalNormalizedPosition <= 0.05f)
         {
             //create list of soldiers and who they're revealing
             Dictionary<string, List<string>> allSoldiersRevealing = new();
             Dictionary<string, List<string>> allSoldiersRevealedBy = new();
-            Dictionary<string, List<string>> allSoldiersNotRevealing = new();
-            Dictionary<string, List<string>> allSoldiersNotRevealedBy = new();
+            Dictionary<string, List<string>> allSoldiersNotRevealingOutOfSR = new();
+            Dictionary<string, List<string>> allSoldiersNotRevealingNoLos = new();
+            Dictionary<string, List<string>> allSoldiersNotRevealingHidden = new();
             Dictionary<string, List<string>> allSoldiersRevealingFinal = new();
 
             foreach (Soldier s in game.AllSoldiers())
             {
                 allSoldiersRevealing.Add(s.id, new List<string>());
                 allSoldiersRevealedBy.Add(s.id, new List<string>());
-                allSoldiersNotRevealing.Add(s.id, new List<string>());
-                allSoldiersNotRevealedBy.Add(s.id, new List<string>());
+                allSoldiersNotRevealingOutOfSR.Add(s.id, new List<string>());
+                allSoldiersNotRevealingNoLos.Add(s.id, new List<string>());
+                allSoldiersNotRevealingHidden.Add(s.id, new List<string>());
                 allSoldiersRevealingFinal.Add(s.id, new List<string>());
 
                 //add soldiers that can't possibly be seen cause out of radius
                 foreach (Soldier s2 in game.AllSoldiers())
-                    if (s.IsOppositeTeamAs(s2) && !s.PhysicalObjectWithinMaxRadius(s2))
-                        allSoldiersNotRevealing[s.id].Add(s2.id);
+                {
+                    if (s.IsOppositeTeamAs(s2) && s2.IsAlive())
+                    {
+                        if (!s.PhysicalObjectWithinMaxRadius(s2))
+                            allSoldiersNotRevealingOutOfSR[s.id].Add(s2.id);
+                    } 
+                }
             }
 
             Transform detectionAlert = detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
@@ -1925,7 +1941,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                             {
                                 AddLosGlimpseAlert(detector, child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text);
                                 StartCoroutine(OpenLostLOSList());
-                                allSoldiersNotRevealing[counter.id].Add(detector.id);
+                                allSoldiersNotRevealingNoLos[counter.id].Add(detector.id);
                             }
 
                             //check for xp
@@ -1938,14 +1954,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         }
                         else
                         {
-                            allSoldiersNotRevealing[counter.id].Add(detector.id);
+                            allSoldiersNotRevealingHidden[counter.id].Add(detector.id);
 
                             //check for xp
                             AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true);
                         }
                     }
                     else
-                        allSoldiersNotRevealing[counter.id].Add(detector.id);
+                        allSoldiersNotRevealingNoLos[counter.id].Add(detector.id);
 
                     if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
                     {
@@ -1958,7 +1974,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                             {
                                 AddLosGlimpseAlert(counter, child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text);
                                 StartCoroutine(OpenLostLOSList());
-                                allSoldiersNotRevealing[detector.id].Add(counter.id);
+                                allSoldiersNotRevealingNoLos[detector.id].Add(counter.id);
                             }
                             
                             //check for xp
@@ -1967,14 +1983,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         }
                         else
                         {
-                            allSoldiersNotRevealing[detector.id].Add(counter.id);
+                            allSoldiersNotRevealingHidden[detector.id].Add(counter.id);
 
                             //check for xp
                             AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true);
                         }
                     }
                     else
-                        allSoldiersNotRevealing[detector.id].Add(counter.id);
+                        allSoldiersNotRevealingNoLos[detector.id].Add(counter.id);
                 }
                 else if (child.GetComponent<ClaymoreAlertLOS>() != null)
                 {
@@ -1988,22 +2004,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 //print(keyValuePair.Key + " " + game.FindSoldierById(keyValuePair.Key).soldierName);
                 List<string> arrayOfRevealingList = allSoldiersRevealing[keyValuePair.Key];
-                List<string> arrayOfOldRevealingList = soldierManager.FindSoldierById(keyValuePair.Key).RevealingSoldiers;
-                List<string> arrayOfNotRevealingList = allSoldiersNotRevealing[keyValuePair.Key];
+                List<string> arrayOfOldRevealingList = soldierManager.FindSoldierById(keyValuePair.Key).LOSToTheseSoldiersAndRevealing;
+                List<string> arrayOfNotRevealingList = new();
+                arrayOfNotRevealingList.AddRange(allSoldiersNotRevealingOutOfSR[keyValuePair.Key]);
+                arrayOfNotRevealingList.AddRange(allSoldiersNotRevealingNoLos[keyValuePair.Key]);
+                arrayOfNotRevealingList.AddRange(allSoldiersNotRevealingHidden[keyValuePair.Key]);
 
-                //populate final reveal list using fresh reveals plus old reveals minus not reveals
-                List<string> arrayFinalRevealingList = new();
-                foreach (string soldierId in arrayOfRevealingList)
-                    arrayFinalRevealingList.Add(soldierId);
-                foreach (string soldierId in arrayOfOldRevealingList)
-                {
-                    arrayFinalRevealingList.Remove(soldierId);
-                    arrayFinalRevealingList.Add(soldierId);
-                }
-                foreach (string soldierId in arrayOfNotRevealingList)
-                    arrayFinalRevealingList.Remove(soldierId);
-
-                //print(IdToName(keyValuePair.Key) + " : " + PrintList(arrayOfRevealingList) + " + " + PrintList(arrayOfOldRevealingList) + " - " + PrintList(arrayOfNotRevealingList) + " = " + PrintList(arrayFinalRevealingList));
+                //populate final reveal list = fresh reveals plus old reveals minus not reveals
+                List<string> arrayFinalRevealingList = arrayOfRevealingList.Concat(arrayOfOldRevealingList).Distinct().Except(arrayOfNotRevealingList).ToList();
+                print(IdToName(keyValuePair.Key) + "--->New:[" + PrintList(arrayOfRevealingList) + "] + Existing:[" + PrintList(arrayOfOldRevealingList) + "] - NotRevealing:[" + PrintList(arrayOfNotRevealingList) + "] = Final:[" + PrintList(arrayFinalRevealingList) + "]");
 
                 foreach (string soldierId in arrayFinalRevealingList)
                     allSoldiersRevealingFinal[keyValuePair.Key].Add(soldierId);
@@ -2020,11 +2029,23 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 }
             }
 
-            //repopulate each soldier's revealing and revealedby lists with all reveals
+            //repopulate each soldier's los lists
             foreach (Soldier s in game.AllSoldiers())
             {
-                s.RevealingSoldiers = allSoldiersRevealingFinal.GetValueOrDefault(s.id);
-                s.RevealedBySoldiers = allSoldiersRevealedBy.GetValueOrDefault(s.id);
+                foreach (string soldierOutOfSR in allSoldiersNotRevealingOutOfSR.GetValueOrDefault(s.Id))
+                    s.AddSoldierOutOfSR(soldierOutOfSR);
+
+                foreach (string noLosToThisSoldier in allSoldiersNotRevealingNoLos.GetValueOrDefault(s.Id))
+                    s.AddNoLOSToThisSoldier(noLosToThisSoldier);
+
+                foreach (string losToThisSoldierButHidden in allSoldiersNotRevealingHidden.GetValueOrDefault(s.Id))
+                    s.AddLOSToThisSoldierButHidden(losToThisSoldierButHidden);
+
+                foreach (string losToThisSoldierAndRevealing in allSoldiersRevealingFinal.GetValueOrDefault(s.Id))
+                    s.AddLOSToThisSoldierAndRevealing(losToThisSoldierAndRevealing);
+
+                foreach (string soldierRevealingThisSoldier in allSoldiersRevealedBy.GetValueOrDefault(s.Id))
+                    s.AddSoldierRevealingThisSoldier(soldierRevealingThisSoldier);
             }
 
             //only close the detectionUI if it's open
@@ -2077,7 +2098,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Transform child in lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
         {
             //destroy false alerts
-            if (child.GetComponent<SoldierAlert>().soldier.RevealedBySoldiers.Any())
+            if (child.GetComponent<SoldierAlert>().soldier.SoldiersRevealingThisSoldier.Any())
                 Destroy(child.gameObject);
             else if (child.GetComponent<SoldierAlert>().soldier.IsOnturnAndAlive())
                 child.gameObject.SetActive(false);

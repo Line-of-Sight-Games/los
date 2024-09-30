@@ -3876,6 +3876,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         // Log the name of the calling method
         print($"Coroutine called by: {new StackTrace(1).GetFrame(0).GetMethod()}");
+        print($"cause of los check {causeOfLosCheck}");
 
         int[] pMultipliers = { 3, 2, 1 };
 
@@ -4147,7 +4148,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else
                         {
-                            print("goes here");
                             if (detecteeSoldier.PhysicalObjectWithinMinRadius(movingSoldier))
                             {
                                 addDetection = true;
@@ -4180,7 +4180,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             }
                             else if (detecteeSoldier.PhysicalObjectWithinMaxRadius(movingSoldier))
                             {
-                                print("Then here");
                                 addDetection = true;
 
                                 if (movingSoldier.ActiveC > detecteeSoldier.DetectionActiveStat(pMultipliers[2]))
@@ -4230,7 +4229,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         noDetectLeft = true;
                     }
 
-                    print($"{detectedRight}|{avoidanceLeft}|{detectedLeft}|{avoidanceRight}|{noDetectRight}|{noDetectLeft}|{overwatchLeft}");
                     //determine what kind of arrow to place
                     if (detectedRight)
                     {
@@ -4265,31 +4263,30 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         else if (overwatchLeft)
                             arrowType = "overwatch1WayLeft";
                     }
-                    print($"straight after: {arrowType}");
 
-                    //suppress detection alerts that evaluate the same as prior state on stat changes which can not affect LOS
-                    if (causeOfLosCheck.Contains("statChange"))
+                    //potential suppression of detection alerts on stat changes which do not affect physical LOS
+                    if (causeOfLosCheck.Contains("statChange") && !causeOfLosCheck.Contains("losChange"))
                     {
-                        if (arrowType == "detection2Way" && movingSoldier.RevealedBySoldiers.Contains(detecteeSoldier.id) && detecteeSoldier.RevealedBySoldiers.Contains(movingSoldier.id))
+                        print($"this type of check does not affect LOS");
+                        //suppression of existing denials of LOS where the only thing that changes is the SR
+                        if (causeOfLosCheck.Contains("SR"))
                         {
-                            addDetection = false;
-                            print(arrowType + ": soldiers can already see each other");
+                            print($"this type of check only changes SR");
+                            if (arrowType.Contains("detection") && !movingSoldier.SoldiersOutOfSR.Contains(detecteeSoldier.id) && !detecteeSoldier.SoldiersOutOfSR.Contains(movingSoldier.id))
+                                addDetection = false;
                         }
-                        else if (arrowType == "detection1WayRight" && detecteeSoldier.RevealedBySoldiers.Contains(movingSoldier.id))
-                        {
+
+                        //suppression of existing approvals of LOS where the only thing that changes is stat changes
+                        if (arrowType == "detection2Way" && movingSoldier.SoldiersRevealingThisSoldier.Contains(detecteeSoldier.id) && detecteeSoldier.SoldiersRevealingThisSoldier.Contains(movingSoldier.id))
                             addDetection = false;
-                            print(arrowType + ": onturn can see offturn (1 way)");
-                        }
-                        else if (arrowType == "detection1WayLeft" && movingSoldier.RevealedBySoldiers.Contains(detecteeSoldier.id))
-                        {
+                        else if (arrowType == "detection1WayRight" && !movingSoldier.SoldiersRevealingThisSoldier.Contains(detecteeSoldier.id) && detecteeSoldier.SoldiersRevealingThisSoldier.Contains(movingSoldier.id))
                             addDetection = false;
-                            print(arrowType + ": offturn can see onturn (1 way)");
-                        }
+                        else if (arrowType == "detection1WayLeft" && movingSoldier.SoldiersRevealingThisSoldier.Contains(detecteeSoldier.id) && !detecteeSoldier.SoldiersRevealingThisSoldier.Contains(movingSoldier.id))
+                            addDetection = false;
                     }
 
                     if (addDetection)
                     {
-                        print($"before adding detection: {arrowType}");
                         menu.AddDetectionAlert(movingSoldier, detecteeSoldier, detectorLabel, counterLabel, arrowType);
                         showDetectionUI = true;
                     }
@@ -4402,6 +4399,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
     public void DetectionAlertAllNonCoroutine()
     {
+        //kill LOS between everyone
+        foreach (Soldier s in AllSoldiers())
+            s.RemoveAllLOSToAllSoldiers();
+
         StartCoroutine(DetectionAlertAll("losChange|losCheck")); //losCheckAll
     }
     public IEnumerator DetectionAlertAll(string causeOfLosCheck)
@@ -4416,7 +4417,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 StartCoroutine(DetectionAlertSingle(s, causeOfLosCheck, Vector3.zero, string.Empty)); //losCheck
             }
         }
-        menu.ConfirmDetections();
     }
 
 

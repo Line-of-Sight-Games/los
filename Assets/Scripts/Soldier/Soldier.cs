@@ -27,7 +27,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
-    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, revealedBySoldiersList, revealingSoldiersList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
+    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
     public Item itemPrefab;
     private JArray statsJArray;
     public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
@@ -114,11 +114,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "inventory", Inventory.AllItemIds },
             { "inventorySlots", inventorySlots },
 
-            //save list of revealing soldiers
-            { "revealingSoldiers", revealingSoldiersList },
+            //save list of soldiers that can't be seen (due to being out of SR)
+            { "soldiersOutOfSRList", soldiersOutOfSRList },
 
-            //save list of revealed by soldiers
-            { "revealedBySoldiers", revealedBySoldiersList },
+            //save list of soldiers that can't be seen (due to lack of LOS)
+            { "noLosToTheseSoldiersList", noLosToTheseSoldiersList },
+
+            //save list of soldiers that could be seen and are seen
+            { "losToTheseSoldiersAndRevealingList", losToTheseSoldiersAndRevealingList },
+
+            //save list of soldiers that could be seen but are not seen (due to camo)
+            { "losToTheseSoldiersButHiddenList", losToTheseSoldiersButHiddenList },
+
+            //save list of soldiers who are currently revealing this soldier
+            { "soldiersRevealingThisSoldierList", soldiersRevealingThisSoldierList },
 
             //save list of controlling soldiers
             { "controllingSoldiers", controllingSoldiersList },
@@ -224,8 +233,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         inventorySlots = JsonConvert.DeserializeObject<Dictionary<string, string>>(details["inventorySlots"].ToString());
 
         //load associated soldier lists
-        revealingSoldiersList = (details["revealingSoldiers"] as JArray).Select(token => token.ToString()).ToList();
-        revealedBySoldiersList = (details["revealedBySoldiers"] as JArray).Select(token => token.ToString()).ToList();
+        soldiersOutOfSRList = (details["soldiersOutOfSRList"] as JArray).Select(token => token.ToString()).ToList();
+        noLosToTheseSoldiersList = (details["noLosToTheseSoldiersList"] as JArray).Select(token => token.ToString()).ToList();
+        losToTheseSoldiersAndRevealingList = (details["losToTheseSoldiersAndRevealingList"] as JArray).Select(token => token.ToString()).ToList();
+        losToTheseSoldiersButHiddenList = (details["losToTheseSoldiersButHiddenList"] as JArray).Select(token => token.ToString()).ToList();
+        soldiersRevealingThisSoldierList = (details["soldiersRevealingThisSoldierList"] as JArray).Select(token => token.ToString()).ToList();
         controllingSoldiersList = (details["controllingSoldiers"] as JArray).Select(token => token.ToString()).ToList();
         controlledBySoldiersList = (details["controlledBySoldiers"] as JArray).Select(token => token.ToString()).ToList();
 
@@ -461,7 +473,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsRevealed()
     {
-        if ((IsAlive() && RevealedBySoldiers.Any()) || IsDead())
+        if ((IsAlive() && SoldiersRevealingThisSoldier.Any()) || IsDead())
             return true;
         else
             return false;
@@ -472,21 +484,21 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsRevealing(Soldier soldier)
     {
-        if (IsAbleToSee() && RevealingSoldiers.Contains(soldier.Id))
+        if (IsAbleToSee() && LOSToTheseSoldiersAndRevealing.Contains(soldier.Id))
             return true;
         else
             return false;
     }
     public bool IsBeingRevealedBy(Soldier soldier)
     {
-        if (IsAlive() && RevealedBySoldiers.Contains(soldier.Id))
+        if (IsAlive() && SoldiersRevealingThisSoldier.Contains(soldier.Id))
             return true;
         else
             return false;
     }
     public bool CanSeeInOwnRight(Soldier s)
     {
-        if (IsAbleToSee() && RevealingSoldiers.Contains(s.id))
+        if (IsAbleToSee() && LOSToTheseSoldiersAndRevealing.Contains(s.id))
             return true;
         else
             return false;
@@ -1623,7 +1635,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void CheckRevealed()
     {
         //check if revealed at all
-        if (RevealedBySoldiers.Any())
+        if (SoldiersRevealingThisSoldier.Any())
             revealed = true;
         else
             revealed = false; 
@@ -1776,34 +1788,111 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
     }
 
+    public void RemoveAllLOSToAllSoldiers()
+    {
+        foreach (Soldier s in game.AllSoldiers())
+            if (s.IsOppositeTeamAs(this))
+                RemoveAllLOSToSoldier(s.Id);
+    }
     public void Unreveal()
     {
         //revealedByTeam = "";
-        RevealedBySoldiers = new List<string>();
-        RevealingSoldiers = new List<string>();
+        SoldiersRevealingThisSoldier = new List<string>();
+        LOSToTheseSoldiersAndRevealing = new List<string>();
         revealed = false;
     }
 
-    public void RemoveSoldierLOS(string name)
+    public void AddLOSToThisSoldierAndRevealing(string id)
     {
-        RemoveRevealedBySoldier(name);
-        RemoveRevealingSoldier(name);
+        //add to the right list
+        if (!LOSToTheseSoldiersAndRevealing.Contains(id))
+            LOSToTheseSoldiersAndRevealing.Add(id);
+
+        //add reference of this soldier revealing others
+        soldierManager.FindSoldierById(id).AddSoldierRevealingThisSoldier(this.Id);
+
+        //remove from the other lists
+        RemoveLOSToThisSoldierButHidden(id);
+        RemoveNoLOSToThisSoldier(id);
+        RemoveSoldierOutOfSR(id);
+    }
+    public void AddLOSToThisSoldierButHidden(string id)
+    {
+        if (!LOSToTheseSoldiersButHidden.Contains(id))
+            LOSToTheseSoldiersButHidden.Add(id);
+
+        RemoveLOSToThisSoldierAndRevealing(id);
+        RemoveNoLOSToThisSoldier(id);
+        RemoveSoldierOutOfSR(id);
+    }
+    public void AddNoLOSToThisSoldier(string id)
+    {
+        if (!NoLOSToTheseSoldiers.Contains(id))
+            NoLOSToTheseSoldiers.Add(id);
+
+        RemoveLOSToThisSoldierAndRevealing(id);
+        RemoveLOSToThisSoldierButHidden(id);
+        RemoveSoldierOutOfSR(id);
+    }
+    public void AddSoldierOutOfSR(string id)
+    {
+        if (!SoldiersOutOfSR.Contains(id))
+            SoldiersOutOfSR.Add(id);
+
+        RemoveLOSToThisSoldierAndRevealing(id);
+        RemoveLOSToThisSoldierButHidden(id);
+        RemoveNoLOSToThisSoldier(id);
+    }
+    public void AddSoldierRevealingThisSoldier(string id)
+    {
+        if (!SoldiersRevealingThisSoldier.Contains(id))
+            SoldiersRevealingThisSoldier.Add(id);
+
+        //dissuader ability
+        if (soldierManager.FindSoldierById(id).IsDissuader())
+        {
+            if (!IsRevoker())
+                SetDissuaded();
+        }
+    }
+    public void RemoveAllLOSToSoldier(string id)
+    {
+        RemoveLOSToThisSoldierAndRevealing(id);
+        RemoveLOSToThisSoldierButHidden(id);
+        RemoveNoLOSToThisSoldier(id);
+        RemoveSoldierOutOfSR(id);
+    }
+    public void RemoveLOSToThisSoldierAndRevealing(string id)
+    {
+        LOSToTheseSoldiersAndRevealing.Remove(id);
+
+        //remove this soldier revealing other soldiers
+        soldierManager.FindSoldierById(id).RemoveSoldierRevealingThisSoldier(this.Id);
+    }
+    public void RemoveLOSToThisSoldierButHidden(string id)
+    {
+        LOSToTheseSoldiersButHidden.Remove(id);
+    }
+    public void RemoveNoLOSToThisSoldier(string id)
+    {
+        NoLOSToTheseSoldiers.Remove(id);
+    }
+    public void RemoveSoldierOutOfSR(string id)
+    {
+        SoldiersOutOfSR.Remove(id);
+    }
+    public void RemoveSoldierRevealingThisSoldier(string id)
+    {
+        bool actualRemove = SoldiersRevealingThisSoldier.Remove(id);
+        
+        //show the losLostList popup if no more soldier's revealing
+        if (actualRemove && !SoldiersRevealingThisSoldier.Any() && IsAlive() && !IsPlayingDead())
+        {
+            menu.AddLostLosAlert(this);
+            StartCoroutine(menu.OpenLostLOSList());
+        }
     }
 
-    public void RemoveRevealedBySoldier(string name)
-    {
-        List<string> temp = revealedBySoldiersList;
-        temp.Remove(name);
-
-        if (RevealedBySoldiers.Contains(name))
-            RevealedBySoldiers = temp;
-    }
-
-    public void RemoveRevealingSoldier(string name)
-    {
-        if (RevealingSoldiers.Contains(name))
-            RevealingSoldiers.Remove(name);
-    }
 
     public Sprite LoadPortrait(string portraitName)
     {
@@ -2601,12 +2690,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 hp = 0;
 
                 //remove all reveals and revealedby
-                RevealingSoldiers.Clear();
-                RevealedBySoldiers.Clear();
-
-                //remove all instances of anyone else revealing them
-                foreach (Soldier s in game.AllSoldiers())
-                    s.RevealingSoldiers.Remove(id);
+                RemoveAllLOSToAllSoldiers();
 
                 //remove all engagements
                 if (IsMeleeEngaged())
@@ -2619,8 +2703,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     lastandicide = true;
                 //run trauma check
                 StartCoroutine(game.TraumaCheck(this, tp, IsCommander(), lastandicide));
-                //remove all LOS
-                menu.ConfirmDetections();
+
                 //re-render as dead
                 CheckSpecialityColor(soldierSpeciality);
 
@@ -4174,40 +4257,30 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return engagedSoldiers;
         }
     }
-    public List<string> RevealedBySoldiers
+    public List<string> SoldiersRevealingThisSoldier
     {
-        get { return revealedBySoldiersList; }
-        set
-        {
-            //print("Setting RevealedBySoldiers");
-            if (revealedBySoldiersList.Any() && !value.Any() && IsAlive() && !IsPlayingDead())
-            {
-                revealedBySoldiersList = value;
-                menu.AddLostLosAlert(this);
-                StartCoroutine(menu.OpenLostLOSList());
-            }
-            else
-                revealedBySoldiersList = value;
-        }
+        get { return soldiersRevealingThisSoldierList; }
+        set { soldiersRevealingThisSoldierList = value; }
     }
-
-    public List<string> RevealingSoldiers
+    public List<string> LOSToTheseSoldiersAndRevealing
     {
-        get { return revealingSoldiersList; }
-        set 
-        { 
-            revealingSoldiersList = value;
-
-            if (IsDissuader())
-            {
-                foreach (string id in revealingSoldiersList)
-                {
-                    Soldier soldier = soldierManager.FindSoldierById(id);
-                    if (soldier != null && !soldier.IsRevoker())
-                        soldier.SetDissuaded();
-                }
-            }
-        }
+        get { return losToTheseSoldiersAndRevealingList; }
+        set { losToTheseSoldiersAndRevealingList = value; }
+    }
+    public List<string> SoldiersOutOfSR
+    {
+        get { return soldiersOutOfSRList; }
+        set { soldiersOutOfSRList = value; }
+    }
+    public List<string> NoLOSToTheseSoldiers
+    {
+        get { return noLosToTheseSoldiersList; }
+        set { noLosToTheseSoldiersList = value; }
+    }
+    public List<string> LOSToTheseSoldiersButHidden
+    {
+        get { return losToTheseSoldiersButHiddenList; }
+        set { losToTheseSoldiersButHiddenList = value; }
     }
     public Item LeftHandItem
     {
