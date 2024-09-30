@@ -3909,10 +3909,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             "Ammo_AR" => "Reload Assault Rifle?",
             "Ammo_LMG" => "Reload Light Machine Gun?",
-            "Ammo_Pi" => "Reload Pistol?",
             "Ammo_Ri" => "Reload Rifle?",
             "Ammo_Sh" => "Reload Shotgun?",
-            "Ammo_SMG" => "Reload Sub-Machine Gun or Pistol?",
+            "Ammo_SMG_Pi" => "Reload Sub-Machine Gun or Pistol?",
             "Ammo_Sn" => "Reload Sniper?",
             "Claymore" => "Place Claymore?",
             "Deployment_Beacon" => "Place Deployment Beacon?",

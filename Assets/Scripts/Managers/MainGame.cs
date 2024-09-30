@@ -2598,10 +2598,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 break;
             case "Ammo_AR":
             case "Ammo_LMG":
-            case "Ammo_Pi":
             case "Ammo_Ri":
             case "Ammo_Sh":
-            case "Ammo_SMG":
+            case "Ammo_SMG_Pi":
             case "Ammo_Sn":
                 itemUsed.UseItem(linkedIcon, itemUsedOn, null);
                 break;

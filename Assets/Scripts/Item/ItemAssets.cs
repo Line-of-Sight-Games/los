@@ -13,10 +13,9 @@ public class ItemAssets : MonoBehaviour
 
     public Sprite Ammo_AR;
     public Sprite Ammo_LMG;
-    public Sprite Ammo_Pi;
     public Sprite Ammo_Ri;
     public Sprite Ammo_Sh;
-    public Sprite Ammo_SMG;
+    public Sprite Ammo_SMG_Pi;
     public Sprite Ammo_Sn;
     public Sprite AR_ACOG_FAL;
     public Sprite AR_AK_47;
