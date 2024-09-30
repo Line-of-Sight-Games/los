@@ -4272,7 +4272,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (causeOfLosCheck.Contains("SR"))
                         {
                             print($"this type of check only changes SR");
-                            if (arrowType.Contains("detection") && !movingSoldier.SoldiersOutOfSR.Contains(detecteeSoldier.id) && !detecteeSoldier.SoldiersOutOfSR.Contains(movingSoldier.id))
+                            if (!movingSoldier.SoldiersOutOfSR.Contains(detecteeSoldier.id) && !detecteeSoldier.SoldiersOutOfSR.Contains(movingSoldier.id))
                                 addDetection = false;
                         }
 
