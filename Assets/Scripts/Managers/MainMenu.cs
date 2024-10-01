@@ -712,13 +712,25 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideHealthState").Find("HealthStateDropdown").GetComponent<TMP_Dropdown>();
 
         if (dropdown.value == 3)
-            activeSoldier.InstantKill(null, new() { "Override" });
+        {
+            if (!activeSoldier.IsDead())
+                activeSoldier.InstantKill(null, new() { "Override" });
+        }
         else if (dropdown.value == 2)
-            activeSoldier.MakeUnconscious(null, new() { "Override" });
+        {
+            if (!activeSoldier.IsUnconscious())
+                activeSoldier.MakeUnconscious(null, new() { "Override" });
+        }
         else if (dropdown.value == 1)
-            activeSoldier.MakeLastStand();
-        else
-            activeSoldier.MakeActive();
+        {
+            if (!activeSoldier.IsLastStand())
+                activeSoldier.MakeLastStand();
+        }
+        else if (dropdown.value == 0)
+        {
+            if (!activeSoldier.IsActive())
+                activeSoldier.MakeActive();
+        }
     }
     public void GetOverrideTerrainOn(Transform soldierStatsUI)
     {
@@ -1579,7 +1591,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     soldierStatsUI.Find("General").Find("OverrideTraumaPoints").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.tp.ToString();
                     soldierStatsUI.Find("General").Find("OverrideHealthState").gameObject.SetActive(true);
                     GetOverrideHealthState(soldierStatsUI);
-                    
                 }
                 else
                 {

@@ -384,6 +384,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
             return false;
     }
+    public bool IsActive()
+    {
+        if (CheckState("Active"))
+            return true;
+        return false;
+    }
     public bool IsAbleToWalk()
     {
         if (IsConscious())
@@ -1672,15 +1678,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
 
-        if (vulnerableTurns > 0)
-        {
-            //run detection alerts if loud action performed for first time
-            if (loudActionTurnsVulnerable == 0)
-                StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudAction", Vector3.zero, string.Empty)); //loscheck
-
-            if (vulnerableTurns > loudActionTurnsVulnerable)
-                SetLoudRevealed(vulnerableTurns);
-        }
+        SetLoudRevealed(vulnerableTurns);
     }
     public void PerformLoudAction()
     {
@@ -1704,10 +1702,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         
         if (vulnerableTurns > 0)
         {
-            //run detection alerts if loud action performed for first time
-            if (loudActionTurnsVulnerable == 0)
-                StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudAction", Vector3.zero, string.Empty)); //losCheck
-
             if (vulnerableTurns > loudActionTurnsVulnerable)
                 SetLoudRevealed(vulnerableTurns);
         }
@@ -2207,10 +2201,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void SetLoudRevealed(int turns)
     {
-        loudActionTurnsVulnerable = turns;
-        print($"{soldierName} is vulnerable to detection for {turns} turns.");
-    }
+        if (turns > 0)
+        {
+            //run detection alerts if loud action performed for first time
+            if (loudActionTurnsVulnerable == 0)
+                StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudActionActive", Vector3.zero, string.Empty)); //loscheck
 
+            if (turns > loudActionTurnsVulnerable)
+                loudActionTurnsVulnerable = turns;
+        }
+    }
+    public void UnsetLoudRevealed()
+    {
+        StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudActionDeactive", Vector3.zero, string.Empty)); //loscheck
+    }
     public bool IsSuppressed()
     {
         if (GetSuppression() > 0)
@@ -2248,8 +2252,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (stunnedTurnsVulnerable > 0)
             return true;
-        else
-            return false;
+        return false;
     }
     public void TakePoisoning(string poisonedBy, bool resistable)
     {
@@ -2573,29 +2576,34 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)(SR)|stunActive", Vector3.zero, string.Empty)); //losCheck
         }
     }
+    public void UnsetStunned()
+    {
+        StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)(SR)|stunDeactive", Vector3.zero, string.Empty)); //losCheck
+    }
     public int TakeStun(int stunRounds)
     {
         if (stunRounds > 0)
         {
-            int resistedRounds = 0;
+            int resistedRounds = 0, actualRoundsStun = 0;
             for (int i = 0; i < stunRounds; i++)
             {
                 if (ResilienceCheck())
                     resistedRounds++;
             }
+            actualRoundsStun = stunRounds - resistedRounds;
 
             if (resistedRounds > 0)
             {                
                 menu.AddDamageAlert(this, $"Resisted stun ({resistedRounds} rounds).", true, true);
                 menu.AddXpAlert(this, resistedRounds, $"Resisted stun ({resistedRounds} rounds).", true);
             }
-            if (resistedRounds < stunRounds)
+            if (actualRoundsStun > 0)
             {
                 menu.AddDamageAlert(this, $"Suffered stun ({stunRounds - resistedRounds} rounds).", false, true);
-                SetStunned(stunRounds * 2);
+                SetStunned(actualRoundsStun * 2);
             }
 
-            return stunRounds - resistedRounds;
+            return actualRoundsStun;
         }
 
         return 0;
@@ -2629,7 +2637,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void MakeUnconscious(Soldier damagedBy, List<string> damageSource)
     {
-        bleedoutTurns = 2 * ((stats.H.Val + stats.R.Val) / 3);
+        bleedoutTurns = Mathf.FloorToInt(2 * (stats.H.Val + stats.R.Val) / 3.0f);
 
         ClearHealthState();
         SetState("Unconscious");

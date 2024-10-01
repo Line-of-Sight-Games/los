@@ -339,18 +339,28 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (s.IsAvenger())
             {
                 if (s.turnsAvenging > 0)
+                {
                     s.turnsAvenging--;
-                else
-                    s.UnsetAvenging();
+                    if (s.turnsAvenging == 0)
+                        s.UnsetAvenging();
+                }
             }
 
             //decrement stunnage
             if (s.stunnedTurnsVulnerable > 0)
+            {
                 s.stunnedTurnsVulnerable--;
+                if (s.stunnedTurnsVulnerable == 0)
+                    s.UnsetStunned();
+            }
 
             //decrement loud action counter
             if (s.loudActionTurnsVulnerable > 0)
+            {
                 s.loudActionTurnsVulnerable--;
+                if (s.loudActionTurnsVulnerable == 0)
+                    s.UnsetLoudRevealed();
+            }
         }
 
         menu.CheckXP();
@@ -373,10 +383,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //decrement bleedout timer
             if (s.IsUnconscious())
             {
-                if (s.bleedoutTurns == 0)
-                    StartCoroutine(s.BleedoutKill());
-                else
-                    s.bleedoutTurns--;
+                s.bleedoutTurns--;
+                if (s.bleedoutTurns <= 0)
+                    StartCoroutine(s.BleedoutKill());    
             }
         }
     }
