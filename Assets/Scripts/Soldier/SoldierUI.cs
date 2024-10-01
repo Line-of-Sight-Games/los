@@ -13,10 +13,10 @@ public class SoldierUI : MonoBehaviour
     public TMP_InputField xSize, ySize, zSize;
     public int x, y, z;
     public TMP_Dropdown terrainDropdown;
-    public GameObject kia, resolveBroken, spotted, revealed;
+    public GameObject revealMessage, resolveBroken;
     public Button actionButton, fieldButton;
     public SoldierPortrait soldierPotrait;
-    public TextMeshProUGUI ap, mp, location; 
+    public TextMeshProUGUI ap, mp, location, revealMessageText; 
 
     private void Start()
     {

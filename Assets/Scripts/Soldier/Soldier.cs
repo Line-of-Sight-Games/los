@@ -2128,13 +2128,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             soldierUI.fieldButton.gameObject.SetActive(false);
 
             if (IsDead())
-            {
-                soldierUI.kia.SetActive(true);
                 soldierUI.actionButton.GetComponent<Image>().color = new Color(1, 0, 0, 0.2f);
-            }
             else
             {
-                soldierUI.kia.SetActive(false);
                 switch (speciality)
                 {
                     case "Leadership":

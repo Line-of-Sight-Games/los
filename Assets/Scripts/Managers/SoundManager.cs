@@ -20,6 +20,7 @@ public class SoundManager : MonoBehaviour
     {
         if (!isPlaying)
         {
+            print($"Played sound {clip.name}, for {soundDuration}, ended at {soundEndTime}.");
             noisePlayer.PlayOneShot(clip);
             isPlaying = true;
             soundDuration = clip.length;

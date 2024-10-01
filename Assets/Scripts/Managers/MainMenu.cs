@@ -1133,14 +1133,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 s.soldierUI.gameObject.SetActive(true);
                 s.soldierUI.actionButton.interactable = true;
-                s.soldierUI.revealed.SetActive(false);
-                s.soldierUI.spotted.SetActive(false);
-                s.soldierUI.resolveBroken.SetActive(false);
+                s.soldierUI.revealMessage.SetActive(false);
+                s.soldierUI.revealMessageText.text = string.Empty;
             }
             else
             {
                 //set visibility of button
-                if (s.IsOnturn() || (s.IsOffturn() && s.IsRevealed()) || (s.IsOffturn() && s.IsSpotted())) 
+                if (s.IsOnturn() || (s.IsOffturn() && (s.IsRevealed() || s.IsSpotted()) || s.IsDead() || s.IsPlayingDead())) 
                     s.soldierUI.gameObject.SetActive(true);
                 else
                     s.soldierUI.gameObject.SetActive(false);
@@ -1151,23 +1150,32 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 else
                     s.soldierUI.actionButton.interactable = false;
 
-                //set revealed message
-                if (s.IsOffturn() && s.IsRevealed())
-                    s.soldierUI.revealed.SetActive(true);
+                //set message
+                if (s.IsDead() || s.IsPlayingDead())
+                {
+                    s.soldierUI.revealMessageText.text = "<color=red>Dead</color>";
+                    s.soldierUI.revealMessage.SetActive(true);
+                }
+                else if (s.IsOffturn() && s.IsRevealed())
+                {
+                    s.soldierUI.revealMessage.SetActive(true);
+                    s.soldierUI.revealMessageText.text = "<color=green>Revealed</color>";
+                }
+                else if (s.IsOffturn() && s.IsSpotted())
+                {
+                    s.soldierUI.revealMessage.SetActive(true);
+                    s.soldierUI.revealMessageText.text = "<color=green>Spotting</color>";
+                }
                 else
-                    s.soldierUI.revealed.SetActive(false);
-
-                //set spotted message
-                if (s.IsOffturn() && s.IsSpotted())
-                    s.soldierUI.spotted.SetActive(true);
-                else
-                    s.soldierUI.spotted.SetActive(false);
+                    s.soldierUI.revealMessage.SetActive(false);
 
                 //set broken message
-                if (!s.IsBroken() && s.HasUnresolvedBrokenAllies())
+                if (s.IsOnturnAndAlive() && !s.IsBroken() && s.HasUnresolvedBrokenAllies())
                     s.soldierUI.resolveBroken.SetActive(true);
                 else
                     s.soldierUI.resolveBroken.SetActive(false);
+
+                
             }
         }
     }

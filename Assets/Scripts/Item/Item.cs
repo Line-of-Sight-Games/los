@@ -339,6 +339,10 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (linkedSoldier != null)
         {
+            //rerun detection alert for thermal goggles
+            if (itemName.Equals("Thermal_Goggles"))
+                StartCoroutine(game.DetectionAlertSingle(linkedSoldier, "statChange(SR)|thermalEquipped", Vector3.zero, string.Empty));
+
             //unset cover for JA wearers
             if (itemName.Equals("Armour_Juggernaut"))
                 linkedSoldier.UnsetCover();
