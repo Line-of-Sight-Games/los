@@ -54,7 +54,8 @@ public class Inventory
             item.whereEquipped = "";
             if (linkedInventoryObject != null && linkedInventoryObject.InventorySlots != null)
             {
-                linkedInventoryObject.InventorySlots[slotName] = "";
+                //safe replacement to account for internal item swap glitch
+                linkedInventoryObject.InventorySlots[slotName] = linkedInventoryObject.InventorySlots[slotName].Replace($"{item.Id}", "");
                 if (item.IsNestedOnSoldier())
                     item.RunDropEffect(item.SoldierNestedOn());
             }

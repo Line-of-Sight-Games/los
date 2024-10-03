@@ -379,13 +379,15 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     //gunner ability
                     if (!linkedSoldier.gunnerGunsBlessed.Contains(this.Id))
                     {
-                        //one time 1.5 bonus to max clip and ammo
+                        //one time 1.5 bonus to max clip
                         gunTraits["MaxClip"] = Mathf.FloorToInt(gunTraits["MaxClip"] * 1.5f);
-                        ammo = Mathf.FloorToInt(ammo * 1.5f);
 
-                        //add 1 round to empty guns
-                        if (ammo == 0)
-                            ammo++;
+                        //get ammo increase minimum 1
+                        int ammoIncrease = Mathf.FloorToInt(ammo * 0.5f);
+                        if (ammoIncrease == 0)
+                            ammoIncrease = 1;
+
+                        ammo += ammoIncrease;
 
                         linkedSoldier.gunnerGunsBlessed.Add(this.Id);
                     }
