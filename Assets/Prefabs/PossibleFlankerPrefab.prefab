@@ -32,7 +32,6 @@ RectTransform:
   m_Children:
   - {fileID: 6113892196656419536}
   m_Father: {fileID: 6555607041518850898}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -133,7 +132,6 @@ RectTransform:
   - {fileID: 8685804133706562317}
   - {fileID: 6226184467869245535}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -180,7 +178,6 @@ RectTransform:
   m_Children:
   - {fileID: 2187533013208006784}
   m_Father: {fileID: 8685804133706562317}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -256,7 +253,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6113892196656419536}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -306,8 +302,29 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 6555607041518850898}
     m_Modifications:
+    - target: {fileID: 855990136811820732, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124927400623524748, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1256156467774827679, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3589477493645295573, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6084633665712030346, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6555607041518850898, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -420,7 +437,14 @@ PrefabInstance:
       propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9141416978744803195, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
 --- !u!224 &6226184467869245535 stripped
 RectTransform:

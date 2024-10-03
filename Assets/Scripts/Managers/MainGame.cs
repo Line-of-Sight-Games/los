@@ -2325,7 +2325,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         instantKill = true;
                         loudAction = false;
                     }
-                    else if (defender.IsOnOverwatch() && attacker.stats.M.Val > defender.stats.M.Val) //overwatch kill
+                    else if (defender.IsOnOverwatch() && attacker.stats.M.Val > defender.stats.M.Val) //overwatcher kill
                     {
                         damageMessage = "<color=green>INSTANT KILL\n(Overwatcher)</color>";
                         instantKill = true;
@@ -2345,9 +2345,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else
                     {
-                        //drop weaker melee weapons
-                        attacker.DropOtherMeleeWeapon();
-                        defender.DropOtherMeleeWeapon();
+                        //drop impractical handheld items
+                        attacker.DropWeakerHandheldItem();
+                        defender.DropWeakerHandheldItem();
 
                         if (meleeDamage > 0)
                         {

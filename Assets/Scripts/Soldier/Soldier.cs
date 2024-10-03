@@ -3427,7 +3427,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
-    public void DropOtherMeleeWeapon()
+    public void DropWeakerHandheldItem()
     {
         int leftMelee, rightMelee;
         if (LeftHandItem == null)
