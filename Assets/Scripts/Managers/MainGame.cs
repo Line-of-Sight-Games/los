@@ -2901,13 +2901,23 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else if (catcher.activeInHierarchy)
                     {
-                        Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
+                        if (throwItemUI.itemUsed.IsCatchable())
+                        {
+                            Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
 
-                        //if soldier has left hand free catch it there, otherwise catch in right hand
-                        if (catchingSoldier.LeftHandItem == null)
-                            throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                            //if soldier has left hand free catch it there, otherwise catch in right hand
+                            if (catchingSoldier.LeftHandItem == null)
+                                throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                            else
+                                throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+                        }
                         else
-                            throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+                        {
+                            throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                            throwItemUI.itemUsed.X = x;
+                            throwItemUI.itemUsed.Y = y;
+                            throwItemUI.itemUsed.Z = z;
+                        }
                     }
                     else
                     {
@@ -2937,13 +2947,23 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
             else if (catcher.activeInHierarchy)
             {
-                Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
+                if (throwItemUI.itemUsed.IsCatchable())
+                {
+                    Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
 
-                //if soldier has left hand free catch it there, otherwise catch in right hand
-                if (catchingSoldier.LeftHandItem == null)
-                    throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                    //if soldier has left hand free catch it there, otherwise catch in right hand
+                    if (catchingSoldier.LeftHandItem == null)
+                        throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                    else
+                        throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+                }
                 else
-                    throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+                {
+                    throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
+                    throwItemUI.itemUsed.X = x;
+                    throwItemUI.itemUsed.Y = y;
+                    throwItemUI.itemUsed.Z = z;
+                }
             }
             else
             {

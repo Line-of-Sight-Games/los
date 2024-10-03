@@ -762,6 +762,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
         ConsumeItem();
     }
+    public bool IsCatchable()
+    {
+        if (equippableSlots.Contains("Hand"))
+            return true;
+        return false;
+    }
     public bool IsBreakable()
     {
         if (!traits.Contains("Unbreakable"))
