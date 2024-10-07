@@ -2652,7 +2652,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (int.TryParse(shotUI.apCost.text, out int ap))
         {
-            if (game.CheckAP(ap))
+            if (activeSoldier.CheckAP(ap))
             {
                 Soldier shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
                 IAmShootable target = game.FindShootableById(shotUI.targetDropdown.captionText.text);
@@ -2761,7 +2761,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         int.TryParse(shotUI.apCost.text, out int ap);
         //deduct ap for aiming if leaving shot
-        game.DeductAP(ap - 1);
+        activeSoldier.DeductAP(ap - 1);
 
         CloseShotUI();
     }
@@ -2939,7 +2939,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (int.TryParse(meleeUI.apCost.text, out int ap))
         {
-            if (game.CheckAP(ap))
+            if (activeSoldier.CheckAP(ap))
             {
                 //find attacker and defender
                 Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
@@ -4187,7 +4187,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (throwOrDrop.Equals("throw") || (throwOrDrop.Equals("drop") && !itemThrown.whereEquipped.Contains("Hand")))
             ap++;
 
-        if (activeSoldier.game.CheckAP(ap))
+        if (activeSoldier.CheckAP(ap))
         {
             if (throwOrDrop.Equals("throw"))
             {
@@ -4220,7 +4220,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenUseULFUI(string effect, Item ulfUsed)
     {
-        if (game.CheckAP(3))
+        if (activeSoldier.CheckAP(3))
         {
             useULFUI.GetComponent<UseItemUI>().itemUsed = ulfUsed;
             useULFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = effect;

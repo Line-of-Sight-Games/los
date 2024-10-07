@@ -3884,6 +3884,81 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
 
 
+    //AP/MP functions
+    public bool CheckAP(int ap)
+    {
+        //check if it's on the current players turn
+        if (menu.overrideView)
+            return true;
+        else
+        {
+            if (this.ap >= ap)
+                return true;
+            else
+            {
+                game.notEnoughAPUI.SetActive(true);
+                return false;
+            }
+        }
+    }
+    public bool CheckMP(int mp)
+    {
+        if (menu.overrideView)
+            return true;
+        else
+        {
+            if (this.mp >= mp)
+                return true;
+            else
+            {
+                game.notEnoughMPUI.SetActive(true);
+                return false;
+            }
+        }
+    }
+    public void DeductAP(int ap)
+    {
+        if (!menu.overrideView && ap > 0)
+        {
+            this.ap -= ap;
+            usedAP = true;
+
+            //break spotter ability
+            RemoveAllSpotting();
+
+            if (this.ap < 0)
+                this.ap = 0;
+        }
+    }
+    public void DeductMP(int mp)
+    {
+        if (!menu.overrideView && mp > 0)
+        {
+            this.mp -= mp;
+            usedMP = true;
+
+            if (this.mp < 0)
+                this.mp = 0;
+        }
+    }
+    public void DrainAP()
+    {
+        ap = 0;
+        usedAP = true;
+    }
+    public void DrainMP()
+    {
+        mp = 0;
+        usedMP = true;
+    }
+
+
+
+
+
+
+
+
 
 
 

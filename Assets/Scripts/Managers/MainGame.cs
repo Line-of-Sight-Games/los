@@ -475,16 +475,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //draining soldier AP and MP after use during turn
     public void EndSoldierTurn()
     {
-        DrainAP();
-        DrainMP();
+        activeSoldier.DrainAP();
+        activeSoldier.DrainMP();
     }
 
     //cover functions
     public void ConfirmCover()
     {
-        if (CheckAP(1))
+        if (activeSoldier.CheckAP(1))
         {
-            DeductAP(1);
+            activeSoldier.DeductAP(1);
             activeSoldier.SetCover();
         }
 
@@ -510,9 +510,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (menu.ValidateIntInput(overwatchUI.xPos, out int x) && menu.ValidateIntInput(overwatchUI.yPos, out int y) && menu.ValidateIntInput(overwatchUI.radius, out int r) && menu.ValidateIntInput(overwatchUI.arc, out int a))
         {
-            if (CheckAP(2))
+            if (activeSoldier.CheckAP(2))
             {
-                DrainAP();
+                activeSoldier.DrainAP();
                 activeSoldier.SetOverwatch(x, y, r, a);
             }
             menu.CloseOverwatchUI();
@@ -586,11 +586,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (moveUI.moveTypeDropdown.captionText.text.Contains("Planner"))
         {
-            if (CheckMP(1) && CheckAP(ap))
+            if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap))
             {
                 //planner donation proceeds
-                DeductAP(ap);
-                DrainMP();
+                activeSoldier.DeductAP(ap);
+                activeSoldier.DrainMP();
                 foreach (Transform child in moveUI.closestAllyUI.transform.Find("ClosestAllyPanel"))
                     soldierManager.FindSoldierByName(child.Find("SoldierName").GetComponent<TextMeshProUGUI>().text).plannerDonatedMove += activeSoldier.HalfMove;
             }
@@ -604,7 +604,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     if (force || (moveToLocation.Item1.x <= activeSoldier.X + 3 && moveToLocation.Item1.x >= activeSoldier.X - 3 && moveToLocation.Item1.y <= activeSoldier.Y + 3 && moveToLocation.Item1.y >= activeSoldier.Y - 3))
                     {
-                        if (CheckAP(ap))
+                        if (activeSoldier.CheckAP(ap))
                         {
                             PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
                             //trigger loud action
@@ -640,7 +640,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         int distance = CalculateMoveDistance(moveToLocation.Item1);
                         if (force || distance <= maxMove)
                         {
-                            if (CheckMP(1) && CheckAP(ap))
+                            if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap))
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
                             menu.CloseMoveUI();
                         }
@@ -663,9 +663,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         int.TryParse(fallDistance, out int fallDistanceInt);
         string launchMelee = string.Empty;
-        DeductAP(ap);
+        activeSoldier.DeductAP(ap);
         if (!freeMove)
-            DeductMP(1);
+            activeSoldier.DeductMP(1);
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
         movingSoldier.X = (int)moveToLocation.Item1.x;
@@ -1520,7 +1520,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         tempShooterTarget = Tuple.Create(shooter, target);
         if (runSecondShot || retry) { }
         else
-            DeductAP(ap);
+            activeSoldier.DeductAP(ap);
 
         menu.SetShotResolvedFlagTo(false);
 
@@ -2288,7 +2288,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (int.TryParse(meleeUI.apCost.text, out int ap))
         {
-            if (CheckAP(ap))
+            if (activeSoldier.CheckAP(ap))
             {
                 FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}");
 
@@ -2298,7 +2298,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     damageType.Add("Charge");
 
                 menu.SetMeleeResolvedFlagTo(false);
-                DeductAP(ap);
+                activeSoldier.DeductAP(ap);
 
                 int meleeDamage = CalculateMeleeResult(attacker, defender);
                 string damageMessage;
@@ -2530,9 +2530,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void ConfirmConfigure()
     {
         int ap = UpdateConfigureAP();
-        if (CheckAP(ap))
+        if (activeSoldier.CheckAP(ap))
         {
-            DeductAP(ap);
+            activeSoldier.DeductAP(ap);
             foreach (ItemIcon itemIcon in configUI.GetComponentsInChildren<ItemIcon>(true))
             {
                 Item item = itemIcon.item;
@@ -2550,9 +2550,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //disarm function
     public void ConfirmDisarm()
     {
-        if (CheckAP(1))
+        if (activeSoldier.CheckAP(1))
         {
-            DeductAP(1);
+            activeSoldier.DeductAP(1);
 
             POI poiToDisarm = poiManager.FindPOIById(menu.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item disarmedItem = null;
@@ -2657,7 +2657,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 break;
 
         }
-        DeductAP(ap);
+        activeSoldier.DeductAP(ap);
         menu.CloseUseItemUI();
     }
     public void ConfirmDropThrowItem(UseItemUI useItemUI)
@@ -2668,7 +2668,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             menu.OpenDropUI(useItemUI);
 
-        DeductAP(ap);
+        activeSoldier.DeductAP(ap);
         menu.CloseDropThrowItemUI();
     }
     public void UpdateSoldierUsedOn(UseItemUI useItemUI)
@@ -2765,9 +2765,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmULF(UseItemUI useULFUI)
     {
-        if (CheckAP(3))
+        if (activeSoldier.CheckAP(3))
         {
-            DeductAP(3);
+            activeSoldier.DeductAP(3);
             useULFUI.itemUsed.UseULF(useULFUI.itemUsedFromSlotName);
             menu.CloseUseULFUI();
         }
@@ -2932,45 +2932,45 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
     }
-    public void ConfirmDrop(UseItemUI throwItemUI)
+    public void ConfirmDrop(UseItemUI dropItemUI)
     {
-        TMP_InputField targetX = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetY = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetZ = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>();
-        GameObject invalidThrow = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("InvalidThrow").gameObject;
-        GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ItemWillBreak").gameObject;
-        GameObject catcher = throwItemUI.transform.Find("OptionPanel").Find("Catcher").gameObject;
+        TMP_InputField targetX = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetY = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>();
+        TMP_InputField targetZ = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>();
+        GameObject invalidThrow = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("InvalidThrow").gameObject;
+        GameObject itemWillBreak = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ItemWillBreak").gameObject;
+        GameObject catcher = dropItemUI.transform.Find("OptionPanel").Find("Catcher").gameObject;
 
         if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
         {
             if (itemWillBreak.activeInHierarchy)
-                throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+                dropItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
             else if (catcher.activeInHierarchy)
             {
-                if (throwItemUI.itemUsed.IsCatchable())
+                if (dropItemUI.itemUsed.IsCatchable())
                 {
                     Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
 
                     //if soldier has left hand free catch it there, otherwise catch in right hand
                     if (catchingSoldier.LeftHandItem == null)
-                        throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                        dropItemUI.itemUsed.MoveItem(activeSoldier, dropItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
                     else
-                        throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+                        dropItemUI.itemUsed.MoveItem(activeSoldier, dropItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
                 }
                 else
                 {
-                    throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
-                    throwItemUI.itemUsed.X = x;
-                    throwItemUI.itemUsed.Y = y;
-                    throwItemUI.itemUsed.Z = z;
+                    dropItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(dropItemUI.itemUsed, dropItemUI.itemUsedFromSlotName); //move item to ground
+                    dropItemUI.itemUsed.X = x;
+                    dropItemUI.itemUsed.Y = y;
+                    dropItemUI.itemUsed.Z = z;
                 }
             }
             else
             {
-                throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
-                throwItemUI.itemUsed.X = x;
-                throwItemUI.itemUsed.Y = y;
-                throwItemUI.itemUsed.Z = z;
+                dropItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(dropItemUI.itemUsed, dropItemUI.itemUsedFromSlotName); //move item to ground
+                dropItemUI.itemUsed.X = x;
+                dropItemUI.itemUsed.Y = y;
+                dropItemUI.itemUsed.Z = z;
             }
             activeSoldier.PerformLoudAction(5);
             menu.CloseDropUI();
@@ -3156,10 +3156,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmDipElec()
     {
-        if (CheckAP(3))
+        if (activeSoldier.CheckAP(3))
         {
             menu.FreezeTime();
-            DeductAP(3);
+            activeSoldier.DeductAP(3);
             bool terminalDisabled = false;
             int passCount = 0;
             string resultString = "";
@@ -3242,74 +3242,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
 
-    //AP/MP functions
-    public bool CheckAP(int ap)
-    {
-        //check if it's on the current players turn
-        if (menu.overrideView)
-            return true;
-        else
-        {
-            if (activeSoldier.ap >= ap)
-                return true;
-            else
-            {
-                notEnoughAPUI.SetActive(true);
-                return false;
-            }
-        }
-    }
-    public bool CheckMP(int mp)
-    {
-        if (menu.overrideView)
-            return true;
-        else
-        {
-            if (activeSoldier.mp >= mp)
-                return true;
-            else
-            {
-                notEnoughMPUI.SetActive(true);
-                return false;
-            }
-        }
-    }
-    public void DeductAP(int ap)
-    {
-        if (!menu.overrideView && ap > 0)
-        {
-            activeSoldier.ap -= ap;
-            activeSoldier.usedAP = true;
-
-            //break spotter ability
-            activeSoldier.RemoveAllSpotting();
-        }
-    }
-    public void DeductMP(int mp)
-    {
-        if (!menu.overrideView && mp > 0)
-        {
-            activeSoldier.mp -= mp;
-            activeSoldier.usedMP = true;
-        }
-    }
-    public void DrainAP()
-    {
-        activeSoldier.ap = 0;
-        activeSoldier.usedAP = true;
-    }
-    public void DrainMP()
-    {
-        activeSoldier.mp = 0;
-        activeSoldier.usedMP = true;
-    }
 
     //lastandicide functions
     public void Lastandicide()
     {
-        if (CheckAP(1))
+        if (activeSoldier.CheckAP(1))
         {
-            DeductAP(1);
+            activeSoldier.DeductAP(1);
             activeSoldier.InstantKill(activeSoldier, new List<string> { "Lastandicide" });
         }
     }

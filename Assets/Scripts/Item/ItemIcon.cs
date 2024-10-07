@@ -209,7 +209,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     if (menu.activeSoldier.IsGunner() && item.IsAmmo())
                         ap = 1;
 
-                    if (menu.activeSoldier.game.CheckAP(ap))
+                    if (menu.activeSoldier.CheckAP(ap))
                     {
                         if (menu.activeSoldier.HandsFreeToUseItem(item))
                             menu.OpenUseItemUI(item, transform.parent.name, this, ap);

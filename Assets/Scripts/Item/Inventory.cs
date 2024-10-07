@@ -50,14 +50,16 @@ public class Inventory
     {
         if (HasItem(item.id))
         {
+            //run any drop effects
+            if (item.IsNestedOnSoldier())
+                item.RunDropEffect(item.SoldierNestedOn());
+
             RemoveItem(item);
             item.whereEquipped = "";
             if (linkedInventoryObject != null && linkedInventoryObject.InventorySlots != null)
             {
                 //safe replacement to account for internal item swap glitch
                 linkedInventoryObject.InventorySlots[slotName] = linkedInventoryObject.InventorySlots[slotName].Replace($"{item.Id}", "");
-                if (item.IsNestedOnSoldier())
-                    item.RunDropEffect(item.SoldierNestedOn());
             }
         }
     }

@@ -410,7 +410,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void RunDropEffect(Soldier linkedSoldier)
     {
-    
+        //minus ap for logistics belt
+        if (itemName.Equals("Logistics_Belt"))
+            linkedSoldier.DeductAP(1);
     }
     public bool CheckAnyAmmo()
     {
