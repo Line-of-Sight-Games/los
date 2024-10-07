@@ -28,7 +28,7 @@ public class DropthrowPopup : MonoBehaviour
             noThrowIndicatorText.text = "Too Weak";
             noThrowIndicator.SetActive(true);
         }
-        if (!menu.activeSoldier.IsAbleToSee())
+        if (menu.activeSoldier.IsBlind())
         {
             throwButton.interactable = false;
             noThrowIndicatorText.text = "Blind";

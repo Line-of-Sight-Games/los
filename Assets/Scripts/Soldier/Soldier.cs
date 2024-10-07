@@ -411,6 +411,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         return false;
     }
+    public bool IsBlind()
+    {
+        if (!IsAbleToSee())
+            return true;
+        return false;
+    }
     public bool IsPlayingDead()
     {
         if (IsAlive() && CheckState("Playdead"))

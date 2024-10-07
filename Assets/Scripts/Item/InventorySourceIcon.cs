@@ -6,6 +6,9 @@ public class InventorySourceIcon : MonoBehaviour
 {
     public MainMenu menu;
     public GameObject linkedInventoryPanel;
+    public Button linkedIconButton;
+    public GameObject disabledReason;
+    public TextMeshProUGUI disabledReasonText;
 
     public void Start()
     {
@@ -22,5 +25,17 @@ public class InventorySourceIcon : MonoBehaviour
     public void OpenItemPanel()
     {
         menu.OpenInventoryPanel(linkedInventoryPanel);
+    }
+
+    public void Grey(string reason)
+    {
+        linkedIconButton.interactable = false;
+        disabledReason.SetActive(true);
+        disabledReasonText.text = reason;
+    }
+    public void UnGrey()
+    {
+        linkedIconButton.interactable = true;
+        disabledReason.SetActive(false);
     }
 }

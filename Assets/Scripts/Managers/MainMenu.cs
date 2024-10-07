@@ -1406,7 +1406,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //block shot button
             if (!activeSoldier.HasGunsEquipped())
                 buttonStates.Add(shotButton, "No Gun");
-            else if (!activeSoldier.IsAbleToSee())
+            else if (activeSoldier.IsBlind())
                 buttonStates.Add(shotButton, "Blind");
             else if (!activeSoldier.IsValidLoadout())
                 buttonStates.Add(shotButton, "Hands Full");
@@ -1427,7 +1427,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //block dipelec button
             if (!activeSoldier.TerminalInRange(default))
                 buttonStates.Add(dipElecButton, "No Terminal");
-            else if (!activeSoldier.IsAbleToSee())
+            else if (activeSoldier.IsBlind())
                 buttonStates.Add(dipElecButton, "Blind");
             else if (!activeSoldier.TerminalInRange(true))
                 buttonStates.Add(dipElecButton, "Terminal Disabled");
@@ -1437,7 +1437,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //block overwatch button
             if (!activeSoldier.HasGunsEquipped())
                 buttonStates.Add(overwatchButton, "No Gun");
-            else if (!activeSoldier.IsAbleToSee())
+            else if (activeSoldier.IsBlind())
                 buttonStates.Add(overwatchButton, "Blind");
             else if (!activeSoldier.IsValidLoadout())
                 buttonStates.Add(overwatchButton, "Hands Full");
@@ -1465,7 +1465,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //block disarm button
             if (!activeSoldier.DisarmableInRange())
                 buttonStates.Add(disarmButton, "No Devices");
-            else if (!activeSoldier.IsAbleToSee())
+            else if (activeSoldier.IsBlind())
                 buttonStates.Add(disarmButton, "Blind");
 
             GreyOutButtons(buttonStates, "");
@@ -3271,7 +3271,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void AddGroundInventorySourceButton()
     {
         GameObject groundInventoryPanel = Instantiate(inventoryPanelGroundPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(null).gameObject;
-        Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
+        InventorySourceIcon groundInventoryButton = Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
         foreach (Item i in game.FindNearbyItems())
         {
             if (i.transform.parent == null)
@@ -3280,22 +3280,57 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
             }
         }
+
+        if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
+            groundInventoryButton.Grey("Spawn Config");
+        else
+            groundInventoryButton.UnGrey();
     }
     public void AddAllyInventorySourceButtons()
     {
         foreach (Soldier s in game.AllSoldiers())
+        {
             if (s.IsFielded() && activeSoldier.PhysicalObjectWithinItemRadius(s) && (activeSoldier.IsSameTeamAs(s) || s.IsUnconscious() || s.IsDead()) && s.IsInteractable())
-                Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
+            {
+                InventorySourceIcon allyInventoryButton = Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
+
+                if (activeSoldier.IsBlind())
+                    allyInventoryButton.Grey("Blind");
+                else if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
+                    allyInventoryButton.Grey("Spawn Config");
+                else
+                    allyInventoryButton.UnGrey();
+            }
+        }
     }
     public void AddPOIInventorySourceButtons()
     {
+        
         foreach (GoodyBox gb in game.AllGoodyBoxes())
+        {
             if (activeSoldier.PhysicalObjectWithinItemRadius(gb))
-                Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
-
+            {
+                InventorySourceIcon gbInventoryButton = Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
+                
+                if (activeSoldier.IsBlind())
+                    gbInventoryButton.Grey("Blind");
+                else
+                    gbInventoryButton.UnGrey();
+            }
+        }
+                
         foreach (DrugCabinet dc in game.AllDrugCabinets())
+        {
             if (activeSoldier.PhysicalObjectWithinItemRadius(dc))
-                Instantiate(dcInventoryIconPrefab.GetComponent<InventorySourceIconDrugCabinet>().Init(dc, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(dc).gameObject), inventorySourceIconsUI.transform);
+            {
+                InventorySourceIcon dcInventoryButton = Instantiate(dcInventoryIconPrefab.GetComponent<InventorySourceIconDrugCabinet>().Init(dc, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(dc).gameObject), inventorySourceIconsUI.transform);
+                
+                if (activeSoldier.IsBlind())
+                    dcInventoryButton.Grey("Blind");
+                else
+                    dcInventoryButton.UnGrey();
+            }
+        }
     }
     public void AddGlobalInventorySourceButton()
     {
