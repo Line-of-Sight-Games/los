@@ -663,9 +663,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         int.TryParse(fallDistance, out int fallDistanceInt);
         string launchMelee = string.Empty;
-        activeSoldier.DeductAP(ap);
+        movingSoldier.DeductAP(ap);
         if (!freeMove)
-            activeSoldier.DeductMP(1);
+            movingSoldier.DeductMP(1);
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
         movingSoldier.X = (int)moveToLocation.Item1.x;

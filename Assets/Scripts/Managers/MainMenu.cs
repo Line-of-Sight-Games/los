@@ -495,7 +495,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void ToggleMute()
     {
         muteIcon.SetActive(!muteIcon.activeSelf);
-        soundManager.noisePlayer.mute = !soundManager.noisePlayer.mute;
+        soundManager.isMute = !soundManager.isMute;
+    }
+    public void Mute()
+    {
+        muteIcon.SetActive(true);
+        soundManager.isMute = true;
+    }
+    public void UnMute()
+    {
+        muteIcon.SetActive(false);
+        soundManager.isMute = false;
     }
     public bool ValidateIntInput(TMP_InputField inputField, out int outputInt)
     {
@@ -666,6 +676,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             overrideVersionDisplay.SetActive(false);
             overrideInsertObjectsButton.SetActive(false);
             HideOverrideWeather();
+            UnMute();
         }
         else
             overrideUI.SetActive(true);
@@ -692,6 +703,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             overrideVersionDisplay.SetActive(true);
             overrideInsertObjectsButton.SetActive(true);
             GetOverrideWeather();
+            Mute();
         }
     }
     public void GetOverrideHealthState(Transform soldierStatsUI)

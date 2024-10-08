@@ -8,9 +8,7 @@ using UnityEditor;
 
 public class ItemIconGB : MonoBehaviour
 {
-    public AudioSource noisePlayerItemIcon;
-    public AudioClip buttonPress;
-
+    public SoundManager soundManager;
     public ItemAssets itemAssets;
     public Item linkedItem;
     public int pickupNumber = 0;
@@ -20,10 +18,9 @@ public class ItemIconGB : MonoBehaviour
 
     public void Start()
     {
-        noisePlayerItemIcon = FindFirstObjectByType<AudioSource>();
-
         itemAssets = FindFirstObjectByType<ItemAssets>();
         game = FindFirstObjectByType<MainGame>();
+        soundManager = FindFirstObjectByType<SoundManager>();
         transform.Find("ItemImage").GetComponent<Image>().sprite = itemAssets.GetSprite(this.gameObject.name);
         transform.Find("Arrow").GetComponent<Image>().sprite = arrows[0];
         destination = null;
@@ -45,8 +42,7 @@ public class ItemIconGB : MonoBehaviour
 
     public void PlayButtonPress()
     {
-        //print("played button press from soldier UI");
-        noisePlayerItemIcon.PlayOneShot(buttonPress);
+        soundManager.PlayButtonPress();
     }
     public void Update()
     {

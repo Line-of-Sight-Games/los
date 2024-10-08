@@ -4,11 +4,9 @@ using UnityEngine.UI;
 
 public class SoldierUI : MonoBehaviour
 {
-    public AudioSource noisePlayerSoldierUI;
-    public AudioClip buttonPress;
-
     public MainMenu menu;
     public MainGame game;
+    public SoundManager soundManager;
     public Soldier linkedSoldier;
     public TMP_InputField xSize, ySize, zSize;
     public int x, y, z;
@@ -20,15 +18,14 @@ public class SoldierUI : MonoBehaviour
 
     private void Start()
     {
-        noisePlayerSoldierUI = FindFirstObjectByType<AudioSource>();
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
+        soundManager = FindFirstObjectByType<SoundManager>();
     }
 
     public void PlayButtonPress()
     {
-        //print("played button press from soldier UI");
-        noisePlayerSoldierUI.PlayOneShot(buttonPress);
+        soundManager.PlayButtonPress();
     }
 
     public void FieldSoldier()

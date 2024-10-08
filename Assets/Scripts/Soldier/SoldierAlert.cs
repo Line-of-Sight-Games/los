@@ -6,9 +6,7 @@ using TMPro;
 
 public class SoldierAlert : MonoBehaviour
 {
-    public AudioSource noisePlayerSoldierAlert;
-    public AudioClip buttonPress;
-
+    public SoundManager soundManager;
     public Soldier soldier;
     public bool promotionComplete;
     public TMP_Dropdown statDropdown, abilityDropdown;
@@ -51,13 +49,12 @@ public class SoldierAlert : MonoBehaviour
 
     private void Start()
     {
-        noisePlayerSoldierAlert = FindFirstObjectByType<AudioSource>();
+        soundManager = FindFirstObjectByType<SoundManager>();
     }
 
     public void PlayButtonPress()
     {
-        //print("played button press from soldier alert");
-        noisePlayerSoldierAlert.PlayOneShot(buttonPress);
+        soundManager.PlayButtonPress();
     }
 
     public void SetSoldier(Soldier initSoldier)
