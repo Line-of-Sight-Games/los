@@ -1031,7 +1031,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     TakePoisoning(administeredBy.Id, false);
                 else
                 {
-                    int num = game.RandomNumber(1, 10);
+                    int num = HelperFunctions.RandomNumber(1, 10);
                     if (num == 10)
                     {
                         TakeSpecificDrug(administeredBy, drugName, false, !IsExperimentalist());

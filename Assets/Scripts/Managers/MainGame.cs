@@ -79,17 +79,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return FindObjectsByType<DrugCabinet>(default).ToList();
     }
-    public int RandomNumber(int min, int max)
-    {
-        return UnityEngine.Random.Range(min, max + 1);
-    }
     public int DiceRoll()
     {
-        return RandomNumber(1, 6);
+        return HelperFunctions.RandomNumber(1, 6);
     }
     public bool CoinFlip()
     {
-        if (RandomNumber(0, 1) == 1)
+        if (HelperFunctions.RandomNumber(0, 1) == 1)
             return true;
 
         return false;
@@ -1534,8 +1530,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             resistSuppression = shooter.SuppressionCheck();
             gun.SpendSingleAmmo();
 
-            int randNum1 = RandomNumber(0, 100);
-            int randNum2 = RandomNumber(0, 100);
+            int randNum1 = HelperFunctions.RandomNumber(0, 100);
+            int randNum2 = HelperFunctions.RandomNumber(0, 100);
             Tuple<int, int, int> chances;
             chances = CalculateHitPercentage(shooter, target, gun);
 
@@ -1621,7 +1617,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     if (targetSoldier.IsMeleeEngaged()) //pick random target to hit in engagement
                     {
-                        int randNum3 = RandomNumber(0, originalTarget.EngagedSoldiers.Count);
+                        int randNum3 = HelperFunctions.RandomNumber(0, originalTarget.EngagedSoldiers.Count);
                         if (randNum3 > 0)
                         {
                             targetSoldier = originalTarget.EngagedSoldiers[randNum3 - 1];
@@ -2700,7 +2696,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 int highestRoll = 0, newX, newY;
                 float scatterDistance;
-                int scatterDegree = RandomNumber(0, 360);
+                int scatterDegree = HelperFunctions.RandomNumber(0, 360);
                 for (int i = 0; i < rolls; i++)
                 {
                     int roll = DiceRoll();
@@ -2802,7 +2798,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
                 int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), throwLocation));
-                int scatterDegree = RandomNumber(0, 360);
+                int scatterDegree = HelperFunctions.RandomNumber(0, 360);
                 int scatterDistance = activeSoldier.StrengthCheck() switch
                 {
                     false => Mathf.CeilToInt(DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
@@ -2857,7 +2853,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
                 int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), throwLocation));
-                int scatterDegree = RandomNumber(0, 360);
+                int scatterDegree = HelperFunctions.RandomNumber(0, 360);
                 int scatterDistance = activeSoldier.StrengthCheck() switch
                 {
                     false => Mathf.CeilToInt(DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),

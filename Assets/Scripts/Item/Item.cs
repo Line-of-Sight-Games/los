@@ -369,7 +369,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             //label unlabelled syringes
             if (linkedSoldier.IsMedic() && itemName.Equals("Syringe_Unlabelled"))
-                itemName = $"Syringe_{itemManager.drugTable[game.RandomNumber(0, itemManager.drugTable.Length - 1)]}";
+                itemName = $"Syringe_{itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)]}";
 
             //perform ability effects
             if (IsGun())
@@ -646,7 +646,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     break;
                 case "Syringe_Unlabelled":
                     if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug(itemManager.drugTable[game.RandomNumber(0, itemManager.drugTable.Length - 1)], linkedSoldier);
+                        soldierUsedOn.TakeDrug(itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)], linkedSoldier);
                     else
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;

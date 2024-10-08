@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -11,7 +12,8 @@ public class SoundManager : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
     public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
-    public AudioClip[] commanderSelectionGeneric;
+    public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
+
     public bool banzaiPlayed, isMute;
 
     private Dictionary<AudioClip, Coroutine> playingSounds = new();
@@ -113,9 +115,12 @@ public class SoundManager : MonoBehaviour
     //soldier voices
     public void PlayRandomVoice(AudioClip[] audioClipArray)
     {
-        if (game.CoinFlip()) //50% chance of silence
+        if (audioClipArray.Any())
         {
-            PlaySound(commanderSelectionGeneric[Random.Range(0, commanderSelectionGeneric.Length)]);
+            if (game.CoinFlip()) //50% chance of silence
+            {
+                PlaySound(audioClipArray[HelperFunctions.RandomNumber(0, audioClipArray.Length - 1)]);
+            }
         }
     }
     public void PlaySoldierSelectedGeneric(string specialty)
@@ -123,42 +128,42 @@ public class SoundManager : MonoBehaviour
         if (specialty.Equals("Leadership"))
             PlayRandomVoice(commanderSelectionGeneric);
         else if (specialty.Equals("Health"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(spartanSelectionGeneric);
         else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(survivorSelectionGeneric);
         else if (specialty.Equals("Speed"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(runnerSelectionGeneric);
         else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(evaderSelectionGeneric);
         else if (specialty.Equals("Fight"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(reservistSelectionGeneric);
         else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(seekerSelectionGeneric);
         else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(seekerSelectionGeneric);
         else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(scoutSelectionGeneric);
         else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(infantrymanSelectionGeneric);
         else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(operatorSelectionGeneric);
         else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(earthquakeSelectionGeneric);
         else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(hunterSelectionGeneric);
         else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(cycloneSelectionGeneric);
         else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(hammerSelectionGeneric);
         else if (specialty.Equals("Melee"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(wolfSelectionGeneric);
         else if (specialty.Equals("Strength"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(herculesSelectionGeneric);
         else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(diplomatSelectionGeneric);
         else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(technicianSelectionGeneric);
         else if (specialty.Equals("Healing"))
-            PlayRandomVoice(commanderSelectionGeneric);
+            PlayRandomVoice(medicSelectionGeneric);
     }
 }

@@ -23,11 +23,31 @@ public class SoldierUI : MonoBehaviour
         soundManager = FindFirstObjectByType<SoundManager>();
     }
 
-    public void PlayButtonPress()
+    public void FieldButtonClicked()
     {
         soundManager.PlayButtonPress();
-    }
 
+        FieldSoldier();
+    }
+    public void ActionButtonClicked()
+    {
+        soundManager.PlayButtonPress();
+        soundManager.PlaySoldierSelectedGeneric(linkedSoldier.soldierSpeciality);
+
+        OpenSoldierMenu("");
+    }
+    public void ConfirmFieldButtonClicked()
+    {
+        soundManager.PlayButtonPress();
+
+        ConfirmFieldSoldier();
+    }
+    public void CancelFieldButtonClicked()
+    {
+        soundManager.PlayButtonPress();
+
+        CancelFieldSoldier();
+    }
     public void FieldSoldier()
     {
         transform.Find("PopupBox").gameObject.SetActive(true);

@@ -70,10 +70,10 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     public void GenerateWeather()
     {
         int k = 0;
-        vis = game.RandomNumber(0, 4);
-        sp = game.RandomNumber(0, 3);
-        dir = game.RandomNumber(0, 7);
-        rn = game.RandomNumber(0, 4);
+        vis = HelperFunctions.RandomNumber(0, 4);
+        sp = HelperFunctions.RandomNumber(0, 3);
+        dir = HelperFunctions.RandomNumber(0, 7);
+        rn = HelperFunctions.RandomNumber(0, 4);
 
         for (int i = 1; i <= game.maxRounds; i++)
         {
@@ -111,7 +111,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         }
         else
         {
-            if (game.RandomNumber(1, 5) >= 4)
+            if (HelperFunctions.RandomNumber(1, 5) >= 4)
             {
                 if (game.CoinFlip())
                     vis--;
@@ -136,7 +136,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         }
         else
         {
-            if (game.RandomNumber(1, 5) >= 4)
+            if (HelperFunctions.RandomNumber(1, 5) >= 4)
             {
                 if (game.CoinFlip())
                     sp--;
@@ -149,7 +149,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     }
     private int NextWindDirection(int dir)
     {
-        if (game.RandomNumber(1, 3) == 3)
+        if (HelperFunctions.RandomNumber(1, 3) == 3)
         {
             if (game.CoinFlip())
             {
@@ -181,7 +181,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         }
         else
         {
-            if (game.RandomNumber(1, 5) >= 4)
+            if (HelperFunctions.RandomNumber(1, 5) >= 4)
             {
                 if (game.CoinFlip())
                     rn--;
