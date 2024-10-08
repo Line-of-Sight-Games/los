@@ -3327,7 +3327,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 if (activeSoldier.IsBlind())
                     gbInventoryButton.Grey("Blind");
                 else
+                {
+                    //play config near GB sound
+                    soundManager.PlaySoldierConfigNearGB(activeSoldier.soldierSpeciality);
+
                     gbInventoryButton.UnGrey();
+                }
             }
         }
                 

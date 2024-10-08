@@ -602,7 +602,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (activeSoldier.CheckAP(ap))
                         {
+                            //play move confirm sound
+                            soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
+
                             PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
+
                             //trigger loud action
                             activeSoldier.PerformLoudAction(10);
                         }
@@ -636,8 +640,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         int distance = CalculateMoveDistance(moveToLocation.Item1);
                         if (force || distance <= maxMove)
                         {
-                            if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap))
+                            if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap)) 
+                            {
+                                //play move confirm sound
+                                soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
+
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
+                            }
                             menu.CloseMoveUI();
                         }
                         else

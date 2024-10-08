@@ -13,6 +13,9 @@ public class SoundManager : MonoBehaviour
     public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
     public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
+    public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
+    public AudioClip[] commanderConfigNearGB, spartanConfigNearGB, survivorConfigNearGB, runnerConfigNearGB, evaderConfigNearGB, reservistConfigNearGB, seekerConfigNearGB, chameleonConfigNearGB, scoutConfigNearGB, infantrymanConfigNearGB, operatorConfigNearGB, earthquakeConfigNearGB, hunterConfigNearGB, cycloneConfigNearGB, hammerConfigNearGB, wolfConfigNearGB, herculesConfigNearGB, diplomatConfigNearGB, technicianConfigNearGB, medicConfigNearGB;
+
 
     public bool banzaiPlayed, isMute;
 
@@ -34,14 +37,14 @@ public class SoundManager : MonoBehaviour
     private IEnumerator PlayAndTrackSound(AudioClip clip)
     {
         // Play the sound using PlayOneShot
-        print($"Playing sound {clip.name}");
+        print($"Playing sound \"{clip.name}\"");
         audioSource.PlayOneShot(clip);
 
         // Wait for the clip to finish
         yield return new WaitForSeconds(clip.length);
 
         // Remove the sound from the tracking dictionary after it finishes
-        print($"Closing sound {clip.name}");
+        print($"Closing sound \"{clip.name}\"");
         playingSounds.Remove(clip);
     }
 
@@ -165,5 +168,91 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianSelectionGeneric);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicSelectionGeneric);
+    }
+    public void PlaySoldierConfigNearGB(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderConfigNearGB);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanConfigNearGB);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorConfigNearGB);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerConfigNearGB);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderConfigNearGB);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistConfigNearGB);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerConfigNearGB);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerConfigNearGB);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutConfigNearGB);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanConfigNearGB);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorConfigNearGB);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeConfigNearGB);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterConfigNearGB);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneConfigNearGB);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerConfigNearGB);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfConfigNearGB);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesConfigNearGB);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatConfigNearGB);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianConfigNearGB);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicConfigNearGB);
+    }
+    public void PlaySoldierConfirmMove(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderConfirmMove);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanConfirmMove);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorConfirmMove);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerConfirmMove);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderConfirmMove);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistConfirmMove);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerConfirmMove);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerConfirmMove);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutConfirmMove);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanConfirmMove);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorConfirmMove);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeConfirmMove);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterConfirmMove);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneConfirmMove);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerConfirmMove);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfConfirmMove);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesConfirmMove);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatConfirmMove);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianConfirmMove);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicConfirmMove);
     }
 }

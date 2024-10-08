@@ -64,6 +64,9 @@ public class SoldierUI : MonoBehaviour
         {
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
+                //play move confirm sound
+                soundManager.PlaySoldierConfirmMove(linkedSoldier.soldierSpeciality);
+
                 linkedSoldier.startX = x;
                 linkedSoldier.startY = y;
                 linkedSoldier.startZ = z;
