@@ -15,6 +15,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
     public AudioClip[] commanderConfigNearGB, spartanConfigNearGB, survivorConfigNearGB, runnerConfigNearGB, evaderConfigNearGB, reservistConfigNearGB, seekerConfigNearGB, chameleonConfigNearGB, scoutConfigNearGB, infantrymanConfigNearGB, operatorConfigNearGB, earthquakeConfigNearGB, hunterConfigNearGB, cycloneConfigNearGB, hammerConfigNearGB, wolfConfigNearGB, herculesConfigNearGB, diplomatConfigNearGB, technicianConfigNearGB, medicConfigNearGB;
+    public AudioClip[] commanderDetectClaymore, spartanDetectClaymore, survivorDetectClaymore, runnerDetectClaymore, evaderDetectClaymore, reservistDetectClaymore, seekerDetectClaymore, chameleonDetectClaymore, scoutDetectClaymore, infantrymanDetectClaymore, operatorDetectClaymore, earthquakeDetectClaymore, hunterDetectClaymore, cycloneDetectClaymore, hammerDetectClaymore, wolfDetectClaymore, herculesDetectClaymore, diplomatDetectClaymore, technicianDetectClaymore, medicDetectClaymore;
 
 
     public bool banzaiPlayed, isMute;
@@ -254,5 +255,48 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianConfirmMove);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicConfirmMove);
+    }
+    public void PlaySoldierDetectClaymore(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderDetectClaymore);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanDetectClaymore);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorDetectClaymore);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerDetectClaymore);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderDetectClaymore);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistDetectClaymore);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerDetectClaymore);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerDetectClaymore);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutDetectClaymore);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanDetectClaymore);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorDetectClaymore);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeDetectClaymore);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterDetectClaymore);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneDetectClaymore);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerDetectClaymore);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfDetectClaymore);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesDetectClaymore);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatDetectClaymore);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianDetectClaymore);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicDetectClaymore);
     }
 }

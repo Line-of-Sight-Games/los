@@ -602,7 +602,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (activeSoldier.CheckAP(ap))
                         {
-                            //play move confirm sound
+                            //play dialogue move confirm
                             soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
 
                             PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
@@ -642,7 +642,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         {
                             if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap)) 
                             {
-                                //play move confirm sound
+                                //play dialogue move confirm
                                 soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
 
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
@@ -2356,7 +2356,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                         if (meleeDamage > 0)
                         {
-                            //play success sound
+                            //play melee success sound
                             if (damageType.Contains("Charge"))
                                 soundManager.PlayMeleeResolution("successCharge");
                             else
@@ -2379,7 +2379,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else if (meleeDamage < 0)
                         {
-                            //play counterattack sound
+                            //play melee counterattack sound
                             soundManager.PlayMeleeResolution("counter");
 
                             if (!defender.IsWearingExoArmour() && attacker.IsWearingJuggernautArmour(false)) //no damage counter against jugs
@@ -2394,7 +2394,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else
                         {
-                            //play breakeven sound
+                            //play melee breakeven sound
                             soundManager.PlayMeleeResolution("breakeven");
 
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
