@@ -4343,6 +4343,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenGrenadeUI(UseItemUI useItemUI)
     {
+        //play grenade use dialogue
+        soundManager.PlaySoldierUseGrenade(activeSoldier.soldierSpeciality);
+
         grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         grenadeUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
         grenadeUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
@@ -4373,6 +4376,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenClaymoreUI(UseItemUI useItemUI)
     {
+        //play claymore placement sfx
+        soundManager.PlayPlaceClaymore();
+        //play claymore placement dialogue
+        soundManager.PlaySoldierPlaceClaymore(activeSoldier.soldierSpeciality);
+
         claymoreUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         claymoreUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
         claymoreUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
