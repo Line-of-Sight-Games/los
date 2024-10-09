@@ -589,7 +589,13 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 case "Medikit_Medium":
                 case "Medikit_Large":
                     if (poisonedBy == null || poisonedBy == "")
+                    {
+                        //play heal ally dialogue
+                        if (linkedSoldier != soldierUsedOn) //only if it's an ally you're healing
+                            game.soundManager.PlaySoldierHealAlly(linkedSoldier.soldierSpeciality);
+
                         soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
+                    }
                     else
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
                     break;

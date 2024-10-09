@@ -17,6 +17,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderConfigNearGB, spartanConfigNearGB, survivorConfigNearGB, runnerConfigNearGB, evaderConfigNearGB, reservistConfigNearGB, seekerConfigNearGB, chameleonConfigNearGB, scoutConfigNearGB, infantrymanConfigNearGB, operatorConfigNearGB, earthquakeConfigNearGB, hunterConfigNearGB, cycloneConfigNearGB, hammerConfigNearGB, wolfConfigNearGB, herculesConfigNearGB, diplomatConfigNearGB, technicianConfigNearGB, medicConfigNearGB;
     public AudioClip[] commanderDetectClaymore, spartanDetectClaymore, survivorDetectClaymore, runnerDetectClaymore, evaderDetectClaymore, reservistDetectClaymore, seekerDetectClaymore, chameleonDetectClaymore, scoutDetectClaymore, infantrymanDetectClaymore, operatorDetectClaymore, earthquakeDetectClaymore, hunterDetectClaymore, cycloneDetectClaymore, hammerDetectClaymore, wolfDetectClaymore, herculesDetectClaymore, diplomatDetectClaymore, technicianDetectClaymore, medicDetectClaymore;
     public AudioClip[] commanderEnterOverwatch, spartanEnterOverwatch, survivorEnterOverwatch, runnerEnterOverwatch, evaderEnterOverwatch, reservistEnterOverwatch, seekerEnterOverwatch, chameleonEnterOverwatch, scoutEnterOverwatch, infantrymanEnterOverwatch, operatorEnterOverwatch, earthquakeEnterOverwatch, hunterEnterOverwatch, cycloneEnterOverwatch, hammerEnterOverwatch, wolfEnterOverwatch, herculesEnterOverwatch, diplomatEnterOverwatch, technicianEnterOverwatch, medicEnterOverwatch;
+    public AudioClip[] commanderHealAlly, spartanHealAlly, survivorHealAlly, runnerHealAlly, evaderHealAlly, reservistHealAlly, seekerHealAlly, chameleonHealAlly, scoutHealAlly, infantrymanHealAlly, operatorHealAlly, earthquakeHealAlly, hunterHealAlly, cycloneHealAlly, hammerHealAlly, wolfHealAlly, herculesHealAlly, diplomatHealAlly, technicianHealAlly, medicHealAlly;
 
 
     public bool banzaiPlayed, isMute;
@@ -342,5 +343,48 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianEnterOverwatch);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicEnterOverwatch);
+    }
+    public void PlaySoldierHealAlly(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderHealAlly);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanHealAlly);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorHealAlly);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerHealAlly);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderHealAlly);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistHealAlly);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerHealAlly);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerHealAlly);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutHealAlly);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanHealAlly);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorHealAlly);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeHealAlly);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterHealAlly);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneHealAlly);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerHealAlly);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfHealAlly);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesHealAlly);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatHealAlly);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianHealAlly);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicHealAlly);
     }
 }
