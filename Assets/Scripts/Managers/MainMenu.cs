@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -241,7 +242,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public bool OverrideKey()
     {
         if (Input.GetKey(overrideKey))
-            return true;
+            return true; 
         return false;
     }
     public bool SecondOverrideKey()
@@ -697,7 +698,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             FreezeTime();
             ToggleOverrideView();
             CloseOverrideMenu();
-            soundManager.PlayOverrideAlarm();
+            soundManager.PlayOverrideAlarm(); //play override alarm sfx
             endTurnButton.SetActive(false);
             overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Resume";
             overrideVersionDisplay.SetActive(true);
@@ -1306,8 +1307,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (turnTime > game.maxTurnTime)
         {
-            turnTimer.color = Color.red;
+            //play banzai sfx
             soundManager.PlayBanzai();
+
+            turnTimer.color = Color.red;
         }
         else if (turnTime > game.maxTurnTime * 0.75)
         {
@@ -1773,6 +1776,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
             
             detectionAlertUI.SetActive(true);
+
+            //play detection alarm sfx
             soundManager.PlayDetectionAlarm();
         }
     }
@@ -1834,16 +1839,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             
             CloseGMAlertDetectionUI();
         }
-        else
-            soundManager.PlayOverrideAlarm();
     }
     public void AddDetectionAlert(Soldier detector, Soldier counter, string detectorLabel, string counterLabel, string arrowType)
     {
-        //print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
+        print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
         //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
-            if ((child.GetComponent<SoldierAlertLOS>().s1 == detector && child.GetComponent<SoldierAlertLOS>().s2 == counter) || (child.GetComponent<SoldierAlertLOS>().s1 == counter && child.GetComponent<SoldierAlertLOS>().s2 == detector))
-                Destroy(child.gameObject);
+        {
+            if (child.TryGetComponent<SoldierAlertLOS>(out var soldierAlert))
+            {
+                if ((soldierAlert.s1 == detector && soldierAlert.s2 == counter) || (soldierAlert.s1 == counter && soldierAlert.s2 == detector))
+                    Destroy(soldierAlert.gameObject);
+            }
+        }
+            
 
         GameObject detectionAlert = Instantiate(detectionAlertPrefab, detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
@@ -1880,11 +1889,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddDetectionAlert(Soldier detector, Claymore claymore, string detectorLabel, string counterLabel, string arrowType)
     {
-        //print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
+        print($"Tried to add detection alert {detector.soldierName} to claymore {claymore.X}, {claymore.Y}, {claymore.Z} with {arrowType} arrow");
         //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
-            if (child.GetComponent<ClaymoreAlertLOS>().soldier == detector && child.GetComponent<ClaymoreAlertLOS>().claymore == claymore)
-                Destroy(child.gameObject);
+        {
+            if (child.TryGetComponent<ClaymoreAlertLOS>(out var claymoreAlert))
+            {
+                if (claymoreAlert.soldier == detector && claymoreAlert.claymore == claymore)
+                    Destroy(claymoreAlert.gameObject);
+            }
+        }
 
         GameObject detectionAlert = Instantiate(detectionAlertClaymorePrefab, detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
@@ -2046,7 +2060,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 }
                 else if (child.GetComponent<ClaymoreAlertLOS>() != null)
                 {
-                    //play claymore detect sound
+                    //play claymore detect sfx
                     soundManager.PlaySoldierDetectClaymore(child.GetComponent<ClaymoreAlertLOS>().soldier.soldierSpeciality);
 
                     Claymore claymore = child.GetComponent<ClaymoreAlertLOS>().claymore;
@@ -3216,7 +3230,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenOvermoveUI(string message)
     {
+        //play overmove alarm sfx
         soundManager.PlayOvermoveAlarm();
+
         overmoveUI.transform.Find("Warning").GetComponent<TextMeshProUGUI>().text = message;
         overmoveUI.SetActive(true);
     }
@@ -3226,7 +3242,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenSuppressionMoveUI()
     {
+        //play overmove alarm sfx
         soundManager.PlayOvermoveAlarm();
+
         suppressionMoveUI.SetActive(true);
     }
     public void CloseSuppressionMoveUI()
@@ -3260,7 +3278,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             CloseOvermoveUI();
         }
         else
-            soundManager.PlayOverrideAlarm();
+            soundManager.PlayOverrideAlarm(); //play override alarm sfx
     }
     public void ConfirmSuppressionMove()
     {
@@ -3270,7 +3288,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             CloseSuppressionMoveUI();
         }
         else
-            soundManager.PlayOverrideAlarm();
+            soundManager.PlayOverrideAlarm(); //play override alarm sfx
     }
 
 

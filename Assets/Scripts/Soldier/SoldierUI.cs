@@ -25,25 +25,30 @@ public class SoldierUI : MonoBehaviour
 
     public void FieldButtonClicked()
     {
+        //play button press sfx
         soundManager.PlayButtonPress();
 
         FieldSoldier();
     }
     public void ActionButtonClicked()
     {
+        //play button press sfx
         soundManager.PlayButtonPress();
+        //play select generic dialogue
         soundManager.PlaySoldierSelectedGeneric(linkedSoldier.soldierSpeciality);
 
         OpenSoldierMenu("");
     }
     public void ConfirmFieldButtonClicked()
     {
+        //play button press sfx
         soundManager.PlayButtonPress();
 
         ConfirmFieldSoldier();
     }
     public void CancelFieldButtonClicked()
     {
+        //play button press sfx
         soundManager.PlayButtonPress();
 
         CancelFieldSoldier();
@@ -64,7 +69,7 @@ public class SoldierUI : MonoBehaviour
         {
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
-                //play move confirm sound
+                //play move confirm dialogue
                 soundManager.PlaySoldierConfirmMove(linkedSoldier.soldierSpeciality);
 
                 linkedSoldier.startX = x;

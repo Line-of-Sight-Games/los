@@ -189,6 +189,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         menu.DisplaySoldiersGameOver();
         menu.roundIndicator.text = "Game Over";
         menu.teamTurnIndicator.text = result;
+
+        //play game over music
         soundManager.PlayGameOverMusic();
     }
     public void SwitchTeam(int team)
@@ -508,6 +510,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (activeSoldier.CheckAP(2))
             {
+                //play overwatch confirm dialogue
+                soundManager.PlaySoldierEnterOverwatch(activeSoldier.soldierSpeciality);
+
                 activeSoldier.DrainAP();
                 activeSoldier.SetOverwatch(x, y, r, a);
             }
@@ -602,7 +607,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (activeSoldier.CheckAP(ap))
                         {
-                            //play dialogue move confirm
+                            //play move confirm dialogue
                             soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
 
                             PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
@@ -642,7 +647,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         {
                             if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap)) 
                             {
-                                //play dialogue move confirm
+                                //play move confirm dialogue
                                 soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
 
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
@@ -2356,11 +2361,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                         if (meleeDamage > 0)
                         {
-                            //play melee success sound
+                            //play melee success sfx
                             if (damageType.Contains("Charge"))
-                                soundManager.PlayMeleeResolution("successCharge");
+                                soundManager.PlayMeleeResolution("successCharge"); //play melee success charge sfx
                             else
-                                soundManager.PlayMeleeResolution("successStatic");
+                                soundManager.PlayMeleeResolution("successStatic"); //play melee success static sfx
 
                             if (attacker.IsWearingExoArmour() && !defender.IsWearingJuggernautArmour(false)) //exo kill on standard man
                             {
@@ -2379,7 +2384,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else if (meleeDamage < 0)
                         {
-                            //play melee counterattack sound
+                            //play melee counterattack sfx
                             soundManager.PlayMeleeResolution("counter");
 
                             if (!defender.IsWearingExoArmour() && attacker.IsWearingJuggernautArmour(false)) //no damage counter against jugs
@@ -2394,7 +2399,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else
                         {
-                            //play melee breakeven sound
+                            //play melee breakeven sfx
                             soundManager.PlayMeleeResolution("breakeven");
 
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";

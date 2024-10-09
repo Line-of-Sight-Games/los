@@ -16,6 +16,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
     public AudioClip[] commanderConfigNearGB, spartanConfigNearGB, survivorConfigNearGB, runnerConfigNearGB, evaderConfigNearGB, reservistConfigNearGB, seekerConfigNearGB, chameleonConfigNearGB, scoutConfigNearGB, infantrymanConfigNearGB, operatorConfigNearGB, earthquakeConfigNearGB, hunterConfigNearGB, cycloneConfigNearGB, hammerConfigNearGB, wolfConfigNearGB, herculesConfigNearGB, diplomatConfigNearGB, technicianConfigNearGB, medicConfigNearGB;
     public AudioClip[] commanderDetectClaymore, spartanDetectClaymore, survivorDetectClaymore, runnerDetectClaymore, evaderDetectClaymore, reservistDetectClaymore, seekerDetectClaymore, chameleonDetectClaymore, scoutDetectClaymore, infantrymanDetectClaymore, operatorDetectClaymore, earthquakeDetectClaymore, hunterDetectClaymore, cycloneDetectClaymore, hammerDetectClaymore, wolfDetectClaymore, herculesDetectClaymore, diplomatDetectClaymore, technicianDetectClaymore, medicDetectClaymore;
+    public AudioClip[] commanderEnterOverwatch, spartanEnterOverwatch, survivorEnterOverwatch, runnerEnterOverwatch, evaderEnterOverwatch, reservistEnterOverwatch, seekerEnterOverwatch, chameleonEnterOverwatch, scoutEnterOverwatch, infantrymanEnterOverwatch, operatorEnterOverwatch, earthquakeEnterOverwatch, hunterEnterOverwatch, cycloneEnterOverwatch, hammerEnterOverwatch, wolfEnterOverwatch, herculesEnterOverwatch, diplomatEnterOverwatch, technicianEnterOverwatch, medicEnterOverwatch;
 
 
     public bool banzaiPlayed, isMute;
@@ -298,5 +299,48 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianDetectClaymore);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicDetectClaymore);
+    }
+    public void PlaySoldierEnterOverwatch(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderEnterOverwatch);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanEnterOverwatch);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorEnterOverwatch);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerEnterOverwatch);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderEnterOverwatch);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistEnterOverwatch);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerEnterOverwatch);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerEnterOverwatch);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutEnterOverwatch);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanEnterOverwatch);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorEnterOverwatch);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeEnterOverwatch);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterEnterOverwatch);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneEnterOverwatch);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerEnterOverwatch);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfEnterOverwatch);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesEnterOverwatch);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatEnterOverwatch);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianEnterOverwatch);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicEnterOverwatch);
     }
 }
