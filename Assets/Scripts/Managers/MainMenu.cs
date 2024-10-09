@@ -3338,22 +3338,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddPOIInventorySourceButtons()
     {
-        
+        bool poisNearby = false;
+
         foreach (GoodyBox gb in game.AllGoodyBoxes())
         {
             if (activeSoldier.PhysicalObjectWithinItemRadius(gb))
             {
+                poisNearby = true;
                 InventorySourceIcon gbInventoryButton = Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
                 
                 if (activeSoldier.IsBlind())
                     gbInventoryButton.Grey("Blind");
                 else
-                {
-                    //play config near GB sound
-                    soundManager.PlaySoldierConfigNearGB(activeSoldier.soldierSpeciality);
-
                     gbInventoryButton.UnGrey();
-                }
             }
         }
                 
@@ -3361,6 +3358,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (activeSoldier.PhysicalObjectWithinItemRadius(dc))
             {
+                poisNearby = true;
                 InventorySourceIcon dcInventoryButton = Instantiate(dcInventoryIconPrefab.GetComponent<InventorySourceIconDrugCabinet>().Init(dc, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(dc).gameObject), inventorySourceIconsUI.transform);
                 
                 if (activeSoldier.IsBlind())
@@ -3368,6 +3366,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 else
                     dcInventoryButton.UnGrey();
             }
+        }
+
+        if (activeSoldier.IsAbleToSee() && poisNearby)
+        {
+            //play configure near GB dialogue
+            soundManager.PlaySoldierConfigNearGB(activeSoldier.soldierSpeciality);
         }
     }
     public void AddGlobalInventorySourceButton()

@@ -18,6 +18,9 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderDetectClaymore, spartanDetectClaymore, survivorDetectClaymore, runnerDetectClaymore, evaderDetectClaymore, reservistDetectClaymore, seekerDetectClaymore, chameleonDetectClaymore, scoutDetectClaymore, infantrymanDetectClaymore, operatorDetectClaymore, earthquakeDetectClaymore, hunterDetectClaymore, cycloneDetectClaymore, hammerDetectClaymore, wolfDetectClaymore, herculesDetectClaymore, diplomatDetectClaymore, technicianDetectClaymore, medicDetectClaymore;
     public AudioClip[] commanderEnterOverwatch, spartanEnterOverwatch, survivorEnterOverwatch, runnerEnterOverwatch, evaderEnterOverwatch, reservistEnterOverwatch, seekerEnterOverwatch, chameleonEnterOverwatch, scoutEnterOverwatch, infantrymanEnterOverwatch, operatorEnterOverwatch, earthquakeEnterOverwatch, hunterEnterOverwatch, cycloneEnterOverwatch, hammerEnterOverwatch, wolfEnterOverwatch, herculesEnterOverwatch, diplomatEnterOverwatch, technicianEnterOverwatch, medicEnterOverwatch;
     public AudioClip[] commanderHealAlly, spartanHealAlly, survivorHealAlly, runnerHealAlly, evaderHealAlly, reservistHealAlly, seekerHealAlly, chameleonHealAlly, scoutHealAlly, infantrymanHealAlly, operatorHealAlly, earthquakeHealAlly, hunterHealAlly, cycloneHealAlly, hammerHealAlly, wolfHealAlly, herculesHealAlly, diplomatHealAlly, technicianHealAlly, medicHealAlly;
+    public AudioClip[] commanderEquipArmour, spartanEquipArmour, survivorEquipArmour, runnerEquipArmour, evaderEquipArmour, reservistEquipArmour, seekerEquipArmour, chameleonEquipArmour, scoutEquipArmour, infantrymanEquipArmour, operatorEquipArmour, earthquakeEquipArmour, hunterEquipArmour, cycloneEquipArmour, hammerEquipArmour, wolfEquipArmour, herculesEquipArmour, diplomatEquipArmour, technicianEquipArmour, medicEquipArmour;
+
+
 
 
     public bool banzaiPlayed, isMute;
@@ -386,5 +389,48 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianHealAlly);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicHealAlly);
+    }
+    public void PlaySoldierEquipArmour(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderEquipArmour);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanEquipArmour);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorEquipArmour);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerEquipArmour);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderEquipArmour);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistEquipArmour);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerEquipArmour);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerEquipArmour);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutEquipArmour);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanEquipArmour);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorEquipArmour);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeEquipArmour);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterEquipArmour);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneEquipArmour);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerEquipArmour);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfEquipArmour);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesEquipArmour);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatEquipArmour);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianEquipArmour);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicEquipArmour);
     }
 }

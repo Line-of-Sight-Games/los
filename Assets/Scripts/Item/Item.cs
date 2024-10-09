@@ -344,8 +344,20 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 StartCoroutine(game.DetectionAlertSingle(linkedSoldier, "statChange(SR)|thermalEquipped", Vector3.zero, string.Empty));
 
             //unset cover for JA wearers
-            if (itemName.Equals("Armour_Juggernaut"))
+            if (IsJuggernautArmour())
+            {
+                //play armour equip dialogue for JA
+                game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
+
                 linkedSoldier.UnsetCover();
+            }
+
+            //play armour equip dialogue for BA
+            if (IsBodyArmour())
+            {
+                //play armour equip dialogue for BA
+                game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
+            }
 
             //take exo armour health
             if (itemName.Equals("Armour_Exo"))
