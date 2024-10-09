@@ -3000,6 +3000,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
+                //play claymore placement sfx
+                soundManager.PlayPlaceClaymore();
+                //play claymore placement dialogue
+                soundManager.PlaySoldierPlaceClaymore(activeSoldier.soldierSpeciality);
+
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
                 Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id)).PlaceClaymore();
 

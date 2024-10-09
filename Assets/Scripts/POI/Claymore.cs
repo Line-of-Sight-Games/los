@@ -91,7 +91,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     }
     public bool CheckClaymoreTriggered(Soldier triggeringSoldier)
     {
-        if (triggeringSoldier.IsFielded() && triggeringSoldier.PhysicalObjectWithinRadius(this, 3))
+        if (triggeringSoldier.IsAlive() && triggeringSoldier.PhysicalObjectWithinRadius(this, 3))
         {
             Vector2 centreLine = new(facingX - X, facingY - Y);
             Vector2 targetLine = new(triggeringSoldier.X - X, triggeringSoldier.Y - Y);

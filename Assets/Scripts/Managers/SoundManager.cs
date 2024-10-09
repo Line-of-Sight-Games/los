@@ -12,6 +12,7 @@ public class SoundManager : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
     public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
+    public AudioClip placeClaymore;
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
     public AudioClip[] commanderConfigNearGB, spartanConfigNearGB, survivorConfigNearGB, runnerConfigNearGB, evaderConfigNearGB, reservistConfigNearGB, seekerConfigNearGB, chameleonConfigNearGB, scoutConfigNearGB, infantrymanConfigNearGB, operatorConfigNearGB, earthquakeConfigNearGB, hunterConfigNearGB, cycloneConfigNearGB, hammerConfigNearGB, wolfConfigNearGB, herculesConfigNearGB, diplomatConfigNearGB, technicianConfigNearGB, medicConfigNearGB;
@@ -19,6 +20,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderEnterOverwatch, spartanEnterOverwatch, survivorEnterOverwatch, runnerEnterOverwatch, evaderEnterOverwatch, reservistEnterOverwatch, seekerEnterOverwatch, chameleonEnterOverwatch, scoutEnterOverwatch, infantrymanEnterOverwatch, operatorEnterOverwatch, earthquakeEnterOverwatch, hunterEnterOverwatch, cycloneEnterOverwatch, hammerEnterOverwatch, wolfEnterOverwatch, herculesEnterOverwatch, diplomatEnterOverwatch, technicianEnterOverwatch, medicEnterOverwatch;
     public AudioClip[] commanderHealAlly, spartanHealAlly, survivorHealAlly, runnerHealAlly, evaderHealAlly, reservistHealAlly, seekerHealAlly, chameleonHealAlly, scoutHealAlly, infantrymanHealAlly, operatorHealAlly, earthquakeHealAlly, hunterHealAlly, cycloneHealAlly, hammerHealAlly, wolfHealAlly, herculesHealAlly, diplomatHealAlly, technicianHealAlly, medicHealAlly;
     public AudioClip[] commanderEquipArmour, spartanEquipArmour, survivorEquipArmour, runnerEquipArmour, evaderEquipArmour, reservistEquipArmour, seekerEquipArmour, chameleonEquipArmour, scoutEquipArmour, infantrymanEquipArmour, operatorEquipArmour, earthquakeEquipArmour, hunterEquipArmour, cycloneEquipArmour, hammerEquipArmour, wolfEquipArmour, herculesEquipArmour, diplomatEquipArmour, technicianEquipArmour, medicEquipArmour;
+    public AudioClip[] commanderPlaceClaymore, spartanPlaceClaymore, survivorPlaceClaymore, runnerPlaceClaymore, evaderPlaceClaymore, reservistPlaceClaymore, seekerPlaceClaymore, chameleonPlaceClaymore, scoutPlaceClaymore, infantrymanPlaceClaymore, operatorPlaceClaymore, earthquakePlaceClaymore, hunterPlaceClaymore, cyclonePlaceClaymore, hammerPlaceClaymore, wolfPlaceClaymore, herculesPlaceClaymore, diplomatPlaceClaymore, technicianPlaceClaymore, medicPlaceClaymore;
 
 
 
@@ -113,6 +115,10 @@ public class SoundManager : MonoBehaviour
             PlaySound(meleeSuccessStatic);
         else if (result.Equals("successCharge"))
             PlaySound(meleeSuccessCharge);
+    }
+    public void PlayPlaceClaymore()
+    {
+        PlaySound(placeClaymore);
     }
 
 
@@ -432,5 +438,48 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianEquipArmour);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicEquipArmour);
+    }
+    public void PlaySoldierPlaceClaymore(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderPlaceClaymore);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanPlaceClaymore);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorPlaceClaymore);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerPlaceClaymore);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderPlaceClaymore);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistPlaceClaymore);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerPlaceClaymore);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerPlaceClaymore);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutPlaceClaymore);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanPlaceClaymore);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorPlaceClaymore);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakePlaceClaymore);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterPlaceClaymore);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cyclonePlaceClaymore);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerPlaceClaymore);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfPlaceClaymore);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesPlaceClaymore);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatPlaceClaymore);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianPlaceClaymore);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicPlaceClaymore);
     }
 }
