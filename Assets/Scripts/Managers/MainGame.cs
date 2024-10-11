@@ -607,8 +607,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (activeSoldier.CheckAP(ap))
                         {
-                            //play move confirm dialogue
-                            soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
+                            //play move dialogue
+                            if (moveUI.meleeToggle.isOn)
+                                soundManager.PlaySoldierMeleeMove(activeSoldier.soldierSpeciality); //play melee move dialogue
+                            else
+                                soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality); //play standard move dialogue
 
                             PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
 
@@ -647,8 +650,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         {
                             if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap)) 
                             {
-                                //play move confirm dialogue
-                                soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality);
+                                //play move dialogue
+                                if (moveUI.meleeToggle.isOn)
+                                    soundManager.PlaySoldierMeleeMove(activeSoldier.soldierSpeciality); //play melee move dialogue
+                                else
+                                    soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality); //play standard move dialogue
 
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
                             }
