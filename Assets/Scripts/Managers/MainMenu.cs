@@ -4344,7 +4344,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenGrenadeUI(UseItemUI useItemUI)
     {
         //play grenade use dialogue
-        soundManager.PlaySoldierUseGrenade(activeSoldier.soldierSpeciality);
+        if (useItemUI.itemUsed.IsTabun())
+            soundManager.PlaySoldierUseTabun(activeSoldier.soldierSpeciality);
+        else if (useItemUI.itemUsed.IsSmoke())
+            soundManager.PlaySoldierUseSmoke(activeSoldier.soldierSpeciality);
+        else
+            soundManager.PlaySoldierUseGrenade(activeSoldier.soldierSpeciality);
+
 
         grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         grenadeUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
