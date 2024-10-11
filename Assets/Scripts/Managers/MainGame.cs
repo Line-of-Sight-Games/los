@@ -2401,6 +2401,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         {
                             //play melee breakeven sfx
                             soundManager.PlayMeleeResolution("breakeven");
+                            //play melee breakeven dialogue
+                            soundManager.PlaySoldierMeleeBreakeven(activeSoldier.soldierSpeciality);
 
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
 
