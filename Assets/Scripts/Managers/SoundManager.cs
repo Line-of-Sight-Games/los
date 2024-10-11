@@ -24,6 +24,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderUseGrenade, spartanUseGrenade, survivorUseGrenade, runnerUseGrenade, evaderUseGrenade, reservistUseGrenade, seekerUseGrenade, chameleonUseGrenade, scoutUseGrenade, infantrymanUseGrenade, operatorUseGrenade, earthquakeUseGrenade, hunterUseGrenade, cycloneUseGrenade, hammerUseGrenade, wolfUseGrenade, herculesUseGrenade, diplomatUseGrenade, technicianUseGrenade, medicUseGrenade;
     public AudioClip[] commanderUseTabun, spartanUseTabun, survivorUseTabun, runnerUseTabun, evaderUseTabun, reservistUseTabun, seekerUseTabun, chameleonUseTabun, scoutUseTabun, infantrymanUseTabun, operatorUseTabun, earthquakeUseTabun, hunterUseTabun, cycloneUseTabun, hammerUseTabun, wolfUseTabun, herculesUseTabun, diplomatUseTabun, technicianUseTabun, medicUseTabun;
     public AudioClip[] commanderUseSmoke, spartanUseSmoke, survivorUseSmoke, runnerUseSmoke, evaderUseSmoke, reservistUseSmoke, seekerUseSmoke, chameleonUseSmoke, scoutUseSmoke, infantrymanUseSmoke, operatorUseSmoke, earthquakeUseSmoke, hunterUseSmoke, cycloneUseSmoke, hammerUseSmoke, wolfUseSmoke, herculesUseSmoke, diplomatUseSmoke, technicianUseSmoke, medicUseSmoke;
+    public AudioClip[] commanderKillEnemy, spartanKillEnemy, survivorKillEnemy, runnerKillEnemy, evaderKillEnemy, reservistKillEnemy, seekerKillEnemy, chameleonKillEnemy, scoutKillEnemy, infantrymanKillEnemy, operatorKillEnemy, earthquakeKillEnemy, hunterKillEnemy, cycloneKillEnemy, hammerKillEnemy, wolfKillEnemy, herculesKillEnemy, diplomatKillEnemy, technicianKillEnemy, medicKillEnemy;
 
 
 
@@ -613,5 +614,48 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianUseSmoke);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicUseSmoke);
+    }
+    public void PlaySoldierKillEnemy(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderKillEnemy);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanKillEnemy);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorKillEnemy);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerKillEnemy);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderKillEnemy);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistKillEnemy);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerKillEnemy);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerKillEnemy);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutKillEnemy);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanKillEnemy);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorKillEnemy);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeKillEnemy);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterKillEnemy);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneKillEnemy);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerKillEnemy);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfKillEnemy);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesKillEnemy);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatKillEnemy);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianKillEnemy);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicKillEnemy);
     }
 }

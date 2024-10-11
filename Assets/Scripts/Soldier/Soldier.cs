@@ -2690,6 +2690,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
             else 
             {
+                //play kill enemy dialogue
+                if (killedBy.IsOnturn() && killedBy.IsConscious())
+                    game.soundManager.PlaySoldierKillEnemy(killedBy.soldierSpeciality);
+
                 menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}. He is now <color=red>Dead</color>", false, false);
 
                 //make him dead
