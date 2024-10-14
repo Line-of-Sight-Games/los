@@ -89,8 +89,8 @@ public class OverwatchShotUI : MonoBehaviour
                 targetSoldier.terrainOn = terrainDropdown.captionText.text;
 
                 game.tempShooterTarget = Tuple.Create(shooter, target);
-                int randNum1 = HelperFunctions.RandomNumber(0, 100);
-                int randNum2 = HelperFunctions.RandomNumber(0, 100);
+                int randNum1 = HelperFunctions.RandomNumber(1, 100);
+                int randNum2 = HelperFunctions.RandomNumber(1, 100);
                 Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
                 gun.SpendSingleAmmo();
 

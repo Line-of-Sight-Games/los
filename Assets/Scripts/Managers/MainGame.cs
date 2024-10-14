@@ -1550,8 +1550,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             resistSuppression = shooter.SuppressionCheck();
             gun.SpendSingleAmmo();
 
-            int randNum1 = HelperFunctions.RandomNumber(0, 100);
-            int randNum2 = HelperFunctions.RandomNumber(0, 100);
+            int randNum1 = HelperFunctions.RandomNumber(1, 100);
+            int randNum2 = HelperFunctions.RandomNumber(1, 100);
             Tuple<int, int, int> chances;
             chances = CalculateHitPercentage(shooter, target, gun);
 
