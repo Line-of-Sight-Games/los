@@ -339,54 +339,91 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (linkedSoldier != null)
         {
-            //rerun detection alert for thermal goggles
+            //thermal goggles
             if (itemName.Equals("Thermal_Goggles"))
-                StartCoroutine(game.DetectionAlertSingle(linkedSoldier, "statChange(SR)|thermalEquipped", Vector3.zero, string.Empty));
-
-            //unset cover for JA wearers
-            if (IsJuggernautArmour())
             {
-                //play pickup JA dialogue
+                //play equip armour sfx
+                game.soundManager.PlayEquipArmour();
+                
+                //run detection alert
+                StartCoroutine(game.DetectionAlertSingle(linkedSoldier, "statChange(SR)|thermalEquipped", Vector3.zero, string.Empty));
+            }
+            else if (IsJuggernautArmour())
+            {
+                //play equip armour sfx
+                game.soundManager.PlayEquipArmour();
+
+                //play equip armour dialogue
                 game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
 
+                //unset cover
                 linkedSoldier.UnsetCover();
             }
-
-            //play pickup BA dialogue
-            if (IsBodyArmour())
-                game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
-
-            //play pickup UHF dialogue
-            if (IsUHF())
-                game.soundManager.PlaySoldierPickupUHF(linkedSoldier.soldierSpeciality);
-
-            //play pickup ULF dialogue
-            if (IsULF())
-                game.soundManager.PlaySoldierPickupULF(linkedSoldier.soldierSpeciality);
-
-            //take exo armour health
-            if (itemName.Equals("Armour_Exo"))
+            else if (itemName.Equals("Armour_Exo"))
             {
+                //play equip armour sfx
+                game.soundManager.PlayEquipArmour();
+
+                //take exo armour health
                 linkedSoldier.stats.H.BaseVal -= 3;
                 linkedSoldier.TakeDamage(null, 3, true, new() { "Exo" });
             }
-
-            //reset sustenance for stim armour
-            if (itemName.Equals("Armour_Stimulant"))
+            else if (itemName.Equals("Armour_Stimulant"))
             {
+                //play equip armour sfx
+                game.soundManager.PlayEquipArmour();
+
+                //reset sustenance for stim armour
                 linkedSoldier.ResetRoundsWithoutFood();
+
+                //kill drugs
                 for (int i = 0; i < itemManager.drugTable.Length; i++)
                     linkedSoldier.UnsetOnDrug(itemManager.drugTable[i]);
+
+                //kil tabun
                 linkedSoldier.UnsetTabun();
             }
+            else if (IsBodyArmour())
+            {
+                //play equip armour sfx
+                game.soundManager.PlayEquipArmour();
 
-            //add ap for logistics belt
-            if (itemName.Equals("Logistics_Belt"))
+                //play pickup armour dialogue
+                game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
+            }
+            else if (IsBackpack())
+            {
+                //play equip wearable gear
+                game.soundManager.PlayEquipWearableGear();
+            }
+            else if (IsBrace())
+            {
+                //play equip wearable gear
+                game.soundManager.PlayEquipWearableGear();
+            }
+            else if (IsBag())
+            {
+                //play equip wearable gear
+                game.soundManager.PlayEquipWearableGear();
+            }
+            else if (itemName.Equals("Logistics_Belt"))
+            {
+                //play equip wearable gear
+                game.soundManager.PlayEquipWearableGear();
+
+                //add ap
                 linkedSoldier.ap++;
-
-            //label unlabelled syringes
-            if (linkedSoldier.IsMedic() && itemName.Equals("Syringe_Unlabelled"))
-                itemName = $"Syringe_{itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)]}";
+            }
+            else if (IsUHF())
+                game.soundManager.PlaySoldierPickupUHF(linkedSoldier.soldierSpeciality);
+            else if (IsULF())
+                game.soundManager.PlaySoldierPickupULF(linkedSoldier.soldierSpeciality);
+            else if (itemName.Equals("Syringe_Unlabelled"))
+            {
+                //label unlabelled syringes
+                if (linkedSoldier.IsMedic())
+                    itemName = $"Syringe_{itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)]}";
+            }
 
             //perform ability effects
             if (IsGun())
