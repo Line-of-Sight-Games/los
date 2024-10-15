@@ -3201,7 +3201,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (CoinFlip())
                         passCount++;
                 }
-                resultString = "Negotiation";
+                resultString += "Negotiation";
             }
             else if (dipelecUI.dipElecTypeDropdown.value == 1)
             {
@@ -3211,7 +3211,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (CoinFlip())
                         passCount++;
                 }
-                resultString = "Hack";
+                resultString += "Hack";
             }
             else
             {
@@ -3233,11 +3233,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                         textComponent.text = (resultString == "Hack") ? dipelec.GetLevelElec(i + 1) : dipelec.GetLevelDip(i + 1);
                     }
+                    resultString += $"SuccessL{dipelecUI.dipElecLevelDropdown.value + 1}";
                 }
                 else
                 {
                     menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Failed " + resultString;
                     menu.dipelecResultUI.transform.Find("RewardPanel").gameObject.SetActive(false);
+                    resultString += "Fail";
                 }
             }
             else
@@ -3248,6 +3250,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (activeSoldier.hp > 3)
                     activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new() { "Dipelec" });
             }
+
+            print(resultString);
+            //play dipelec result sfx
+            soundManager.PlayDipelecResolution(resultString);
 
             menu.OpenDipelecResultUI();
             menu.CloseDipElecUI();

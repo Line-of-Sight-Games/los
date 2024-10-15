@@ -7,12 +7,21 @@ using UnityEngine.Audio;
 public class SoundManager : MonoBehaviour
 {
     public MainGame game;
+    public bool banzaiPlayed, isMute;
 
     //audio stuff
     public AudioSource audioSource;
+    private Dictionary<AudioClip, Coroutine> playingSounds = new();
+
+    //meta sfx
     public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
+
+    //game sfx
     public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
     public AudioClip placeClaymore;
+    public AudioClip dipelecFail, dipelecHacking, dipelecNegotiating, dipelecSuccessL1, dipelecSuccessL2, dipelecSuccessL3, dipelecSuccessL4;
+
+    //dialogue
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
     public AudioClip[] commanderConfigNearGB, spartanConfigNearGB, survivorConfigNearGB, runnerConfigNearGB, evaderConfigNearGB, reservistConfigNearGB, seekerConfigNearGB, chameleonConfigNearGB, scoutConfigNearGB, infantrymanConfigNearGB, operatorConfigNearGB, earthquakeConfigNearGB, hunterConfigNearGB, cycloneConfigNearGB, hammerConfigNearGB, wolfConfigNearGB, herculesConfigNearGB, diplomatConfigNearGB, technicianConfigNearGB, medicConfigNearGB;
@@ -32,13 +41,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderPickupULF, spartanPickupULF, survivorPickupULF, runnerPickupULF, evaderPickupULF, reservistPickupULF, seekerPickupULF, chameleonPickupULF, scoutPickupULF, infantrymanPickupULF, operatorPickupULF, earthquakePickupULF, hunterPickupULF, cyclonePickupULF, hammerPickupULF, wolfPickupULF, herculesPickupULF, diplomatPickupULF, technicianPickupULF, medicPickupULF;
     public AudioClip[] commanderSeeEnemy, spartanSeeEnemy, survivorSeeEnemy, runnerSeeEnemy, evaderSeeEnemy, reservistSeeEnemy, seekerSeeEnemy, chameleonSeeEnemy, scoutSeeEnemy, infantrymanSeeEnemy, operatorSeeEnemy, earthquakeSeeEnemy, hunterSeeEnemy, cycloneSeeEnemy, hammerSeeEnemy, wolfSeeEnemy, herculesSeeEnemy, diplomatSeeEnemy, technicianSeeEnemy, medicSeeEnemy;
 
-
-
-
-    public bool banzaiPlayed, isMute;
-
-    private Dictionary<AudioClip, Coroutine> playingSounds = new();
-
+    //basic sound functions
     public void PlaySound(AudioClip clip)
     {
         if (!isMute)
@@ -65,6 +68,8 @@ public class SoundManager : MonoBehaviour
         print($"Closing sound \"{clip.name}\"");
         playingSounds.Remove(clip);
     }
+
+
 
 
 
@@ -129,6 +134,27 @@ public class SoundManager : MonoBehaviour
     public void PlayPlaceClaymore()
     {
         PlaySound(placeClaymore);
+    }
+    public void PlayDipelecResolution(string result)
+    {
+        if (result.Contains("Hack"))
+            PlaySound(dipelecHacking);
+        else if (result.Contains("Negotiation"))
+            PlaySound(dipelecNegotiating);
+
+        if (result.Contains("Fail"))
+            PlaySound(dipelecFail);
+        else if (result.Contains("Success"))
+        {
+            if (result.Contains("L1"))
+                PlaySound(dipelecSuccessL1);
+            else if (result.Contains("L2"))
+                PlaySound(dipelecSuccessL2);
+            else if (result.Contains("L3"))
+                PlaySound(dipelecSuccessL3);
+            else if (result.Contains("L4"))
+                PlaySound(dipelecSuccessL4);
+        }
     }
 
 
