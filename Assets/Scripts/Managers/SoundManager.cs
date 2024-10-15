@@ -28,6 +28,8 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderMeleeBreakeven, spartanMeleeBreakeven, survivorMeleeBreakeven, runnerMeleeBreakeven, evaderMeleeBreakeven, reservistMeleeBreakeven, seekerMeleeBreakeven, chameleonMeleeBreakeven, scoutMeleeBreakeven, infantrymanMeleeBreakeven, operatorMeleeBreakeven, earthquakeMeleeBreakeven, hunterMeleeBreakeven, cycloneMeleeBreakeven, hammerMeleeBreakeven, wolfMeleeBreakeven, herculesMeleeBreakeven, diplomatMeleeBreakeven, technicianMeleeBreakeven, medicMeleeBreakeven;
     public AudioClip[] commanderMeleeMove, spartanMeleeMove, survivorMeleeMove, runnerMeleeMove, evaderMeleeMove, reservistMeleeMove, seekerMeleeMove, chameleonMeleeMove, scoutMeleeMove, infantrymanMeleeMove, operatorMeleeMove, earthquakeMeleeMove, hunterMeleeMove, cycloneMeleeMove, hammerMeleeMove, wolfMeleeMove, herculesMeleeMove, diplomatMeleeMove, technicianMeleeMove, medicMeleeMove;
     public AudioClip[] commanderShotMiss, spartanShotMiss, survivorShotMiss, runnerShotMiss, evaderShotMiss, reservistShotMiss, seekerShotMiss, chameleonShotMiss, scoutShotMiss, infantrymanShotMiss, operatorShotMiss, earthquakeShotMiss, hunterShotMiss, cycloneShotMiss, hammerShotMiss, wolfShotMiss, herculesShotMiss, diplomatShotMiss, technicianShotMiss, medicShotMiss;
+    public AudioClip[] commanderPickupUHF, spartanPickupUHF, survivorPickupUHF, runnerPickupUHF, evaderPickupUHF, reservistPickupUHF, seekerPickupUHF, chameleonPickupUHF, scoutPickupUHF, infantrymanPickupUHF, operatorPickupUHF, earthquakePickupUHF, hunterPickupUHF, cyclonePickupUHF, hammerPickupUHF, wolfPickupUHF, herculesPickupUHF, diplomatPickupUHF, technicianPickupUHF, medicPickupUHF;
+    public AudioClip[] commanderPickupULF, spartanPickupULF, survivorPickupULF, runnerPickupULF, evaderPickupULF, reservistPickupULF, seekerPickupULF, chameleonPickupULF, scoutPickupULF, infantrymanPickupULF, operatorPickupULF, earthquakePickupULF, hunterPickupULF, cyclonePickupULF, hammerPickupULF, wolfPickupULF, herculesPickupULF, diplomatPickupULF, technicianPickupULF, medicPickupULF;
 
 
 
@@ -789,5 +791,91 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianShotMiss);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicShotMiss);
+    }
+    public void PlaySoldierPickupUHF(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderPickupUHF);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanPickupUHF);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorPickupUHF);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerPickupUHF);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderPickupUHF);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistPickupUHF);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerPickupUHF);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerPickupUHF);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutPickupUHF);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanPickupUHF);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorPickupUHF);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakePickupUHF);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterPickupUHF);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cyclonePickupUHF);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerPickupUHF);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfPickupUHF);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesPickupUHF);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatPickupUHF);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianPickupUHF);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicPickupUHF);
+    }
+    public void PlaySoldierPickupULF(string specialty)
+    {
+        if (specialty.Equals("Leadership"))
+            PlayRandomVoice(commanderPickupULF);
+        else if (specialty.Equals("Health"))
+            PlayRandomVoice(spartanPickupULF);
+        else if (specialty.Equals("Resilience"))
+            PlayRandomVoice(survivorPickupULF);
+        else if (specialty.Equals("Speed"))
+            PlayRandomVoice(runnerPickupULF);
+        else if (specialty.Equals("Evasion"))
+            PlayRandomVoice(evaderPickupULF);
+        else if (specialty.Equals("Fight"))
+            PlayRandomVoice(reservistPickupULF);
+        else if (specialty.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerPickupULF);
+        else if (specialty.Equals("Camouflage"))
+            PlayRandomVoice(seekerPickupULF);
+        else if (specialty.Equals("Sight Radius"))
+            PlayRandomVoice(scoutPickupULF);
+        else if (specialty.Equals("Rifle"))
+            PlayRandomVoice(infantrymanPickupULF);
+        else if (specialty.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorPickupULF);
+        else if (specialty.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakePickupULF);
+        else if (specialty.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterPickupULF);
+        else if (specialty.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cyclonePickupULF);
+        else if (specialty.Equals("Shotgun"))
+            PlayRandomVoice(hammerPickupULF);
+        else if (specialty.Equals("Melee"))
+            PlayRandomVoice(wolfPickupULF);
+        else if (specialty.Equals("Strength"))
+            PlayRandomVoice(herculesPickupULF);
+        else if (specialty.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatPickupULF);
+        else if (specialty.Equals("Electronics"))
+            PlayRandomVoice(technicianPickupULF);
+        else if (specialty.Equals("Healing"))
+            PlayRandomVoice(medicPickupULF);
     }
 }

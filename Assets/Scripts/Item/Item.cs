@@ -346,18 +346,23 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             //unset cover for JA wearers
             if (IsJuggernautArmour())
             {
-                //play armour equip dialogue for JA
+                //play pickup JA dialogue
                 game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
 
                 linkedSoldier.UnsetCover();
             }
 
-            //play armour equip dialogue for BA
+            //play pickup BA dialogue
             if (IsBodyArmour())
-            {
-                //play armour equip dialogue for BA
                 game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
-            }
+
+            //play pickup UHF dialogue
+            if (IsUHF())
+                game.soundManager.PlaySoldierPickupUHF(linkedSoldier.soldierSpeciality);
+
+            //play pickup ULF dialogue
+            if (IsULF())
+                game.soundManager.PlaySoldierPickupUHF(linkedSoldier.soldierSpeciality);
 
             //take exo armour health
             if (itemName.Equals("Armour_Exo"))
@@ -1015,6 +1020,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public bool IsPoisonSatchel()
     {
         if (itemName.Equals("Poison_Satchel"))
+            return true;
+        return false;
+    }
+    public bool IsUHF()
+    {
+        if (itemName.Equals("UHF_Radio"))
             return true;
         return false;
     }
