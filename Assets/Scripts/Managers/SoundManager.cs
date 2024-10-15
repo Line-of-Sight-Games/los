@@ -20,7 +20,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
     public AudioClip placeClaymore;
     public AudioClip dipelecFail, dipelecHacking, dipelecNegotiating, dipelecSuccessL1, dipelecSuccessL2, dipelecSuccessL3, dipelecSuccessL4;
-    public AudioClip shotAR, shotLMG, shotPi, shotRi, shotSh, shotSMG, shotSn, shotSuppressLMG_SMG_AR, shotSuppressPi_Ri_Sn_Sh, shotSilencedLMG_SMG_AR, shotSilencedPi_Ri_Sn_Sh, coverDestruction;
+    public AudioClip shotAR, shotLMG, shotPi, shotRi, shotSh, shotSMG, shotSn, shotSuppressLMG_SMG_AR, shotSuppressPi_Ri_Sn_Sh, shotSilencedLMG_SMG_AR, shotSilencedPi_Ri_Sn_Sh, coverDestruction, reloadAR, reloadLMG, reloadPi, reloadRi, reloadSh, reloadSMG, reloadSn;
     public AudioClip fallFromHeight, structuralCollapse;
 
     //dialogue
@@ -216,6 +216,23 @@ public class SoundManager : MonoBehaviour
             PlaySound(shotSuppressLMG_SMG_AR);
         else if (gun.IsPistol() || gun.IsRifle() || gun.IsSniper() || gun.IsShotgun())
             PlaySound(shotSuppressPi_Ri_Sn_Sh);
+    }
+    public void PlayReload(Item gun)
+    {
+        if (gun.IsAssaultRifle())
+            PlaySound(reloadAR);
+        else if (gun.IsLMG())
+            PlaySound(reloadLMG);
+        else if (gun.IsPistol())
+            PlaySound(reloadPi);
+        else if (gun.IsRifle())
+            PlaySound(reloadRi);
+        else if (gun.IsShotgun())
+            PlaySound(reloadSh);
+        else if (gun.IsSMG())
+            PlaySound(reloadSMG);
+        else if (gun.IsSniper())
+            PlaySound(reloadSn);
     }
     public void PlayCoverDestruction()
     {

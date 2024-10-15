@@ -592,6 +592,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 case "Ammo_Sh":
                 case "Ammo_SMG_Pi":
                 case "Ammo_Sn":
+                    //play reload sfx
+                    game.soundManager.PlayReload(itemUsedOn);
+
                     (this.ammo, itemUsedOn.ammo) = (itemUsedOn.ammo, this.ammo);
                     if (this.ammo != 0)
                         charges++; //add a "charge" to ensure ammo is not deleted
