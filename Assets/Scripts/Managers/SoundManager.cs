@@ -21,6 +21,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip placeClaymore;
     public AudioClip dipelecFail, dipelecHacking, dipelecNegotiating, dipelecSuccessL1, dipelecSuccessL2, dipelecSuccessL3, dipelecSuccessL4;
     public AudioClip shotAR, shotLMG, shotPi, shotRi, shotSh, shotSMG, shotSn, shotSuppressLMG_SMG_AR, shotSuppressPi_Ri_Sn_Sh, shotSilencedLMG_SMG_AR, shotSilencedPi_Ri_Sn_Sh, coverDestruction;
+    public AudioClip fallFromHeight, structuralCollapse;
 
     //dialogue
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
@@ -220,7 +221,14 @@ public class SoundManager : MonoBehaviour
     {
         PlaySound(coverDestruction);
     }
-
+    public void PlayFallFromHeight()
+    {
+        PlaySound(fallFromHeight);
+    }
+    public void PlayStructuralCollapse()
+    {
+        PlaySound(structuralCollapse);
+    }
 
 
 

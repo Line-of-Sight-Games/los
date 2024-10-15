@@ -2697,7 +2697,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             else 
             {
                 //play kill enemy dialogue
-                if (killedBy.IsOnturn() && killedBy.IsConscious())
+                if (killedBy != null && killedBy.IsOnturn() && killedBy.IsConscious())
                     game.soundManager.PlaySoldierKillEnemy(killedBy.soldierSpeciality);
 
                 menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}. He is now <color=red>Dead</color>", false, false);
@@ -3111,6 +3111,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool StructuralCollapseCheck(int structureHeight)
     {
+        //play structural collapse sfx
+        game.soundManager.PlayStructuralCollapse();
+
         int survivalPassesNeeded = Mathf.FloorToInt(structureHeight / 10f);
         int survivalPassesAchieved = 0;
         int survivalAttempts = 1;
