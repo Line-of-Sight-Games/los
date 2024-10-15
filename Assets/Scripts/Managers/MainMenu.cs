@@ -2060,7 +2060,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 }
                 else if (child.GetComponent<ClaymoreAlertLOS>() != null)
                 {
-                    //play claymore detect sfx
+                    //play claymore detect dialogue
                     soundManager.PlaySoldierDetectClaymore(child.GetComponent<ClaymoreAlertLOS>().soldier.soldierSpeciality);
 
                     Claymore claymore = child.GetComponent<ClaymoreAlertLOS>().claymore;

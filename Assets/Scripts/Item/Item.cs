@@ -362,7 +362,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             //play pickup ULF dialogue
             if (IsULF())
-                game.soundManager.PlaySoldierPickupUHF(linkedSoldier.soldierSpeciality);
+                game.soundManager.PlaySoldierPickupULF(linkedSoldier.soldierSpeciality);
 
             //take exo armour health
             if (itemName.Equals("Armour_Exo"))
