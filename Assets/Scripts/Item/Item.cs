@@ -746,6 +746,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
         if (IsFrag())
         {
+            //play explosion sfx
+            game.soundManager.PlayExplosion();
+
             foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
             {
                 int damage = 0;

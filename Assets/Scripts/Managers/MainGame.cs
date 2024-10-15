@@ -3100,6 +3100,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {
+        //play explosion sfx
+        soundManager.PlayExplosion();
+
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 

@@ -17,6 +17,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
 
     //game sfx
+    public AudioClip explosion;
     public AudioClip meleeCounter, meleeBreakeven, meleeSuccessStatic, meleeSuccessCharge;
     public AudioClip placeClaymore;
     public AudioClip dipelecFail, dipelecHacking, dipelecNegotiating, dipelecSuccessL1, dipelecSuccessL2, dipelecSuccessL3, dipelecSuccessL4;
@@ -78,7 +79,7 @@ public class SoundManager : MonoBehaviour
 
 
 
-    //fx functions
+    //meta sfx functions
     public void PlayBanzai()
     {
         if (!banzaiPlayed)
@@ -122,6 +123,17 @@ public class SoundManager : MonoBehaviour
     public void PlayNewAbility()
     {
         PlaySound(newAbilityUpgrade);
+    }
+
+
+
+
+
+
+    //game sfx functions
+    public void PlayExplosion()
+    {
+        PlaySound(explosion);
     }
     public void PlayMeleeResolution(string result)
     {
