@@ -1514,8 +1514,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
         Item gun = null;
         bool runSecondShot = false;
-        print(menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text);
-        if (menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Contains("|"))
+        string gunNames = menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text;
+        print(gunNames);
+        if (gunNames.Contains("|"))
         {
             string[] guns = menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Split('|');
             gun = shooter.GetEquippedGun(guns[0]);
@@ -1523,7 +1524,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             runSecondShot = true;
         }
         else
-            gun = shooter.GetEquippedGun(menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text);
+            gun = shooter.GetEquippedGun(gunNames);
 
         int.TryParse(shotUI.apCost.text, out int ap);
         int actingHitChance;
@@ -1542,6 +1543,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (shotUI.shotTypeDropdown.value == 0) //standard shot
         {
+            //play shot sfx
+            soundManager.PlayShotResolution(gun);
+
             if (target is Soldier)
                 FileUtility.WriteToReport($"{shooter.soldierName} shooting at {(target as Soldier).soldierName}");
             else
@@ -1591,6 +1595,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //standard shot hits cover
                 if (randNum1 <= actingHitChance)
                 {
+                    //play cover destruction
+                    soundManager.PlayCoverDestruction();
+
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                     //critical shot hits cover
@@ -1712,6 +1719,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (shotUI.shotTypeDropdown.value == 1) //supression shot
         {
+            //play shot sfx
+            soundManager.PlaySuppressionResolution(gun);
+
             FileUtility.WriteToReport($"{shooter.soldierName} suppressing {target}");
 
             gun.SpendSpecificAmmo(gun.gunTraits["SuppressDrain"], true);

@@ -1806,11 +1806,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         //add to the right list
         if (!LOSToTheseSoldiersAndRevealing.Contains(id))
+        {
             LOSToTheseSoldiersAndRevealing.Add(id);
 
-        //play see enemy dialogue
-        if (IsOnturn())
-            game.soundManager.PlaySoldierSeeEnemy(soldierSpeciality);
+            //play see enemy dialogue
+            if (IsOnturn())
+                game.soundManager.PlaySoldierSeeEnemy(soldierSpeciality);
+        }
 
         //add reference of this soldier revealing others
         soldierManager.FindSoldierById(id).AddSoldierRevealingThisSoldier(this.Id);
