@@ -339,6 +339,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (linkedSoldier != null)
         {
+            //play pickup general sfx
+            game.soundManager.PlayConfigGeneral();
+
             //thermal goggles
             if (itemName.Equals("Thermal_Goggles"))
             {
@@ -464,6 +467,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void RunDropEffect(Soldier linkedSoldier)
     {
+        //play pickup general sfx
+        game.soundManager.PlayConfigGeneral();
+
         //minus ap for logistics belt
         if (itemName.Equals("Logistics_Belt"))
             linkedSoldier.DeductAP(1);
