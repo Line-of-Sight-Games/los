@@ -1725,8 +1725,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (shotUI.shotTypeDropdown.value == 1) //supression shot
         {
-            //play shot sfx
+            //play suppression sfx
             soundManager.PlaySuppressionResolution(gun);
+
+            //play suppression dialogue
+            soundManager.PlaySoldierSuppressEnemy(shooter.soldierSpeciality);
 
             FileUtility.WriteToReport($"{shooter.soldierName} suppressing {target}");
 
