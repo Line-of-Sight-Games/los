@@ -42,7 +42,7 @@ public class ValidThrowChecker : MonoBehaviour
             }
             else
             {
-                if (GetThrowLocation(out Vector3 throwLocation) && Vector3.Distance(throwLocation, new(menu.activeSoldier.X, menu.activeSoldier.Y, menu.activeSoldier.Z)) > menu.activeSoldier.SRColliderMin.radius)
+                if (GetThrowLocation(out Vector3 throwLocation) && Vector3.Distance(throwLocation, new(menu.activeSoldier.X, menu.activeSoldier.Y, menu.activeSoldier.Z)) > 3) //dropping allowed while blid within 3
                     throwBeyondBlindRadius.SetActive(true);
             }
         }

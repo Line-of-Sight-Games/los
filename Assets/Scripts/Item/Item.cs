@@ -747,6 +747,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void CheckExplosionGrenade(Soldier explodedBy, Vector3 position)
     {
+        //play use grenade sfx
+        game.soundManager.PlayUseGrenade(this);
+
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} | Detonated: {position.x},{position.y},{position.z}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.Id;
 

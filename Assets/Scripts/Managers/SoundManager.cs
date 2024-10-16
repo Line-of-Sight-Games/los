@@ -24,6 +24,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip shotAR, shotLMG, shotPi, shotRi, shotSh, shotSMG, shotSn, shotSuppressLMG_SMG_AR, shotSuppressPi_Ri_Sn_Sh, shotSilencedLMG_SMG_AR, shotSilencedPi_Ri_Sn_Sh, coverDestruction, reloadAR, reloadLMG, reloadPi, reloadRi, reloadSh, reloadSMG, reloadSn;
     public AudioClip fallFromHeight, structuralCollapse;
     public AudioClip equipArmour, equipWearableGear, configureGeneral;
+    public AudioClip itemUseFrag, itemUseFlash, itemUseSmoke, itemUseTabun;
 
     //dialogue
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
@@ -269,6 +270,17 @@ public class SoundManager : MonoBehaviour
     public void PlayConfigGeneral()
     {
         PlaySound(configureGeneral);
+    }
+    public void PlayUseGrenade(Item grenade)
+    {
+        if (grenade.IsFrag())
+            PlaySound(itemUseFrag);
+        else if (grenade.IsFlashbang())
+            PlaySound(itemUseFlash);
+        else if (grenade.IsSmoke())
+            PlaySound(itemUseSmoke);
+        else if (grenade.IsTabun())
+            PlaySound(itemUseTabun);
     }
 
 
