@@ -2648,7 +2648,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "E_Tool":
             case "Food_Pack":
             case "Water_Canteen":
-            case "ULF_Radio":
                 itemUsed.UseItem(linkedIcon, null, null);
                 break;
             case "Ammo_AR":
@@ -2754,6 +2753,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         highestRoll = roll;
                 }
 
+                //play uhf result dialogue
+                soundManager.PlayUHFResult(highestRoll);
+
+                //calculate scatter
                 scatterDistance = highestRoll switch
                 {
                     2 => radius + 1,

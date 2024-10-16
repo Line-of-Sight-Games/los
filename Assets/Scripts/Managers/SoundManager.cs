@@ -47,6 +47,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderPickupULF, spartanPickupULF, survivorPickupULF, runnerPickupULF, evaderPickupULF, reservistPickupULF, seekerPickupULF, chameleonPickupULF, scoutPickupULF, infantrymanPickupULF, operatorPickupULF, earthquakePickupULF, hunterPickupULF, cyclonePickupULF, hammerPickupULF, wolfPickupULF, herculesPickupULF, diplomatPickupULF, technicianPickupULF, medicPickupULF;
     public AudioClip[] commanderSeeEnemy, spartanSeeEnemy, survivorSeeEnemy, runnerSeeEnemy, evaderSeeEnemy, reservistSeeEnemy, seekerSeeEnemy, chameleonSeeEnemy, scoutSeeEnemy, infantrymanSeeEnemy, operatorSeeEnemy, earthquakeSeeEnemy, hunterSeeEnemy, cycloneSeeEnemy, hammerSeeEnemy, wolfSeeEnemy, herculesSeeEnemy, diplomatSeeEnemy, technicianSeeEnemy, medicSeeEnemy;
     public AudioClip[] commanderSuppressEnemy, spartanSuppressEnemy, survivorSuppressEnemy, runnerSuppressEnemy, evaderSuppressEnemy, reservistSuppressEnemy, seekerSuppressEnemy, chameleonSuppressEnemy, scoutSuppressEnemy, infantrymanSuppressEnemy, operatorSuppressEnemy, earthquakeSuppressEnemy, hunterSuppressEnemy, cycloneSuppressEnemy, hammerSuppressEnemy, wolfSuppressEnemy, herculesSuppressEnemy, diplomatSuppressEnemy, technicianSuppressEnemy, medicSuppressEnemy;
+    public AudioClip[] ulfFail, ulfSuccess, uhfDialUp, uhfMiss, uhfHit, uhfDirectHit;
 
     //basic sound functions
     public void PlaySound(AudioClip clip)
@@ -1152,5 +1153,25 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianSuppressEnemy);
         else if (specialty.Equals("Healing"))
             PlayRandomVoice(medicSuppressEnemy);
+    }
+    public void PlayUHFDialUp()
+    {
+        PlaySound(uhfDialUp[HelperFunctions.RandomNumber(0, uhfDialUp.Length - 1)]);
+    }
+    public void PlayUHFResult(int roll)
+    {
+        if (roll == 6)
+            PlaySound(uhfDirectHit[HelperFunctions.RandomNumber(0, uhfDirectHit.Length - 1)]);
+        else if (roll == 1)
+            PlaySound(uhfMiss[HelperFunctions.RandomNumber(0, uhfMiss.Length - 1)]);
+        else
+            PlaySound(uhfHit[HelperFunctions.RandomNumber(0, uhfHit.Length - 1)]);
+    }
+    public void PlayULFResult(string result)
+    {
+        if (result.Contains("Jamming") || result.Contains("Spying"))
+            PlaySound(ulfSuccess[HelperFunctions.RandomNumber(0, ulfSuccess.Length - 1)]);
+        else
+            PlaySound(ulfFail[HelperFunctions.RandomNumber(0, ulfFail.Length - 1)]);
     }
 }

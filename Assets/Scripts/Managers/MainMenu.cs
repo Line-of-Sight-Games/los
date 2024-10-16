@@ -4264,15 +4264,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (activeSoldier.CheckAP(3))
         {
-            useULFUI.GetComponent<UseItemUI>().itemUsed = ulfUsed;
-            useULFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = effect;
-            useULFUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = effect switch
+            if (activeSoldier.HandsFreeToUseItem(ulfUsed))
             {
-                "spy" => "Attempt to spy with ULF radio?",
-                "jam" => "Attempt to jam communications with ULF radio?",
-                _ => $"Unrecognised action ({effect})",
-            };
-            useULFUI.SetActive(true);
+                useULFUI.GetComponent<UseItemUI>().itemUsed = ulfUsed;
+                useULFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = effect;
+                useULFUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = effect switch
+                {
+                    "spy" => "Attempt to spy with ULF radio?",
+                    "jam" => "Attempt to jam communications with ULF radio?",
+                    _ => $"Unrecognised action ({effect})",
+                };
+                useULFUI.SetActive(true);
+            }
         }
     }
     public void CloseUseULFUI()
@@ -4281,6 +4284,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenULFResultUI(string message)
     {
+        //play ulf dialogue
+        soundManager.PlayULFResult(message);
+
         ULFResultUI.transform.Find("OptionPanel").Find("Result").Find("Text").GetComponent<TextMeshProUGUI>().text = message;
         ULFResultUI.SetActive(true);
     }
@@ -4308,6 +4314,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenUHFUI(UseItemUI useItemUI)
     {
+        //play uhf dial up dialogue
+        soundManager.PlayUHFDialUp();
+
         UHFUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         UHFUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
         UHFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;

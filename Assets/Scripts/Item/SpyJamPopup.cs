@@ -7,7 +7,7 @@ using TMPro;
 public class SpyJamPopup : MonoBehaviour
 {
     public MainMenu menu;
-    public GameObject useItemUI, jammedIndicator;
+    public GameObject useItemUI, jammedIndicator, inUseIndicator;
     public Button spyButton, jamButton;
     public Item ulfUsed;
 
@@ -20,7 +20,13 @@ public class SpyJamPopup : MonoBehaviour
     }
     public void ShowSpyJamPopup()
     {
-        if (ulfUsed.IsJammed())
+        if (ulfUsed.IsJamming() || ulfUsed.IsSpying())
+        {
+            spyButton.interactable = false;
+            jamButton.interactable = false;
+            inUseIndicator.SetActive(true);
+        }
+        else if (ulfUsed.IsJammed())
         {
             spyButton.interactable = false;
             jamButton.interactable = false;
@@ -33,6 +39,7 @@ public class SpyJamPopup : MonoBehaviour
         spyButton.interactable = true;
         jamButton.interactable = true;
         jammedIndicator.SetActive(false);
+        inUseIndicator.SetActive(false);
         gameObject.SetActive(false);
     }
 
