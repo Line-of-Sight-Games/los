@@ -3054,6 +3054,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
+                //play use deployment beacon
+                soundManager.PlayUseDepBeacon();
+
                 useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
                 Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), activeSoldier.Id);
 

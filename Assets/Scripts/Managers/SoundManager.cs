@@ -25,6 +25,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip fallFromHeight, structuralCollapse;
     public AudioClip equipArmour, equipWearableGear, configureGeneral;
     public AudioClip itemUseFrag, itemUseFlash, itemUseSmoke, itemUseTabun;
+    public AudioClip itemUseDepBeacon, itemUseETool, itemUseFood, itemUseMedikit, itemUsePoisonSatchel, itemUseSyringe, itemUseWater, itemUsePoisonedItem;
 
     //dialogue
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
@@ -282,6 +283,43 @@ public class SoundManager : MonoBehaviour
         else if (grenade.IsTabun())
             PlaySound(itemUseTabun);
     }
+    public void PlayUseDepBeacon()
+    {
+        PlaySound(itemUseDepBeacon);
+    }
+    public void PlayUseETool()
+    {
+        PlaySound(itemUseETool);
+    }
+    public void PlayUseFood()
+    {
+        PlaySound(itemUseFood);
+    }
+    public void PlayUseMedikit()
+    {
+        PlaySound(itemUseMedikit);
+    }
+    public void PlayUsePoisonSatchel()
+    {
+        PlaySound(itemUsePoisonSatchel);
+    }
+    public void PlayUseSyringe()
+    {
+        PlaySound(itemUseSyringe);
+    }
+    public void PlayUseWater()
+    {
+        PlaySound(itemUseWater);
+    }
+    public void PlayUsePoisonedItem()
+    {
+        PlaySound(itemUsePoisonedItem);
+    }
+
+
+
+
+
 
 
 

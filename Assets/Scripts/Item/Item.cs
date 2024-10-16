@@ -626,7 +626,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             switch (itemName)
             {
                 case "E_Tool":
-                    print("tried to use etool");
+                    //play use etool
+                    game.soundManager.PlayUseETool();
+
                     menu.OpenEtoolResultUI();
                     break;
                 case "Ammo_AR":
@@ -644,15 +646,28 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     break;
                 case "Food_Pack":
                     if (poisonedBy == null || poisonedBy == "")
+                    {
+                        //play use food pack
+                        game.soundManager.PlayUseFood();
+
                         linkedSoldier.roundsWithoutFood -= 10;
+                    }
                     else
+                    {
+                        //play use poison
+                        game.soundManager.PlayUsePoisonedItem();
+
                         linkedSoldier.TakePoisoning(poisonedBy, true);
+                    }
                     break;
                 case "Medikit_Small":
                 case "Medikit_Medium":
                 case "Medikit_Large":
                     if (poisonedBy == null || poisonedBy == "")
                     {
+                        //play use medikit
+                        game.soundManager.PlayUseMedikit();
+
                         //play heal ally dialogue
                         if (linkedSoldier != soldierUsedOn) //only if it's an ally you're healing
                             game.soundManager.PlaySoldierHealAlly(linkedSoldier.soldierSpeciality);
@@ -660,70 +675,72 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                         soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
                     }
                     else
+                    {
+                        //play use poison
+                        game.soundManager.PlayUsePoisonedItem();
+
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
+                    }
                     break;
                 case "Poison_Satchel":
+                    //play use poison
+                    game.soundManager.PlayUsePoisonSatchel();
+
                     itemUsedOn.poisonedBy = linkedSoldier.Id;
                     break;
                 case "Syringe_Amphetamine":
-                    if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Amphetamine", linkedSoldier);
-                    else
-                        soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
                 case "Syringe_Androstenedione":
-                    if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Androstenedione", linkedSoldier);
-                    else
-                        soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
                 case "Syringe_Cannabinoid":
-                    if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Cannabinoid", linkedSoldier);
-                    else
-                        soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
                 case "Syringe_Danazol":
-                    if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Danazol", linkedSoldier);
-                    else
-                        soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
                 case "Syringe_Glucocorticoid":
-                    if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Glucocorticoid", linkedSoldier);
-                    else
-                        soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
                 case "Syringe_Modafinil":
-                    if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Modafinil", linkedSoldier);
-                    else
-                        soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
                 case "Syringe_Shard":
-                    if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Shard", linkedSoldier);
-                    else
-                        soldierUsedOn.TakePoisoning(poisonedBy, true);
-                    break;
                 case "Syringe_Trenbolone":
                     if (poisonedBy == null || poisonedBy == "")
-                        soldierUsedOn.TakeDrug("Trenbolone", linkedSoldier);
+                    {
+                        //play use syringe
+                        game.soundManager.PlayUseSyringe();
+
+                        soldierUsedOn.TakeDrug(itemName.Split('_')[1], linkedSoldier);
+                    }
                     else
+                    {
+                        //play use poison
+                        game.soundManager.PlayUsePoisonedItem();
+
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
+                    }
                     break;
                 case "Syringe_Unlabelled":
                     if (poisonedBy == null || poisonedBy == "")
+                    {
+                        //play use syringe
+                        game.soundManager.PlayUseSyringe();
+
                         soldierUsedOn.TakeDrug(itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)], linkedSoldier);
+                    }
                     else
+                    {
+                        //play use poison
+                        game.soundManager.PlayUsePoisonedItem();
+
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
+                    }
                     break;
                 case "Water_Canteen":
                     if (poisonedBy == null || poisonedBy == "")
+                    {
+                        game.soundManager.PlayUseWater();
+
                         linkedSoldier.roundsWithoutFood -= 5;
+                    }
                     else
+                    {
+                        //play use poison
+                        game.soundManager.PlayUsePoisonedItem();
+
                         linkedSoldier.TakePoisoning(poisonedBy, true);
+                    }
                     weight--;
                     break;
                 default:
