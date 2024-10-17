@@ -2590,7 +2590,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Item gun in activeSoldier.EquippedGuns)
         {
             print($"{gun.itemName}|{gun.ammo}|{gun.gunTraits["SuppressDrain"]}");
-            if (!gun.CheckSpecificAmmo(gun.gunTraits["SuppressDrain"], true))
+            if (!gun.CheckGreaterThanSpecificAmmo(gun.gunTraits["SuppressDrain"], true))
                 gunsWithoutEnoughAmmoToSuppress++;
         }
         print(gunsWithoutEnoughAmmoToSuppress);

@@ -54,13 +54,14 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     private void Update()
     {
-        linkedSoldier = menu.activeSoldier;
-
         if (owner != null) 
         {
             X = owner.X;
             Y = owner.Y;
             Z = owner.Z;
+
+            if (IsNestedOnSoldier())
+                linkedSoldier = SoldierNestedOn();
         }
     }
     public Item Init(string name)
@@ -488,7 +489,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         return false;
     }
-    public bool CheckSpecificAmmo(int ammo, bool fromSuppression)
+    public bool CheckGreaterThanSpecificAmmo(int ammo, bool fromSuppression)
     {
         if (linkedSoldier != null)
         {
@@ -497,10 +498,17 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             if (this.ammo >= ammo)
                 return true;
-            else
-                return false;
         }
         return false;    
+    }
+    public bool CheckSpecificAmmo(int ammo)
+    {
+        if (linkedSoldier != null)
+        {
+            if (this.ammo == ammo)
+                return true;
+        }
+        return false;
     }
 
     public void SpendSingleAmmo()

@@ -3360,13 +3360,38 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasAnyAmmo()
     {
-        if (EquippedGuns.Any())
+        print("checking for any ammo");
+        if (HasGunsEquipped())
+        {
+            print("found equipped guns");
+            foreach (Item gun in EquippedGuns)
+            {
+                print($"gun name {gun.itemName}");
+                if (gun.CheckAnyAmmo())
+                {
+                    print("gun has ammo");
+                    return true;
+                }
+                    
+            }
+                
+        }
+        return false;
+    }
+    public bool HasOneAmmo()
+    {
+        if (HasGunsEquipped())
         {
             foreach (Item gun in EquippedGuns)
-                if (gun.CheckAnyAmmo())
+                if (gun.CheckSpecificAmmo(1))
                     return true;
         }
         return false;
+    }
+    public bool HasNoAmmo()
+    {
+        print($"has no ammo result {!HasAnyAmmo()}");
+        return !HasAnyAmmo();
     }
     public bool HasSMGsOrPistolsEquipped()
     {
