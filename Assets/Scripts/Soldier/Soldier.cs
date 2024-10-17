@@ -1344,13 +1344,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 //add damage alert
                 menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage.", false, false);
-                //make sure damage came from another soldier
-                if (damagedBy != null)
-                {
-                    //apply stun affect from tranquiliser
-                    if (damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
-                        TakeStun(1);
-                }
+                
+                //apply stun affect from tranquiliser
+                if (damagedBy != null && damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
+                    TakeStun(1);
+
+                //set sound flags after damage
+                game.soundManager.SetSoldierSelectionSoundFlagAfterDamage(this);
             }
         }
     }
@@ -2668,6 +2668,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
+        //set sound flags after ally killed or uncon
+        foreach (Soldier s in game.AllSoldiers())
+        {
+            if (s.IsSameTeamAs(this))
+                game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
+        }
+
         StartCoroutine(game.DetectionAlertSingle(this, "losChange|statChange(C)(SR)|healthState(unconscious)", Vector3.zero, string.Empty)); //losCheck
     }
     public void Resurrect(int hp)
@@ -2750,6 +2757,24 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 foreach (Soldier s in game.AllSoldiers())
                     if (this.IsSameTeamAs(s) && s.IsAvenger())
                         s.SetAvenging();
+
+                //set sound flags after ally killed JA
+                if (IsWearingJuggernautArmour(false))
+                {
+                    foreach (Soldier s in game.AllSoldiers())
+                    {
+                        if (s.IsSameTeamAs(this))
+                            game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledJA(s);
+                    }
+                }
+                else //set sound flags after ally killed or uncon
+                {
+                    foreach (Soldier s in game.AllSoldiers())
+                    {
+                        if (s.IsSameTeamAs(this))
+                            game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
+                    }
+                }
             }
         }
     }

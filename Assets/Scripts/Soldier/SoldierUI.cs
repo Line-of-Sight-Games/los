@@ -35,7 +35,7 @@ public class SoldierUI : MonoBehaviour
         //play button press sfx
         soundManager.PlayButtonPress();
         //play select generic dialogue
-        soundManager.PlaySoldierSelectedGeneric(linkedSoldier.soldierSpeciality);
+        soundManager.PlaySoldierSelection(linkedSoldier);
 
         OpenSoldierMenu("");
     }
