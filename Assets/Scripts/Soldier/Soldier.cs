@@ -3252,6 +3252,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
+    public bool HasBrokenAllies()
+    {
+        foreach (Soldier s in game.AllSoldiers())
+            if (this.IsSameTeamAs(s) && s.IsBroken())
+                return true;
+
+        return false;
+    }
     public bool IsFrozen()
     {
         if (tp == 3)
