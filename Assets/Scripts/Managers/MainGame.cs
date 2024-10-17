@@ -2810,6 +2810,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     CheckExplosionUHF(activeSoldier, new Vector3(x, y, z), radius, damage);
                 }
             }
+
+            //set sound flags after enemy use UHF
+            foreach (Soldier s in AllSoldiers())
+            {
+                if (s.IsOppositeTeamAs(activeSoldier))
+                    soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseUHF(s);
+            }
         }
     }
     public void ConfirmULF(UseItemUI useULFUI)

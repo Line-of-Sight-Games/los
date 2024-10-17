@@ -48,11 +48,12 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderSuppressEnemy, spartanSuppressEnemy, survivorSuppressEnemy, runnerSuppressEnemy, evaderSuppressEnemy, reservistSuppressEnemy, seekerSuppressEnemy, chameleonSuppressEnemy, scoutSuppressEnemy, infantrymanSuppressEnemy, operatorSuppressEnemy, earthquakeSuppressEnemy, hunterSuppressEnemy, cycloneSuppressEnemy, hammerSuppressEnemy, wolfSuppressEnemy, herculesSuppressEnemy, diplomatSuppressEnemy, technicianSuppressEnemy, medicSuppressEnemy;
     public AudioClip[] ulfFail, ulfSuccess, uhfDialUp, uhfMiss, uhfHit, uhfDirectHit;
 
-    public List<string> soldierTakenDamage, soldierAllyKilledJA, soldierAllyKilledOrUncon, soldierEnemyUseULF;
+    public List<string> soldierTakenDamage, soldierAllyKilledJA, soldierAllyKilledOrUncon, soldierEnemyUseULF, soldierEnemyUseUHF;
     public AudioClip[] commanderSelectionAfterDamage, spartanSelectionAfterDamage, survivorSelectionAfterDamage, runnerSelectionAfterDamage, evaderSelectionAfterDamage, reservistSelectionAfterDamage, seekerSelectionAfterDamage, chameleonSelectionAfterDamage, scoutSelectionAfterDamage, infantrymanSelectionAfterDamage, operatorSelectionAfterDamage, earthquakeSelectionAfterDamage, hunterSelectionAfterDamage, cycloneSelectionAfterDamage, hammerSelectionAfterDamage, wolfSelectionAfterDamage, herculesSelectionAfterDamage, diplomatSelectionAfterDamage, technicianSelectionAfterDamage, medicSelectionAfterDamage;
     public AudioClip[] commanderSelectionAfterAllyKilledJA, spartanSelectionAfterAllyKilledJA, survivorSelectionAfterAllyKilledJA, runnerSelectionAfterAllyKilledJA, evaderSelectionAfterAllyKilledJA, reservistSelectionAfterAllyKilledJA, seekerSelectionAfterAllyKilledJA, chameleonSelectionAfterAllyKilledJA, scoutSelectionAfterAllyKilledJA, infantrymanSelectionAfterAllyKilledJA, operatorSelectionAfterAllyKilledJA, earthquakeSelectionAfterAllyKilledJA, hunterSelectionAfterAllyKilledJA, cycloneSelectionAfterAllyKilledJA, hammerSelectionAfterAllyKilledJA, wolfSelectionAfterAllyKilledJA, herculesSelectionAfterAllyKilledJA, diplomatSelectionAfterAllyKilledJA, technicianSelectionAfterAllyKilledJA, medicSelectionAfterAllyKilledJA;
     public AudioClip[] commanderSelectionAfterAllyKilledOrUncon, spartanSelectionAfterAllyKilledOrUncon, survivorSelectionAfterAllyKilledOrUncon, runnerSelectionAfterAllyKilledOrUncon, evaderSelectionAfterAllyKilledOrUncon, reservistSelectionAfterAllyKilledOrUncon, seekerSelectionAfterAllyKilledOrUncon, chameleonSelectionAfterAllyKilledOrUncon, scoutSelectionAfterAllyKilledOrUncon, infantrymanSelectionAfterAllyKilledOrUncon, operatorSelectionAfterAllyKilledOrUncon, earthquakeSelectionAfterAllyKilledOrUncon, hunterSelectionAfterAllyKilledOrUncon, cycloneSelectionAfterAllyKilledOrUncon, hammerSelectionAfterAllyKilledOrUncon, wolfSelectionAfterAllyKilledOrUncon, herculesSelectionAfterAllyKilledOrUncon, diplomatSelectionAfterAllyKilledOrUncon, technicianSelectionAfterAllyKilledOrUncon, medicSelectionAfterAllyKilledOrUncon;
     public AudioClip[] commanderSelectionAfterEnemyUseULF, spartanSelectionAfterEnemyUseULF, survivorSelectionAfterEnemyUseULF, runnerSelectionAfterEnemyUseULF, evaderSelectionAfterEnemyUseULF, reservistSelectionAfterEnemyUseULF, seekerSelectionAfterEnemyUseULF, chameleonSelectionAfterEnemyUseULF, scoutSelectionAfterEnemyUseULF, infantrymanSelectionAfterEnemyUseULF, operatorSelectionAfterEnemyUseULF, earthquakeSelectionAfterEnemyUseULF, hunterSelectionAfterEnemyUseULF, cycloneSelectionAfterEnemyUseULF, hammerSelectionAfterEnemyUseULF, wolfSelectionAfterEnemyUseULF, herculesSelectionAfterEnemyUseULF, diplomatSelectionAfterEnemyUseULF, technicianSelectionAfterEnemyUseULF, medicSelectionAfterEnemyUseULF;
+    public AudioClip[] commanderSelectionAfterEnemyUseUHF, spartanSelectionAfterEnemyUseUHF, survivorSelectionAfterEnemyUseUHF, runnerSelectionAfterEnemyUseUHF, evaderSelectionAfterEnemyUseUHF, reservistSelectionAfterEnemyUseUHF, seekerSelectionAfterEnemyUseUHF, chameleonSelectionAfterEnemyUseUHF, scoutSelectionAfterEnemyUseUHF, infantrymanSelectionAfterEnemyUseUHF, operatorSelectionAfterEnemyUseUHF, earthquakeSelectionAfterEnemyUseUHF, hunterSelectionAfterEnemyUseUHF, cycloneSelectionAfterEnemyUseUHF, hammerSelectionAfterEnemyUseUHF, wolfSelectionAfterEnemyUseUHF, herculesSelectionAfterEnemyUseUHF, diplomatSelectionAfterEnemyUseUHF, technicianSelectionAfterEnemyUseUHF, medicSelectionAfterEnemyUseUHF;
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
 
     //basic sound functions
@@ -1151,6 +1152,7 @@ public class SoundManager : MonoBehaviour
         soldierAllyKilledJA.Remove(soldier.Id);
         soldierAllyKilledOrUncon.Remove(soldier.Id);
         soldierEnemyUseULF.Remove(soldier.Id);
+        soldierEnemyUseUHF.Remove(soldier.Id);
     }
     public void SetSoundFlag(Soldier soldier, List<string> soldierList)
     {
@@ -1176,6 +1178,10 @@ public class SoundManager : MonoBehaviour
     {
         SetSoundFlag(soldier, soldierEnemyUseULF);
     }
+    public void SetSoldierSelectionSoundFlagAfterEnemyUseUHF(Soldier soldier)
+    {
+        SetSoundFlag(soldier, soldierEnemyUseUHF);
+    }
     public void PlaySoldierSelection(Soldier soldier)
     {
         if (soldier.IsConscious())
@@ -1188,6 +1194,8 @@ public class SoundManager : MonoBehaviour
                 PlaySoldierSelectionAfterAllyKilledOrUncon(soldier);
             else if (soldierEnemyUseULF.Contains(soldier.Id))
                 PlaySoldierSelectionAfterEnemyUseULF(soldier);
+            else if (soldierEnemyUseUHF.Contains(soldier.Id))
+                PlaySoldierSelectionAfterEnemyUseUHF(soldier);
             else
                 PlaySoldierSelectionGeneric(soldier);
 
@@ -1369,6 +1377,49 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianSelectionAfterEnemyUseULF);
         else if (soldier.soldierSpeciality.Equals("Healing"))
             PlayRandomVoice(medicSelectionAfterEnemyUseULF);
+    }
+    public void PlaySoldierSelectionAfterEnemyUseUHF(Soldier soldier)
+    {
+        if (soldier.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(commanderSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(spartanSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(survivorSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(runnerSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(evaderSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(reservistSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(seekerSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(scoutSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(infantrymanSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(hammerSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(wolfSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(herculesSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(technicianSelectionAfterEnemyUseUHF);
+        else if (soldier.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(medicSelectionAfterEnemyUseUHF);
     }
     public void PlaySoldierSelectionGeneric(Soldier soldier)
     {
