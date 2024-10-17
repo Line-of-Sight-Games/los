@@ -2687,7 +2687,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-        //set sound flags after ally killed or uncon
+        //set sound flags after ally made uncon
         foreach (Soldier s in game.AllSoldiers())
         {
             if (s.IsSameTeamAs(this))
@@ -2777,21 +2777,25 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     if (this.IsSameTeamAs(s) && s.IsAvenger())
                         s.SetAvenging();
 
-                //set sound flags after ally killed JA
+                //set sound flags after soldier killed JA
                 if (IsWearingJuggernautArmour(false))
                 {
                     foreach (Soldier s in game.AllSoldiers())
                     {
                         if (s.IsSameTeamAs(this))
                             game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledJA(s);
+                        else
+                            game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyKilledJA(s);
                     }
                 }
-                else //set sound flags after ally killed or uncon
+                else //set sound flags after soldier killed
                 {
                     foreach (Soldier s in game.AllSoldiers())
                     {
                         if (s.IsSameTeamAs(this))
                             game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
+                        else
+                            game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyKilled(s);
                     }
                 }
             }
