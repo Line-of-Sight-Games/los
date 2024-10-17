@@ -839,9 +839,27 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             }
         }
         else if (IsSmoke())
+        {
             Instantiate(game.poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
+
+            //set sound flags after enemy use smoke
+            foreach (Soldier s in game.AllSoldiers())
+            {
+                if (s.IsOppositeTeamAs(explodedBy))
+                    game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseSmoke(s);
+            }
+        }
         else if (IsTabun())
+        {
             Instantiate(game.poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
+            
+            //set sound flags after enemy use tabun
+            foreach (Soldier s in game.AllSoldiers())
+            {
+                if (s.IsOppositeTeamAs(explodedBy))
+                    game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseTabun(s);
+            }
+        }
 
         //show explosion ui
         menu.OpenExplosionUI();
