@@ -1662,7 +1662,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void PerformLoudAction(int loudActionRadius)
     {
-        int vulnerableTurns = 0;
+        int maxVulnerableTurns = 0;
 
         //shadow ability
         if (IsShadow())
@@ -1672,45 +1672,64 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (s.IsConscious() && this.IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
             {
-                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 6)
+                int vulnerableTurns = 0;
+
+                if (s.PhysicalObjectWithinMinRadius(this))
                     vulnerableTurns = 6;
-                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 4)
+                else if (s.PhysicalObjectWithinHalfRadius(this))
                     vulnerableTurns = 4;
-                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 2)
+                else if (s.PhysicalObjectWithinMaxRadius(this))
                     vulnerableTurns = 2;
+
+                if (vulnerableTurns > 0)
+                {
+                    //set sound flags for hearing sound
+                    game.soundManager.SetSoldierSelectionSoundFlagAfterHeardSound(s);
+
+                    if (vulnerableTurns > maxVulnerableTurns)
+                        maxVulnerableTurns = vulnerableTurns;
+                }
 
                 if (s.IsSpotter() && IsHidden())
                     s.SetSpotting(this);
             }
         }
 
-        SetLoudRevealed(vulnerableTurns);
+        SetLoudRevealed(maxVulnerableTurns);
     }
     public void PerformLoudAction()
     {
-        int vulnerableTurns = 0;
+        int maxVulnerableTurns = 0;
 
         foreach (Soldier s in game.AllSoldiers())
         {
             if (s.IsConscious() && this.IsOppositeTeamAs(s))
             {
-                if (s.PhysicalObjectWithinMinRadius(this) && vulnerableTurns < 6)
+                int vulnerableTurns = 0;
+
+                if (s.PhysicalObjectWithinMinRadius(this))
                     vulnerableTurns = 6;
-                else if (s.PhysicalObjectWithinHalfRadius(this) && vulnerableTurns < 4)
+                else if (s.PhysicalObjectWithinHalfRadius(this))
                     vulnerableTurns = 4;
-                else if (s.PhysicalObjectWithinMaxRadius(this) && vulnerableTurns < 2)
+                else if (s.PhysicalObjectWithinMaxRadius(this))
                     vulnerableTurns = 2;
 
+                if (vulnerableTurns > 0) 
+                {
+                    //set sound flags for hearing sound
+                    game.soundManager.SetSoldierSelectionSoundFlagAfterHeardSound(s);
+
+                    if (vulnerableTurns > maxVulnerableTurns)
+                        maxVulnerableTurns = vulnerableTurns;
+                }
+                
+                //spotter ability
                 if (s.IsSpotter() && IsHidden())
                     s.SetSpotting(this);
             }
         }
         
-        if (vulnerableTurns > 0)
-        {
-            if (vulnerableTurns > loudActionTurnsVulnerable)
-                SetLoudRevealed(vulnerableTurns);
-        }
+        SetLoudRevealed(maxVulnerableTurns);
     }
     public List<int> APLoop()
     {

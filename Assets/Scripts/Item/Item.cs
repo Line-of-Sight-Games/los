@@ -615,6 +615,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 }
                 menu.AddXpAlert(linkedSoldier, 2, $"{linkedSoldier.soldierName} successfully used a ULF radio to {effect}.", true);
 
+                //perform loud action
+                linkedSoldier.PerformLoudAction(24);
+
                 //set sound flags after enemy use ULF
                 foreach (Soldier s in game.AllSoldiers())
                 {

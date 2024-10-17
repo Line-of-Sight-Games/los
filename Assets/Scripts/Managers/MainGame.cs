@@ -2811,6 +2811,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
 
+            //perform loud action
+            activeSoldier.PerformLoudAction(14);
+
             //set sound flags after enemy use UHF
             foreach (Soldier s in AllSoldiers())
             {
