@@ -618,10 +618,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 //perform loud action
                 linkedSoldier.PerformLoudAction(24);
 
-                //set sound flags after enemy use ULF
+                //set sound flags after use ULF
                 foreach (Soldier s in game.AllSoldiers())
                 {
-                    if (s.IsOppositeTeamAs(linkedSoldier))
+                    if (s.IsSameTeamAs(linkedSoldier))
+                        game.soundManager.SetSoldierSelectionSoundFlagAfterAllyUseULF(s);
+                    else
                         game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseULF(s);
                 }
             }

@@ -1617,13 +1617,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter.soldierSpeciality);
 
-                    //set sound flags after ally misses shot
-                    foreach (Soldier s in AllSoldiers())
-                    {
-                        if (s.IsSameTeamAs(activeSoldier))
-                            soundManager.SetSoldierSelectionSoundFlagAfterAllyMissesShot(s);
-                    }
-
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits["Damage"]}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
@@ -1649,13 +1642,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter.soldierSpeciality);
-
-                    //set sound flags after ally misses shot
-                    foreach (Soldier s in AllSoldiers())
-                    {
-                        if (s.IsSameTeamAs(activeSoldier))
-                            soundManager.SetSoldierSelectionSoundFlagAfterAllyMissesShot(s);
-                    }
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits["Damage"]}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
@@ -1720,9 +1706,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //set sound flags after ally misses shot
                     foreach (Soldier s in AllSoldiers())
                     {
-                        if (s.IsSameTeamAs(activeSoldier))
+                        if (s.IsSameTeamAs(shooter))
                             soundManager.SetSoldierSelectionSoundFlagAfterAllyMissesShot(s);
                     }
+
+                    //set sound flags after enemy misses shot
+                    soundManager.SetSoldierSelectionSoundFlagAfterEnemyMissesShot(targetSoldier);
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.gunTraits["Damage"]}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
@@ -2838,7 +2827,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //set sound flags after enemy use UHF
             foreach (Soldier s in AllSoldiers())
             {
-                if (s.IsOppositeTeamAs(activeSoldier))
+                if (s.IsSameTeamAs(activeSoldier))
+                    soundManager.SetSoldierSelectionSoundFlagAfterAllyUseUHF(s);
+                else
                     soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseUHF(s);
             }
         }
