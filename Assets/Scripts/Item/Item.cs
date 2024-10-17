@@ -467,8 +467,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void RunDropEffect(Soldier linkedSoldier)
     {
-        //play pickup general sfx
-        game.soundManager.PlayConfigGeneral();
+        //play drop general sfx (clashes with item use sound for consumables)
+        //game.soundManager.PlayConfigGeneral(); 
 
         //minus ap for logistics belt
         if (itemName.Equals("Logistics_Belt"))
@@ -614,6 +614,13 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     menu.OpenULFResultUI("<color=green>Jamming successful!</color>");
                 }
                 menu.AddXpAlert(linkedSoldier, 2, $"{linkedSoldier.soldierName} successfully used a ULF radio to {effect}.", true);
+
+                //set sound flags after enemy use ULF
+                foreach (Soldier s in game.AllSoldiers())
+                {
+                    if (s.IsOppositeTeamAs(linkedSoldier))
+                        game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseULF(s);
+                }
             }
             else
                 menu.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
