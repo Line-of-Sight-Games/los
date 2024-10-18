@@ -3266,6 +3266,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool IsShaken()
+    {
+        if (tp == 2)
+            return true;
+        return false;
+    }
+    public bool IsWavering()
+    {
+        if (tp == 1)
+            return true;
+        return false;
+    }
     public bool IsDesensitised()
     {
         if (tp >= 5)
