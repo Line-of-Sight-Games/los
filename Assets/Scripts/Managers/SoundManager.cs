@@ -71,6 +71,9 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] commanderSelectionWhileFrozen, spartanSelectionWhileFrozen, survivorSelectionWhileFrozen, runnerSelectionWhileFrozen, evaderSelectionWhileFrozen, reservistSelectionWhileFrozen, seekerSelectionWhileFrozen, chameleonSelectionWhileFrozen, scoutSelectionWhileFrozen, infantrymanSelectionWhileFrozen, operatorSelectionWhileFrozen, earthquakeSelectionWhileFrozen, hunterSelectionWhileFrozen, cycloneSelectionWhileFrozen, hammerSelectionWhileFrozen, wolfSelectionWhileFrozen, herculesSelectionWhileFrozen, diplomatSelectionWhileFrozen, technicianSelectionWhileFrozen, medicSelectionWhileFrozen;
     public AudioClip[] commanderSelectionWhileShaken, spartanSelectionWhileShaken, survivorSelectionWhileShaken, runnerSelectionWhileShaken, evaderSelectionWhileShaken, reservistSelectionWhileShaken, seekerSelectionWhileShaken, chameleonSelectionWhileShaken, scoutSelectionWhileShaken, infantrymanSelectionWhileShaken, operatorSelectionWhileShaken, earthquakeSelectionWhileShaken, hunterSelectionWhileShaken, cycloneSelectionWhileShaken, hammerSelectionWhileShaken, wolfSelectionWhileShaken, herculesSelectionWhileShaken, diplomatSelectionWhileShaken, technicianSelectionWhileShaken, medicSelectionWhileShaken;
     public AudioClip[] commanderSelectionWhileWavering, spartanSelectionWhileWavering, survivorSelectionWhileWavering, runnerSelectionWhileWavering, evaderSelectionWhileWavering, reservistSelectionWhileWavering, seekerSelectionWhileWavering, chameleonSelectionWhileWavering, scoutSelectionWhileWavering, infantrymanSelectionWhileWavering, operatorSelectionWhileWavering, earthquakeSelectionWhileWavering, hunterSelectionWhileWavering, cycloneSelectionWhileWavering, hammerSelectionWhileWavering, wolfSelectionWhileWavering, herculesSelectionWhileWavering, diplomatSelectionWhileWavering, technicianSelectionWhileWavering, medicSelectionWhileWavering;
+    public AudioClip[] commanderSelectionWhileOneEnemyLeft, spartanSelectionWhileOneEnemyLeft, survivorSelectionWhileOneEnemyLeft, runnerSelectionWhileOneEnemyLeft, evaderSelectionWhileOneEnemyLeft, reservistSelectionWhileOneEnemyLeft, seekerSelectionWhileOneEnemyLeft, chameleonSelectionWhileOneEnemyLeft, scoutSelectionWhileOneEnemyLeft, infantrymanSelectionWhileOneEnemyLeft, operatorSelectionWhileOneEnemyLeft, earthquakeSelectionWhileOneEnemyLeft, hunterSelectionWhileOneEnemyLeft, cycloneSelectionWhileOneEnemyLeft, hammerSelectionWhileOneEnemyLeft, wolfSelectionWhileOneEnemyLeft, herculesSelectionWhileOneEnemyLeft, diplomatSelectionWhileOneEnemyLeft, technicianSelectionWhileOneEnemyLeft, medicSelectionWhileOneEnemyLeft;
+    public AudioClip[] commanderSelectionWhileTwoEnemyLeft, spartanSelectionWhileTwoEnemyLeft, survivorSelectionWhileTwoEnemyLeft, runnerSelectionWhileTwoEnemyLeft, evaderSelectionWhileTwoEnemyLeft, reservistSelectionWhileTwoEnemyLeft, seekerSelectionWhileTwoEnemyLeft, chameleonSelectionWhileTwoEnemyLeft, scoutSelectionWhileTwoEnemyLeft, infantrymanSelectionWhileTwoEnemyLeft, operatorSelectionWhileTwoEnemyLeft, earthquakeSelectionWhileTwoEnemyLeft, hunterSelectionWhileTwoEnemyLeft, cycloneSelectionWhileTwoEnemyLeft, hammerSelectionWhileTwoEnemyLeft, wolfSelectionWhileTwoEnemyLeft, herculesSelectionWhileTwoEnemyLeft, diplomatSelectionWhileTwoEnemyLeft, technicianSelectionWhileTwoEnemyLeft, medicSelectionWhileTwoEnemyLeft;
+    public AudioClip[] commanderSelectionWhileThreeEnemyLeft, spartanSelectionWhileThreeEnemyLeft, survivorSelectionWhileThreeEnemyLeft, runnerSelectionWhileThreeEnemyLeft, evaderSelectionWhileThreeEnemyLeft, reservistSelectionWhileThreeEnemyLeft, seekerSelectionWhileThreeEnemyLeft, chameleonSelectionWhileThreeEnemyLeft, scoutSelectionWhileThreeEnemyLeft, infantrymanSelectionWhileThreeEnemyLeft, operatorSelectionWhileThreeEnemyLeft, earthquakeSelectionWhileThreeEnemyLeft, hunterSelectionWhileThreeEnemyLeft, cycloneSelectionWhileThreeEnemyLeft, hammerSelectionWhileThreeEnemyLeft, wolfSelectionWhileThreeEnemyLeft, herculesSelectionWhileThreeEnemyLeft, diplomatSelectionWhileThreeEnemyLeft, technicianSelectionWhileThreeEnemyLeft, medicSelectionWhileThreeEnemyLeft;
     public AudioClip[] commanderSelectionGeneric, spartanSelectionGeneric, survivorSelectionGeneric, runnerSelectionGeneric, evaderSelectionGeneric, reservistSelectionGeneric, seekerSelectionGeneric, chameleonSelectionGeneric, scoutSelectionGeneric, infantrymanSelectionGeneric, operatorSelectionGeneric, earthquakeSelectionGeneric, hunterSelectionGeneric, cycloneSelectionGeneric, hammerSelectionGeneric, wolfSelectionGeneric, herculesSelectionGeneric, diplomatSelectionGeneric, technicianSelectionGeneric, medicSelectionGeneric;
 
     //basic sound functions
@@ -1292,6 +1295,12 @@ public class SoundManager : MonoBehaviour
                 PlaySoldierSelectionWhileShaken(soldier);
             else if (soldier.IsWavering())
                 PlaySoldierSelectionWhileWavering(soldier);
+            else if (OneEnemyLeft(soldier))
+                PlaySoldierSelectionWhileOneEnemyLeft(soldier);
+            else if (TwoEnemyLeft(soldier))
+                PlaySoldierSelectionWhileTwoEnemyLeft(soldier);
+            else if (ThreeEnemyLeft(soldier))
+                PlaySoldierSelectionWhileThreeEnemyLeft(soldier);
             else
                 PlaySoldierSelectionGeneric(soldier);
 
@@ -2248,6 +2257,135 @@ public class SoundManager : MonoBehaviour
         else if (soldier.soldierSpeciality.Equals("Healing"))
             PlayRandomVoice(medicSelectionWhileWavering);
     }
+    public void PlaySoldierSelectionWhileOneEnemyLeft(Soldier soldier)
+    {
+        if (soldier.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(commanderSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(spartanSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(survivorSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(runnerSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(evaderSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(reservistSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(seekerSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(scoutSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(infantrymanSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(hammerSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(wolfSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(herculesSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(technicianSelectionWhileOneEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(medicSelectionWhileOneEnemyLeft);
+    }
+    public void PlaySoldierSelectionWhileTwoEnemyLeft(Soldier soldier)
+    {
+        if (soldier.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(commanderSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(spartanSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(survivorSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(runnerSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(evaderSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(reservistSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(seekerSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(scoutSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(infantrymanSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(hammerSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(wolfSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(herculesSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(technicianSelectionWhileTwoEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(medicSelectionWhileTwoEnemyLeft);
+    }
+    public void PlaySoldierSelectionWhileThreeEnemyLeft(Soldier soldier)
+    {
+        if (soldier.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(commanderSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(spartanSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(survivorSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(runnerSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(evaderSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(reservistSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(seekerSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(seekerSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(scoutSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(infantrymanSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(operatorSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(earthquakeSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(hunterSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(cycloneSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(hammerSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(wolfSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(herculesSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(diplomatSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(technicianSelectionWhileThreeEnemyLeft);
+        else if (soldier.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(medicSelectionWhileThreeEnemyLeft);
+    }
     public void PlaySoldierSelectionGeneric(Soldier soldier)
     {
         if (soldier.soldierSpeciality.Equals("Leadership"))
@@ -2290,5 +2428,33 @@ public class SoundManager : MonoBehaviour
             PlayRandomVoice(technicianSelectionGeneric);
         else if (soldier.soldierSpeciality.Equals("Healing"))
             PlayRandomVoice(medicSelectionGeneric);
+    }
+    public bool OneEnemyLeft(Soldier soldier)
+    {
+        if (EnemyCount(soldier) == 1)
+            return true;
+        return false;
+    }
+    public bool TwoEnemyLeft(Soldier soldier)
+    {
+        if (EnemyCount(soldier) == 2)
+            return true;
+        return false;
+    }
+    public bool ThreeEnemyLeft(Soldier soldier)
+    {
+        if (EnemyCount(soldier) == 3)
+            return true;
+        return false;
+    }
+    public int EnemyCount(Soldier soldier) 
+    {
+        int enemyCount = 0;
+        foreach (Soldier s in game.AllSoldiers())
+        {
+            if (s.IsOppositeTeamAs(soldier) && s.IsAlive())
+                enemyCount++;
+        }
+        return enemyCount;
     }
 }
