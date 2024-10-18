@@ -4121,7 +4121,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetConsciousState()
     {
         if (IsUnconscious())
-            return $", <color=blue>Unconscious ({bleedoutTurns})</color>";
+            return $", <color=blue>Unconscious({bleedoutTurns})</color>";
         else if (IsLastStand())
             return ", <color=red>Last Stand</color>";
         else

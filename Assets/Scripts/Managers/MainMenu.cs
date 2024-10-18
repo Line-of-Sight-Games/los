@@ -3470,7 +3470,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         clearDipelecFlag = true;
         dipelecUI.transform.Find("DipElecType").Find("DipElecTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
         dipelecUI.transform.Find("Level").Find("LevelDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        dipelecUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text = "";
         dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
         clearDipelecFlag = false;
     }
@@ -3480,17 +3479,22 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ClearDipelecResultUI()
     {
-        foreach (Transform child in dipelecResultUI.transform.Find("RewardPanel").Find("Scroll").Find("View").Find("Content"))
+        foreach (Transform child in dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"))
             Destroy(child.gameObject);
     }
     public void CloseDipelecResultUI()
     {
         if (OverrideKey())
         {
-            UnfreezeTime();
-            ClearDipelecResultUI();
-            dipelecResultUI.SetActive(false);
-            activeSoldier.PerformLoudAction(30);
+            if (dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").childCount > 1)
+                Destroy(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").GetChild(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").childCount - 1).gameObject);
+            else
+            {
+                UnfreezeTime();
+                ClearDipelecResultUI();
+                dipelecResultUI.SetActive(false);
+                activeSoldier.PerformLoudAction(30);
+            }
         }
     }
     

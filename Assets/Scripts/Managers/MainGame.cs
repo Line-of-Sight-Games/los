@@ -3245,23 +3245,23 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             if (dipelecUI.dipElecTypeDropdown.value == 0)
             {
+                resultString += "Negotiation";
                 terminal.SoldiersAlreadyNegotiated.Add(activeSoldier.Id);
                 for (int i = 0; i < activeSoldier.stats.Dip.Val; i++)
                 {
                     if (CoinFlip())
                         passCount++;
                 }
-                resultString += "Negotiation";
             }
             else if (dipelecUI.dipElecTypeDropdown.value == 1)
             {
+                resultString += "Hack";
                 terminal.SoldiersAlreadyHacked.Add(activeSoldier.Id);
                 for (int i = 0; i < activeSoldier.stats.Elec.Val; i++)
                 {
                     if (CoinFlip())
                         passCount++;
                 }
-                resultString += "Hack";
             }
             else
             {
@@ -3270,38 +3270,39 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             if (!terminalDisabled)
             {
-                if (passCount > dipelecUI.dipElecLevelDropdown.value)
+                int targetLevel = dipelecUI.dipElecLevelDropdown.value + 1;
+                if (passCount >= targetLevel)
                 {
-                    menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"<color=green>Successful {resultString}</color>";
-                    menu.AddXpAlert(activeSoldier, (int)Mathf.Pow(2, dipelecUI.dipElecLevelDropdown.value), $"Successful level {dipelecUI.dipElecLevelDropdown.value + 1} {resultString}", true);
-                    dipelecUI.levelUI.SetActive(true);
-                    menu.dipelecResultUI.transform.Find("RewardPanel").gameObject.SetActive(true);
-                    for (int i = 0; i <= dipelecUI.dipElecLevelDropdown.value; i++)
+                    for (int i = 1; i <= targetLevel; i++)
                     {
-                        GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("RewardPanel").Find("Scroll").Find("View").Find("Content"));
-                        TextMeshProUGUI textComponent = dipelecReward.GetComponentInChildren<TextMeshProUGUI>();
-
-                        textComponent.text = (resultString == "Hack") ? dipelec.GetLevelElec(i + 1) : dipelec.GetLevelDip(i + 1);
+                        menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=green>{resultString} successful</color>";
+                        GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
+                        dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = (resultString == "Hack") ? dipelec.GetLevelElec(i) : dipelec.GetLevelDip(i);
                     }
-                    resultString += $"SuccessL{dipelecUI.dipElecLevelDropdown.value + 1}";
+
+                    //add xp for successful dipelec
+                    menu.AddXpAlert(activeSoldier, (int)Mathf.Pow(2, targetLevel-1), $"Successful level {targetLevel} {resultString}", true);
+
+                    resultString += $"SuccessL{targetLevel}";
                 }
                 else
                 {
-                    menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Failed " + resultString;
-                    menu.dipelecResultUI.transform.Find("RewardPanel").gameObject.SetActive(false);
-                    resultString += "Fail";
+                    menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>{resultString} failed</color>";
+                    GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
+                    dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"No reward";
+
+                    resultString += $"Fail";
                 }
             }
             else
             {
-                menu.dipelecResultUI.transform.Find("RewardPanel").gameObject.SetActive(false);
-                menu.dipelecResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Terminal Disabled!";
+                GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
+                dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>Terminal disabled</color>";
+
                 terminal.terminalEnabled = false;
                 if (activeSoldier.hp > 3)
                     activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new() { "Dipelec" });
             }
-
-            print(resultString);
             //play dipelec result sfx
             soundManager.PlayDipelecResolution(resultString);
 
