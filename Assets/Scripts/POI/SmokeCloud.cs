@@ -140,6 +140,9 @@ public class SmokeCloud : POI, IDataPersistence
         if (xp > 0)
             menu.AddXpAlert(placedBy, xp, $"Smoke grenade covered {alliesAffected.Count} allies and {enemiesAffected.Count} enemies.", true);
 
+        //show dissipation alert
+        menu.CreateCloudDissipationAlert(this);
+
         //dissipate and recheck
         game.CheckAllSmokeClouds();
     }
