@@ -34,7 +34,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public int currentRound, currentTeam, currentTurn, maxRounds, maxTeams, maxTurnTime, tempTeam;
     public Camera cam;
     public Light sun;
-    public GameObject battlefield, bottomPlane, outlineArea, notEnoughAPUI, notEnoughMPUI, moveToSameSpotUI;
+    public GameObject battlefield, bottomPlane, outlineArea;
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
@@ -3334,15 +3334,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
             activeSoldier.DeductAP(1);
             activeSoldier.InstantKill(activeSoldier, new List<string> { "Lastandicide" });
         }
-    }
-
-    public void CloseNotEnoughAP()
-    {
-        notEnoughAPUI.SetActive(false);
-    }
-    public void CloseNotEnoughMP()
-    {
-        notEnoughMPUI.SetActive(false);
     }
 
     //trauma functions

@@ -36,6 +36,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public OverwatchUI overwatchUI;
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
+    public GeneralAlertUI generalAlertUI;
 
     public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
     
@@ -2915,7 +2916,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
         {
             ClearMeleeUI();
-            OpenNoMeleeTargetsUI();
+            generalAlertUI.Activate("No melee targets found");
         }
     }
     public void ClearFlankersUI(GameObject flankersUI)
@@ -2996,14 +2997,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             meleeConfirmUI.transform.Find("OptionPanel").Find("Damage").Find("DamageDisplay").GetComponent<TextMeshProUGUI>().text = "";
             clearMeleeFlag = false;
         }
-    }
-    public void OpenNoMeleeTargetsUI()
-    {
-        noMeleeTargetsUI.SetActive(true);
-    }
-    public void CloseNoMeleeTargetsUI()
-    {
-        noMeleeTargetsUI.SetActive(false);
     }
     public void AddMeleeAlert(Soldier attacker, Soldier defender, string damageResult, string controlResult)
     {
@@ -4539,6 +4532,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         SetTeamTurnStartFlagTo(true);
         teamTurnStartUI.SetActive(false);
     }
+
+
+
 
 
 

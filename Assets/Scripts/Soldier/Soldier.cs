@@ -3418,10 +3418,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (HasGunsEquipped())
         {
             foreach (Item gun in EquippedGuns)
-                if (!gun.IsPistol() && !gun.IsSMG())
-                    return false;
+                if (gun.IsPistol() || gun.IsSMG())
+                    return true;
         }
-        return true;
+        return false;
     }
     public bool HasArmourIntegrity()
     {
@@ -3999,10 +3999,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
         {
             if (this.ap >= ap)
+            {
+                if (!menu.meleeUI.isActiveAndEnabled && IsMeleeControlling() && ap > 1)
+                {
+                    menu.generalAlertUI.Activate("Cannot perform actions >1AP while controlling melee");
+                    return false;
+                }
                 return true;
+            }
             else
             {
-                game.notEnoughAPUI.SetActive(true);
+                menu.generalAlertUI.Activate("Not enough AP to perform action");
                 return false;
             }
         }
@@ -4017,7 +4024,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 return true;
             else
             {
-                game.notEnoughMPUI.SetActive(true);
+                menu.generalAlertUI.Activate("Not enough MP to perform move");
                 return false;
             }
         }
