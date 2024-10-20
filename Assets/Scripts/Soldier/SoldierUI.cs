@@ -108,7 +108,7 @@ public class SoldierUI : MonoBehaviour
     }
     public void DeathRoll()
     {
-        if (menu.overrideView && menu.DeathKey())
+        if (menu.OverrideView && menu.DeathKey())
         {
             if (game.DiceRoll() == 1)
             {

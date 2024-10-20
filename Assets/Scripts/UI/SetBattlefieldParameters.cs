@@ -95,7 +95,7 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
 
             DataPersistenceManager.Instance.SaveGame();
 
-            menu.UnfreezeTime();
+            menu.UnfreezeTimer();
             setupMenuUI.SetActive(false);
             gameMenuUI.SetActive(true);
         }

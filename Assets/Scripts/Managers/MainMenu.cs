@@ -50,7 +50,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public float turnTime;
     public string meleeChargeIndicator;
     public Soldier activeSoldier;
-    public bool overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
+    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
         detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist, explosiveBarrelSprite, goodyBoxSprite,
@@ -162,7 +162,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //check you are in corrrect scene
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
         {
-            UnfreezeTime();
+            UnfreezeTimer();
             //check the game has started and weather exists
             if (game.currentRound > 0 && weather.savedWeather.Count > 0)
             {
@@ -182,8 +182,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 //check if game has not run out of turns
                 if (game.currentRound <= game.maxRounds)
                 {
+                    //always count play time
                     playTimeTotal += Time.unscaledDeltaTime;
-                    turnTime += Time.deltaTime;
+
+                    //don't count turn time if timerstopped
+                    if (!TimerStop)
+                        turnTime += Time.deltaTime;
+
                     DisplayWeather();
                 }
                 if (!game.gameOver)
@@ -200,7 +205,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         ToggleMute();
                 }
 
-                if (!overrideView)
+                if (!OverrideView)
                 {
                     //show/hide end turn button
                     if (activeSoldier == null)
@@ -404,79 +409,85 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
             return id;
     }
-    public void FreezeTime()
+    public void FreezeTimer(bool force = false)
     {
-        print("Tried to freeze time");
-        timeStopIcon.SetActive(true);
-        Time.timeScale = 0f;
+        if (force || !OverrideView)
+        {
+            print("freezing timer");
+            TimerStop = true;
+            timeStopIcon.SetActive(true);
+        }
     }
-    public void UnfreezeTime()
+    public void UnfreezeTimer(bool force = false)
     {
-        print("Tried to unfreeze time");
-        timeStopIcon.SetActive(false);
-        Time.timeScale = 1.0f;
+        if (force || !OverrideView)
+        {
+            print("unfreezing timer");
+            TimerStop = false;
+            timeStopIcon.SetActive(false);
+        }
     }
     public void SetDetectionResolvedFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
-            FreezeTime();
+            FreezeTimer();
 
         detectionResolvedFlag = value;
     }
     public void SetXpResolvedFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
-            FreezeTime();
+            FreezeTimer();
 
         xpResolvedFlag = value;
     }
     public void SetMeleeResolvedFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
-            FreezeTime();
+            FreezeTimer();
 
         meleeResolvedFlag = value;
     }
     public void SetShotResolvedFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
-            FreezeTime();
+            FreezeTimer();
 
         shotResolvedFlag = value;
     }
     public void SetExplosionResolvedFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
-            FreezeTime();
+            FreezeTimer();
 
         explosionResolvedFlag = value;
     }
     public void SetInspirerResolvedFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
-            FreezeTime();
+            FreezeTimer();
 
         inspirerResolvedFlag = value;
     }
     public void SetTeamTurnOverFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
         {
-            FreezeTime();
+            FreezeTimer();
             OpenPlayerTurnOverUI();
         }
 
@@ -485,10 +496,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void SetTeamTurnStartFlagTo(bool value)
     {
         if (value)
-            UnfreezeTime();
+            UnfreezeTimer();
         else
         {
-            FreezeTime();
+            FreezeTimer();
             OpenPlayerTurnStartUI();
         }
 
@@ -668,10 +679,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //override functions - menu
     public void OpenOverrideMenu()
     {
-        if (overrideView)
+        if (OverrideView)
         {
             //exit override
-            UnfreezeTime();
             ToggleOverrideView();
             endTurnButton.SetActive(true);
             overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Override";
@@ -689,14 +699,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ToggleOverrideView()
     {
-        overrideView = !overrideView;
+        OverrideView = !OverrideView;
     }
     public void ConfirmOverride()
     {
         if (OverrideKey())
         {
             //enter override
-            FreezeTime();
             ToggleOverrideView();
             CloseOverrideMenu();
             soundManager.PlayOverrideAlarm(); //play override alarm sfx
@@ -1155,7 +1164,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         foreach (Soldier s in game.AllSoldiers())
         {
-            if (overrideView)
+            if (OverrideView)
             {
                 s.soldierUI.gameObject.SetActive(true);
                 s.soldierUI.actionButton.interactable = true;
@@ -1209,7 +1218,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         foreach (Soldier s in game.AllSoldiers())
         {
-            if (overrideView)
+            if (OverrideView)
                 s.GetComponent<Renderer>().enabled = true;
             else
             {
@@ -1222,7 +1231,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
         foreach (Claymore c in FindObjectsByType<Claymore>(default))
         {
-            if (overrideView)
+            if (OverrideView)
                 c.GetComponent<Renderer>().enabled = true;
             else
             {
@@ -1259,7 +1268,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         var itemList = FindObjectsByType<Item>(default);
         foreach (Item i in itemList)
         {
-            if (overrideView)
+            if (OverrideView)
                 i.GetComponent<Renderer>().enabled = true;
             else
             {
@@ -1370,7 +1379,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (game.gameOver)
             GreyAll("Game Over");
-        //else if (overrideView)
+        //else if (OverrideView)
         //    GreyOutButtons(AddAllButtons(buttonStates), "Override");
         else if (activeSoldier.IsDead())
             GreyOutButtons(AddAllButtons(buttonStates), "Dead");
@@ -1557,7 +1566,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = $"XP: {activeSoldier.xp}";
         soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = activeSoldier.GetStatus();
 
-        if (overrideView)
+        if (OverrideView)
         {
             soldierBanner.Find("OverrideHP").gameObject.SetActive(true);
             soldierBanner.Find("OverrideHP").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.hp.ToString();
@@ -1589,7 +1598,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 else if (activeSoldier.stats.GetStat(s[0]).Val > activeSoldier.stats.GetStat(s[0]).BaseVal)
                     displayColor = Color.green;
 
-                if (overrideView)
+                if (OverrideView)
                 {
                     soldierStatsUI.Find("Stats").Find("OverrideBase").gameObject.SetActive(true);
                     soldierStatsUI.Find("Stats").Find("OverrideBase").Find(s[0]).GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.stats.GetStat(s[0].ToString()).BaseVal.ToString();
@@ -1673,7 +1682,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public void CloseSoldierMenu()
     {
-        if (activeSoldier.usedAP && activeSoldier.ap > 0 && !overrideView)
+        if (activeSoldier.usedAP && activeSoldier.ap > 0 && !OverrideView)
             OpenEndSoldierTurnAlertUI();
         else
         {
@@ -2160,10 +2169,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public IEnumerator OpenLostLOSList()
     {
-        //print("OpenLostLosList(start)");
-        //yield return new WaitForSeconds(0.05f);
-        yield return new WaitUntil(() => meleeResolvedFlag == true && overrideView == false);
-        //print("OpenLostLosList(passedmeleeflag)");
+        yield return new WaitUntil(() => meleeResolvedFlag == true);
+
         bool display = false;
         foreach (Transform child in lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
         {
@@ -2235,10 +2242,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public IEnumerator OpenDamageList()
     {
-        //print("OpenLostLosList(start)");
-        //yield return new WaitForSeconds(0.05f);
-        yield return new WaitUntil(() => shotResolvedFlag == true && meleeResolvedFlag == true && overrideView == false);
-        //print("OpenLostLosList(passedmeleeflag)");
+        yield return new WaitUntil(() => shotResolvedFlag == true && meleeResolvedFlag == true);
+
         bool display = false;
         foreach (Transform child in damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
         {
@@ -2379,8 +2384,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void OpenTraumaAlertUI()
+    public IEnumerator OpenTraumaAlertUI()
     {
+        yield return new WaitUntil(() => meleeResolvedFlag == true && shotResolvedFlag == true && explosionResolvedFlag == true);
+
         traumaAlertUI.SetActive(true);
     }
     public void CloseTraumaAlertUI()
@@ -2389,13 +2396,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void OpenBrokenFledUI()
     {
-        FreezeTime();
+        FreezeTimer();
         brokenFledUI.SetActive(true);
     }
 
     public void CloseBrokenFledUI()
     {
-        UnfreezeTime();
+        UnfreezeTimer();
         brokenFledUI.SetActive(false);
     }
 
@@ -3490,7 +3497,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 Destroy(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").GetChild(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").childCount - 1).gameObject);
             else
             {
-                UnfreezeTime();
+                UnfreezeTimer();
                 ClearDipelecResultUI();
                 dipelecResultUI.SetActive(false);
                 activeSoldier.PerformLoudAction(30);
@@ -3624,7 +3631,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //damage event functions - menu
     public void OpenDamageEventUI()
     {
-        FreezeTime();
+        FreezeTimer();
         damageEventUI.damageEventTypeDropdown.ClearOptions();
 
         //generate damage event type dropdown
@@ -3667,7 +3674,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CloseDamageEventUI()
     {
-        UnfreezeTime();
+        UnfreezeTimer();
         ClearDamageEventUI();
         damageEventUI.gameObject.SetActive(false);
     }
@@ -4547,6 +4554,23 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //properties
+    public bool OverrideView
+    {
+        get { return overrideView; }
+        set 
+        { 
+            overrideView = value;
+            if (overrideView)
+                FreezeTimer(true);
+            else
+                UnfreezeTimer(true);
+        }
+    }
+    public bool TimerStop
+    {
+        get { return timerStop; }
+        set { timerStop = value; }
+    }
     public string[][] AllStats
     {
         get

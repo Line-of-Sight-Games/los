@@ -1370,7 +1370,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void TabunTraumaCheck()
     {
         menu.AddTraumaAlert(this, 1, "Tabun exposure.", stats.R.Val + stats.Heal.Val, 1, "");
-        menu.OpenTraumaAlertUI();
+        StartCoroutine(menu.OpenTraumaAlertUI());
     }
     public void TakeTrauma(int trauma)
     {
@@ -3994,7 +3994,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool CheckAP(int ap)
     {
         //check if it's on the current players turn
-        if (menu.overrideView)
+        if (menu.OverrideView)
             return true;
         else
         {
@@ -4016,7 +4016,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool CheckMP(int mp)
     {
-        if (menu.overrideView)
+        if (menu.OverrideView)
             return true;
         else
         {
@@ -4031,7 +4031,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void DeductAP(int ap)
     {
-        if (!menu.overrideView && ap > 0)
+        if (!menu.OverrideView && ap > 0)
         {
             this.ap -= ap;
             usedAP = true;
@@ -4045,7 +4045,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void DeductMP(int mp)
     {
-        if (!menu.overrideView && mp > 0)
+        if (!menu.OverrideView && mp > 0)
         {
             this.mp -= mp;
             usedMP = true;

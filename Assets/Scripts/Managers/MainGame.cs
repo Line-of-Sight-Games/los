@@ -38,7 +38,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
-    public int tempAP, tempMP;
+    public float frozenTime;
+    public int frozenAP, frozenMP;
     public Tuple<Soldier, IAmShootable> tempShooterTarget;
 
     public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI, soldierDisplayPanelUI;
@@ -182,10 +183,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         gameOver = true;
         print("GameOver");
 
-        if (menu.overrideView)
+        if (menu.OverrideView)
             menu.ToggleOverrideView();
 
-        menu.FreezeTime();
+        menu.FreezeTimer();
         menu.DisplaySoldiersGameOver();
         menu.roundIndicator.text = "Game Over";
         menu.teamTurnIndicator.text = result;
@@ -217,8 +218,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartFrozenTurn(Soldier frozenSoldier)
     {
-        tempAP = frozenSoldier.ap;
-        tempMP = frozenSoldier.mp;
+        frozenTime = Time.time;
+        frozenAP = frozenSoldier.ap;
+        frozenMP = frozenSoldier.mp;
 
         //change game parameters
         frozenTurn = true;
@@ -231,8 +233,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void EndFrozenTurn()
     {
-        activeSoldier.ap = tempAP;
-        activeSoldier.mp = tempMP;
+        menu.turnTime = frozenTime;
+        activeSoldier.ap = frozenAP;
+        activeSoldier.mp = frozenMP;
         frozenTurn = false;
         SwitchTeam(tempTeam);
     }
@@ -3235,7 +3238,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (activeSoldier.CheckAP(3))
         {
-            menu.FreezeTime();
+            menu.FreezeTimer();
             activeSoldier.DeductAP(3);
             bool terminalDisabled = false;
             int passCount = 0;
@@ -3427,10 +3430,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
 
             if (showTraumaUI)
-            {
-                yield return new WaitUntil(() => menu.meleeResolvedFlag == true);
-                menu.OpenTraumaAlertUI();
-            }
+                StartCoroutine(menu.OpenTraumaAlertUI());
         }
     }
     public void ConfirmTrauma()
@@ -3905,7 +3905,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (causeOfLosCheck.Contains("losChange") || causeOfLosCheck.Contains("loudAction"))
             triggersOverwatch = true;
 
-        yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true && menu.overrideView == false);
+        yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true);
 
         //imperceptible delay to allow colliders to be recalculated at new destination
         yield return new WaitForSeconds(0.05f);

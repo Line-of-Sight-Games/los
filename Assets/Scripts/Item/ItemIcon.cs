@@ -55,7 +55,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             transform.Find("Ammo").GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
         }
 
-        if (menu.overrideView)
+        if (menu.OverrideView)
         {
             if (item.IsGun() || item.IsAmmo())
             {
@@ -181,7 +181,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void UseItem()
     {
-        if (menu.onItemUseScreen && !menu.overrideView)
+        if (menu.onItemUseScreen && !menu.OverrideView)
         {
             if (item.IsUsable())
             {
@@ -220,7 +220,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void DropThrowItem()
     {
-        if (menu.onItemUseScreen && !menu.overrideView)
+        if (menu.onItemUseScreen && !menu.OverrideView)
         {
             if (item.IsThrowable())
             {
