@@ -38,8 +38,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
-    public float frozenTime;
-    public int frozenAP, frozenMP;
     public Tuple<Soldier, IAmShootable> tempShooterTarget;
 
     public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI, soldierDisplayPanelUI;
@@ -222,26 +220,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartFrozenTurn(Soldier frozenSoldier)
     {
-        menu.FreezeTimer();
-        frozenAP = frozenSoldier.ap;
-        frozenMP = frozenSoldier.mp;
+        menu.SetOverrideView();
 
         //change game parameters
         frozenTurn = true;
         SwitchTeam(frozenSoldier.soldierTeam);
 
         //activate the surviving soldier
-        frozenSoldier.ap = 100;
         frozenSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu("frozen");
         menu.OpenShotUI();
     }
     public void EndFrozenTurn()
     {
-        menu.UnfreezeTimer();
+        menu.UnsetOverrideView();
 
-        menu.turnTime = frozenTime;
-        activeSoldier.ap = frozenAP;
-        activeSoldier.mp = frozenMP;
         frozenTurn = false;
         SwitchTeam(tempTeam);
     }
@@ -1161,16 +1153,22 @@ public class MainGame : MonoBehaviour, IDataPersistence
             "Sniper Rifle" => shooter.stats.Sn.Val,
             "Pistol" or _ => shooter.stats.GetHighestWeaponSkill(),
         };
+        //report parameters
+        shotParameters.Add(Tuple.Create("WS", $"{weaponSkill}"));
 
         //apply juggernaut armour debuff
         if (shooter.IsWearingJuggernautArmour(false))
             juggernautBonus = -1;
         weaponSkill += juggernautBonus;
+        //report parameters
+        shotParameters.Add(Tuple.Create("juggernaut", $"{juggernautBonus}"));
 
         //apply stim armour buff
         if (shooter.IsWearingStimulantArmour())
             stimBonus = 2;
         weaponSkill += stimBonus;
+        //report parameters
+        shotParameters.Add(Tuple.Create("stim", $"{stimBonus}"));
 
         //apply trauma debuff
         weaponSkill *= ShooterTraumaMod(shooter);
@@ -1181,11 +1179,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //correct negatives
         if (weaponSkill < 0)
             weaponSkill = 0;
-
-        //report parameters
-        shotParameters.Add(Tuple.Create("WS", $"{weaponSkill}"));
-        shotParameters.Add(Tuple.Create("juggernaut", $"{juggernautBonus}"));
-        shotParameters.Add(Tuple.Create("stim", $"{stimBonus}"));
 
         return weaponSkill;
     }
