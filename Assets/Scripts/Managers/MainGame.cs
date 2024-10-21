@@ -184,7 +184,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         print("GameOver");
 
         if (menu.OverrideView)
-            menu.ToggleOverrideView();
+            menu.UnsetOverrideView();
 
         menu.FreezeTimer();
         menu.DisplaySoldiersGameOver();
@@ -201,6 +201,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartModaTurn(Soldier modaSoldier)
     {
+        menu.FreezeTimer();
+
         //change game parameters
         modaTurn = true;
         SwitchTeam(modaSoldier.soldierTeam);
@@ -212,13 +214,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void EndModaTurn()
     {
+        menu.UnfreezeTimer();
+
         activeSoldier.Kill(null, new() { "Modafinil" });
         modaTurn = false;
         SwitchTeam(tempTeam);
     }
     public void StartFrozenTurn(Soldier frozenSoldier)
     {
-        frozenTime = Time.time;
+        menu.FreezeTimer();
         frozenAP = frozenSoldier.ap;
         frozenMP = frozenSoldier.mp;
 
@@ -233,6 +237,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void EndFrozenTurn()
     {
+        menu.UnfreezeTimer();
+
         menu.turnTime = frozenTime;
         activeSoldier.ap = frozenAP;
         activeSoldier.mp = frozenMP;
@@ -633,7 +639,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.OpenOvermoveUI("Warning: Landing is further than 3cm away from jump point.");
                 }
                 else
-                    menu.OpenMoveToSameSpotUI();
+                    menu.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
             }
         }
         else
@@ -676,7 +682,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.OpenSuppressionMoveUI();
                 }
                 else
-                    menu.OpenMoveToSameSpotUI();
+                    menu.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
             }
             else
                 print("Invalid Input");

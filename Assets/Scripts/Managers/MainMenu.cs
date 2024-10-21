@@ -38,7 +38,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, noMeleeTargetsUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, overrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -679,42 +679,59 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //override functions - menu
     public void OpenOverrideMenu()
     {
-        if (OverrideView)
-        {
-            //exit override
-            ToggleOverrideView();
-            endTurnButton.SetActive(true);
-            overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Override";
-            overrideVersionDisplay.SetActive(false);
-            overrideInsertObjectsButton.SetActive(false);
-            HideOverrideWeather();
-            UnMute();
-        }
-        else
-            overrideUI.SetActive(true);
+        overrideUI.SetActive(true);
     }
     public void CloseOverrideMenu()
     {
         overrideUI.SetActive(false);
     }
-    public void ToggleOverrideView()
-    {
-        OverrideView = !OverrideView;
-    }
-    public void ConfirmOverride()
+    public void ConfirmEnterOverride()
     {
         if (OverrideKey())
         {
-            //enter override
-            ToggleOverrideView();
             CloseOverrideMenu();
+            SetOverrideView();
+        }
+    }
+    public void ConfirmExitOverride()
+    {
+        UnsetOverrideView();
+    }
+    public void SetOverrideView()
+    {
+        if (!OverrideView)
+        {
+            //enter override
+            OverrideView = true;
+
             soundManager.PlayOverrideAlarm(); //play override alarm sfx
+
             endTurnButton.SetActive(false);
-            overrideButton.GetComponentInChildren<TextMeshProUGUI>().text = "Resume";
+            enterOverrideButton.SetActive(false);
+
+            exitOverrideButton.SetActive(true);
             overrideVersionDisplay.SetActive(true);
             overrideInsertObjectsButton.SetActive(true);
             GetOverrideWeather();
             Mute();
+        }
+    }
+    public void UnsetOverrideView()
+    {
+        if (OverrideView)
+        {
+            //exit override
+            OverrideView = false;
+
+            exitOverrideButton.SetActive(false);
+            overrideVersionDisplay.SetActive(false);
+            overrideInsertObjectsButton.SetActive(false);
+            HideOverrideWeather();
+
+            endTurnButton.SetActive(true);
+            enterOverrideButton.SetActive(true);
+            
+            UnMute();
         }
     }
     public void GetOverrideHealthState(Transform soldierStatsUI)
@@ -2846,7 +2863,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public IEnumerator OpenMeleeUI(string meleeCharge)
     {
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitUntil(() => detectionResolvedFlag == true);
         //set attacker
         Soldier attacker = activeSoldier;
         meleeUI.attackerID.text = attacker.id;
@@ -3219,14 +3236,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         game.UpdateMoveUI();
         
         moveUI.gameObject.SetActive(true);
-    }
-    public void OpenMoveToSameSpotUI()
-    {
-        moveToSameSpotUI.SetActive(true);
-    }
-    public void CloseMoveToSameSpotUI()
-    {
-        moveToSameSpotUI.SetActive(false);
     }
     public void OpenOvermoveUI(string message)
     {
