@@ -1070,6 +1070,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
+    public bool IsEtool()
+    {
+        if (name.Equals("E_Tool"))
+            return true;
+        return false;
+    }
     public bool IsWeapon()
     {
         if (traits.Contains("Weapon"))

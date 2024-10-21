@@ -3083,6 +3083,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             message = "Hands Full";
         else if (item.IsLargeMedikit() && !HasAHandFree(true))
             message = "Hands Full";
+        else if (item.IsEtool() && !HasAHandFree(true))
+            message = "Hands Full";
         else if (!IsValidLoadout())
         {
             if (!(HasAHandFree(false) && item.whereEquipped.Contains("Hand")))
