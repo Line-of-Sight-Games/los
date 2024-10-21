@@ -39,6 +39,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
     public Tuple<Soldier, IAmShootable> tempShooterTarget;
+    public Soldier tempSoldier;
+    public List<string> tempDamageSource;
 
     public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI, soldierDisplayPanelUI;
     public Soldier activeSoldier;
@@ -197,15 +199,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
         tempTeam = currentTeam;
         currentTeam = team;
     }
-    public void StartModaTurn(Soldier modaSoldier)
+    public void StartModaTurn(Soldier modaSoldier, Soldier killedBy, List<string> damageSource)
     {
         menu.FreezeTimer();
 
-        //change game parameters
+        //set temp parameters
+        tempSoldier = killedBy;
+        tempDamageSource = damageSource;
+
+        //activate modafinil turn
         modaTurn = true;
         SwitchTeam(modaSoldier.soldierTeam);
-
-        //activate the surviving soldier
         modaSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu("moda");
         modaSoldier.GenerateAP();
         modaSoldier.modaProtect = false;
@@ -214,7 +218,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         menu.UnfreezeTimer();
 
-        activeSoldier.Kill(null, new() { "Modafinil" });
+        //update temp parameters
+        tempDamageSource.Add("Modafinil");
+
+        //deactivate modafinil turn
+        activeSoldier.Kill(tempSoldier, tempDamageSource);
         modaTurn = false;
         SwitchTeam(tempTeam);
     }

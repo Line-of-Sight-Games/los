@@ -2718,7 +2718,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (modaProtect)
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted death with Modafinil. He gets an immediate turn.", true, true);
-                game.StartModaTurn(this);
+                game.StartModaTurn(this, killedBy, damageSource);
             }
             else 
             {

@@ -1208,11 +1208,40 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
+    public bool IsExoArmour()
+    {
+        if (name.Contains("Armour_Exo"))
+            return true;
+        return false;
+    }
+    public bool IsStimArmour()
+    {
+        if (name.Contains("Armour_Stim"))
+            return true;
+        return false;
+    }
+    public bool IsThermalGoggles()
+    {
+        if (name.Contains("Armour_Stim"))
+            return true;
+        return false;
+    }
     public string SpecialityTag()
     {
         if (IsGun())
             return traits[1];
         return "";
+    }
+    public bool IsOnlyRemovableFromCorpse()
+    {
+        print("checking if removable only from corpse");
+        if (IsExoArmour() || IsStimArmour() || IsThermalGoggles())
+        {
+            print("only removable from corpse");
+            return true;
+        }
+            
+        return false;
     }
 
 

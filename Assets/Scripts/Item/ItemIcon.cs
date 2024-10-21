@@ -78,6 +78,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
+        
         canvasGroup.alpha = 0.6f;
         canvasGroup.blocksRaycasts = false;
         transform.SetParent(GetComponentInParent<Canvas>().transform);
@@ -103,73 +104,79 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 if (originalInventoryObject != null)
                     originalInventoryId = originalInventoryObject.Id;
 
-                if (targetSlot != null)
-                {
-                    if (CheckValidSlot(targetSlot) && CheckBlockedSlotsAreFree(targetSlot))
-                    {
-                        SetCurrentSlot(targetSlot.AssignItemIcon(this));
-
-                        targetSlotName = targetSlot.name;
-
-                        InventoryDisplayPanelSoldier soldierInventory = targetSlot.GetComponentInParent<InventoryDisplayPanelSoldier>();
-                        if (targetSlotName.Contains("Backpack"))
-                            targetInventoryId = soldierInventory.GetItemInSlot("Back").Id;
-                        else if (targetSlotName.Contains("LeftBrace"))
-                        {
-                            targetInventoryId = soldierInventory.GetItemInSlot("LeftLeg").Id;
-                            targetSlotName = "Brace1";
-                        } 
-                        else if (targetSlotName.Contains("RightBrace"))
-                        {
-                            targetInventoryId = soldierInventory.GetItemInSlot("RightLeg").Id;
-                            targetSlotName = "Brace1";
-                        }
-                        else if (targetSlotName.Contains("BArmour"))
-                            targetInventoryId = soldierInventory.GetItemInSlot("Chest").Id;
-                        else if (targetSlotName.Contains("JArmour"))
-                            targetInventoryId = soldierInventory.GetItemInSlot("Head").Id;
-                        else if (targetSlotName.Contains("Bag"))
-                            targetInventoryId = soldierInventory.GetItemInSlot("Posterior").Id;
-                        else
-                            targetInventoryId = targetSlot.linkedInventoryObject.Id;
-                        
-                        if (targetSlot == originalSlot)
-                            item.markedForAction = string.Empty;
-                        else
-                            item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
-                    }
-                    else
-                        ReturnToOldSlot();
-                }
-                else if (targetPanel != null)
-                {
-
-                    if (targetPanel.linkedInventorySource == originalInventoryObject)
-                    {
-                        ReturnToOriginalSlot();
-
-                        item.markedForAction = string.Empty;
-                    }
-                    else if (targetPanel.name.Contains("Ground"))
-                    {
-                        SetCurrentSlot(Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this));
-
-                        targetSlotName = transform.parent.name;
-                        item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
-                    }
-                    else if (targetPanel.name.Contains("GB"))
-                    {
-                        SetCurrentSlot(Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this));
-
-                        targetInventoryId = targetPanel.linkedInventorySource.Id;
-                        targetSlotName = transform.parent.name;
-                        item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
-                    }
-                    else
-                        ReturnToOldSlot();
-                }
-                else
+                if (item.IsOnlyRemovableFromCorpse() && item.IsNestedOnSoldier() && item.SoldierNestedOn().IsAlive())
                     ReturnToOldSlot();
+                else
+                {
+                    if (targetSlot != null)
+                    {
+                        //check that the target slot is free and that any slots it blocks are also free
+                        if (CheckValidSlot(targetSlot) && CheckBlockedSlotsAreFree(targetSlot))
+                        {
+                            SetCurrentSlot(targetSlot.AssignItemIcon(this));
+
+                            targetSlotName = targetSlot.name;
+
+                            InventoryDisplayPanelSoldier soldierInventory = targetSlot.GetComponentInParent<InventoryDisplayPanelSoldier>();
+                            if (targetSlotName.Contains("Backpack"))
+                                targetInventoryId = soldierInventory.GetItemInSlot("Back").Id;
+                            else if (targetSlotName.Contains("LeftBrace"))
+                            {
+                                targetInventoryId = soldierInventory.GetItemInSlot("LeftLeg").Id;
+                                targetSlotName = "Brace1";
+                            }
+                            else if (targetSlotName.Contains("RightBrace"))
+                            {
+                                targetInventoryId = soldierInventory.GetItemInSlot("RightLeg").Id;
+                                targetSlotName = "Brace1";
+                            }
+                            else if (targetSlotName.Contains("BArmour"))
+                                targetInventoryId = soldierInventory.GetItemInSlot("Chest").Id;
+                            else if (targetSlotName.Contains("JArmour"))
+                                targetInventoryId = soldierInventory.GetItemInSlot("Head").Id;
+                            else if (targetSlotName.Contains("Bag"))
+                                targetInventoryId = soldierInventory.GetItemInSlot("Posterior").Id;
+                            else
+                                targetInventoryId = targetSlot.linkedInventoryObject.Id;
+
+                            if (targetSlot == originalSlot)
+                                item.markedForAction = string.Empty;
+                            else
+                                item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
+                        }
+                        else
+                            ReturnToOldSlot();
+                    }
+                    else if (targetPanel != null)
+                    {
+
+                        if (targetPanel.linkedInventorySource == originalInventoryObject)
+                        {
+                            ReturnToOriginalSlot();
+
+                            item.markedForAction = string.Empty;
+                        }
+                        else if (targetPanel.name.Contains("Ground"))
+                        {
+                            SetCurrentSlot(Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this));
+
+                            targetSlotName = transform.parent.name;
+                            item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
+                        }
+                        else if (targetPanel.name.Contains("GB"))
+                        {
+                            SetCurrentSlot(Instantiate(targetPanel.itemSlotPrefab, targetPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>().Init(targetPanel.linkedInventorySource).AssignItemIcon(this));
+
+                            targetInventoryId = targetPanel.linkedInventorySource.Id;
+                            targetSlotName = transform.parent.name;
+                            item.markedForAction = $"{originalInventoryId}|{originalSlotName}|{targetInventoryId}|{targetSlotName}";
+                        }
+                        else
+                            ReturnToOldSlot();
+                    }
+                    else
+                        ReturnToOldSlot();
+                }
             }
             else
                 ReturnToOldSlot();
