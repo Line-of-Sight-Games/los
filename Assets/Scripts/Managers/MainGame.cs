@@ -3342,10 +3342,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
 
     //trauma functions
-    public IEnumerator TraumaCheck(Soldier deadSoldier, int tp, bool commander, bool lastandicide)
+    public void TraumaCheck(Soldier deadSoldier, int tp, bool commander, bool lastandicide)
     {
-        yield return new WaitUntil(() => menu.detectionResolvedFlag == true && menu.meleeResolvedFlag == true && menu.explosionResolvedFlag == true);
-
         if (deadSoldier.IsDead())
         {
             bool showTraumaUI = false;

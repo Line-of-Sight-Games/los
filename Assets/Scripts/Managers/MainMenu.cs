@@ -2359,6 +2359,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (OverrideKey())
         {
+            foreach (Transform child in traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
+                if (child.GetComponent<SoldierAlert>().soldier.IsDead())
+                    Destroy(child.gameObject);
+
             traumaUI.SetActive(true);
             CloseTraumaAlertUI();
         }

@@ -2745,7 +2745,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (damageSource.Contains("Critical") || damageSource.Contains("Melee") || damageSource.Contains("Explosive") || damageSource.Contains("Deathroll"))
                     tp++;
                 //run trauma check
-                StartCoroutine(game.TraumaCheck(this, tp, IsCommander(), damageSource.Contains("Lastandicide")));
+                game.TraumaCheck(this, tp, IsCommander(), damageSource.Contains("Lastandicide"));
 
                 //re-render as dead
                 CheckSpecialityColor(soldierSpeciality);
