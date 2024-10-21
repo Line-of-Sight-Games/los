@@ -1656,8 +1656,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     Soldier originalTarget = targetSoldier;
 
-                    if (targetSoldier.IsMeleeEngaged()) //pick random target to hit in engagement
+                    //if target is engaged, and not engaged with the shooter
+                    if (targetSoldier.IsMeleeEngaged() && !targetSoldier.IsMeleeEngagedWith(shooter)) 
                     {
+                        //pick random target to hit in engagement
                         int randNum3 = HelperFunctions.RandomNumber(0, originalTarget.EngagedSoldiers.Count);
                         if (randNum3 > 0)
                         {
@@ -2204,13 +2206,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
         s2.controlledBySoldiersList.Add(controller.id);
         s2.controllingSoldiersList.Remove(controller.id);
 
-        menu.OpenMeleeResultUI();
+        StartCoroutine(menu.OpenMeleeResultUI());
     }
     public void EstablishNoController(Soldier s1, Soldier s2)
     {
         BreakMeleeEngagement(s1, s2);
 
-        menu.OpenMeleeResultUI();
+        StartCoroutine(menu.OpenMeleeResultUI());
     }
     public string DetermineMeleeController(Soldier attacker, Soldier defender, bool counterattack, bool disengage)
     {
@@ -2497,7 +2499,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (loudAction)
                     attacker.PerformLoudAction();
 
-                menu.OpenMeleeResultUI();
+                StartCoroutine(menu.OpenMeleeResultUI());
                 menu.CloseMeleeUI();
             }
         }
@@ -2507,7 +2509,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (s1.EngagedSoldiers.Count > 0)
         {
             menu.SetMeleeResolvedFlagTo(false);
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitUntil(() => menu.detectionResolvedFlag == true);
             foreach (Soldier s in s1.EngagedSoldiers)
                 menu.AddMeleeAlert(s1, s, "No Damage\n(Engagement Change)", DetermineMeleeController(s1, s, false, false));
         }
@@ -3342,10 +3344,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //trauma functions
     public IEnumerator TraumaCheck(Soldier deadSoldier, int tp, bool commander, bool lastandicide)
     {
-        //print("Trauma check start");
-        //imperceptible delay to allow colliders to be recalculated at new destination
-        yield return new WaitForSeconds(0.05f);
-        //print("Trauma check passed wait");
+        yield return new WaitUntil(() => menu.detectionResolvedFlag == true && menu.meleeResolvedFlag == true && menu.explosionResolvedFlag == true);
+
         if (deadSoldier.IsDead())
         {
             bool showTraumaUI = false;
@@ -3905,9 +3905,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
             triggersOverwatch = true;
 
         yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true);
-
-        //imperceptible delay to allow colliders to be recalculated at new destination
-        yield return new WaitForSeconds(0.05f);
 
         if (movingSoldier.IsAlive())
         {

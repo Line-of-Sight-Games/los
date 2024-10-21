@@ -3037,8 +3037,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         meleeAlert.transform.Find("Attacker").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(attacker);
         meleeAlert.transform.Find("Defender").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(defender);
     }
-    public void OpenMeleeResultUI()
+    public IEnumerator OpenMeleeResultUI()
     {
+        yield return new WaitUntil(() => shotResolvedFlag == true);
+
         meleeResultUI.SetActive(true);
     }
     public void ConfirmMeleeResult()
