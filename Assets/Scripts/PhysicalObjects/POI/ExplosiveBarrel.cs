@@ -1,0 +1,107 @@
+using System;
+using System.Collections;
+using System.Threading;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
+{
+    public bool triggered;
+    public bool exploded;
+    private void Start()
+    {
+        poiType = "barrel";
+        menu = FindFirstObjectByType<MainMenu>();
+        game = FindFirstObjectByType<MainGame>();
+        poiManager = FindFirstObjectByType<POIManager>();
+    }
+
+    public ExplosiveBarrel Init(Tuple<Vector3, string> location)
+    {
+        id = GenerateGuid();
+        x = (int)location.Item1.x;
+        y = (int)location.Item1.y;
+        z = (int)location.Item1.z;
+        terrainOn = location.Item2;
+        MapPhysicalPosition(x, y, z);
+
+        return this;
+    }
+
+    public override void LoadData(GameData data)
+    {
+        if (data.allPOIDetails.TryGetValue(id, out details))
+        {
+            //load position
+            poiType = (string)details["poiType"];
+            x = Convert.ToInt32(details["x"]);
+            y = Convert.ToInt32(details["y"]);
+            z = Convert.ToInt32(details["z"]);
+            terrainOn = (string)details["terrainOn"];
+            MapPhysicalPosition(x, y, z);
+        }
+    }
+
+    public override void SaveData(ref GameData data)
+    {
+        details = new()
+        {
+            { "poiType", poiType },
+            { "x", x },
+            { "y", y },
+            { "z", z },
+            { "terrainOn", terrainOn }
+        };
+
+        //add the item in
+        if (data.allPOIDetails.ContainsKey(id))
+            data.allPOIDetails.Remove(id);
+
+        data.allPOIDetails.Add(id, details);
+    }
+
+    public void CheckExplosionBarrel(Soldier explodedBy)
+    {
+        //play explosion sfx
+        game.soundManager.PlayExplosion();
+
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel | Detonated: {this.X},{this.Y},{this.Z}").gameObject;
+        explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
+
+        //create explosion objects
+        Explosion explosion1 = Instantiate(menu.poiManager.explosionPrefab).Init(3, new(X, Y, Z));
+        Explosion explosion2 = Instantiate(menu.poiManager.explosionPrefab).Init(8, new(X, Y, Z));
+        Explosion explosion3 = Instantiate(menu.poiManager.explosionPrefab).Init(15, new(X, Y, Z));
+
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
+        {
+            int damage = 0;
+            if (obj.IsWithinSphere(explosion1.BodyCollider))
+                damage = 8;
+            else if (obj.IsWithinSphere(explosion2.BodyCollider))
+                damage = 4;
+            else if (obj.IsWithinSphere(explosion3.BodyCollider))
+                damage = 2;
+
+            if (damage > 0)
+            {
+                if (obj is Item hitItem)
+                    menu.AddExplosionAlertItem(explosionList, hitItem, new(X, Y), explodedBy, damage);
+                else if (obj is POI hitPoi && hitPoi != this)
+                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                else if (obj is Soldier hitSoldier)
+                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y), explodedBy, damage, 1);
+            }
+        }
+
+        //show explosion ui
+        menu.OpenExplosionUI();
+        
+        poiManager.DestroyPOI(this);
+    }
+    public bool Triggered
+    { get { return triggered; } set { triggered = value; } }
+    public bool Exploded
+    { get { return exploded; } set { exploded = value; } }
+}

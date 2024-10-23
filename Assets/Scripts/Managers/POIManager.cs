@@ -8,6 +8,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
     public List<string> allPOIIds = new();
     public List<POI> allPOIs = new();
     public POI poiPrefab;
+    public Explosion explosionPrefab;
     public GoodyBox gbPrefab;
     public Terminal terminalPrefab;
     public ExplosiveBarrel barrelPrefab;

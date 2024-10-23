@@ -52,33 +52,70 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
 
     //helper functions - game
+    public List<PhysicalObject> AllBattlefieldObjects()
+    {
+        List<PhysicalObject> battlefieldObjects = new();
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
+        {
+            if (obj.OnBattlefield())
+                battlefieldObjects.Add(obj);
+        }
+
+        return battlefieldObjects;
+    }
     public List<Soldier> AllSoldiers()
     {
         return soldierManager.allSoldiers;
     }
+    public List<Soldier> AllFieldedSoldiers()
+    {
+        return AllBattlefieldObjects().OfType<Soldier>().ToList();
+    }
+    public List<Soldier> AllFieldedFriendlySoldiers()
+    {
+        List<Soldier> fieldedAllies = new();
+        foreach (Soldier s in AllFieldedSoldiers())
+        {
+            if (s.soldierTeam == currentTeam)
+                fieldedAllies.Add(s);
+        }
+
+        return fieldedAllies;
+    }
+    public List<Soldier> AllFieldedEnemySoldiers()
+    {
+        List<Soldier> fieldedAllies = new();
+        foreach (Soldier s in AllFieldedSoldiers())
+        {
+            if (s.soldierTeam != currentTeam)
+                fieldedAllies.Add(s);
+        }
+
+        return fieldedAllies;
+    }
     public List<IAmDetectable> AllDetectable()
     {
-        return FindObjectsByType<MonoBehaviour>(default).OfType<IAmDetectable>().ToList();
+        return AllBattlefieldObjects().OfType<IAmDetectable>().ToList();
     }
     public List<IAmShootable> AllShootable()
     {
-        return FindObjectsByType<MonoBehaviour>(default).OfType<IAmShootable>().ToList();
+        return AllBattlefieldObjects().OfType<IAmShootable>().ToList();
     }
     public List<IHaveInventory> AllHasInventory()
     {
-        return FindObjectsByType<MonoBehaviour>(default).OfType<IHaveInventory>().ToList();
+        return AllBattlefieldObjects().OfType<IHaveInventory>().ToList();
     }
     public List<IAmDisarmable> AllDisarmable()
     {
-        return FindObjectsByType<MonoBehaviour>(default).OfType<IAmDisarmable>().ToList();
+        return AllBattlefieldObjects().OfType<IAmDisarmable>().ToList();
     }
     public List<GoodyBox> AllGoodyBoxes()
     {
-        return FindObjectsByType<GoodyBox>(default).ToList();
+        return AllBattlefieldObjects().OfType<GoodyBox>().ToList();
     }
     public List<DrugCabinet> AllDrugCabinets()
     {
-        return FindObjectsByType<DrugCabinet>(default).ToList();
+        return AllBattlefieldObjects().OfType<DrugCabinet>().ToList();
     }
     public int DiceRoll()
     {
@@ -295,7 +332,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void EndTeamTurn()
     {
         //pre xp check stuff
-        foreach (Soldier s in AllSoldiers())
+        foreach (Soldier s in AllFieldedSoldiers())
         {
             if (s.IsOnturnAndAlive()) //run things that trigger at the end of friendly team turn
             {
@@ -373,7 +410,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         menu.CheckXP();
 
         //post xp stuff
-        foreach (Soldier s in AllSoldiers())
+        foreach (Soldier s in AllFieldedSoldiers())
         {
             if (s.IsOnturnAndAlive()) //run things that trigger at the end of friendly team turn
             {
@@ -418,7 +455,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (menu.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
             StartCoroutine(menu.OpenDamageList());
 
-        foreach (Soldier s in AllSoldiers())
+        foreach (Soldier s in AllFieldedSoldiers())
         {
             if (s.IsOnturnAndAlive())
             {
@@ -805,7 +842,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         shotUI.coverLocationUI.SetActive(false);
 
         //generate target list
-        foreach (Soldier s in AllSoldiers())
+        foreach (Soldier s in AllFieldedSoldiers())
         {
             TMP_Dropdown.OptionData targetOptionData = null;
             if (s.IsAlive() && shooter.IsOppositeTeamAs(s) && s.IsRevealed())
@@ -968,7 +1005,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (!target.IsTactician() || shooter.IsRevoker())
             {
                 //find all soldiers who could be considered for flanking and their flanking angles
-                foreach (Soldier s in AllSoldiers())
+                foreach (Soldier s in AllFieldedSoldiers())
                     if (s.IsAbleToSee() && s.IsSameTeamAs(shooter) && s.CanSeeInOwnRight(target) && !HelperFunctions.IsWithinAngle(new(shooter.X, shooter.Y), new(s.X, s.Y), new(target.X, target.Y), 80f))
                         allFlankingAngles.Add(Tuple.Create(HelperFunctions.CalculateAngle360(new(shooter.X, shooter.Y), new(s.X, s.Y), new(target.X, target.Y)), s));
 
@@ -3149,12 +3186,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}").gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
+        //create explosion objects
+        Explosion explosion1 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(radius / 2, position);
+        Explosion explosion2 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(radius, position);
+
         foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
         {
             float damagef = 0;
-            if (obj.PhysicalObjectWithinRadius(position, radius / 2))
+            if (obj.IsWithinSphere(explosion1.BodyCollider))
                 damagef = damage;
-            else if (obj.PhysicalObjectWithinRadius(position, radius))
+            else if (obj.IsWithinSphere(explosion2.BodyCollider))
                 damagef = damage / 2.0f;
 
             if (damagef > 0)
