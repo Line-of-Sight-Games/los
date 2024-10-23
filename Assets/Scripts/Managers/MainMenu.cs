@@ -4399,10 +4399,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         grenadeUI.transform.Find("OptionPanel").Find("Target").Find("XPos").GetComponent<TMP_InputField>().text = "";
         grenadeUI.transform.Find("OptionPanel").Find("Target").Find("YPos").GetComponent<TMP_InputField>().text = "";
         grenadeUI.transform.Find("OptionPanel").Find("Target").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        grenadeUI.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject.SetActive(false);
-        grenadeUI.transform.Find("PressedOnce").gameObject.SetActive(false);
         grenadeUI.transform.Find("OptionPanel").Find("Target").Find("FinalPosition").gameObject.SetActive(false);
         grenadeUI.transform.Find("OptionPanel").Find("Target").Find("PreciseThrow").gameObject.SetActive(false);
+        grenadeUI.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject.SetActive(false);
+        grenadeUI.transform.Find("OptionPanel").Find("PressedOnce").gameObject.SetActive(false);
     }
     public void CloseGrenadeUI()
     {
