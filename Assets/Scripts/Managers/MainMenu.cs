@@ -38,11 +38,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, moveToSameSpotUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab, explosionPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
-    public SightRadiusCircle sightRadiusCirclePrefab;
+    public SightRadiusSphere sightRadiusSpherePrefab;
     public List<Button> actionButtons;
     public List<Sprite> insignia;
     public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton;
@@ -285,7 +285,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 CreateLOSArrows();
                 if (activeSoldier != null)
                 {
-                    CreateSightRadiusCircle();
+                    CreateSightRadiusSphere();
                 }
             }
 
@@ -302,7 +302,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //destroy gizmos upon key release
             if (SecondOverrideKeyUp())
             {
-                DestroySightRadiusCircle();
+                DestroySightRadiusSphere();
                 DestroyLOSArrows();
             }
         }
@@ -362,16 +362,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (LOSArrow arrow in LOSArrows)
             Destroy(arrow.gameObject);
     }
-    public void CreateSightRadiusCircle()
+    public void CreateSightRadiusSphere()
     {
-        SightRadiusCircle sightRadiusCircle = Instantiate(sightRadiusCirclePrefab).Init(activeSoldier);
-        sightRadiusCircle.transform.SetAsLastSibling();
+        SightRadiusSphere sightRadiusSphere = Instantiate(sightRadiusSpherePrefab).Init(activeSoldier);
     }
-    public void DestroySightRadiusCircle()
+    public void DestroySightRadiusSphere()
     {
-        var sightRadiusCircles = FindObjectsByType<SightRadiusCircle>(FindObjectsInactive.Include, default);
-        foreach (SightRadiusCircle sightRadiusCircle in sightRadiusCircles)
-            Destroy(sightRadiusCircle.gameObject);
+        var sightRadiusSpheres = FindObjectsByType<SightRadiusSphere>(FindObjectsInactive.Include, default);
+        foreach (SightRadiusSphere sightRadiusSphere in sightRadiusSpheres)
+            Destroy(sightRadiusSphere.gameObject);
     }
     public string PrintArray(Array array)
     {

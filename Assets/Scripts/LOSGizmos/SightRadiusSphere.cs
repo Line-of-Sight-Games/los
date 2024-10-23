@@ -3,60 +3,24 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SightRadiusCircle : LOSGizmo
+public class SightRadiusSphere : LOSGizmo
 {
     readonly int segments = 100;
-    public SightRadiusCircle Init(Soldier from)
+    public SphereCollider losSphereCollider;
+    public GameObject losSpherePhysical;
+    public SightRadiusSphere Init(Soldier from)
     {
         transform.position = from.transform.position;
         if (from.IsOnOverwatch())
             GenerateArcSectorMesh(from.overwatchConeRadius, from.overwatchConeArc, new (from.overwatchYPoint, 0f, from.overwatchXPoint));
         else
-            GenerateCircleMesh(from.stats.SR.Val);
+        {
+            transform.position = new Vector3(from.x - 0.5f, from.z, from.y - 0.5f);
+            losSphereCollider.radius = from.SRColliderMax.radius;
+            losSpherePhysical.transform.localScale *= (2 * from.SRColliderMax.radius);
+        }
 
         return this;
-    }
-
-    void GenerateCircleMesh(int radius)
-    {
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        Mesh mesh = new();
-        meshFilter.mesh = mesh;
-
-        float angleStep = 2 * Mathf.PI / segments;
-
-        Vector3[] vertices = new Vector3[segments + 1]; // +1 for the center vertex
-        int[] triangles = new int[segments * 3];
-
-        // Central vertex
-        vertices[0] = Vector3.zero;
-
-        // Create vertices in a circle
-        for (int i = 1; i <= segments; i++)
-        {
-            float x = Mathf.Cos(angleStep * (i - 1)) * radius;
-            float z = Mathf.Sin(angleStep * (i - 1)) * radius;
-            vertices[i] = new Vector3(x, 0f, z);
-        }
-
-        // Create triangles
-        for (int i = 0; i < segments - 1; i++)
-        {
-            triangles[i * 3] = 0;
-            triangles[i * 3 + 1] = i + 1;
-            triangles[i * 3 + 2] = i + 2;
-        }
-
-        // Close the loop with the last triangle
-        triangles[(segments - 1) * 3] = 0;
-        triangles[(segments - 1) * 3 + 1] = segments;
-        triangles[(segments - 1) * 3 + 2] = 1;
-
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
     }
     void GenerateArcSectorMesh(int radius, int angle, Vector3 overwatchTarget)
     {
