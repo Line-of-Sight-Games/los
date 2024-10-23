@@ -11,6 +11,11 @@ public class ValidThrowChecker : MonoBehaviour
     public TMP_Dropdown catcherDropdown;
     public UseItemUI useItemUI;
 
+    private void Start()
+    {
+        menu = FindFirstObjectByType<MainMenu>();
+    }
+
     private void Update()
     {
         CheckThrowingRange();
@@ -35,17 +40,40 @@ public class ValidThrowChecker : MonoBehaviour
 
         if (!pressedOnce.activeInHierarchy)
         {
-            if (menu.activeSoldier.IsAbleToSee()) 
+            if (GetThrowLocation(out Vector3 throwLocation))
             {
-                if (GetThrowLocation(out Vector3 throwLocation) && Vector3.Distance(throwLocation, new(menu.activeSoldier.X, menu.activeSoldier.Y, menu.activeSoldier.Z)) > menu.activeSoldier.ThrowRadius)
-                    throwBeyondRadius.SetActive(true);
+                if (menu.activeSoldier.IsAbleToSee() && menu.activeSoldier.HasStrength())
+                {
+                    if (!IsWithinBounds(menu.activeSoldier, throwLocation))
+                        throwBeyondRadius.SetActive(true);
+                }
+                else
+                {
+                    if (!IsWithinDropBounds(menu.activeSoldier, throwLocation)) //dropping allowed while blind within 3 or 0 strength
+                        throwBeyondBlindRadius.SetActive(true);
+                }
             }
-            else
-            {
-                if (GetThrowLocation(out Vector3 throwLocation) && Vector3.Distance(throwLocation, new(menu.activeSoldier.X, menu.activeSoldier.Y, menu.activeSoldier.Z)) > 3) //dropping allowed while blid within 3
-                    throwBeyondBlindRadius.SetActive(true);
-            }
+            
         }
+    }
+    public bool IsWithinBounds(Soldier throwingSoldier, Vector3 throwLocation)
+    {
+        int deltaX = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow((int)throwLocation.x - throwingSoldier.X, 2)));
+        int deltaY = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow((int)throwLocation.y - throwingSoldier.Y, 2)));
+        int deltaZ = Mathf.Min((int)throwLocation.z - throwingSoldier.Z, Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow((int)throwLocation.z - throwingSoldier.Z, 2))));
+        int s = throwingSoldier.stats.Str.Val;
+
+        print($"s={s} | deltaX={deltaX} | deltaY={deltaY} | Z={deltaZ} | rhs={(100 * Mathf.Pow(s, 2) - (Mathf.Pow(deltaX, 2) + Mathf.Pow(deltaY, 2))) / (20 * s)}");
+
+        if (deltaZ <= (100 * Mathf.Pow(s, 2) - (Mathf.Pow(deltaX, 2) + Mathf.Pow(deltaY, 2))) / (20 * s))
+            return true;
+        return false;
+    }
+    public bool IsWithinDropBounds(Soldier throwingSoldier, Vector3 throwLocation)
+    {
+        if (Vector2.Distance(throwLocation, new(throwingSoldier.X, throwingSoldier.Y)) <= 3 && throwLocation.z <= (throwingSoldier.Z + 3))
+            return true;
+        return false;
     }
     public bool GetThrowLocation(out Vector3 throwLocation)
     {
@@ -53,7 +81,6 @@ public class ValidThrowChecker : MonoBehaviour
         if (menu.ValidateIntInput(XPos, out int x) && menu.ValidateIntInput(YPos, out int y) && menu.ValidateIntInput(ZPos, out int z))
         {
             throwLocation = new Vector3(x, y, z);
-            print($"{throwLocation}");
             return true;
         }
         return false;

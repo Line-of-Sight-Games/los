@@ -515,6 +515,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         else
             return false;
     }
+    public bool HasStrength()
+    {
+        if (stats.Str.Val > 0)
+            return true;
+        return false;
+    }
     public bool IsResilient()
     {
         if (IsAlive() && stats.R.Val >= 6)

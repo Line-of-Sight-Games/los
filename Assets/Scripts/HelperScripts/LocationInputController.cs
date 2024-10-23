@@ -3,7 +3,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 
-public class LocationInputController : InputController
+public class LocationInputController : MinMaxInputController
 {
     private void OnEnable()
     {

@@ -3564,18 +3564,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         
         overwatchUI.radius.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max {activeSoldier.SRColliderMax.radius}";
-        overwatchUI.radius.GetComponent<InputController>().max = Mathf.RoundToInt(activeSoldier.SRColliderMax.radius);
+        overwatchUI.radius.GetComponent<MinMaxInputController>().max = Mathf.RoundToInt(activeSoldier.SRColliderMax.radius);
         
         //allow guardsman to overwatch up to 180 degrees
         if (activeSoldier.IsGuardsman())
         {
             overwatchUI.arc.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max 180";
-            overwatchUI.arc.GetComponent<InputController>().max = 180;
+            overwatchUI.arc.GetComponent<MinMaxInputController>().max = 180;
         }
         else
         {
             overwatchUI.arc.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max 90";
-            overwatchUI.arc.GetComponent<InputController>().max = 90;
+            overwatchUI.arc.GetComponent<MinMaxInputController>().max = 90;
         }
 
         //set ap cost
@@ -4387,25 +4387,22 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         grenadeUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
         grenadeUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text = useItemUI.itemUsed.itemName;
+        grenadeUI.transform.Find("OptionPanel").Find("GrenadeType").GetComponentInChildren<TextMeshProUGUI>().text = useItemUI.itemUsed.itemName;
 
         grenadeUI.SetActive(true);
-
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<LocationInputController>().SetMin(-activeSoldier.ThrowRadius);
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<LocationInputController>().SetMin(-activeSoldier.ThrowRadius);
     }
     public void ClearGrenadeUI()
     {
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("ZPos").GetComponent<TMP_InputField>().text = "";
         grenadeUI.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject.SetActive(false);
         grenadeUI.transform.Find("PressedOnce").gameObject.SetActive(false);
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(false);
-        grenadeUI.transform.Find("OptionPanel").Find("GrenadeTarget").Find("PreciseThrow").gameObject.SetActive(false);
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("FinalPosition").gameObject.SetActive(false);
+        grenadeUI.transform.Find("OptionPanel").Find("Target").Find("PreciseThrow").gameObject.SetActive(false);
     }
     public void CloseGrenadeUI()
     {

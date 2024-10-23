@@ -2909,13 +2909,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmGrenade(UseItemUI useGrenade)
     {
-        string grenadeName = useGrenade.transform.Find("OptionPanel").Find("GrenadeName").Find("Text").GetComponent<TextMeshProUGUI>().text;
-        ValidThrowChecker throwTarget = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").GetComponent<ValidThrowChecker>();
-        GameObject throwBeyondRadius = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ThrowBeyondRadius").gameObject;
-        GameObject throwBeyondBlindRadius = useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("ThrowBeyondBlindRadius").gameObject;
+        string grenadeName = useGrenade.transform.Find("OptionPanel").Find("GrenadeType").Find("Text").GetComponent<TextMeshProUGUI>().text;
+        ValidThrowChecker throwTarget = useGrenade.transform.Find("OptionPanel").Find("Target").GetComponent<ValidThrowChecker>();
+        GameObject throwBeyondRadius = useGrenade.transform.Find("OptionPanel").Find("Target").Find("ThrowBeyondRadius").gameObject;
+        GameObject throwBeyondBlindRadius = useGrenade.transform.Find("OptionPanel").Find("Target").Find("ThrowBeyondBlindRadius").gameObject;
         GameObject scatteredOffMap = useGrenade.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject;
 
-        if (!useGrenade.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
+        if (!throwTarget.pressedOnce.activeInHierarchy) //first press
         {
             if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
             {
@@ -2930,17 +2930,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 };
 
                 if (scatterDistance == -1 || throwDistance <= 3)
-                    useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("PreciseThrow").gameObject.SetActive(true);
+                    useGrenade.transform.Find("OptionPanel").Find("Target").Find("PreciseThrow").gameObject.SetActive(true);
                 else
                 {
                     (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
                     throwTarget.XPos.text = $"{newX}";
                     throwTarget.YPos.text = $"{newY}";
-                    useGrenade.transform.Find("OptionPanel").Find("GrenadeTarget").Find("FinalPosition").gameObject.SetActive(true);
+                    useGrenade.transform.Find("OptionPanel").Find("Target").Find("FinalPosition").gameObject.SetActive(true);
                 }
 
-                useGrenade.transform.Find("PressedOnce").gameObject.SetActive(true);
+                throwTarget.pressedOnce.SetActive(true);
             }
         }
         else //second press
