@@ -775,13 +775,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_Dropdown dropdown = soldierStatsUI.Find("General").Find("OverrideTerrainOn").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
 
-        if (activeSoldier.terrainOn.Equals("Alpine"))
+        if (activeSoldier.TerrainOn.Equals("Alpine"))
             dropdown.value = 0;
-        else if (activeSoldier.terrainOn.Equals("Desert"))
+        else if (activeSoldier.TerrainOn.Equals("Desert"))
             dropdown.value = 1;
-        else if (activeSoldier.terrainOn.Equals("Jungle"))
+        else if (activeSoldier.TerrainOn.Equals("Jungle"))
             dropdown.value = 2;
-        else if(activeSoldier.terrainOn.Equals("Urban"))
+        else if(activeSoldier.TerrainOn.Equals("Urban"))
             dropdown.value = 3;
     }
     public void SetOverrideTerrainOn()
@@ -789,13 +789,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideTerrainOn").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
 
         if (dropdown.value == 0)
-            activeSoldier.terrainOn = "Alpine";
+            activeSoldier.TerrainOn = "Alpine";
         else if (dropdown.value == 1)
-            activeSoldier.terrainOn = "Desert";
+            activeSoldier.TerrainOn = "Desert";
         else if (dropdown.value == 2)
-            activeSoldier.terrainOn = "Jungle";
+            activeSoldier.TerrainOn = "Jungle";
         else if (dropdown.value == 3)
-            activeSoldier.terrainOn = "Urban";
+            activeSoldier.TerrainOn = "Urban";
     }
     public void HideOverrideWeather()
     {

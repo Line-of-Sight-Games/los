@@ -2395,17 +2395,23 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         UnsetState("SmokeBlinded");
         SetState("SmokeCovered");
         menu.AddDamageAlert(this, $"Covered by smoke cloud (<color=green>Defence Zone</color>).", true, true);
+
+        StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(SR)|smokeActive(defencezone)", Vector3.zero, string.Empty)); //losCheck
     }
     public void SetSmokeBlinded()
     {
         UnsetState("SmokeCovered");
         SetState("SmokeBlinded");
         menu.AddDamageAlert(this, $"Covered by smoke cloud (<color=red>Blind Zone</color>).", false, true);
+
+        StartCoroutine(game.DetectionAlertSingle(this, "statChange(SR)|smokeActive(blindzone)", Vector3.zero, string.Empty)); //losCheck
     }
     public void UnsetSmoked()
     {
         UnsetState("SmokeCovered");
         UnsetState("SmokeBlinded");
+
+        StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(SR)|smokeDeactive", Vector3.zero, string.Empty)); //losCheck
     }
     public bool IsInTabun()
     {
