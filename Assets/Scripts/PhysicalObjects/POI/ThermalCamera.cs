@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
@@ -9,6 +10,7 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
     public Soldier placedBy;
     public int facingX, facingY;
     public bool active;
+    public GameObject beam;
 
     private void Start()
     {
@@ -38,6 +40,8 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
         placedById = otherDetails.Item3;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
+        InitBeam(ConvertMathPosToPhysical(new(facingX, facingY, Z)));
+
         poiPortrait = LoadPortrait(poiType);
 
         return this;
@@ -59,6 +63,8 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
             facingX = Convert.ToInt32(details["facingX"]);
             facingY = Convert.ToInt32(details["facingY"]);
             placedById = (string)details["placedById"];
+
+            InitBeam(ConvertMathPosToPhysical(new(facingX, facingY, Z)));
         }
     }
 
@@ -82,6 +88,36 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
             data.allPOIDetails.Remove(id);
 
         data.allPOIDetails.Add(id, details);
+    }
+
+    public void InitBeam(Vector3 targetPosition)
+    {
+        // Calculate direction vector based on facingCoordinates
+        Vector3 origin = transform.position;
+        Vector3 direction = (targetPosition - origin).normalized;
+
+        //find map endpoint extrapolated from targetPosition
+        Vector3 boundaryPoint = CalculateBoundaryPoint(origin, direction);
+        float distance = Vector3.Distance(origin, boundaryPoint);
+
+        //set position and rotate to endpoint
+        beam.transform.SetPositionAndRotation(origin + direction * (distance / 2), Quaternion.LookRotation(direction));
+
+        //scale beam to match the distance
+        beam.transform.localScale = new Vector3(beam.transform.localScale.x, beam.transform.localScale.y, distance);
+    }
+
+    public Vector3 CalculateBoundaryPoint(Vector3 start, Vector3 direction)
+    {
+        float tX = direction.x != 0 ? ((direction.x > 0 ? game.maxX : 1) - start.x) / direction.x : float.MaxValue;
+        float tY = direction.y != 0 ? ((direction.y > 0 ? game.maxY : 1) - start.y) / direction.y : float.MaxValue;
+        float tZ = direction.z != 0 ? ((direction.z > 0 ? game.maxZ : 0) - start.z) / direction.z : float.MaxValue;
+
+        // Find the smallest positive t (time to reach boundary)
+        float t = Mathf.Min(tX, tY, tZ);
+
+        // Return the boundary point along the direction vector
+        return start + direction * t;
     }
     public Sprite DisarmImage { get { return poiPortrait; } }
 }
