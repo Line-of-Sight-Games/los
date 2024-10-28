@@ -13,12 +13,6 @@ public class SightRadiusSphere : LOSGizmo
         transform.position = from.transform.position;
         if (from.IsOnOverwatch())
             GenerateArcSectorMesh(from.overwatchConeRadius, from.overwatchConeArc, new (from.overwatchYPoint, 0f, from.overwatchXPoint));
-        else
-        {
-            transform.position = new Vector3(from.x - 0.5f, from.z, from.y - 0.5f);
-            losSphereCollider.radius = from.SRColliderMax.radius;
-            losSpherePhysical.transform.localScale *= (2 * from.SRColliderMax.radius);
-        }
 
         return this;
     }

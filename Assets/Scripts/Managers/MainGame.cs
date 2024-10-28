@@ -466,7 +466,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (s.IsInspirer())
                     CheckInspirer(s);
 
-                yield return new WaitUntil(() => menu.inspirerResolvedFlag == true);
+                yield return new WaitUntil(() => menu.inspirerResolvedFlag);
 
                 s.GenerateAP();
             }
@@ -727,6 +727,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void PerformMove(Soldier movingSoldier, int ap, Tuple<Vector3, string> moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance, bool freeMove)
     {
+        movingSoldier.moveResolvedFlag = false;
         FileUtility.WriteToReport($"{movingSoldier.soldierName} moved to {moveToLocation}");
 
         int.TryParse(fallDistance, out int fallDistanceInt);
@@ -734,11 +735,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
         movingSoldier.DeductAP(ap);
         if (!freeMove)
             movingSoldier.DeductMP(1);
+
+        //fill the tempMove variable in case move needs to be reverted
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
-        movingSoldier.X = (int)moveToLocation.Item1.x;
-        movingSoldier.Y = (int)moveToLocation.Item1.y;
-        movingSoldier.Z = (int)moveToLocation.Item1.z;
+        
+        //perform the move
+        movingSoldier.x = (int)moveToLocation.Item1.x;
+        movingSoldier.y = (int)moveToLocation.Item1.y;
+        movingSoldier.z = (int)moveToLocation.Item1.z;
         movingSoldier.TerrainOn = moveToLocation.Item2;
 
         //activate in cover
@@ -2554,7 +2559,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (s1.EngagedSoldiers.Count > 0)
         {
             menu.SetMeleeResolvedFlagTo(false);
-            yield return new WaitUntil(() => menu.detectionResolvedFlag == true);
+            yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.detectionResolvedFlag);
             foreach (Soldier s in s1.EngagedSoldiers)
                 menu.AddMeleeAlert(s1, s, "No Damage\n(Engagement Change)", DetermineMeleeController(s1, s, false, false));
         }
@@ -3758,7 +3763,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             previousPositionsMovingSoldier.Add(position);
 
             //record when moving solider sees detectee
-            if (CalculateRange(detectee, position) <= movingSoldier.SRColliderMax.radius)
+            if (CalculateRange(detectee, position) <= movingSoldier.SRColliderFull.radius)
                 movingSoldierSeesDetectee.Add(true);
             else
                 movingSoldierSeesDetectee.Add(false);
@@ -3856,7 +3861,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             previousPositionsMovingSoldier.Add(position);
 
             //record when detectee sees moving soldier
-            if (CalculateRange(detectee, position) <= detectee.SRColliderMax.radius)
+            if (CalculateRange(detectee, position) <= detectee.SRColliderFull.radius)
                 detecteeSeesMovingSoldier.Add(true);
             else
                 detecteeSeesMovingSoldier.Add(false);
@@ -3905,7 +3910,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             previousPositionsMovingSoldier.Add(position);
 
             //record when moving solider sees detectee
-            if (CalculateRange(detectee, position) <= movingSoldier.SRColliderMax.radius)
+            if (CalculateRange(detectee, position) <= movingSoldier.SRColliderFull.radius)
                 movingSoldierSeesDetectee.Add(true);
             else
                 movingSoldierSeesDetectee.Add(false);
@@ -3951,7 +3956,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (causeOfLosCheck.Contains("losChange") || causeOfLosCheck.Contains("loudAction"))
             triggersOverwatch = true;
 
-        yield return new WaitUntil(() => menu.shotResolvedFlag == true && menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true);
+        yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.shotResolvedFlag && menu.meleeResolvedFlag && menu.inspirerResolvedFlag);
 
         if (movingSoldier.IsAlive())
         {
@@ -4470,7 +4475,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public IEnumerator DetectionAlertAll(string causeOfLosCheck)
     {
-        yield return new WaitUntil(() => menu.meleeResolvedFlag == true && menu.inspirerResolvedFlag == true);
+        yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.meleeResolvedFlag && menu.inspirerResolvedFlag);
 
         foreach (Soldier s in AllSoldiers())
         {

@@ -74,7 +74,7 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
     public void SetCam()
     {
         cam.orthographicSize = Mathf.Max(x, z) / 2;
-        cam.transform.position = new Vector3(x / 2, y + 1, z / 2);
+        cam.transform.position = new Vector3(x / 2, y * 2, z / 2);
         sun.transform.position = new Vector3(0, y + 1, 0);
     }
 

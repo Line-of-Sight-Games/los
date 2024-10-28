@@ -2,6 +2,14 @@ using UnityEngine;
 
 public static class HelperFunctions
 {
+    public static Vector3 ConvertPhysicalPosToMathPos(Vector3 physicalPos)
+    {
+        return new(Mathf.RoundToInt(physicalPos.x + 0.5f), Mathf.RoundToInt(physicalPos.z), Mathf.RoundToInt(physicalPos.y + 0.5f));
+    }
+    public static Vector3 ConvertMathPosToPhysicalPos(Vector3 mathPos)
+    {
+        return new(mathPos.x - 0.5f, mathPos.z, mathPos.y - 0.5f);
+    }
     public static int RandomNumber(int min, int max)
     {
         return Random.Range(min, max + 1);

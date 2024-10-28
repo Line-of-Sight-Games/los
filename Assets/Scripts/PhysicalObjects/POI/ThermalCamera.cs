@@ -40,7 +40,7 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
         placedById = otherDetails.Item3;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
-        InitBeam(ConvertMathPosToPhysical(new(facingX, facingY, Z)));
+        InitBeam(HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)));
 
         poiPortrait = LoadPortrait(poiType);
 
@@ -64,7 +64,7 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
             facingY = Convert.ToInt32(details["facingY"]);
             placedById = (string)details["placedById"];
 
-            InitBeam(ConvertMathPosToPhysical(new(facingX, facingY, Z)));
+            InitBeam(HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)));
         }
     }
 

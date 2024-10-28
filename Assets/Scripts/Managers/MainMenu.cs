@@ -285,7 +285,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 CreateLOSArrows();
                 if (activeSoldier != null)
                 {
-                    CreateSightRadiusSphere();
+                    RevealSightRadiusSpheres();
                 }
             }
 
@@ -302,7 +302,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //destroy gizmos upon key release
             if (SecondOverrideKeyUp())
             {
-                DestroySightRadiusSphere();
+                HideSightRadiusSphere();
                 DestroyLOSArrows();
             }
         }
@@ -362,15 +362,23 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (LOSArrow arrow in LOSArrows)
             Destroy(arrow.gameObject);
     }
-    public void CreateSightRadiusSphere()
+    public void RevealSightRadiusSpheres()
     {
-        SightRadiusSphere sightRadiusSphere = Instantiate(sightRadiusSpherePrefab).Init(activeSoldier);
+        if (activeSoldier != null)
+        {
+            activeSoldier.SRColliderMinRenderer.enabled = true;
+            activeSoldier.SRColliderHalfRenderer.enabled = true;
+            activeSoldier.SRColliderFullRenderer.enabled = true;
+        }
     }
-    public void DestroySightRadiusSphere()
+    public void HideSightRadiusSphere()
     {
-        var sightRadiusSpheres = FindObjectsByType<SightRadiusSphere>(FindObjectsInactive.Include, default);
-        foreach (SightRadiusSphere sightRadiusSphere in sightRadiusSpheres)
-            Destroy(sightRadiusSphere.gameObject);
+        if (activeSoldier != null)
+        {
+            activeSoldier.SRColliderMinRenderer.enabled = false;
+            activeSoldier.SRColliderHalfRenderer.enabled = false;
+            activeSoldier.SRColliderFullRenderer.enabled = false;
+        }
     }
     public string PrintArray(Array array)
     {
@@ -503,6 +511,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         }
 
         teamTurnStartFlag = value;
+    }
+    public bool MovementResolvedFlag()
+    {
+        foreach (Soldier s in game.AllFieldedSoldiers())
+        {
+            if (!s.moveResolvedFlag)
+                return false;
+        }
+        return true;
     }
     public void ToggleMute()
     {
@@ -1263,7 +1280,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 tc.beam.GetComponent<Renderer>().enabled = true;
             else
             {
-                if (tc.placedBy.soldierTeam == game.currentTeam)
+                if (tc.placedBy != null && tc.placedBy.soldierTeam == game.currentTeam)
                     tc.beam.GetComponent<Renderer>().enabled = true;
                 else
                     tc.beam.GetComponent<Renderer>().enabled = false;
@@ -2119,7 +2136,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 //populate final reveal list = fresh reveals plus old reveals minus not reveals
                 List<string> arrayFinalRevealingList = arrayOfRevealingList.Concat(arrayOfOldRevealingList).Distinct().Except(arrayOfNotRevealingList).ToList();
-                print(IdToName(keyValuePair.Key) + "--->New:[" + PrintList(arrayOfRevealingList) + "] + Existing:[" + PrintList(arrayOfOldRevealingList) + "] - NotRevealing:[" + PrintList(arrayOfNotRevealingList) + "] = Final:[" + PrintList(arrayFinalRevealingList) + "]");
+                //print(IdToName(keyValuePair.Key) + "--->New:[" + PrintList(arrayOfRevealingList) + "] + Existing:[" + PrintList(arrayOfOldRevealingList) + "] - NotRevealing:[" + PrintList(arrayOfNotRevealingList) + "] = Final:[" + PrintList(arrayFinalRevealingList) + "]");
 
                 foreach (string soldierId in arrayFinalRevealingList)
                     allSoldiersRevealingFinal[keyValuePair.Key].Add(soldierId);
@@ -2658,7 +2675,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
     public IEnumerator OpenOverwatchShotUI(Soldier shooter, Soldier target)
     {
-        yield return new WaitUntil(() => detectionResolvedFlag == true);
+        yield return new WaitUntil(() => MovementResolvedFlag() && detectionResolvedFlag);
 
         overwatchShotUI.Init(shooter, target);
         overwatchShotUI.gameObject.SetActive(true);
@@ -2882,7 +2899,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public IEnumerator OpenMeleeUI(string meleeCharge)
     {
-        yield return new WaitUntil(() => detectionResolvedFlag == true);
+        yield return new WaitUntil(() => MovementResolvedFlag() && detectionResolvedFlag);
         //set attacker
         Soldier attacker = activeSoldier;
         meleeUI.attackerID.text = attacker.id;
@@ -3574,8 +3591,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenOverwatchUI()
     {
         
-        overwatchUI.radius.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max {activeSoldier.SRColliderMax.radius}";
-        overwatchUI.radius.GetComponent<MinMaxInputController>().max = Mathf.RoundToInt(activeSoldier.SRColliderMax.radius);
+        overwatchUI.radius.placeholder.GetComponent<TextMeshProUGUI>().text = $"Max {activeSoldier.SRColliderFull.radius}";
+        overwatchUI.radius.GetComponent<MinMaxInputController>().max = Mathf.RoundToInt(activeSoldier.SRColliderFull.radius);
         
         //allow guardsman to overwatch up to 180 degrees
         if (activeSoldier.IsGuardsman())

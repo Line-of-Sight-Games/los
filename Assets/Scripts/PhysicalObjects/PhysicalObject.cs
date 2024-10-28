@@ -20,10 +20,6 @@ public class PhysicalObject : MonoBehaviour
     {
         return System.Guid.NewGuid().ToString();
     }
-    public Vector3 ConvertMathPosToPhysical(Vector3 mathPos)
-    {
-        return new(mathPos.x - 0.5f, mathPos.z, mathPos.y - 0.5f);
-    }
     public void MapPhysicalPosition(int x, int y, int z)
     {
         //print("Mapped physical position");

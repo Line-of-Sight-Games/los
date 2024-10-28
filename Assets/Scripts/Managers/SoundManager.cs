@@ -95,14 +95,12 @@ public class SoundManager : MonoBehaviour
     private IEnumerator PlayAndTrackSound(AudioClip clip)
     {
         // Play the sound using PlayOneShot
-        print($"Playing sound \"{clip.name}\"");
         audioSource.PlayOneShot(clip);
 
         // Wait for the clip to finish
         yield return new WaitForSeconds(clip.length);
 
         // Remove the sound from the tracking dictionary after it finishes
-        print($"Closing sound \"{clip.name}\"");
         playingSounds.Remove(clip);
     }
 

@@ -19,7 +19,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag;
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, stunnedTurnsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
@@ -30,7 +30,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
     public Item itemPrefab;
     private JArray statsJArray;
-    public SphereCollider SRColliderMax, SRColliderHalf, SRColliderMin, itemCollider;
+    public GameObject SRColliderFullPhysical, SRColliderHalfPhysical, SRColliderMinPhysical;
+    public SphereCollider SRColliderFull, SRColliderHalf, SRColliderMin, tileCollider;
+    public Renderer SRColliderFullRenderer, SRColliderHalfRenderer, SRColliderMinRenderer;
     public new Renderer renderer;
     public Dictionary<string, string> inventorySlots = new()
     {
@@ -676,6 +678,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 DisplayStats();
                 CheckRevealed();
                 CheckSightRadius();
+
+                //execute movement
+                if (transform.position != HelperFunctions.ConvertMathPosToPhysicalPos(new(X, Y, Z)))
+                    transform.position = Vector3.MoveTowards(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(X, Y, Z)), 1f);
+                else
+                    moveResolvedFlag = true;
             }
         }
     }
@@ -731,7 +739,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //reflect changes to colliders
         SRColliderMin.radius = Mathf.Min(3, stats.SR.Val);
         SRColliderHalf.radius = Mathf.Max(SRColliderMin.radius, (stats.SR.Val / 2));
-        SRColliderMax.radius = Mathf.Max(SRColliderMin.radius, stats.SR.Val);
+        SRColliderFull.radius = Mathf.Max(SRColliderMin.radius, stats.SR.Val);
+        
+        SRColliderMinPhysical.transform.localScale = new(SRColliderMin.radius * 2, SRColliderMin.radius * 2, SRColliderMin.radius * 2);
+        SRColliderHalfPhysical.transform.localScale = new(SRColliderHalf.radius * 2, SRColliderHalf.radius * 2, SRColliderHalf.radius * 2);
+        SRColliderFullPhysical.transform.localScale = new(SRColliderFull.radius * 2, SRColliderFull.radius * 2, SRColliderFull.radius * 2);
 
         //check if soldier becomes blind
         if (stats.SR.Val == 0)
@@ -2856,7 +2868,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool PhysicalObjectWithinMaxRadius(PhysicalObject obj)
     {
-        if (obj.IsWithinSphere(this.SRColliderMax))
+        if (obj.IsWithinSphere(this.SRColliderFull))
             return true;
 
         return false;
@@ -2877,14 +2889,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool PhysicalObjectWithinItemRadius(PhysicalObject obj)
     {
-        if (obj.IsWithinSphere(this.itemCollider))
+        if (obj.IsWithinSphere(this.tileCollider))
             return true;
 
         return false;
     }
     public bool PhysicalObjectWithinMeleeRadius(PhysicalObject obj)
     {
-        if (obj.IsWithinSphere(this.itemCollider))
+        if (obj.IsWithinSphere(this.tileCollider))
             return true;
 
         return false;
@@ -2992,7 +3004,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (Soldier s in game.AllSoldiers())
             if (s.IsAbleToSee() && this.IsSameTeamAsIncludingSelf(s))
-                if (game.CalculateRange(s, obj) <= s.SRColliderMax.radius)
+                if (game.CalculateRange(s, obj) <= s.SRColliderFull.radius)
                     objectIsRevealed = true;
         return objectIsRevealed;
     }
@@ -3042,28 +3054,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool CheckTabunClouds()
     {
         TabunCloud[] allTabunClouds = FindObjectsByType<TabunCloud>(default);
-        print($"running function checktabunclouds for {this.soldierName}");
         if (allTabunClouds.Length > 0)
         {
-            print($"there are clouds to test {this.soldierName}");
             if (IsAlive() && !IsWearingStimulantArmour())
             {
-                print($"testing soldier {this.soldierName}");
                 bool currentlyInTabun = false;
                 foreach (TabunCloud cloud in allTabunClouds)
                 {
                     if (cloud.TurnsUntilDissipation > 0)
                     {
-                        print($"testing tabun cloud {cloud.Id}");
                         if (this.IsWithinSphere(cloud.innerCloud))
                         {
-                            print($"{this.soldierName} in inner tabun cloud {cloud.Id}");
                             currentlyInTabun = true;
                             SetTabunInnerAffected();
                         }
                         else if (this.IsWithinSphere(cloud.outerCloud))
                         {
-                            print($"{this.soldierName} in outer tabun cloud {cloud.Id}");
                             currentlyInTabun = true;
                             SetTabunOuterAffected();
                         }
