@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SRMinRadiusCollider : SRCollider
+public class SRMinRadiusCollider : BaseTriggerCollider
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -15,16 +15,16 @@ public class SRMinRadiusCollider : SRCollider
     }
     private void OnTriggerEnter(Collider colliderThatEntered)
     {
-        if (IsValidSRCollision(colliderThatEntered, out SoldierBodyCollider soldierBodyThatEntered))
+        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
         {
-            print($"{soldierBodyThatEntered.linkedSoldier.soldierName} entered the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            //print($"{soldierBodyThatEntered.linkedSoldier.soldierName} entered the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
         }
     }
     private void OnTriggerExit(Collider colliderThatEntered)
     {
-        if (IsValidSRCollision(colliderThatEntered, out SoldierBodyCollider soldierBodyThatEntered))
+        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
         {
-            print($"{soldierBodyThatEntered.linkedSoldier.soldierName} exited the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            //print($"{soldierBodyThatEntered.linkedSoldier.soldierName} exited the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
         }
     }
 }

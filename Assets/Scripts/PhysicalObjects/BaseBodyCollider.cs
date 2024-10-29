@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class SoldierBodyCollider : BaseBodyCollider
+public class BaseBodyCollider : MonoBehaviour
 {
-    public Soldier linkedSoldier;
+    public PhysicalObject linkedBody;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -15,5 +15,5 @@ public class SoldierBodyCollider : BaseBodyCollider
         
     }
 
-    public Soldier LinkedSoldier { get { return linkedSoldier; } }
+    public PhysicalObject LinkedBody { get { return linkedBody; } }
 }

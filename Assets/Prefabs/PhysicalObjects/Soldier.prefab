@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3e8331a85a7c545b128a2c7547472b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkedSoldier: {fileID: 4380717690802720386}
+  linkedObject: {fileID: 4380717690802720386}
 --- !u!135 &3670613070504241877
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fd59c7ca939b7244b19830529b5d829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkedSoldier: {fileID: 4380717690802720386}
+  linkedObject: {fileID: 4380717690802720386}
 --- !u!135 &1583070955957388279
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -188,6 +188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2a16d785bd950d4d88feca4c78bb506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  linkedBody: {fileID: 0}
   linkedSoldier: {fileID: 4380717690802720386}
 --- !u!33 &7115050985051285636
 MeshFilter:
@@ -745,7 +746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b152ab90aa6e434db48f68b6fc6bf7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkedSoldier: {fileID: 4380717690802720386}
+  linkedObject: {fileID: 4380717690802720386}
 --- !u!135 &4952051446501971680
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -813,7 +814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc2aa39e72fbeb4c88d5e283cc7e98f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkedSoldier: {fileID: 4380717690802720386}
+  linkedObject: {fileID: 4380717690802720386}
 --- !u!135 &4816443929877143705
 SphereCollider:
   m_ObjectHideFlags: 0

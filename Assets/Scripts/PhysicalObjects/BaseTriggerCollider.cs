@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class SRCollider : MonoBehaviour
+public class BaseTriggerCollider : MonoBehaviour
 {
-    public Soldier linkedSoldier;
+    public PhysicalObject linkedObject;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -18,20 +18,20 @@ public class SRCollider : MonoBehaviour
     {
         return HelperFunctions.ConvertPhysicalPosToMathPos(collider.ClosestPoint(transform.position));
     }
-    public bool IsValidSRCollision(Collider other, out SoldierBodyCollider soldierBodyCollider)
+    public bool IsValidBodyCollision(Collider other, out BaseBodyCollider bodyCollider)
     {
-        soldierBodyCollider = null;
-        if (other.gameObject.TryGetComponent(out SoldierBodyCollider collider))
+        bodyCollider = null;
+        if (other.gameObject.TryGetComponent(out BaseBodyCollider collider))
         {
-            soldierBodyCollider = collider;
-            if (LinkedSoldier.OnBattlefield() && soldierBodyCollider.linkedSoldier.OnBattlefield())
+            bodyCollider = collider;
+            if (LinkedObject.OnBattlefield() && bodyCollider.LinkedBody.OnBattlefield())
                 return true;
         }
         return false;
     }
 
-    public Soldier LinkedSoldier
+    public PhysicalObject LinkedObject
     {
-        get { return linkedSoldier; }
+        get { return linkedObject; }
     }
 }

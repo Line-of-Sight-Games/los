@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SRFullRadiusCollider : SRCollider
+public class SRFullRadiusCollider : BaseTriggerCollider
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -15,16 +15,16 @@ public class SRFullRadiusCollider : SRCollider
     }
     private void OnTriggerEnter(Collider colliderThatEntered)
     {
-        if (IsValidSRCollision(colliderThatEntered, out SoldierBodyCollider soldierBodyThatEntered))
+        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
         {
-            print($"{soldierBodyThatEntered.linkedSoldier.soldierName} entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            //print($"{soldierBodyThatEntered.LinkedSoldier.soldierName} entered the SRFullRadiusCollider of {LinkedBody.soldierName} at {CollisionPoint(colliderThatEntered)}");
         }
     }
-    private void OnTriggerExit(Collider colliderThatEntered)
+    public  void OnTriggerExit(Collider colliderThatEntered)
     {
-        if (IsValidSRCollision(colliderThatEntered, out SoldierBodyCollider soldierBodyThatEntered))
+        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
         {
-            print($"{soldierBodyThatEntered.linkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            //print($"{soldierBodyThatEntered.LinkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
         }
     }
 }
