@@ -6,7 +6,7 @@ public class SoldierBodyCollider : BaseBodyCollider
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        linkedBody = linkedSoldier;
     }
 
     // Update is called once per frame
@@ -15,5 +15,9 @@ public class SoldierBodyCollider : BaseBodyCollider
         
     }
 
-    public Soldier LinkedSoldier { get { return linkedSoldier; } }
+    public Soldier LinkedSoldier
+    {
+        get { return linkedSoldier; }
+        set { linkedSoldier = value; }
+    }
 }

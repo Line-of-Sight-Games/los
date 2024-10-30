@@ -6,5 +6,4 @@ public class LOSGizmo : MonoBehaviour
 {
     public Soldier from;
     public LineRenderer lineRendererPrefab;
-
 }

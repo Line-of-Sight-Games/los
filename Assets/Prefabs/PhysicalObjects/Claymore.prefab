@@ -45,7 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75170cdbb25c99042944db58bd8954bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menu: {fileID: 0}
   linkedObject: {fileID: 7263452995996032946}
+  linkedClaymore: {fileID: 7263452995996032946}
 --- !u!135 &5087428226348710236
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -132,6 +134,7 @@ MonoBehaviour:
   facingY: 0
   placedById: 
   placedBy: {fileID: 0}
+  renderer: {fileID: 8356764608090330096}
 --- !u!1 &8012201387627705804
 GameObject:
   m_ObjectHideFlags: 0
@@ -141,9 +144,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6088890397668528540}
+  - component: {fileID: 5837011696358044141}
   - component: {fileID: 788734933135883321}
   - component: {fileID: 8356764608090330096}
   - component: {fileID: 801592357967565294}
+  - component: {fileID: 3825432865074777323}
   m_Layer: 0
   m_Name: ClaymorePhysical
   m_TagString: Untagged
@@ -167,6 +172,20 @@ Transform:
   - {fileID: 1247860523811855407}
   m_Father: {fileID: 4380717690802720414}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5837011696358044141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8012201387627705804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79a58821fdbe9cf438609cc13a018a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkedBody: {fileID: 7263452995996032946}
+  linkedClaymore: {fileID: 7263452995996032946}
 --- !u!33 &788734933135883321
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -241,3 +260,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &3825432865074777323
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8012201387627705804}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

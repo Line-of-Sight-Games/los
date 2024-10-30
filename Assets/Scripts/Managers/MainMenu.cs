@@ -27,6 +27,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 
+    public DetectionUI detectionUI;
     public MoveUI moveUI;
     public ShotUI shotUI;
     public MeleeUI meleeUI;
@@ -38,7 +39,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, detectionUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, detectionAlertPrefab, detectionAlertClaymorePrefab, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -1265,13 +1266,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Claymore c in FindObjectsByType<Claymore>(default))
         {
             if (OverrideView)
-                c.GetComponent<Renderer>().enabled = true;
+                c.renderer.enabled = true;
             else
             {
                 if (c.revealed || (c.placedBy != null && c.placedBy.soldierTeam == game.currentTeam))
-                    c.GetComponent<Renderer>().enabled = true;
+                    c.renderer.enabled = true;
                 else
-                    c.GetComponent<Renderer>().enabled = false;
+                    c.renderer.enabled = false;
             }
         }
         foreach (ThermalCamera tc in FindObjectsByType<ThermalCamera>(default))
@@ -1794,8 +1795,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //detection functions - menu
-    public void OpenGMAlertDetectionUI(string causeOfLosCheck)
+    public IEnumerator OpenDetectionAlertUI(string causeOfLosCheck)
     {
+        //wait for everything else to resolve
+        yield return new WaitUntil(() => MovementResolvedFlag() && shotResolvedFlag && meleeResolvedFlag && inspirerResolvedFlag);
+
         CloseSoldierStatsUI();
 
         //type of los check
@@ -1804,7 +1808,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
         detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(false);
         int childCount = 0, overwatchCount = 0;
-        foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
+        foreach (Transform child in detectionUI.detectionAlertsPanel)
         {
             childCount++;
             if (child.Find("DetectionArrow").GetComponent<Image>().sprite.ToString().Contains("verwatch"))
@@ -1873,7 +1877,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //actually open the alert log
             if (detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
             {
-                detectionUI.SetActive(true);
+                detectionUI.gameObject.SetActive(true);
                 detectionUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>().verticalNormalizedPosition = 1;
 
                 //show payall/denyall buttons if all detections mutual
@@ -1894,87 +1898,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             
             CloseGMAlertDetectionUI();
         }
-    }
-    public void AddDetectionAlert(Soldier detector, Soldier counter, string detectorLabel, string counterLabel, string arrowType)
-    {
-        print($"Tried to add detection alert {detector.soldierName} to {counter.soldierName} with {arrowType} arrow");
-        //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
-        foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
-        {
-            if (child.TryGetComponent<SoldierAlertLOS>(out var soldierAlert))
-            {
-                if ((soldierAlert.s1 == detector && soldierAlert.s2 == counter) || (soldierAlert.s1 == counter && soldierAlert.s2 == detector))
-                    Destroy(soldierAlert.gameObject);
-            }
-        }
-            
-
-        GameObject detectionAlert = Instantiate(detectionAlertPrefab, detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
-
-        //block invalid selections
-        if (detectorLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        if (counterLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-
-        //force reveal for trenbolone
-        if (detector.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        }
-        if (counter.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-        }
-
-        detectionAlert.GetComponent<SoldierAlertLOS>().SetSoldiers(detector, counter);
-        detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
-
-        detectionAlert.transform.Find("Detector").Find("DetectorSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + detector.stats.SR.Val + ")";
-        detectionAlert.transform.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text = counterLabel;
-        detectionAlert.transform.Find("Detector").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(detector);
-        detectionAlert.transform.Find("Detector").Find("DetectorLocation").GetComponent<TextMeshProUGUI>().text = "X:" + detector.X + "\nY:" + detector.Y + "\nZ:" + detector.Z;
-
-        detectionAlert.transform.Find("Counter").Find("CounterSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + counter.stats.SR.Val + ")";
-        detectionAlert.transform.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text = detectorLabel;
-        detectionAlert.transform.Find("Counter").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(counter);
-        detectionAlert.transform.Find("Counter").Find("CounterLocation").GetComponent<TextMeshProUGUI>().text = "X:" + counter.X + "\nY:" + counter.Y + "\nZ:" + counter.Z;
-    }
-    public void AddDetectionAlert(Soldier detector, Claymore claymore, string detectorLabel, string counterLabel, string arrowType)
-    {
-        print($"Tried to add detection alert {detector.soldierName} to claymore {claymore.X}, {claymore.Y}, {claymore.Z} with {arrowType} arrow");
-        //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
-        foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
-        {
-            if (child.TryGetComponent<ClaymoreAlertLOS>(out var claymoreAlert))
-            {
-                if (claymoreAlert.soldier == detector && claymoreAlert.claymore == claymore)
-                    Destroy(claymoreAlert.gameObject);
-            }
-        }
-
-        GameObject detectionAlert = Instantiate(detectionAlertClaymorePrefab, detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
-
-        //block invalid selections
-        detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-
-        //force reveal for claymores
-        detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
-        detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-
-        detectionAlert.GetComponent<ClaymoreAlertLOS>().SetSoldierAndClaymore(detector, claymore);
-        detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
-
-        detectionAlert.transform.Find("Detector").Find("DetectorSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + detector.stats.SR.Val + ")";
-        detectionAlert.transform.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text = counterLabel;
-        detectionAlert.transform.Find("Detector").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(detector);
-        detectionAlert.transform.Find("Detector").Find("DetectorLocation").GetComponent<TextMeshProUGUI>().text = "X:" + detector.X + "\nY:" + detector.Y + "\nZ:" + detector.Z;
-
-        detectionAlert.transform.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text = detectorLabel;
-        detectionAlert.transform.Find("Counter").Find("POIPortrait").GetComponent<POIPortrait>().Init(claymore);
-        detectionAlert.transform.Find("Counter").Find("CounterLocation").GetComponent<TextMeshProUGUI>().text = "X:" + claymore.X + "\nY:" + claymore.Y + "\nZ:" + claymore.Z;
     }
     public void PayAllDetections()
     {
@@ -2173,7 +2096,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             }
 
             //only close the detectionUI if it's open
-            if (detectionUI.activeInHierarchy)
+            if (detectionUI.gameObject.activeInHierarchy)
             {
                 //destroy all detection alerts after done
                 foreach (Transform child in detectionAlert)
@@ -2188,7 +2111,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CloseDetectionUI()
     {
         SetDetectionResolvedFlagTo(true);
-        detectionUI.SetActive(false);
+        detectionUI.gameObject.SetActive(false);
     }
     public void AddLostLosAlert(Soldier soldier)
     {

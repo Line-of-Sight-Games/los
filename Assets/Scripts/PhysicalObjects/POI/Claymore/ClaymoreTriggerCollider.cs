@@ -2,15 +2,44 @@ using UnityEngine;
 
 public class ClaymoreTriggerCollider : BaseTriggerCollider
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Claymore linkedClaymore;
+    public void OnTriggerEnter(Collider colliderThatEntered)
     {
-        
+        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
+        {
+            if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            {
+                if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
+                    LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
+            }
+        }
+    }
+    public void OnTriggerStay(Collider colliderThatEntered)
+    {
+        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
+        {
+            if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            {
+                if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
+                    LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
+            }
+        }
+    }
+    public void OnTriggerExit(Collider colliderThatEntered)
+    {
+        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
+        {
+            if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            {
+                if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
+                    LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public Claymore LinkedClaymore
     {
-        
+        get { return linkedClaymore; }
+        set { linkedClaymore = value; }
     }
 }

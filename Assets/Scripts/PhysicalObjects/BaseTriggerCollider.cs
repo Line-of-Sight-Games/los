@@ -2,18 +2,13 @@ using UnityEngine;
 
 public class BaseTriggerCollider : MonoBehaviour
 {
+    public MainMenu menu;
     public PhysicalObject linkedObject;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Awake()
     {
-        
+        menu = FindFirstObjectByType<MainMenu>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public Vector3 CollisionPoint(Collider collider)
     {
         return HelperFunctions.ConvertPhysicalPosToMathPos(collider.ClosestPoint(transform.position));

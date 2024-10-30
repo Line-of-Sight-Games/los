@@ -13,6 +13,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     public int c, facingX, facingY;
     public string placedById;
     public Soldier placedBy;
+    public Renderer renderer;
 
     private void Start()
     {
@@ -91,7 +92,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     }
     public bool CheckClaymoreTriggered(Soldier triggeringSoldier)
     {
-        if (triggeringSoldier.IsAlive() && triggeringSoldier.PhysicalObjectWithinRadius(this, 3))
+        if (triggeringSoldier.IsAlive())
         {
             Vector2 centreLine = new(facingX - X, facingY - Y);
             Vector2 targetLine = new(triggeringSoldier.X - X, triggeringSoldier.Y - Y);
@@ -106,25 +107,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         }
 
         return false;
-    }
-    public void MoveOverClaymore(Soldier movingSoldier)
-    {
-        if (CheckClaymoreTriggered(movingSoldier))
-            CheckExplosionClaymore(movingSoldier, false);
-    }
-    public void PlaceClaymore()
-    {
-        Soldier triggeringSoldier = null;
-        foreach (Soldier s in game.AllSoldiers())
-        {
-            if (CheckClaymoreTriggered(s))
-            {
-                triggeringSoldier = s;
-                break;
-            }
-        }
-        if (triggered && triggeringSoldier != null)
-            CheckExplosionClaymore(triggeringSoldier, false);
     }
     public void CheckExplosionClaymore(Soldier explodedBy, bool exploded)
     {

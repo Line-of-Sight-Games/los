@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SRHalfRadiusCollider : BaseTriggerCollider
+public class SRHalfRadiusCollider : SoldierTriggerCollider
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -13,18 +13,32 @@ public class SRHalfRadiusCollider : BaseTriggerCollider
     {
         
     }
-    private void OnTriggerEnter(Collider colliderThatEntered)
+    public void OnTriggerEnter(Collider colliderThatEntered)
     {
         if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
         {
-            //print($"{soldierBodyThatEntered.linkedSoldier.soldierName} entered the SRHalfRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            if (TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            {
+                print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the SRHalfRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            }
+            else if (TryGetComponent(out ClaymoreBodyCollider claymoreThatEntered))
+            {
+                print($"{claymoreThatEntered.LinkedClaymore} ({claymoreThatEntered.LinkedClaymore.X},{claymoreThatEntered.LinkedClaymore.Y},{claymoreThatEntered.LinkedClaymore.Z}) entered the SRHalfRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            }
         }
     }
-    private void OnTriggerExit(Collider colliderThatEntered)
+    public void OnTriggerExit(Collider colliderThatEntered)
     {
         if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
         {
-            //print($"{soldierBodyThatEntered.linkedSoldier.soldierName} exited the SRHalfRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            if (TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            {
+                print($"{soldierThatEntered.LinkedSoldier.soldierName} exited the SRHalfRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            }
+            else if (TryGetComponent(out ClaymoreBodyCollider claymoreThatEntered))
+            {
+                print($"{claymoreThatEntered.LinkedClaymore} ({claymoreThatEntered.LinkedClaymore.X},{claymoreThatEntered.LinkedClaymore.Y},{claymoreThatEntered.LinkedClaymore.Z}) exited the SRHalfRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+            }
         }
     }
 }

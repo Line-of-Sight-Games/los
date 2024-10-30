@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkedObject: {fileID: 4380717690802720386}
+  linkedSoldier: {fileID: 4380717690802720386}
 --- !u!135 &3670613070504241877
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -115,6 +116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkedObject: {fileID: 4380717690802720386}
+  linkedSoldier: {fileID: 4380717690802720386}
 --- !u!135 &1583070955957388279
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -145,7 +147,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2799091456641928664}
-  - component: {fileID: 2741422065401319453}
+  - component: {fileID: 8539323372895798583}
   - component: {fileID: 7115050985051285636}
   - component: {fileID: 2165351343985628743}
   - component: {fileID: 4332433177688512971}
@@ -176,7 +178,7 @@ Transform:
   - {fileID: 1440665216920064965}
   m_Father: {fileID: 4380717690802720414}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2741422065401319453
+--- !u!114 &8539323372895798583
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -188,7 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2a16d785bd950d4d88feca4c78bb506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkedBody: {fileID: 0}
+  linkedBody: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
 --- !u!33 &7115050985051285636
 MeshFilter:
@@ -288,7 +290,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
@@ -747,6 +749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkedObject: {fileID: 4380717690802720386}
+  linkedSoldier: {fileID: 0}
 --- !u!135 &4952051446501971680
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -815,6 +818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkedObject: {fileID: 4380717690802720386}
+  linkedSoldier: {fileID: 4380717690802720386}
 --- !u!135 &4816443929877143705
 SphereCollider:
   m_ObjectHideFlags: 0

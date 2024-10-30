@@ -761,10 +761,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //break suppression
         movingSoldier.UnsetSuppression();
 
-        //blow up claymores
-        foreach (Claymore claymore in FindObjectsByType<Claymore>(default))
-            claymore.MoveOverClaymore(movingSoldier);
-
         //check for smoke clouds
         if (!movingSoldier.CheckSmokeClouds() && movingSoldier.IsInSmoke())
             movingSoldier.UnsetSmoked();
@@ -3116,7 +3112,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id)).PlaceClaymore();
+                Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseClaymoreUI();
@@ -3943,12 +3939,244 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return Mathf.RoundToInt(Vector3.Distance(new Vector3(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), moveToLocation));
     }
+
+    public string CreateDetectionMessageClaymore(int claymoreC, int soldierP)
+    {
+        return $"<color=red>DETECTED</color>\nClaymore C={claymoreC} did not exceed P={soldierP}";
+    }
+    public string CreateDetectionMessage(string type, string distance, int activeStatValue, int perceptivenessMultiplier, int soldierPerceptiveness)
+    {
+        string title, part1, join, part2;
+
+        part1 = $"(within {distance} C={activeStatValue}";
+        part2 = $"{perceptivenessMultiplier}P={soldierPerceptiveness * perceptivenessMultiplier})";
+
+        if (type.Contains("avoidance"))
+        {
+            title = "<color=green>AVOIDANCE</color>\n";
+            join = " exceeded ";
+        }
+        else if (type.Contains("overwatch"))
+        {
+            title = "<color=yellow>OVERWATCH</color>\n";
+            join = " did not exceed ";
+        }
+        else
+        {
+            title = "<color=red>DETECTED</color>\n";
+            join = " did not exceed ";
+        }
+
+        return $"{title}{part1}{join}{part2}";
+    }
+    public string CreateDetectionMessage(string type, string distance, int activeStatValue, int perceptivenessMultiplier, int soldierPerceptiveness, Vector3 boundCrossOne)
+    {
+        string title, part1, join, part2;
+
+        part1 = $"(Until: {boundCrossOne.x}, {boundCrossOne.y}, {boundCrossOne.z})\n(within {distance} C={activeStatValue}";
+        part2 = $"{perceptivenessMultiplier}P={soldierPerceptiveness * perceptivenessMultiplier})";
+
+        if (type.Contains("avoidance"))
+        {
+            title = "<color=green>RETREAT AVOIDANCE</color>\n";
+            join = " exceeded ";
+        }
+        else if (type.Contains("overwatch"))
+        {
+            title = "<color=yellow>RETREAT OVERWATCH</color>\n";
+            join = " did not exceed ";
+        }
+        else
+        {
+            title = "<color=red>RETREAT DETECTED</color>\n";
+            join = " did not exceed ";
+        }
+
+        return $"{title}{part1}{join}{part2}";
+    }
+    public string CreateDetectionMessage(string type, string distance, int activeStatValue, int perceptivenessMultiplier, int soldierPerceptiveness, Vector3 boundCrossOne, Vector3 boundCrossTwo)
+    {
+        string title, part1, join, part2;
+
+        part1 = $"(Between: {boundCrossOne.x}, {boundCrossOne.y}, {boundCrossOne.z} and {boundCrossTwo.x}, {boundCrossTwo.y}, {boundCrossTwo.z})\n(within {distance} C={activeStatValue}";
+        part2 = $"{perceptivenessMultiplier}P={soldierPerceptiveness * perceptivenessMultiplier})";
+
+        if (type.Contains("avoidance"))
+        {
+            title = "<color=green>GLIMPSE AVOIDANCE</color>\n";
+            join = " exceeded ";
+        }
+        else if (type.Contains("overwatch"))
+        {
+            title = "<color=yellow>GLIMPSE OVERWATCH</color>\n";
+            join = " did not exceed ";
+        }
+        else
+        {
+            title = "<color=red>GLIMPSE DETECTED</color>\n";
+            join = " did not exceed ";
+        }
+
+        return $"{title}{part1}{join}{part2}";
+    }
+
+    public void DetectionAlertAllNonCoroutine()
+    {
+        //kill LOS between everyone
+        foreach (Soldier s in AllSoldiers())
+            s.RemoveAllLOSToAllSoldiers();
+
+        StartCoroutine(DetectionAlertAll("losChange|losCheck")); //losCheckAll
+    }
+    public IEnumerator DetectionAlertAll(string causeOfLosCheck)
+    {
+        yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.meleeResolvedFlag && menu.inspirerResolvedFlag);
+
+        foreach (Soldier s in AllSoldiers())
+        {
+            if (s.IsOnturnAndAlive())
+            {
+                //print("Running detection alert for " + s.soldierName);
+                StartCoroutine(DetectionAlertSingle(s, causeOfLosCheck, Vector3.zero, string.Empty)); //losCheck
+            }
+        }
+    }
+
+
+
+
+
+
+
+    //insert game objects functions
+    public void ConfirmInsertGameObjects()
+    {
+        //check input formatting
+        if (insertObjectsUI.objectTypeDropdown.value != 0 && GetInsertLocation(out Tuple<Vector3, string> spawnLocation))
+        {
+            if (insertObjectsUI.objectTypeDropdown.value == 1)
+            {
+                GoodyBox gb = Instantiate(poiManager.gbPrefab).Init(spawnLocation);
+                //fill gb with items
+                foreach (Transform child in insertObjectsUI.gbItemsPanel)
+                {
+                    ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
+                    if (itemIcon != null && itemIcon.pickupNumber > 0)
+                        for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
+                            gb.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+                }
+            }
+            else if (insertObjectsUI.objectTypeDropdown.value == 2)
+                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, insertObjectsUI.terminalTypeDropdown.captionText.text);
+            else if (insertObjectsUI.objectTypeDropdown.value == 3)
+                Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
+            else if (insertObjectsUI.objectTypeDropdown.value == 4)
+            {
+                DrugCabinet dc = Instantiate(poiManager.drugCabinetPrefab).Init(spawnLocation);
+                //fill dc with items
+                foreach (Transform child in insertObjectsUI.dcItemsPanel)
+                {
+                    ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
+                    if (itemIcon != null && itemIcon.pickupNumber > 0)
+                        for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
+                            dc.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+                }
+            }
+
+            menu.CloseOverrideInsertObjectsUI();
+        }
+        else
+            print("Invalid Input");
+    }
+    public bool GetInsertLocation(out Tuple<Vector3, string> insertLocation)
+    {
+        insertLocation = default;
+        if (menu.ValidateIntInput(insertObjectsUI.xPos, out int x) && menu.ValidateIntInput(insertObjectsUI.yPos, out int y) && menu.ValidateIntInput(insertObjectsUI.zPos, out int z) && insertObjectsUI.terrainDropdown.value != 0)
+        {
+            insertLocation = Tuple.Create(new Vector3(x, y, z), insertObjectsUI.terrainDropdown.captionText.text);
+
+            return true;
+        }
+
+        return false;
+    }
+    public void UpdateInsertGameObjectsUI()
+    {
+        insertObjectsUI.terminalTypeUI.SetActive(false);
+        insertObjectsUI.allItemsPanelUI.SetActive(false);
+
+        if (insertObjectsUI.objectTypeDropdown.value == 1)
+        {
+            insertObjectsUI.allItemsPanelUI.SetActive(true);
+            activeItemPanel = insertObjectsUI.allItemsPanelUI.transform;
+        }
+        else if (insertObjectsUI.objectTypeDropdown.value == 2)
+        {
+            insertObjectsUI.terminalTypeUI.SetActive(true);
+        }
+        else if (insertObjectsUI.objectTypeDropdown.value == 4)
+        {
+            insertObjectsUI.allDrugsPanelUI.SetActive(true);
+            activeItemPanel = insertObjectsUI.allDrugsPanelUI.transform;
+        }
+    }
+
+
+    public bool GameRunning 
+    {
+        get {  return gameRunning; } set { gameRunning = value; }
+    }
+
+
+    public void LoadData(GameData data)
+    {
+        currentRound = data.currentRound;
+        currentTeam = data.currentTeam;
+        currentTurn = data.currentTurn;
+
+        battlefield.transform.position = data.mapPosition;
+        battlefield.transform.localScale = data.mapDimensions;
+
+        bottomPlane.transform.position = data.bottomPlanePosition;
+        bottomPlane.transform.localScale = data.bottomPlaneDimensions;
+
+        outlineArea.transform.position = data.outlineAreaPosition;
+        outlineArea.transform.localScale = data.outlineAreaDimensions;
+
+        cam.transform.position = data.camPosition;
+        cam.orthographicSize = data.camOrthoSize;
+        sun.transform.position = data.sunPosition;
+        maxRounds = data.maxRounds;
+        maxTurnTime = data.maxTurnTime;
+        maxTeams = data.maxTeams;
+        maxX = data.maxX;
+        maxY = data.maxY;
+        maxZ = data.maxZ;
+    }
+    public void SaveData(ref GameData data)
+    {
+        data.currentRound = currentRound;
+        data.currentTeam = currentTeam;
+        data.currentTurn = currentTurn;
+
+        data.mapPosition = battlefield.transform.position;
+        data.mapDimensions = battlefield.transform.localScale;
+        data.camPosition = cam.transform.position;
+        data.camOrthoSize = cam.orthographicSize;
+        data.sunPosition = sun.transform.position;
+        data.maxRounds = maxRounds;
+        data.maxTurnTime = maxTurnTime;
+        data.maxTeams = maxTeams;
+        data.maxX = maxX;
+        data.maxY = maxY;
+        data.maxZ = maxZ;
+    }
+
     public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee)
     {
+        yield return null;
+        /*
         // Log the name of the calling method
-        print($"Coroutine called by: {new StackTrace(1).GetFrame(0).GetMethod()}");
-        print($"cause of los check {causeOfLosCheck}");
-
         int[] pMultipliers = { 3, 2, 1 };
 
         //check if this detection will trigger overwatch
@@ -4355,7 +4583,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     if (addDetection)
                     {
-                        menu.AddDetectionAlert(movingSoldier, detecteeSoldier, detectorLabel, counterLabel, arrowType);
+                        //menu.detectionUI.AddDetectionAlert(movingSoldier, detecteeSoldier, detectorLabel, counterLabel, arrowType);
                         showDetectionUI = true;
                     }
                 }
@@ -4364,7 +4592,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (movingSoldier.PhysicalObjectWithinMaxRadius(detecteeClaymore))
                     {
                         counterLabel = CreateDetectionMessageClaymore(detecteeClaymore.ActiveC, movingSoldier.stats.P.Val);
-                        menu.AddDetectionAlert(movingSoldier, detecteeClaymore, "Not detected\n(N/A)", counterLabel, "detection1WayRight");
+                        //menu.AddDetectionAlert(movingSoldier, detecteeClaymore, "Not detected\n(N/A)", counterLabel, "detection1WayRight");
                         showDetectionUI = true;
 
                         print($"{movingSoldier.soldierName} detected the claymore at {detecteeClaymore.x},{detecteeClaymore.y},{detecteeClaymore.z}");
@@ -4382,238 +4610,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //run melee if required (Should wait till detections resolved)
             if (launchMelee != string.Empty)
                 StartCoroutine(menu.OpenMeleeUI(launchMelee));
-        }
-    }
-
-    public string CreateDetectionMessageClaymore(int claymoreC, int soldierP)
-    {
-        return $"<color=red>DETECTED</color>\nClaymore C={claymoreC} did not exceed P={soldierP}";
-    }
-    public string CreateDetectionMessage(string type, string distance, int activeStatValue, int perceptivenessMultiplier, int soldierPerceptiveness)
-    {
-        string title, part1, join, part2;
-
-        part1 = $"(within {distance} C={activeStatValue}";
-        part2 = $"{perceptivenessMultiplier}P={soldierPerceptiveness * perceptivenessMultiplier})";
-
-        if (type.Contains("avoidance"))
-        {
-            title = "<color=green>AVOIDANCE</color>\n";
-            join = " exceeded ";
-        }
-        else if (type.Contains("overwatch"))
-        {
-            title = "<color=yellow>OVERWATCH</color>\n";
-            join = " did not exceed ";
-        }
-        else
-        {
-            title = "<color=red>DETECTED</color>\n";
-            join = " did not exceed ";
-        }
-
-        return $"{title}{part1}{join}{part2}";
-    }
-    public string CreateDetectionMessage(string type, string distance, int activeStatValue, int perceptivenessMultiplier, int soldierPerceptiveness, Vector3 boundCrossOne)
-    {
-        string title, part1, join, part2;
-
-        part1 = $"(Until: {boundCrossOne.x}, {boundCrossOne.y}, {boundCrossOne.z})\n(within {distance} C={activeStatValue}";
-        part2 = $"{perceptivenessMultiplier}P={soldierPerceptiveness * perceptivenessMultiplier})";
-
-        if (type.Contains("avoidance"))
-        {
-            title = "<color=green>RETREAT AVOIDANCE</color>\n";
-            join = " exceeded ";
-        }
-        else if (type.Contains("overwatch"))
-        {
-            title = "<color=yellow>RETREAT OVERWATCH</color>\n";
-            join = " did not exceed ";
-        }
-        else
-        {
-            title = "<color=red>RETREAT DETECTED</color>\n";
-            join = " did not exceed ";
-        }
-
-        return $"{title}{part1}{join}{part2}";
-    }
-    public string CreateDetectionMessage(string type, string distance, int activeStatValue, int perceptivenessMultiplier, int soldierPerceptiveness, Vector3 boundCrossOne, Vector3 boundCrossTwo)
-    {
-        string title, part1, join, part2;
-
-        part1 = $"(Between: {boundCrossOne.x}, {boundCrossOne.y}, {boundCrossOne.z} and {boundCrossTwo.x}, {boundCrossTwo.y}, {boundCrossTwo.z})\n(within {distance} C={activeStatValue}";
-        part2 = $"{perceptivenessMultiplier}P={soldierPerceptiveness * perceptivenessMultiplier})";
-
-        if (type.Contains("avoidance"))
-        {
-            title = "<color=green>GLIMPSE AVOIDANCE</color>\n";
-            join = " exceeded ";
-        }
-        else if (type.Contains("overwatch"))
-        {
-            title = "<color=yellow>GLIMPSE OVERWATCH</color>\n";
-            join = " did not exceed ";
-        }
-        else
-        {
-            title = "<color=red>GLIMPSE DETECTED</color>\n";
-            join = " did not exceed ";
-        }
-
-        return $"{title}{part1}{join}{part2}";
-    }
-
-    public void DetectionAlertAllNonCoroutine()
-    {
-        //kill LOS between everyone
-        foreach (Soldier s in AllSoldiers())
-            s.RemoveAllLOSToAllSoldiers();
-
-        StartCoroutine(DetectionAlertAll("losChange|losCheck")); //losCheckAll
-    }
-    public IEnumerator DetectionAlertAll(string causeOfLosCheck)
-    {
-        yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.meleeResolvedFlag && menu.inspirerResolvedFlag);
-
-        foreach (Soldier s in AllSoldiers())
-        {
-            if (s.IsOnturnAndAlive())
-            {
-                //print("Running detection alert for " + s.soldierName);
-                StartCoroutine(DetectionAlertSingle(s, causeOfLosCheck, Vector3.zero, string.Empty)); //losCheck
-            }
-        }
-    }
-
-
-
-
-
-
-
-    //insert game objects functions
-    public void ConfirmInsertGameObjects()
-    {
-        //check input formatting
-        if (insertObjectsUI.objectTypeDropdown.value != 0 && GetInsertLocation(out Tuple<Vector3, string> spawnLocation))
-        {
-            if (insertObjectsUI.objectTypeDropdown.value == 1)
-            {
-                GoodyBox gb = Instantiate(poiManager.gbPrefab).Init(spawnLocation);
-                //fill gb with items
-                foreach (Transform child in insertObjectsUI.gbItemsPanel)
-                {
-                    ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
-                    if (itemIcon != null && itemIcon.pickupNumber > 0)
-                        for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
-                            gb.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
-                }
-            }
-            else if (insertObjectsUI.objectTypeDropdown.value == 2)
-                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, insertObjectsUI.terminalTypeDropdown.captionText.text);
-            else if (insertObjectsUI.objectTypeDropdown.value == 3)
-                Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
-            else if (insertObjectsUI.objectTypeDropdown.value == 4)
-            {
-                DrugCabinet dc = Instantiate(poiManager.drugCabinetPrefab).Init(spawnLocation);
-                //fill dc with items
-                foreach (Transform child in insertObjectsUI.dcItemsPanel)
-                {
-                    ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
-                    if (itemIcon != null && itemIcon.pickupNumber > 0)
-                        for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
-                            dc.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
-                }
-            }
-
-            menu.CloseOverrideInsertObjectsUI();
-        }
-        else
-            print("Invalid Input");
-    }
-    public bool GetInsertLocation(out Tuple<Vector3, string> insertLocation)
-    {
-        insertLocation = default;
-        if (menu.ValidateIntInput(insertObjectsUI.xPos, out int x) && menu.ValidateIntInput(insertObjectsUI.yPos, out int y) && menu.ValidateIntInput(insertObjectsUI.zPos, out int z) && insertObjectsUI.terrainDropdown.value != 0)
-        {
-            insertLocation = Tuple.Create(new Vector3(x, y, z), insertObjectsUI.terrainDropdown.captionText.text);
-
-            return true;
-        }
-
-        return false;
-    }
-    public void UpdateInsertGameObjectsUI()
-    {
-        insertObjectsUI.terminalTypeUI.SetActive(false);
-        insertObjectsUI.allItemsPanelUI.SetActive(false);
-
-        if (insertObjectsUI.objectTypeDropdown.value == 1)
-        {
-            insertObjectsUI.allItemsPanelUI.SetActive(true);
-            activeItemPanel = insertObjectsUI.allItemsPanelUI.transform;
-        }
-        else if (insertObjectsUI.objectTypeDropdown.value == 2)
-        {
-            insertObjectsUI.terminalTypeUI.SetActive(true);
-        }
-        else if (insertObjectsUI.objectTypeDropdown.value == 4)
-        {
-            insertObjectsUI.allDrugsPanelUI.SetActive(true);
-            activeItemPanel = insertObjectsUI.allDrugsPanelUI.transform;
-        }
-    }
-
-
-    public bool GameRunning 
-    {
-        get {  return gameRunning; } set { gameRunning = value; }
-    }
-
-
-    public void LoadData(GameData data)
-    {
-        currentRound = data.currentRound;
-        currentTeam = data.currentTeam;
-        currentTurn = data.currentTurn;
-
-        battlefield.transform.position = data.mapPosition;
-        battlefield.transform.localScale = data.mapDimensions;
-
-        bottomPlane.transform.position = data.bottomPlanePosition;
-        bottomPlane.transform.localScale = data.bottomPlaneDimensions;
-
-        outlineArea.transform.position = data.outlineAreaPosition;
-        outlineArea.transform.localScale = data.outlineAreaDimensions;
-
-        cam.transform.position = data.camPosition;
-        cam.orthographicSize = data.camOrthoSize;
-        sun.transform.position = data.sunPosition;
-        maxRounds = data.maxRounds;
-        maxTurnTime = data.maxTurnTime;
-        maxTeams = data.maxTeams;
-        maxX = data.maxX;
-        maxY = data.maxY;
-        maxZ = data.maxZ;
-    }
-    public void SaveData(ref GameData data)
-    {
-        data.currentRound = currentRound;
-        data.currentTeam = currentTeam;
-        data.currentTurn = currentTurn;
-
-        data.mapPosition = battlefield.transform.position;
-        data.mapDimensions = battlefield.transform.localScale;
-        data.camPosition = cam.transform.position;
-        data.camOrthoSize = cam.orthographicSize;
-        data.sunPosition = sun.transform.position;
-        data.maxRounds = maxRounds;
-        data.maxTurnTime = maxTurnTime;
-        data.maxTeams = maxTeams;
-        data.maxX = maxX;
-        data.maxY = maxY;
-        data.maxZ = maxZ;
+        }*/
     }
 }
