@@ -171,7 +171,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 365, y: 0}
-  m_SizeDelta: {x: 250, y: -340}
+  m_SizeDelta: {x: 380, y: -340}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &418044197570269063
 CanvasRenderer:
@@ -228,7 +228,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 46.6
+  m_fontSize: 53.7
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1086,12 +1086,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menu: {fileID: 0}
+  entered: 0
+  exited: 0
   s1: {fileID: 0}
   s1Label: {fileID: 7489573845404175022}
   s1StartBoundary: {fileID: 2545013774816795558}
   s1EndBoundary: {fileID: 7678939404301354229}
   s1Portrait: {fileID: 3457839567992979617}
   s1Xp: 0
+  detection1WayLeft: {fileID: 21300000, guid: 68ea53dbce81364498119494380e5f7e, type: 3}
+  detection1WayRight: {fileID: 21300000, guid: 9336740efbb0f2d46abe7f6475837f3f, type: 3}
+  avoidance1WayLeft: {fileID: 21300000, guid: 362fa6abc7365414f8e64b1151832eac, type: 3}
+  avoidance1WayRight: {fileID: 21300000, guid: f5f1361d24c4d57499770fa79fed275d, type: 3}
+  detection2Way: {fileID: 21300000, guid: 404b126033496ba49aa8463d821a11d2, type: 3}
+  avoidance2Way: {fileID: 21300000, guid: 6ea5d10d58731b64e9e4f5bfafbac3cf, type: 3}
+  avoidance2WayLeft: {fileID: 21300000, guid: f552727111b28b24486c1d9a18cb7cb8, type: 3}
+  avoidance2WayRight: {fileID: 21300000, guid: 2b07148e07e56744aae3a8c9049cd998, type: 3}
+  detectionOverwatch2WayLeft: {fileID: 21300000, guid: d66ad3ec2c601d841ba0265195bb0e25, type: 3}
+  detectionOverwatch2WayRight: {fileID: 21300000, guid: 9ba247b331f0db343a4600ec2bea3874, type: 3}
+  avoidanceOverwatch2WayLeft: {fileID: 21300000, guid: 8182d388d083bdb45b72d7184537f8e3, type: 3}
+  avoidanceOverwatch2WayRight: {fileID: 21300000, guid: 823bd40156932324a9db5de6c2c730c5, type: 3}
+  overwatch1WayLeft: {fileID: 21300000, guid: f5b54c3d30bbdd240bf97233601b0b9f, type: 3}
+  overwatch1WayRight: {fileID: 21300000, guid: ce3b14bae67b1aa4f901c6465a451919, type: 3}
+  noDetect2Way: {fileID: 21300000, guid: 209b8d457a62ecc4fb6f8aa124ceecfe, type: 3}
+  nullArrow: {fileID: 21300000, guid: 209b8d457a62ecc4fb6f8aa124ceecfe, type: 3}
+  arrow: {fileID: 8170715373945922119}
   s2: {fileID: 0}
   s2Label: {fileID: 5953532909815001646}
   s2StartBoundary: {fileID: 8860696509638453881}
@@ -1213,7 +1232,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 35, y: 0}
-  m_SizeDelta: {x: 250, y: -340}
+  m_SizeDelta: {x: 380, y: -340}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4655097738207183412
 CanvasRenderer:
@@ -1270,7 +1289,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 46.6
+  m_fontSize: 53.7
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1

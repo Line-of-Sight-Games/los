@@ -53,9 +53,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public Soldier activeSoldier;
     public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
-    public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, 
-        detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, fist, explosiveBarrelSprite, goodyBoxSprite,
-        terminalSprite, drugCabinetSprite, covermanSprite;
+    public Sprite fist, explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
     public Color normalTextColour = new(0.196f, 0.196f, 0.196f);
 
     private readonly string[][] allStats =
@@ -1829,7 +1827,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 if (child.Find("DetectionArrow").GetComponent<Image>().sprite.ToString().Contains("verwatch"))
                     overwatchCount++;
             }
-            print(childCount);
+
             if (childCount > 0)
             {
                 SetDetectionResolvedFlagTo(false);

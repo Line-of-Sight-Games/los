@@ -17,15 +17,15 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
                 {
                     if (detectee.ActiveC > detector.ActivePForDetection(pMultiplier))
                     {
-                        detecteeLabel = "<color=green>AVOIDED</color>";
+                        detecteeLabel = "AVOIDED";
                         //avoidanceRight = true;
                     }
                     else
                     {
-                        detecteeLabel = "<color=red>DETECTED</color>";
+                        detecteeLabel = "DETECTED";
                         //avoidanceRight = true;
                     }
-                    menu.detectionUI.CreateDetectionAlertSoldierSoldier(detector, detectee, detecteeLabel);
+                    menu.detectionUI.LOSAlertSoldierSoldierStart(detector, detectee, detecteeLabel);
                     print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
                 }
             }
@@ -41,9 +41,22 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
         {
             if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
             {
-                if (LinkedSoldier.IsOppositeTeamAs(soldierThatEntered.LinkedSoldier))
+                Soldier detector = LinkedSoldier;
+                Soldier detectee = soldierThatEntered.LinkedSoldier;
+                string detecteeLabel = "";
+                if (detector.IsOppositeTeamAs(detectee))
                 {
-                    menu.detectionUI.UpdateDetectionAlertSoldierSoldier(LinkedSoldier, soldierThatEntered.LinkedSoldier);
+                    if (detectee.ActiveC > detector.ActivePForDetection(pMultiplier))
+                    {
+                        detecteeLabel = "AVOIDED";
+                        //avoidanceRight = true;
+                    }
+                    else
+                    {
+                        detecteeLabel = "DETECTED";
+                        //avoidanceRight = true;
+                    }
+                    menu.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, detecteeLabel);
                     print($"{soldierThatEntered.LinkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
                 }
             }
