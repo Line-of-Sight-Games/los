@@ -1658,7 +1658,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierUI.mp.text = "MA:" + mp;
         soldierUI.location.text = "X:" + x + "   Y:" + y + "   Z:" + z;
     }
-    public int DetectionActiveStat(int multiplier)
+    public int ActivePForDetection(int multiplier)
     {
         return stats.P.Val * multiplier;
     }

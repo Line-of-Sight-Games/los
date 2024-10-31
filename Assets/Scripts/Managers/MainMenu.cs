@@ -49,7 +49,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton;
     private float playTimeTotal;
     public float turnTime;
-    public string meleeChargeIndicator;
+    public string meleeChargeIndicator, causeOfLosCheck;
     public Soldier activeSoldier;
     public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
@@ -513,6 +513,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         teamTurnStartFlag = value;
     }
+    public void SetCauseOfLosCheck(string cause)
+    {
+        causeOfLosCheck = cause;
+    }
     public bool MovementResolvedFlag()
     {
         foreach (Soldier s in game.AllFieldedSoldiers())
@@ -896,10 +900,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
         string oldVis = weather.CurrentVis;
 
-        weather.CurrentVis = dropdown.captionText.text;
+        SetCauseOfLosCheck("statChange(SR)|weatherChange(override)");
+        //losCheck will run from collider changes
 
-        if (game.CheckWeatherChange(oldVis, weather.CurrentVis) != "false")
-            StartCoroutine(game.DetectionAlertAll("statChange(SR)|weatherChange(override)")); //losCheckAll
+        weather.CurrentVis = dropdown.captionText.text;
     }
     public void SetOverrideWindSpeed()
     {
@@ -992,14 +996,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (int.TryParse((GetType().GetField(code + "Input").GetValue(this) as TMP_InputField).text, out int newBaseVal) && newBaseVal >= 0)
         {
+            //set los check if P, C, SR is changed
+            if (code == "P" | code == "C" || code == "SR")
+            {
+                SetCauseOfLosCheck($"statChange({code})|baseStatChange(override)"); //losCheck
+                //FIX - los checks for P and C
+            }
+
             activeSoldier.stats.SetStat(code, newBaseVal);
 
             //recalculate stats
             activeSoldier.CalculateActiveStats();
-
-            //run detection alert if P, C, SR is changed
-            if (code == "P" | code == "C" || code == "SR")
-                StartCoroutine(game.DetectionAlertSingle(activeSoldier, $"statChange({code})|baseStatChange(override)", Vector3.zero, string.Empty)); //losCheck
 
             //run melee control re-eval if R, Str, M, F is changed
             if (activeSoldier.IsMeleeEngaged() && (code == "R" || code == "Str" || code == "M" || code == "F"))
@@ -1037,14 +1044,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if ((xyz.Equals("X") && newlocationInput >= 1 && newlocationInput <= game.maxX) || (xyz.Equals("Y") && newlocationInput >= 1 && newlocationInput <= game.maxY) || (xyz.Equals("Z") && newlocationInput >= 0 && newlocationInput <= game.maxZ))
             {
+                SetCauseOfLosCheck("losChange|move(override)");
+                //losCheck run cause of collider change
+
                 if (xyz.Equals("X"))
                     activeSoldier.X = newlocationInput;
                 else if (xyz.Equals("Y"))
                     activeSoldier.Y = newlocationInput;
                 else
                     activeSoldier.Z = newlocationInput;
-
-                StartCoroutine(game.DetectionAlertSingle(activeSoldier, "losChange|move(override)", Vector3.zero, string.Empty)); //losCheck
             }
         }
 
@@ -1795,49 +1803,57 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //detection functions - menu
-    public IEnumerator OpenDetectionAlertUI(string causeOfLosCheck)
+    public IEnumerator OpenDetectionAlertUI()
     {
-        //wait for everything else to resolve
-        yield return new WaitUntil(() => MovementResolvedFlag() && shotResolvedFlag && meleeResolvedFlag && inspirerResolvedFlag);
-
-        CloseSoldierStatsUI();
-
-        //type of los check
-        detectionAlertUI.transform.Find("OptionPanel").Find("Reason").GetComponentInChildren<TextMeshProUGUI>().text = $"({causeOfLosCheck})";
-
-        detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
-        detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(false);
-        int childCount = 0, overwatchCount = 0;
-        foreach (Transform child in detectionUI.detectionAlertsPanel)
+        if (causeOfLosCheck.Equals(string.Empty))
         {
-            childCount++;
-            if (child.Find("DetectionArrow").GetComponent<Image>().sprite.ToString().Contains("verwatch"))
-                overwatchCount++;
+            detectionUI.ClearAllAlerts();
         }
-
-        if (childCount > 0)
+        else
         {
-            SetDetectionResolvedFlagTo(false);
+            print("triggered");
+            //wait for everything else to resolve
+            yield return new WaitUntil(() => MovementResolvedFlag() && shotResolvedFlag && meleeResolvedFlag && inspirerResolvedFlag);
+            print("opening");
+            CloseSoldierStatsUI();
 
-            if (overwatchCount > 1) //more than a single overwatch line detected
-                detectionUI.transform.Find("MultiOverwatchAlert").gameObject.SetActive(true);
-            else
-                detectionUI.transform.Find("MultiOverwatchAlert").gameObject.SetActive(false);
-            
-            //illusionist ability
-            if (activeSoldier != null)
+            //type of los check
+            detectionAlertUI.transform.Find("OptionPanel").Find("Reason").GetComponentInChildren<TextMeshProUGUI>().text = $"({causeOfLosCheck})";
+
+            detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
+            detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(false);
+            int childCount = 0, overwatchCount = 0;
+            foreach (Transform child in detectionUI.detectionAlertsPanel)
             {
-                if (causeOfLosCheck.Contains("move") && activeSoldier.IsIllusionist() && activeSoldier.IsHidden() && !activeSoldier.illusionedThisMove)
-                {
-                    detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(true);
-                    detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(true);
-                }
+                childCount++;
+                if (child.Find("DetectionArrow").GetComponent<Image>().sprite.ToString().Contains("verwatch"))
+                    overwatchCount++;
             }
-            
-            detectionAlertUI.SetActive(true);
+            print(childCount);
+            if (childCount > 0)
+            {
+                SetDetectionResolvedFlagTo(false);
 
-            //play detection alarm sfx
-            soundManager.PlayDetectionAlarm();
+                if (overwatchCount > 1) //more than a single overwatch line detected
+                    detectionUI.transform.Find("MultiOverwatchAlert").gameObject.SetActive(true);
+                else
+                    detectionUI.transform.Find("MultiOverwatchAlert").gameObject.SetActive(false);
+
+                //illusionist ability
+                if (activeSoldier != null)
+                {
+                    if (causeOfLosCheck.Contains("move") && activeSoldier.IsIllusionist() && activeSoldier.IsHidden() && !activeSoldier.illusionedThisMove)
+                    {
+                        detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(true);
+                        detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(true);
+                    }
+                }
+
+                detectionAlertUI.SetActive(true);
+
+                //play detection alarm sfx
+                soundManager.PlayDetectionAlarm();
+            }
         }
     }
     public void CloseGMAlertDetectionUI()

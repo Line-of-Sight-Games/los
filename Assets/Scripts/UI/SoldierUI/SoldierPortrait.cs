@@ -12,7 +12,7 @@ public class SoldierPortrait : MonoBehaviour
     public Image brokenArmourImage;
     public TextMeshProUGUI hpDisplay;
     public Image soldierPosition;
-    public TextMeshProUGUI soldierName;
+    public TextMeshProUGUI soldierName, soldierLocation;
 
     public void Init(Soldier s)
     {
@@ -44,7 +44,7 @@ public class SoldierPortrait : MonoBehaviour
                 brokenArmourImage.gameObject.SetActive(true);
             hpDisplay.text = $"{linkedSoldier.GetFullHP()}";
 
-            //load position
+            //load body position
             if (linkedSoldier.IsUnconscious() || linkedSoldier.IsPlayingDead())
                 soldierPosition.sprite = linkedSoldier.LoadPosition("Unconscious");
             else if (linkedSoldier.IsLastStand())
@@ -54,7 +54,9 @@ public class SoldierPortrait : MonoBehaviour
 
             //load name
             soldierName.text = linkedSoldier.soldierName;
+
+            //load location
+            soldierLocation.text = $"X:{linkedSoldier.X} Y:{linkedSoldier.Y} Z:{linkedSoldier.Z}";
         }
-        
     }
 }

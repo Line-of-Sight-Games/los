@@ -479,7 +479,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //run los checks only if weather changes
         if (CheckWeatherChange(weather.LastTurnVis, weather.CurrentVis) != "false")
-            StartCoroutine(DetectionAlertAll("statChange(SR)|weatherChange")); //losCheckAll
+            menu.SetCauseOfLosCheck("statChange(SR)|weatherChange"); 
+        //losCheck will automatically run due to collider change
     }
     public void StartRound()
     {
@@ -739,7 +740,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //fill the tempMove variable in case move needs to be reverted
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
-        
+
+        menu.SetCauseOfLosCheck("losChange|move");
+        //losCheck will run from collider change
+
         //perform the move
         movingSoldier.x = (int)moveToLocation.Item1.x;
         movingSoldier.y = (int)moveToLocation.Item1.y;
@@ -786,8 +790,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //check broken soldier leaving field
         CheckBrokenFlee(movingSoldier);
-
-        StartCoroutine(DetectionAlertSingle(movingSoldier, "losChange|move", oldPos, launchMelee)); //losCheck
     }
     public void CheckBrokenFlee(Soldier movingSoldier)
     {
@@ -4022,13 +4024,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
     public void DetectionAlertAllNonCoroutine()
     {
+        menu.SetCauseOfLosCheck("losChange|losCheck"); //losCheckAll
+
         //kill LOS between everyone
         foreach (Soldier s in AllSoldiers())
             s.RemoveAllLOSToAllSoldiers();
-
-        StartCoroutine(DetectionAlertAll("losChange|losCheck")); //losCheckAll
     }
-    public IEnumerator DetectionAlertAll(string causeOfLosCheck)
+    public IEnumerator DetectionAlertAll()
     {
         yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.meleeResolvedFlag && menu.inspirerResolvedFlag);
 
@@ -4037,7 +4039,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (s.IsOnturnAndAlive())
             {
                 //print("Running detection alert for " + s.soldierName);
-                StartCoroutine(DetectionAlertSingle(s, causeOfLosCheck, Vector3.zero, string.Empty)); //losCheck
+                StartCoroutine(DetectionAlertSingle(s, menu.causeOfLosCheck, Vector3.zero, string.Empty)); //losCheck
             }
         }
     }
