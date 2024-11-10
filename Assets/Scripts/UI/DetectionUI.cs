@@ -33,24 +33,67 @@ public class DetectionUI : MonoBehaviour
         }
         return null;
     }
+    public SoldierAlertLOS CreateLOSAlert(Soldier s1, Soldier s2)
+    {
+        //create and add to list
+        SoldierAlertLOS detectionAlert = Instantiate(soldierAlertLOSPrefab, detectionAlertsPanel).Init(s1, s2);
+        allSoldierDetectionAlerts.Add(detectionAlert);
+
+        //try to open detectionUI
+        menu.StartCoroutine(menu.OpenDetectionAlertUI());
+
+        return detectionAlert;
+    }
     public void LOSAlertSoldierSoldierStart(Soldier detector, Soldier detectee, string detecteeLabel)
     {
         SoldierAlertLOS detectionAlert;
         if (LOSAlertAlreadyExists(detector, detectee))
-        {
             detectionAlert = ExistingLOSAlert(detector, detectee);
-        }
         else
-        {
-            //create and add to list
-            detectionAlert = Instantiate(soldierAlertLOSPrefab, detectionAlertsPanel).Init(detector, detectee);
-            allSoldierDetectionAlerts.Add(detectionAlert);
+            detectionAlert = CreateLOSAlert(detector, detectee);
 
-            //try to open detectionUI
-            menu.StartCoroutine(menu.OpenDetectionAlertUI());
-        }
+        //update alert
         detectionAlert.entered = true;
         detectionAlert.UpdateStartBoundary(detectee);
+        detectionAlert.UpdateLabel(detectee, detecteeLabel);
+
+
+
+
+
+        /*
+        //block invalid selections
+        if (detectorLabel.Contains("Not detected"))
+            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
+        if (counterLabel.Contains("Not detected"))
+            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
+
+        //force reveal for trenbolone
+        if (detector.trenXRayEffect)
+        {
+            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
+            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
+        }
+        if (counter.trenXRayEffect)
+        {
+            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn = true;
+            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
+        }
+
+        //detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
+        */
+
+    }
+    public void LOSAlertSoldierSoldierStay(Soldier detector, Soldier detectee, string detecteeLabel)
+    {
+        SoldierAlertLOS detectionAlert;
+        if (LOSAlertAlreadyExists(detector, detectee))
+            detectionAlert = ExistingLOSAlert(detector, detectee);
+        else
+            detectionAlert = CreateLOSAlert(detector, detectee);
+
+        //update alert
+        detectionAlert.UpdateEndBoundary(detectee);
         detectionAlert.UpdateLabel(detectee, detecteeLabel);
 
 
@@ -84,18 +127,11 @@ public class DetectionUI : MonoBehaviour
     {
         SoldierAlertLOS detectionAlert;
         if (LOSAlertAlreadyExists(detector, detectee))
-        {
             detectionAlert = ExistingLOSAlert(detector, detectee);
-        }
         else
-        {
-            //create and add to list
-            detectionAlert = Instantiate(soldierAlertLOSPrefab, detectionAlertsPanel).Init(detector, detectee);
-            allSoldierDetectionAlerts.Add(detectionAlert);
+            detectionAlert = CreateLOSAlert(detector, detectee);
 
-            //try to open detectionUI
-            menu.StartCoroutine(menu.OpenDetectionAlertUI());
-        }
+        //update alert
         detectionAlert.exited = true;
         detectionAlert.UpdateEndBoundary(detectee);
         detectionAlert.UpdateLabel(detectee, detecteeLabel);
@@ -161,7 +197,14 @@ public class DetectionUI : MonoBehaviour
     }
     public void ClearAllAlerts()
     {
+        //destory physical objects
         foreach (SoldierAlertLOS alert in allSoldierDetectionAlerts)
             Destroy(alert.gameObject);
+        foreach (ClaymoreAlertLOS alert in allClaymoreDetectionAlerts)
+            Destroy(alert.gameObject);
+
+        //clear lists
+        allSoldierDetectionAlerts.Clear();
+        allClaymoreDetectionAlerts.Clear();
     }
 }

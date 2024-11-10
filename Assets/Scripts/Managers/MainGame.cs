@@ -741,8 +741,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
 
+        //losCheck
+        movingSoldier.losCheck = true;
         menu.SetCauseOfLosCheck("losChange|move");
-        //losCheck will run from collider change
+        //actual check will run from collider change
 
         //perform the move
         movingSoldier.x = (int)moveToLocation.Item1.x;

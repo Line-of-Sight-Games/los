@@ -9,7 +9,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -1990,14 +1989,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                     if (child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn == true)
                     {
-                        if (child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                        if (child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("DETECT") || child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
                         {
                             //if not a glimpse or a retreat detection, add soldier to revealing list
-                            if (!child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
+                            if (!child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
                                 allSoldiersRevealing[counter.id].Add(detector.id);
                             else
                             {
-                                AddLosGlimpseAlert(detector, child.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text);
+                                AddLosGlimpseAlert(detector, child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text);
                                 StartCoroutine(OpenLostLOSList());
                                 allSoldiersNotRevealingNoLos[counter.id].Add(detector.id);
                             }
@@ -2023,14 +2022,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                     if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
                     {
-                        if (child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("DETECTED") || child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                        if (child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("DETECT") || child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
                         {
                             //if not a glimpse or a retreat detection, add soldier to revealing list
-                            if (!child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
+                            if (!child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
                                 allSoldiersRevealing[detector.id].Add(counter.id);
                             else
                             {
-                                AddLosGlimpseAlert(counter, child.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text);
+                                AddLosGlimpseAlert(counter, child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text);
                                 StartCoroutine(OpenLostLOSList());
                                 allSoldiersNotRevealingNoLos[detector.id].Add(counter.id);
                             }
@@ -2107,15 +2106,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                 foreach (string soldierRevealingThisSoldier in allSoldiersRevealedBy.GetValueOrDefault(s.Id))
                     s.AddSoldierRevealingThisSoldier(soldierRevealingThisSoldier);
+
+                s.losCheck = false; //clear the losCheck trigger
             }
 
             //only close the detectionUI if it's open
             if (detectionUI.gameObject.activeInHierarchy)
             {
-                //destroy all detection alerts after done
-                foreach (Transform child in detectionAlert)
-                    Destroy(child.gameObject);
-
+                detectionUI.ClearAllAlerts();
                 CloseDetectionUI();
             }
         }
