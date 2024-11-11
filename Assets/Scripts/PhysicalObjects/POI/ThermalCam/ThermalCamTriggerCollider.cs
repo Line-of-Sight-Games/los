@@ -10,7 +10,7 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
             if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
             {
                 Soldier detectee = soldierThatEntered.LinkedSoldier;
-                if (detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
+                if (LinkedThermalCamera.placedBy != null && detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
                 {
                     menu.detectionUI.LOSAlertThermalCamSoldierStart(LinkedThermalCamera, detectee);
                     print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatEntered)}");
@@ -25,7 +25,7 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
             if (bodyThatStayed.TryGetComponent(out SoldierBodyCollider soldierThatStayed))
             {
                 Soldier detectee = soldierThatStayed.LinkedSoldier;
-                if (detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
+                if (LinkedThermalCamera.placedBy != null && detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
                 {
                     menu.detectionUI.LOSAlertThermalCamSoldierStay(LinkedThermalCamera, detectee);
                     print($"{soldierThatStayed.LinkedSoldier.soldierName} stayed in the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatStayed)}");
@@ -40,7 +40,7 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
             if (bodyThatExited.TryGetComponent(out SoldierBodyCollider soldierThatExited))
             {
                 Soldier detectee = soldierThatExited.LinkedSoldier;
-                if (detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
+                if (LinkedThermalCamera.placedBy != null && detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
                 {
                     menu.detectionUI.LOSAlertThermalCamSoldierEnd(LinkedThermalCamera, detectee);
                     print($"{soldierThatExited.LinkedSoldier.soldierName} exited the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatExited)}");
