@@ -10,7 +10,6 @@ public class ClaymoreAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public Soldier soldier;
     public SoldierPortrait soldierPortrait;
-    public int soldierXp;
 
     public Claymore claymore;
     public POIPortrait claymorePortrait;

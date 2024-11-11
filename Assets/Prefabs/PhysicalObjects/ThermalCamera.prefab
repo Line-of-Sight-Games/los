@@ -151,6 +151,7 @@ GameObject:
   - component: {fileID: 6314933893463633757}
   - component: {fileID: 1785899134600917249}
   - component: {fileID: 5533335998350050949}
+  - component: {fileID: 9191238132120007852}
   - component: {fileID: 5967657051186191258}
   m_Layer: 0
   m_Name: Beam
@@ -227,6 +228,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9191238132120007852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8722722520295885180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cea5aca9b6411e49adb1d9759110ecb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menu: {fileID: 0}
+  linkedObject: {fileID: -8973163453498973134}
+  linkedThermalCam: {fileID: -8973163453498973134}
 --- !u!65 &5967657051186191258
 BoxCollider:
   m_ObjectHideFlags: 0

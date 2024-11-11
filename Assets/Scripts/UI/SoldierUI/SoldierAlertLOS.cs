@@ -15,7 +15,6 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public TextMeshProUGUI s1Label, s1StartBoundary, s1EndBoundary;
     public SoldierPortrait s1Portrait;
     public Toggle s1Toggle;
-    public int s1Xp;
 
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, nullArrow;
 
@@ -25,7 +24,6 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public TextMeshProUGUI s2Label, s2StartBoundary, s2EndBoundary;
     public SoldierPortrait s2Portrait;
     public Toggle s2Toggle;
-    public int s2Xp;
 
     public GameObject causeOfLosCheckDetectorObject;
     public TextMeshProUGUI causeOfLosCheckDetector;

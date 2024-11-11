@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -2040,6 +2041,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
                     Claymore claymore = child.GetComponent<ClaymoreAlertLOS>().claymore;
                     claymore.revealed = true;
+                }
+                else if (child.GetComponent<ThermalCamAlertLOS>() != null)
+                {
+                    if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
+                    {
+                        ThermalCamera thermalCam = child.GetComponent<ThermalCamAlertLOS>().themalCam;
+                        Soldier soldier = child.GetComponent<ThermalCamAlertLOS>().soldier;
+
+                        //check for xp
+                        AddXpAlert(thermalCam.placedBy, 1, $"Thermal camera at ({thermalCam.X},{thermalCam.Y},{thermalCam.Z}) revealed soldier ({soldier.soldierName}).", true);
+                    }
                 }
             }
 
