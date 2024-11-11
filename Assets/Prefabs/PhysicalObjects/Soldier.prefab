@@ -46,8 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3e8331a85a7c545b128a2c7547472b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
+  withinHalfSR: 0
 --- !u!135 &3670613070504241877
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -115,8 +117,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fd59c7ca939b7244b19830529b5d829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
+  withinMinSR: 0
 --- !u!135 &1583070955957388279
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -545,6 +549,8 @@ MonoBehaviour:
   trenXRayEffect: 0
   trenSRShrinkEffect: 0
   moveResolvedFlag: 1
+  losCheck: 0
+  causeOfLosCheck: no change
   hp: 6
   ap: 0
   mp: 0
@@ -748,6 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b152ab90aa6e434db48f68b6fc6bf7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 0}
 --- !u!135 &4952051446501971680
@@ -817,8 +824,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc2aa39e72fbeb4c88d5e283cc7e98f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
+  halfCollider: {fileID: 3053533329258264112}
+  minCollider: {fileID: 111069230480943081}
 --- !u!135 &4816443929877143705
 SphereCollider:
   m_ObjectHideFlags: 0

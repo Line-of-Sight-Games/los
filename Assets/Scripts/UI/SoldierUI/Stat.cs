@@ -65,7 +65,7 @@ public class Stat
             else if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str" || Name == "F"))
                 statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
             else if (Name == "SR" || Name == "C" || Name == "P")
-                statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetectionAlertSingle(statlineBelongsTo.soldierBelongsTo, $"statChange({Name})|baseStatChange", Vector3.zero, string.Empty)); //losCheck
+                statlineBelongsTo.soldierBelongsTo.SetLosCheck($"statChange({Name})|baseStatChange"); //losCheck
         }
 
         return ReadIncrement;

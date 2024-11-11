@@ -347,8 +347,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 //play equip armour sfx
                 game.soundManager.PlayEquipArmour();
                 
-                //run detection alert
-                StartCoroutine(game.DetectionAlertSingle(linkedSoldier, "statChange(SR)|thermalEquipped", Vector3.zero, string.Empty));
+                linkedSoldier.SetLosCheck("statChange(SR)|thermalEquipped"); //losCheck
             }
             else if (IsJuggernautArmour())
             {

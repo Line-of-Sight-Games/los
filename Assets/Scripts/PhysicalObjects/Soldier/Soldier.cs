@@ -20,6 +20,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public Sprite soldierPortrait;
     public string soldierPortraitText;
     public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck;
+    public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, stunnedTurnsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
@@ -1018,14 +1019,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange|statChange(SR)(C)|playdeadActive", Vector3.zero, string.Empty)); //losCheck
+        //losCheck
+        SetLosCheck("losChange|statChange(SR)(C)|playdeadActive"); 
     }
 
     public void UnsetPlaydead()
     {
         UnsetState("Playdead");
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange|statChange(SR)(C)|playdeadDeactive", Vector3.zero, string.Empty)); //losCheck
+        //losCheck
+        SetLosCheck("losChange|statChange(SR)(C)|playdeadDeactive"); 
     }
     public void TakeDrug(string drugName, Soldier administeredBy)
     {
@@ -2254,7 +2257,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             //run detection alerts if loud action performed for first time
             if (loudActionTurnsVulnerable == 0)
-                StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudActionActive", Vector3.zero, string.Empty)); //loscheck
+                SetLosCheck("statChange(C)|loudActionActive"); //loscheck
 
             if (turns > loudActionTurnsVulnerable)
                 loudActionTurnsVulnerable = turns;
@@ -2262,7 +2265,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void UnsetLoudRevealed()
     {
-        StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)|loudActionDeactive", Vector3.zero, string.Empty)); //loscheck
+        SetLosCheck("statChange(C)|loudActionDeactive"); //loscheck
     }
     public bool IsSuppressed()
     {
@@ -2408,7 +2411,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         SetState("SmokeCovered");
         menu.AddDamageAlert(this, $"Covered by smoke cloud (<color=green>Defence Zone</color>).", true, true);
 
-        StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(SR)|smokeActive(defencezone)", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("statChange(P)(SR)|smokeActive(defencezone)"); //losCheck
     }
     public void SetSmokeBlinded()
     {
@@ -2416,14 +2419,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         SetState("SmokeBlinded");
         menu.AddDamageAlert(this, $"Covered by smoke cloud (<color=red>Blind Zone</color>).", false, true);
 
-        StartCoroutine(game.DetectionAlertSingle(this, "statChange(SR)|smokeActive(blindzone)", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("statChange(SR)|smokeActive(blindzone)"); //losCheck
     }
     public void UnsetSmoked()
     {
         UnsetState("SmokeCovered");
         UnsetState("SmokeBlinded");
 
-        StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(SR)|smokeDeactive", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("statChange(P)(SR)|smokeDeactive"); //losCheck
     }
     public bool IsInTabun()
     {
@@ -2493,14 +2496,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             SetTabunEffectLevel(50);
             menu.AddDamageAlert(this, $"Suffered <color=orange>Moderate</color> effects from tabun gas.", false, true);
 
-            StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(C)(SR)|tabunActive(half)", Vector3.zero, string.Empty)); //losCheck
+            SetLosCheck("statChange(P)(C)(SR)|tabunActive(half)"); //losCheck
         }
         else
         {
             SetTabunEffectLevel(100);
             menu.AddDamageAlert(this, $"Suffered <color=red>Severe</color> effects from tabun gas.", false, true);
 
-            StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(C)(SR)|tabunActive(full)", Vector3.zero, string.Empty)); //losCheck
+            SetLosCheck("statChange(P)(C)(SR)|tabunActive(full)"); //losCheck
         }
     }
     public void UnsetTabun()
@@ -2508,7 +2511,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         state.RemoveAll(e => e.Contains("Tabun"));
         TabunTraumaCheck();
 
-        StartCoroutine(game.DetectionAlertSingle(this, "statChange(P)(C)(SR)|tabunDeactive", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("statChange(P)(C)(SR)|tabunDeactive"); //losCheck
     }
     public void SetOverwatch(int x, int y, int r, int a)
     {
@@ -2520,7 +2523,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         overwatchShotCounter = 1;
         SetState("Overwatch");
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange|overwatchActive", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("losChange|overwatchActive"); //losCheck
     }
     public void DecrementOverwatch()
     {
@@ -2542,7 +2545,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             overwatchConeArc = 0;
             UnsetState("Overwatch");
 
-            StartCoroutine(game.DetectionAlertSingle(this, "losChange|overwatchDeactive", Vector3.zero, string.Empty)); //losCheck
+            SetLosCheck("losChange|overwatchDeactive"); //losCheck
         }
     }
     public bool IsAvenging()
@@ -2630,12 +2633,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (IsMeleeEngaged())
                 StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-            StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)(SR)|stunActive", Vector3.zero, string.Empty)); //losCheck
+            SetLosCheck("statChange(C)(SR)|stunActive"); //losCheck
         }
     }
     public void UnsetStunned()
     {
-        StartCoroutine(game.DetectionAlertSingle(this, "statChange(C)(SR)|stunDeactive", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("statChange(C)(SR)|stunDeactive"); //losCheck
     }
     public int TakeStun(int stunRounds)
     {
@@ -2677,7 +2680,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         ClearHealthState();
         SetState("Active");
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange|healthState(active)", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("losChange|healthState(active)"); //losCheck
     }
     public void MakeLastStand()
     {
@@ -2689,7 +2692,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             SetState("Last Stand");
             menu.AddDamageAlert(this, $"{soldierName} fell into <color=red>Last Stand</color>.", false, true);
 
-            StartCoroutine(game.DetectionAlertSingle(this, "losChange|healthState(lastStand)", Vector3.zero, string.Empty)); //losCheck
+            SetLosCheck("losChange|healthState(lastStand)"); //losCheck
         }
     }
     public void MakeUnconscious(Soldier damagedBy, List<string> damageSource)
@@ -2720,7 +2723,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
         }
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange|statChange(C)(SR)|healthState(unconscious)", Vector3.zero, string.Empty)); //losCheck
+        SetLosCheck("losChange|statChange(C)(SR)|healthState(unconscious)"); //losCheck
     }
     public void Resurrect(int hp)
     {
@@ -2729,7 +2732,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         CheckSpecialityColor(soldierSpeciality);
         TakeHeal(null, hp, 0, true, false);
 
-        StartCoroutine(game.DetectionAlertSingle(this, "losChange|healthState(active)", Vector3.zero, string.Empty));
+        SetLosCheck("losChange|healthState(active)"); //losCheck
     }
 
     public void InstantKill(Soldier killedBy, List<string> damageSource)
@@ -2830,6 +2833,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
 
     //detection checks
+    public void SetLosCheck(string causeOfLosCheck)
+    {
+        losCheck = true;
+        this.causeOfLosCheck = causeOfLosCheck;
+        //actual check will run from collider change
+    }
+    public void UnsetLosCheck()
+    {
+        losCheck = false;
+        this.causeOfLosCheck = "no change";
+    }
     public bool PhysicalObjectWithinOverwatchCone(PhysicalObject obj)
     {
         if (IsOnOverwatch())

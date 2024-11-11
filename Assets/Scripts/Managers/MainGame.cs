@@ -206,6 +206,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 return disarmable;
         return null;
     }
+    public void SetLosCheckAll(string causeOfLosCheck)
+    {
+        foreach (Soldier s in AllFieldedSoldiers())
+            s.SetLosCheck(causeOfLosCheck);
+    }
 
 
 
@@ -479,7 +484,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //run los checks only if weather changes
         if (CheckWeatherChange(weather.LastTurnVis, weather.CurrentVis) != "false")
-            menu.SetCauseOfLosCheck("statChange(SR)|weatherChange"); 
+            SetLosCheckAll("statChange(SR)|weatherChange");
         //losCheck will automatically run due to collider change
     }
     public void StartRound()
@@ -742,9 +747,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
 
         //losCheck
-        movingSoldier.losCheck = true;
-        menu.SetCauseOfLosCheck("losChange|move");
-        //actual check will run from collider change
+        movingSoldier.SetLosCheck("losChange|move");
 
         //perform the move
         movingSoldier.x = (int)moveToLocation.Item1.x;
@@ -4026,24 +4029,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
     public void DetectionAlertAllNonCoroutine()
     {
-        menu.SetCauseOfLosCheck("losChange|losCheck"); //losCheckAll
-
         //kill LOS between everyone
         foreach (Soldier s in AllSoldiers())
             s.RemoveAllLOSToAllSoldiers();
-    }
-    public IEnumerator DetectionAlertAll()
-    {
-        yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.meleeResolvedFlag && menu.inspirerResolvedFlag);
 
-        foreach (Soldier s in AllSoldiers())
-        {
-            if (s.IsOnturnAndAlive())
-            {
-                //print("Running detection alert for " + s.soldierName);
-                StartCoroutine(DetectionAlertSingle(s, menu.causeOfLosCheck, Vector3.zero, string.Empty)); //losCheck
-            }
-        }
+        SetLosCheckAll("losChange|losCheck"); //losCheckAll
     }
 
 
@@ -4176,8 +4166,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         data.maxZ = maxZ;
     }
 
-    public IEnumerator DetectionAlertSingle(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee)
+    public IEnumerator DetectionAlertSingleDeprecated(Soldier movingSoldier, string causeOfLosCheck, Vector3 movingSoldierOldPosition, string launchMelee)
     {
+        
         yield return null;
         /*
         // Log the name of the calling method
@@ -4614,6 +4605,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //run melee if required (Should wait till detections resolved)
             if (launchMelee != string.Empty)
                 StartCoroutine(menu.OpenMeleeUI(launchMelee));
-        }*/
+        }
+        */
     }
 }

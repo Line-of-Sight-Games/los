@@ -1,43 +1,48 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SRMinRadiusCollider : SoldierTriggerCollider
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public List<string> soldiersWithinMinSR;
+    public void SafeAddToList(Soldier soldier)
     {
-        
+        if (!soldiersWithinMinSR.Contains(soldier.Id))
+            soldiersWithinMinSR.Add(soldier.Id);
     }
-
-    // Update is called once per frame
-    void Update()
+    public void RemoveFromList(Soldier soldier)
     {
-        
+        soldiersWithinMinSR.Remove(soldier.Id);
     }
     public void OnTriggerEnter(Collider colliderThatEntered)
     {
         if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
         {
-            if (TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
             {
+                SafeAddToList(soldierThatEntered.LinkedSoldier);
                 print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
-            }
-            else if (TryGetComponent(out ClaymoreBodyCollider claymoreThatEntered))
-            {
-                print($"{claymoreThatEntered.LinkedClaymore} ({claymoreThatEntered.LinkedClaymore.X},{claymoreThatEntered.LinkedClaymore.Y},{claymoreThatEntered.LinkedClaymore.Z}) entered the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
             }
         }
     }
-    public void OnTriggerExit(Collider colliderThatEntered)
+    public void OnTriggerStay(Collider colliderThatStayed)
     {
-        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
+        if (IsValidBodyCollision(colliderThatStayed, out BaseBodyCollider bodyThatStayed))
         {
-            if (TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            if (bodyThatStayed.TryGetComponent(out SoldierBodyCollider soldierThatStayed))
             {
-                print($"{soldierThatEntered.LinkedSoldier.soldierName} exited the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+                SafeAddToList(soldierThatStayed.LinkedSoldier);
+                print($"{soldierThatStayed.LinkedSoldier.soldierName} stayed in the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatStayed)}");
             }
-            else if (TryGetComponent(out ClaymoreBodyCollider claymoreThatEntered))
+        }
+    }
+    public void OnTriggerExit(Collider colliderThatExited)
+    {
+        if (IsValidBodyCollision(colliderThatExited, out BaseBodyCollider bodyThatExited))
+        {
+            if (bodyThatExited.TryGetComponent(out SoldierBodyCollider soldierThatExited))
             {
-                print($"{claymoreThatEntered.LinkedClaymore} ({claymoreThatEntered.LinkedClaymore.X},{claymoreThatEntered.LinkedClaymore.Y},{claymoreThatEntered.LinkedClaymore.Z}) exited the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+                RemoveFromList(soldierThatExited.LinkedSoldier);
+                print($"{soldierThatExited.LinkedSoldier.soldierName} exited the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
             }
         }
     }

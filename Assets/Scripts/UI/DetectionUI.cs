@@ -24,6 +24,15 @@ public class DetectionUI : MonoBehaviour
         }
         return false;
     }
+    public bool LOSAlertClaymoreAlreadyExists(Soldier s1, Claymore c)
+    {
+        foreach (ClaymoreAlertLOS alert  in allClaymoreDetectionAlerts)
+        {
+            if (alert.soldier == s1 && alert.claymore == c) //alert already exists
+                return true;
+        }
+        return false;
+    }
     public SoldierAlertLOS ExistingLOSAlert(Soldier s1, Soldier s2)
     {
         foreach (SoldierAlertLOS alert in allSoldierDetectionAlerts)
@@ -44,6 +53,17 @@ public class DetectionUI : MonoBehaviour
 
         return detectionAlert;
     }
+    public ClaymoreAlertLOS CreateLOSAlertClaymore(Soldier s1, Claymore c)
+    {
+        //create and add to list
+        ClaymoreAlertLOS detectionAlert = Instantiate(claymoreAlertLosPrefab, detectionAlertsPanel).Init(s1, c);
+        allClaymoreDetectionAlerts.Add(detectionAlert);
+
+        //try to open detectionUI
+        menu.StartCoroutine(menu.OpenDetectionAlertUI());
+
+        return detectionAlert;
+    }
     public void LOSAlertSoldierSoldierStart(Soldier detector, Soldier detectee, string detecteeLabel)
     {
         SoldierAlertLOS detectionAlert;
@@ -56,33 +76,6 @@ public class DetectionUI : MonoBehaviour
         detectionAlert.entered = true;
         detectionAlert.UpdateStartBoundary(detectee);
         detectionAlert.UpdateLabel(detectee, detecteeLabel);
-
-
-
-
-
-        /*
-        //block invalid selections
-        if (detectorLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        if (counterLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-
-        //force reveal for trenbolone
-        if (detector.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        }
-        if (counter.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-        }
-
-        //detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
-        */
-
     }
     public void LOSAlertSoldierSoldierStay(Soldier detector, Soldier detectee, string detecteeLabel)
     {
@@ -95,33 +88,6 @@ public class DetectionUI : MonoBehaviour
         //update alert
         detectionAlert.UpdateEndBoundary(detectee);
         detectionAlert.UpdateLabel(detectee, detecteeLabel);
-
-
-
-
-
-        /*
-        //block invalid selections
-        if (detectorLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        if (counterLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-
-        //force reveal for trenbolone
-        if (detector.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        }
-        if (counter.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-        }
-
-        //detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
-        */
-
     }
     public void LOSAlertSoldierSoldierEnd(Soldier detector, Soldier detectee, string detecteeLabel)
     {
@@ -135,65 +101,11 @@ public class DetectionUI : MonoBehaviour
         detectionAlert.exited = true;
         detectionAlert.UpdateEndBoundary(detectee);
         detectionAlert.UpdateLabel(detectee, detecteeLabel);
-
-
-
-
-
-        /*
-        //block invalid selections
-        if (detectorLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        if (counterLabel.Contains("Not detected"))
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-
-        //force reveal for trenbolone
-        if (detector.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-        }
-        if (counter.trenXRayEffect)
-        {
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn = true;
-            detectionAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-        }
-
-        //detectionAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
-        */
-
     }
-    public void CreateDetectionAlertSoldierClaymore(Soldier detector, Claymore claymore, string detectorLabel, string counterLabel, string arrowType)
+    public void LOSAlertSoldierClaymore(Soldier detector, Claymore claymore)
     {
-        print($"Tried to add detection alert {detector.soldierName} to claymore {claymore.X}, {claymore.Y}, {claymore.Z} with {arrowType} arrow");
-        //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
-        foreach (ClaymoreAlertLOS alert in allClaymoreDetectionAlerts)
-        {
-            if (alert.soldier == detector && alert.claymore == claymore)
-                Destroy(alert.gameObject);
-        }
-
-        ClaymoreAlertLOS claymoreAlert = Instantiate(claymoreAlertLosPrefab, detectionAlertsPanel);
-        allClaymoreDetectionAlerts.Add(claymoreAlert);
-
-        //block invalid selections
-        claymoreAlert.transform.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().interactable = false;
-
-        //force reveal for claymores
-        claymoreAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
-        claymoreAlert.transform.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().interactable = false;
-
-        claymoreAlert.GetComponent<ClaymoreAlertLOS>().SetSoldierAndClaymore(detector, claymore);
-        claymoreAlert.transform.Find("DetectionArrow").GetComponent<Image>().sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
-
-        claymoreAlert.transform.Find("Detector").Find("DetectorSR").GetComponent<TextMeshProUGUI>().text = "(SR=" + detector.stats.SR.Val + ")";
-        claymoreAlert.transform.Find("Detector").Find("CounterLabel").GetComponent<TextMeshProUGUI>().text = counterLabel;
-        claymoreAlert.transform.Find("Detector").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(detector);
-        claymoreAlert.transform.Find("Detector").Find("DetectorLocation").GetComponent<TextMeshProUGUI>().text = "X:" + detector.X + "\nY:" + detector.Y + "\nZ:" + detector.Z;
-
-        claymoreAlert.transform.Find("Counter").Find("DetectorLabel").GetComponent<TextMeshProUGUI>().text = detectorLabel;
-        claymoreAlert.transform.Find("Counter").Find("POIPortrait").GetComponent<POIPortrait>().Init(claymore);
-        claymoreAlert.transform.Find("Counter").Find("CounterLocation").GetComponent<TextMeshProUGUI>().text = "X:" + claymore.X + "\nY:" + claymore.Y + "\nZ:" + claymore.Z;
+        if (!LOSAlertClaymoreAlreadyExists(detector, claymore))
+            CreateLOSAlertClaymore(detector, claymore);
     }
     public void ClearAllAlerts()
     {

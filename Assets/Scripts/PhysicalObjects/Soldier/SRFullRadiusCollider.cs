@@ -1,12 +1,25 @@
+using System.Linq;
 using System.Reflection.Emit;
 using UnityEngine;
 
 public class SRFullRadiusCollider : SoldierTriggerCollider
 {
-    private int pMultiplier = 1;
+    public SRHalfRadiusCollider halfCollider;
+    public SRMinRadiusCollider minCollider;
+    public int ActivePMultiplier(Soldier detectee)
+    {
+        int pMultiplier = 1;
+        if (halfCollider.soldiersWithinHalfSR.Contains(detectee.Id))
+            pMultiplier = 2;
+        if (minCollider.soldiersWithinMinSR.Contains(detectee.Id))
+            pMultiplier = 3;
+
+        print($"pmultiplier = {pMultiplier}");
+        return pMultiplier;
+    }
     public string DetermineDetecteeLabel(Soldier detector, Soldier detectee)
     {
-        if (detectee.ActiveC > detector.ActivePForDetection(pMultiplier))
+        if (detectee.ActiveC > detector.ActivePForDetection(ActivePMultiplier(detectee)))
             return "AVOID";
         else if (detector.IsOnOverwatch())
             return "OVERWATCH";
@@ -23,13 +36,28 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
                 Soldier detectee = soldierThatEntered.LinkedSoldier;
                 if (detector.IsOppositeTeamAs(detectee))
                 {
-                    menu.detectionUI.LOSAlertSoldierSoldierStart(detector, detectee, DetermineDetecteeLabel(detector, detectee));
-                    print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+                    if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
+                    {
+                        menu.detectionUI.LOSAlertSoldierSoldierStart(detector, detectee, DetermineDetecteeLabel(detector, detectee));
+                        print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+                    }
                 }
             }
             else if (bodyThatEntered.TryGetComponent(out ClaymoreBodyCollider claymoreThatEntered))
             {
-                print($"{claymoreThatEntered.LinkedClaymore} ({claymoreThatEntered.LinkedClaymore.X},{claymoreThatEntered.LinkedClaymore.Y},{claymoreThatEntered.LinkedClaymore.Z}) entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+                Soldier detector = LinkedSoldier;
+                Claymore claymore = claymoreThatEntered.LinkedClaymore;
+                if (detector.IsOppositeTeamAs(claymore.placedBy))
+                {
+                    if (!claymore.revealed)
+                    {
+                        if (detector.stats.P.Val > claymore.ActiveC)
+                        {
+                            menu.detectionUI.LOSAlertSoldierClaymore(detector, claymore);
+                            print($"{claymoreThatEntered.LinkedClaymore} ({claymoreThatEntered.LinkedClaymore.X},{claymoreThatEntered.LinkedClaymore.Y},{claymoreThatEntered.LinkedClaymore.Z}) entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+                        }
+                    }
+                }
             }
         }
     }
@@ -52,7 +80,19 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
             }
             else if (bodyThatStayed.TryGetComponent(out ClaymoreBodyCollider claymoreThatStayed))
             {
-                print($"{claymoreThatStayed.LinkedClaymore} ({claymoreThatStayed.LinkedClaymore.X},{claymoreThatStayed.LinkedClaymore.Y},{claymoreThatStayed.LinkedClaymore.Z}) stayed in the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatStayed)}");
+                Soldier detector = LinkedSoldier;
+                Claymore claymore = claymoreThatStayed.LinkedClaymore;
+                if (detector.IsOppositeTeamAs(claymore.placedBy))
+                {
+                    if (!claymore.revealed)
+                    {
+                        if (detector.stats.P.Val > claymore.ActiveC)
+                        {
+                            menu.detectionUI.LOSAlertSoldierClaymore(detector, claymore);
+                            print($"{claymoreThatStayed.LinkedClaymore} ({claymoreThatStayed.LinkedClaymore.X},{claymoreThatStayed.LinkedClaymore.Y},{claymoreThatStayed.LinkedClaymore.Z}) stayed in the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatStayed)}");
+                        }
+                    }
+                }
             }
         }
     }
@@ -66,13 +106,12 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
                 Soldier detectee = soldierThatExited.LinkedSoldier;
                 if (detector.IsOppositeTeamAs(detectee))
                 {
-                    menu.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, DetermineDetecteeLabel(detector, detectee));
-                    print($"{soldierThatExited.LinkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
+                    if (detector.IsOppositeTeamAs(detectee))
+                    {
+                        menu.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, DetermineDetecteeLabel(detector, detectee));
+                        print($"{soldierThatExited.LinkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
+                    }
                 }
-            }
-            else if (bodyThatExited.TryGetComponent(out ClaymoreBodyCollider claymoreThatExited))
-            {
-                print($"{claymoreThatExited.LinkedClaymore} ({claymoreThatExited.LinkedClaymore.X},{claymoreThatExited.LinkedClaymore.Y},{claymoreThatExited.LinkedClaymore.Z}) exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
             }
         }
     }

@@ -216,7 +216,7 @@ public class OverwatchShotUI : MonoBehaviour
                 menu.OpenShotResultUI(false);
 
                 //refresh detections (potentially trigger more overwatch)
-                StartCoroutine(game.DetectionAlertSingle(targetSoldier, "losChange|postOverwatch", Vector3.zero, string.Empty)); //losCheck
+                targetSoldier.SetLosCheck("losChange|postOverwatch"); //losCheck
 
                 CloseOverwatchShotUI();
             }

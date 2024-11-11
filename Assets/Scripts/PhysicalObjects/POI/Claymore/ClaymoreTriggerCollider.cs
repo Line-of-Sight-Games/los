@@ -25,17 +25,6 @@ public class ClaymoreTriggerCollider : BaseTriggerCollider
             }
         }
     }
-    public void OnTriggerExit(Collider colliderThatEntered)
-    {
-        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
-        {
-            if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
-            {
-                if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
-                    LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
-            }
-        }
-    }
 
     public Claymore LinkedClaymore
     {
