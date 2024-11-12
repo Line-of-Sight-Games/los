@@ -28,7 +28,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
     public Statline stats;
     public Inventory inventory;
-    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
+    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
     public Item itemPrefab;
     private JArray statsJArray;
     public GameObject SRColliderFullPhysical, SRColliderHalfPhysical, SRColliderMinPhysical;

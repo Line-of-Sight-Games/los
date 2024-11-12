@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ThermalCamAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -16,6 +17,8 @@ public class ThermalCamAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerE
     public Soldier soldier;
     public SoldierPortrait soldierPortrait;
     public TextMeshProUGUI startBoundary, endBoundary, label;
+    public Toggle toggle;
+
     private void Start()
     {
         menu = FindFirstObjectByType<MainMenu>();

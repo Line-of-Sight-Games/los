@@ -1,11 +1,9 @@
-using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -1952,13 +1950,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 allSoldiersNotRevealingHidden.Add(s.id, new List<string>());
                 allSoldiersRevealingFinal.Add(s.id, new List<string>());
 
-                //add soldiers that can't possibly be seen cause out of radius
+                //add soldiers that can't possibly be seen cause out of any collider
                 foreach (Soldier s2 in game.AllSoldiers())
                 {
                     if (s.IsOppositeTeamAs(s2) && s2.IsAlive())
                     {
-                        if (!s.PhysicalObjectWithinMaxRadius(s2))
-                            allSoldiersNotRevealingOutOfSR[s.id].Add(s2.id);
+                        if (!s.soldiersWithinAnyCollider.Contains(s2.Id)) //if (!s.PhysicalObjectWithinMaxRadius(s2))
+                            allSoldiersNotRevealingOutOfSR[s.Id].Add(s2.Id);
                     } 
                 }
             }
@@ -1968,88 +1966,120 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 if (child.GetComponent<SoldierAlertLOS>() != null)
                 {
-                    Soldier detector = child.GetComponent<SoldierAlertLOS>().s1;
-                    Soldier counter = child.GetComponent<SoldierAlertLOS>().s2;
+                    SoldierAlertLOS sAlert = child.GetComponent<SoldierAlertLOS>();
+                    Soldier detector = sAlert.s1;
+                    Soldier counter = sAlert.s2;
 
-                    if (child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn == true)
+                    //do checks for s1 (detector)(left side)
+                    //if not a glimpse or a retreat detection, soldier has ended in SR
+                    if (!sAlert.s1Label.text.Contains("GLIMPSE") && !sAlert.s1Label.text.Contains("RETREAT"))
                     {
-                        if (child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("DETECT") || child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                        if (sAlert.s1Toggle.isOn == true)
                         {
-                            //if not a glimpse or a retreat detection, add soldier to revealing list
-                            if (!child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
-                                allSoldiersRevealing[counter.id].Add(detector.id);
+                            if (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH"))
+                            {
+                                allSoldiersRevealing[counter.Id].Add(detector.Id);
+
+                                //check for overwatch shot
+                                if (sAlert.s1Label.text.Contains("OVERWATCH"))
+                                    StartCoroutine(OpenOverwatchShotUI(counter, detector));
+                            }
                             else
                             {
-                                AddLosGlimpseAlert(detector, child.Find("Detector").Find("Label").GetComponent<TextMeshProUGUI>().text);
-                                StartCoroutine(OpenLostLOSList());
-                                allSoldiersNotRevealingNoLos[counter.id].Add(detector.id);
+                                allSoldiersNotRevealingHidden[counter.Id].Add(detector.Id);
+
+                                //check for xp
+                                AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true);
                             }
 
                             //check for xp
                             if (detector.ActiveC > 2)
                                 AddXpAlert(counter, detector.ActiveC + counter.ShadowXpBonus(detector.IsRevoker()), $"Detected soldier ({detector.soldierName}) with C > 2.", true);
-
-                            //check for overwatch shot
-                            if (child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("verwatch") && child.Find("DetectionArrow").GetComponent<Image>().sprite.name.Contains("Left"))
-                                StartCoroutine(OpenOverwatchShotUI(counter, detector));
                         }
                         else
-                        {
-                            allSoldiersNotRevealingHidden[counter.id].Add(detector.id);
-
-                            //check for xp
-                            AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true);
-                        }
+                            allSoldiersNotRevealingNoLos[counter.Id].Add(detector.Id);
                     }
                     else
-                        allSoldiersNotRevealingNoLos[counter.id].Add(detector.id);
-
-                    if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
                     {
-                        if (child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("DETECT") || child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("OVERWATCH"))
+                        allSoldiersNotRevealingOutOfSR[counter.Id].Add(detector.Id);
+                        AddLosGlimpseAlert(detector, sAlert.s1Label.text);
+                        StartCoroutine(OpenLostLOSList());
+                    }
+
+                    //do checks for s2 (counter)(right side)
+                    //if not a glimpse or a retreat detection, add soldier to revealing list
+                    if (!sAlert.s2Label.text.Contains("GLIMPSE") && !sAlert.s2Label.text.Contains("RETREAT"))
+                    {
+                        if (sAlert.s2Toggle.isOn == true)
                         {
-                            //if not a glimpse or a retreat detection, add soldier to revealing list
-                            if (!child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("GLIMPSE") && !child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text.Contains("RETREAT"))
-                                allSoldiersRevealing[detector.id].Add(counter.id);
+                            if (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH"))
+                            {
+                                allSoldiersRevealing[detector.Id].Add(counter.Id);
+
+                                //check for overwatch shot
+                                if (sAlert.s2Label.text.Contains("OVERWATCH"))
+                                    StartCoroutine(OpenOverwatchShotUI(detector, counter));
+                            }
                             else
                             {
-                                AddLosGlimpseAlert(counter, child.Find("Counter").Find("Label").GetComponent<TextMeshProUGUI>().text);
-                                StartCoroutine(OpenLostLOSList());
-                                allSoldiersNotRevealingNoLos[detector.id].Add(counter.id);
+                                allSoldiersNotRevealingHidden[detector.Id].Add(counter.Id);
+                                AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
                             }
-                            
-                            //check for xp
-                            if (counter.ActiveC > 2)
-                                AddXpAlert(detector, counter.ActiveC + detector.ShadowXpBonus(counter.IsRevoker()), $"Detected soldier ({counter.soldierName}) with C > 2.", true);
                         }
                         else
-                        {
-                            allSoldiersNotRevealingHidden[detector.id].Add(counter.id);
-
-                            //check for xp
-                            AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true);
-                        }
+                            allSoldiersNotRevealingNoLos[detector.Id].Add(counter.Id);
                     }
                     else
-                        allSoldiersNotRevealingNoLos[detector.id].Add(counter.id);
+                    {
+                        AddLosGlimpseAlert(counter, sAlert.s2Label.text);
+                        StartCoroutine(OpenLostLOSList());
+                        allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
+                    }
+
+                    //if soldier was paid revealed either by glimpse or in SR and has c > 2 xp check
+                    if (sAlert.s2Toggle.isOn == true && (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH")))
+                    {
+                        if (counter.ActiveC > 2)
+                            AddXpAlert(detector, counter.ActiveC + detector.ShadowXpBonus(counter.IsRevoker()), $"Detected soldier ({counter.soldierName}) with C > 2.", true); //xp
+                    }
                 }
                 else if (child.GetComponent<ClaymoreAlertLOS>() != null)
                 {
-                    //play claymore detect dialogue
-                    soundManager.PlaySoldierDetectClaymore(child.GetComponent<ClaymoreAlertLOS>().soldier.soldierSpeciality);
+                    ClaymoreAlertLOS cAlert = child.GetComponent<ClaymoreAlertLOS>();
+                    Soldier detector = cAlert.soldier;
+                    Claymore claymore = cAlert.claymore;
 
-                    Claymore claymore = child.GetComponent<ClaymoreAlertLOS>().claymore;
+                    //play claymore detect dialogue
+                    soundManager.PlaySoldierDetectClaymore(detector.soldierSpeciality);
+
                     claymore.revealed = true;
                 }
                 else if (child.GetComponent<ThermalCamAlertLOS>() != null)
                 {
-                    if (child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn == true)
-                    {
-                        ThermalCamera thermalCam = child.GetComponent<ThermalCamAlertLOS>().themalCam;
-                        Soldier soldier = child.GetComponent<ThermalCamAlertLOS>().soldier;
+                    ThermalCamAlertLOS tcAlert = child.GetComponent<ThermalCamAlertLOS>();
+                    ThermalCamera thermalCam = tcAlert.themalCam;
+                    Soldier detector = thermalCam.placedBy;
+                    Soldier detectee = tcAlert.soldier;
 
-                        //check for xp
-                        AddXpAlert(thermalCam.placedBy, 1, $"Thermal camera at ({thermalCam.X},{thermalCam.Y},{thermalCam.Z}) revealed soldier ({soldier.soldierName}).", true);
+                    //if not a glimpse or a retreat detection, add soldier to revealing list
+                    if (!tcAlert.label.text.Contains("GLIMPSE") && !tcAlert.label.text.Contains("RETREAT"))
+                    {
+                        if (tcAlert.toggle.isOn == true)
+                            allSoldiersRevealing[detector.Id].Add(detectee.Id);
+                        else
+                            allSoldiersNotRevealingNoLos[detector.Id].Add(detectee.Id);
+                    }
+                    else
+                    {
+                        allSoldiersNotRevealingOutOfSR[detector.Id].Add(detectee.Id);
+                        AddLosGlimpseAlert(detectee, tcAlert.label.text);
+                        StartCoroutine(OpenLostLOSList());
+                    }
+
+                    //if soldier was paid revealed either by glimpse or in SR xp for thermal cam
+                    if (tcAlert.toggle.isOn == true)
+                    {
+                        AddXpAlert(detector, 1, $"Thermal camera at ({thermalCam.X},{thermalCam.Y},{thermalCam.Z}) revealed soldier ({detectee.soldierName}).", true); //xp
                     }
                 }
             }
