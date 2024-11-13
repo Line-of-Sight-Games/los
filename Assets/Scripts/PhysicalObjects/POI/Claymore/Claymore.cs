@@ -17,7 +17,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
 
     private void Start()
     {
-        poiType = "claymore";
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
         poiManager = FindFirstObjectByType<POIManager>();
@@ -31,6 +30,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     public Claymore Init(Tuple<Vector3, string> location, Tuple<int, int, int, string> otherDetails)
     {
         id = GenerateGuid();
+        poiType = "claymore";
         x = (int)location.Item1.x;
         y = (int)location.Item1.y;
         z = (int)location.Item1.z;

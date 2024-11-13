@@ -2675,7 +2675,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
             else if (poiToDisarm is DeploymentBeacon)
                 disarmedItem = itemManager.SpawnItem("Deployment_Beacon");
             else if (poiToDisarm is ThermalCamera)
+            {
+                SetLosCheckAll("losChange|thermalCamDeactive");
                 disarmedItem = itemManager.SpawnItem("Thermal_Camera");
+            }
+                
 
             //set item to same position as poi and destroy poi
             disarmedItem.X = poiToDisarm.X;
@@ -3166,6 +3170,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
+                
+                SetLosCheckAll("losChange|thermalCamActive"); //loscheck all
                 Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);

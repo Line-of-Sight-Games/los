@@ -49,7 +49,7 @@ MonoBehaviour:
   menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
-  withinHalfSR: 0
+  soldiersWithinHalfSR: []
 --- !u!135 &3670613070504241877
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -120,7 +120,7 @@ MonoBehaviour:
   menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
-  withinMinSR: 0
+  soldiersWithinMinSR: []
 --- !u!135 &1583070955957388279
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -589,6 +589,7 @@ MonoBehaviour:
   inventoryList: []
   controlledBySoldiersList: []
   controllingSoldiersList: []
+  soldiersWithinAnyCollider: []
   soldiersOutOfSRList: []
   noLosToTheseSoldiersList: []
   losToTheseSoldiersAndRevealingList: []

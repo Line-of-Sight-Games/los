@@ -1274,13 +1274,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (ThermalCamera tc in FindObjectsByType<ThermalCamera>(default))
         {
             if (OverrideView)
-                tc.beam.GetComponent<Renderer>().enabled = true;
+                tc.beam.renderer.enabled = true;
             else
             {
                 if (tc.placedBy != null && tc.placedBy.soldierTeam == game.currentTeam)
-                    tc.beam.GetComponent<Renderer>().enabled = true;
+                    tc.beam.renderer.enabled = true;
                 else
-                    tc.beam.GetComponent<Renderer>().enabled = false;
+                    tc.beam.renderer.enabled = false;
             }
         }
     }
