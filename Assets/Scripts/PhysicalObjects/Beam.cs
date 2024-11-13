@@ -4,7 +4,7 @@ public class Beam : MonoBehaviour
 {
     public MainGame game;
     public Vector3 startingPosition, targetPosition;
-    public int beamSize;
+    public float beamSize;
 
     public Renderer renderer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -19,7 +19,7 @@ public class Beam : MonoBehaviour
         if (targetPosition != null)
             SetBeam(startingPosition, targetPosition, beamSize);
     }
-    public Beam Init(Vector3 startingPosition, Vector3 targetPosition, int beamSize)
+    public Beam Init(Vector3 startingPosition, Vector3 targetPosition, float beamSize)
     {
         print($"starting pos = {startingPosition}, target pos = {targetPosition}, beamSize = {beamSize}");
         this.startingPosition = startingPosition;
@@ -28,7 +28,7 @@ public class Beam : MonoBehaviour
 
         return this;
     }
-    public void SetBeam(Vector3 startingPosition, Vector3 targetPosition, int size)
+    public void SetBeam(Vector3 startingPosition, Vector3 targetPosition, float size)
     {
         // Calculate direction vector based on facingCoordinates
         Vector3 origin = startingPosition;

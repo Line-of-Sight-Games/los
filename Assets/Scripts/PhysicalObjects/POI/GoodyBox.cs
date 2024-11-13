@@ -9,19 +9,14 @@ public class GoodyBox : POI, IDataPersistence, IHaveInventory
     public JArray itemsJArray;
     public List<string> inventoryList;
 
-
-    private void Start()
-    {
-        poiType = "gb";
-    }
-
     public GoodyBox Init(Tuple<Vector3, string> location)
     {
-        id = GenerateGuid();
-        x = (int)location.Item1.x;
-        y = (int)location.Item1.y;
-        z = (int)location.Item1.z;
-        terrainOn = location.Item2;
+        Id = GenerateGuid();
+        poiType = "gb";
+        X = (int)location.Item1.x;
+        Y = (int)location.Item1.y;
+        Z = (int)location.Item1.z;
+        TerrainOn = location.Item2;
         MapPhysicalPosition(x, y, z);
         inventory = new Inventory(this);
 

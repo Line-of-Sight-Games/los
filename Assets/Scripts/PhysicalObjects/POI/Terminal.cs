@@ -14,13 +14,13 @@ public class Terminal : POI, IDataPersistence
 
     private void Start()
     {
-        poiType = "terminal";
         terminalEnabled = true;
     }
 
     public Terminal Init(Tuple<Vector3, string> location, string type)
     {
         id = GenerateGuid();
+        poiType = "terminal";
         x = (int)location.Item1.x;
         y = (int)location.Item1.y;
         z = (int)location.Item1.z;

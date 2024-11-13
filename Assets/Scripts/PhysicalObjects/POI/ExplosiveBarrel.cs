@@ -11,7 +11,6 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     public bool exploded;
     private void Start()
     {
-        poiType = "barrel";
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
         poiManager = FindFirstObjectByType<POIManager>();
@@ -19,11 +18,12 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
 
     public ExplosiveBarrel Init(Tuple<Vector3, string> location)
     {
-        id = GenerateGuid();
-        x = (int)location.Item1.x;
-        y = (int)location.Item1.y;
-        z = (int)location.Item1.z;
-        terrainOn = location.Item2;
+        Id = GenerateGuid();
+        poiType = "barrel";
+        X = (int)location.Item1.x;
+        Y = (int)location.Item1.y;
+        Z = (int)location.Item1.z;
+        TerrainOn = location.Item2;
         MapPhysicalPosition(x, y, z);
 
         return this;

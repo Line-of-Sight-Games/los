@@ -7,12 +7,9 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
 {
     public string placedById;
     public Soldier placedBy;
-    public bool active;
 
     private void Start()
     {
-        poiType = "depbeacon";
-        active = true;
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
         poiManager = FindFirstObjectByType<POIManager>();
@@ -25,11 +22,12 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
 
     public DeploymentBeacon Init(Tuple<Vector3, string> location, string placedBySoldierId)
     {
-        id = GenerateGuid();
-        x = (int)location.Item1.x;
-        y = (int)location.Item1.y;
-        z = (int)location.Item1.z;
-        terrainOn = location.Item2;
+        Id = GenerateGuid();
+        poiType = "depbeacon";
+        X = (int)location.Item1.x;
+        Y = (int)location.Item1.y;
+        Z = (int)location.Item1.z;
+        TerrainOn = location.Item2;
         MapPhysicalPosition(x, y, z);
         placedById = placedBySoldierId;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
@@ -51,7 +49,6 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
             terrainOn = (string)details["terrainOn"];
             MapPhysicalPosition(x, y, z);
 
-            active = (bool)details["active"];
             placedById = (string)details["placedById"];
         }
     }
@@ -65,7 +62,6 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
             { "y", y },
             { "z", z },
             { "terrainOn", terrainOn },
-            { "active", active },
             { "placedById", placedById }
         };
 

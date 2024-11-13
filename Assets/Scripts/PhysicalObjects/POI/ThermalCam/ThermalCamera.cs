@@ -8,7 +8,8 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
 {
     public string placedById;
     public Soldier placedBy;
-    public int facingX, facingY, beamSize;
+    public int facingX, facingY;
+    public float beamSize;
     public bool active;
     public Beam beam;
 
@@ -89,12 +90,12 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
 
         data.allPOIDetails.Add(id, details);
     }
-    public int GetBeamSize()
+    public float GetBeamSize()
     {
         if (placedBy.IsAdept()) //adept ability
-            return 8;
+            return 8f;
 
-        return 3;
+        return 1.5f;
     }
 
     public Sprite DisarmImage { get { return poiPortrait; } }

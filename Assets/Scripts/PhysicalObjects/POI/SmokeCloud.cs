@@ -16,9 +16,9 @@ public class SmokeCloud : POI, IDataPersistence
     public Soldier placedBy;
     public SphereCollider innerCloud;
     public SphereCollider outerCloud;
+
     private void Start()
     {
-        poiType = "smoke";
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
         poiManager = FindFirstObjectByType<POIManager>();
@@ -27,6 +27,7 @@ public class SmokeCloud : POI, IDataPersistence
     public SmokeCloud Init(Tuple<Vector3, string> location, string thrownBy)
     {
         Id = GenerateGuid();
+        poiType = "smoke";
         X = (int)location.Item1.x;
         Y = (int)location.Item1.y;
         Z = (int)location.Item1.z;
