@@ -92,7 +92,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             colorPrefix = "<color=green>";
         else if (label.Contains("OVERWATCH"))
             colorPrefix = "<color=yellow>";
-        else if (label.Contains("NO LOS"))
+        else if (label.Contains("OUT OF SR"))
             colorPrefix = "<color=grey>";
 
         return $"{colorPrefix}{prefix}{label}{colorSuffix}";
@@ -156,7 +156,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 arrowType = "avoidance2WayLeft";
             else if (s1Label.text.Contains("DETECT"))
                 arrowType = "detection2Way";
-            else if (s1Label.text.Contains("NO LOS"))
+            else if (s1Label.text.Contains("OUT OF SR"))
                 arrowType = "detection1WayRight";
             else if (s1Label.text.Contains("OVERWATCH"))
                 arrowType = "detectionOverwatch2WayLeft";
@@ -167,18 +167,18 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 arrowType = "avoidance2Way";
             else if (s1Label.text.Contains("DETECT"))
                 arrowType = "avoidance2WayRight";
-            else if (s1Label.text.Contains("NO LOS"))
+            else if (s1Label.text.Contains("OUT OF SR"))
                 arrowType = "avoidance1WayRight";
             else if (s1Label.text.Contains("OVERWATCH"))
                 arrowType = "avoidanceOverwatch2WayLeft";
         }
-        else if (s2Label.text.Contains("NO LOS"))
+        else if (s2Label.text.Contains("OUT OF SR"))
         {
             if (s1Label.text.Contains("AVOID"))
                 arrowType = "avoidance1WayLeft";
             else if (s1Label.text.Contains("DETECT"))
                 arrowType = "detection1WayLeft";
-            else if (s1Label.text.Contains("NO LOS"))
+            else if (s1Label.text.Contains("OUT OF SR"))
                 arrowType = "noDetect2Way";
             else if (s1Label.text.Contains("OVERWATCH"))
                 arrowType = "overwatch1WayLeft";
@@ -216,7 +216,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         else
         {
             //locking options for s1 toggle
-            if (s1Label.text.Equals("NO LOS"))
+            if (s1Label.text.Equals("OUT OF SR"))
                 s1Toggle.interactable = false;
             else if (s2.trenXRayEffect)
             {
@@ -237,7 +237,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s1Toggle.interactable = true;
 
             //locking options for s2 toggle
-            if (s2Label.text.Equals("NO LOS"))
+            if (s2Label.text.Equals("OUT OF SR"))
                 s2Toggle.interactable = false;
             else if (s1.trenXRayEffect)
             {
