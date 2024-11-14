@@ -9,8 +9,7 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
     public string placedById;
     public Soldier placedBy;
     public int facingX, facingY;
-    public float beamSize;
-    public bool active;
+    public float beamHeight, beamWidth;
     public Beam beam;
 
     private void Start()
@@ -25,14 +24,13 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
         placedBy = menu.soldierManager.FindSoldierById(placedById);
     }
 
-    public ThermalCamera Init(Tuple<Vector3, string> location, Tuple<int, int, string> otherDetails)
+    public ThermalCamera Init(Vector3 location, Tuple<int, int, string> otherDetails)
     {
         id = GenerateGuid();
         poiType = "thermalcam";
-        x = (int)location.Item1.x;
-        y = (int)location.Item1.y;
-        z = (int)location.Item1.z;
-        terrainOn = location.Item2;
+        x = (int)location.x;
+        y = (int)location.y;
+        z = (int)location.z;
         MapPhysicalPosition(x, y, z);
 
         facingX = otherDetails.Item1;
@@ -40,8 +38,9 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
         placedById = otherDetails.Item3;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
         
-        beamSize = GetBeamSize();
-        beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)), beamSize);
+        beamHeight = GetBeamSize();
+        beamWidth = GetBeamSize();
+        beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)), beamHeight, beamWidth);
 
         poiPortrait = LoadPortrait(poiType);
 
@@ -57,15 +56,15 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
             x = Convert.ToInt32(details["x"]);
             y = Convert.ToInt32(details["y"]);
             z = Convert.ToInt32(details["z"]);
-            terrainOn = (string)details["terrainOn"];
             MapPhysicalPosition(x, y, z);
 
             facingX = Convert.ToInt32(details["facingX"]);
             facingY = Convert.ToInt32(details["facingY"]);
             placedById = (string)details["placedById"];
-            beamSize = Convert.ToInt32(details["beamSize"]);
+            beamHeight = Convert.ToInt32(details["beamHeight"]);
+            beamWidth = Convert.ToInt32(details["beamWidth"]);
 
-            beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)), beamSize);
+            beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)), beamHeight, beamWidth);
         }
     }
 
@@ -77,11 +76,11 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
             { "x", x },
             { "y", y },
             { "z", z },
-            { "terrainOn", terrainOn },
             { "facingX", facingX },
             { "facingY", facingY },
             { "placedById", placedById },
-            { "beamSize", beamSize },
+            { "beamHeight", beamHeight },
+            { "beamWidth", beamWidth },
         };
 
         //add the poi in

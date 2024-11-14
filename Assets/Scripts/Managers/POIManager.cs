@@ -18,6 +18,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
     public DeploymentBeacon deploymentBeaconPrefab;
     public ThermalCamera thermalCamPrefab;
     public DrugCabinet drugCabinetPrefab;
+    public BinocularBeam binocularStripPrefab;
 
     public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite, claymoreSprite, deploymentBeaconSprite, thermalCameraSprite, drugCabinetSprite;
 
@@ -55,6 +56,8 @@ public class POIManager : MonoBehaviour, IDataPersistence
                 newPOI = Instantiate(thermalCamPrefab);
             else if (spawnType == "drugcab")
                 newPOI = Instantiate(drugCabinetPrefab);
+            else if (spawnType == "binocularBeam")
+                newPOI = Instantiate(binocularStripPrefab);
 
             newPOI.id = id;
             newPOI.LoadData(data);

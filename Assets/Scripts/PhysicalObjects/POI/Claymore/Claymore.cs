@@ -27,14 +27,13 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         if (Exploded)
             poiManager.DestroyPOI(this);
     }
-    public Claymore Init(Tuple<Vector3, string> location, Tuple<int, int, int, string> otherDetails)
+    public Claymore Init(Vector3 location, Tuple<int, int, int, string> otherDetails)
     {
         id = GenerateGuid();
         poiType = "claymore";
-        x = (int)location.Item1.x;
-        y = (int)location.Item1.y;
-        z = (int)location.Item1.z;
-        terrainOn = location.Item2;
+        x = (int)location.x;
+        y = (int)location.y;
+        z = (int)location.z;
         MapPhysicalPosition(x, y, z);
 
         c = otherDetails.Item1;

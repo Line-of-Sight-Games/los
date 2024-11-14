@@ -191,12 +191,22 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         //no physical change to los
         if (!s1.causeOfLosCheck.Contains("losChange") && !s2.causeOfLosCheck.Contains("losChange"))
         {
-            if (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))
+            //s2 toggle
+            if (s1.SoldiersOutOfSR.Contains(s2.Id) || s1.NoLOSToTheseSoldiers.Contains(s2.Id))
+            {
+                s2Toggle.interactable = false;
+            }
+            else if (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))
             {
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
 
+            //s1 toggle
+            if (s2.SoldiersOutOfSR.Contains(s1.Id) || s2.NoLOSToTheseSoldiers.Contains(s1.Id))
+            {
+                s1Toggle.interactable = false;
+            }
             if (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))
             {
                 s1Toggle.isOn = true;

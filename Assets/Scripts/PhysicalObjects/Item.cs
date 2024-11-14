@@ -463,6 +463,13 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             }
         }
     }
+    public string GetBinocularMode(string slotName)
+    {
+        if (slotName.Contains("Hand"))
+            return "Recon";
+        
+        return "Flash";
+    }
     public void RunDropEffect(Soldier linkedSoldier)
     {
         //play drop general sfx (clashes with item use sound for consumables)
@@ -642,12 +649,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         {
             switch (itemName)
             {
-                case "E_Tool":
-                    //play use etool
-                    game.soundManager.PlayUseETool();
-
-                    menu.OpenEtoolResultUI();
-                    break;
                 case "Ammo_AR":
                 case "Ammo_LMG":
                 case "Ammo_Ri":
@@ -660,6 +661,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     (this.ammo, itemUsedOn.ammo) = (itemUsedOn.ammo, this.ammo);
                     if (this.ammo != 0)
                         charges++; //add a "charge" to ensure ammo is not deleted
+                    break;
+                case "E_Tool":
+                    //play use etool
+                    game.soundManager.PlayUseETool();
+
+                    menu.OpenEtoolResultUI();
                     break;
                 case "Food_Pack":
                     if (poisonedBy == null || poisonedBy == "")

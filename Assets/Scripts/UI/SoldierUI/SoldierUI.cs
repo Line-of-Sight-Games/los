@@ -72,18 +72,13 @@ public class SoldierUI : MonoBehaviour
                 //play move confirm dialogue
                 soundManager.PlaySoldierConfirmMove(linkedSoldier.soldierSpeciality);
 
-                linkedSoldier.startX = x;
-                linkedSoldier.startY = y;
-                linkedSoldier.startZ = z;
-                linkedSoldier.fielded = true;
-                linkedSoldier.CheckSpecialityColor(linkedSoldier.soldierSpeciality);
-                transform.Find("PopupBox").gameObject.SetActive(false);
-                game.CheckDeploymentBeacons(linkedSoldier);
-
                 //deploy the soldier
-                game.PerformMove(linkedSoldier, 0, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text), false, false, string.Empty, true);
-                //patriot ability
-                linkedSoldier.SetPatriotic();
+                game.PerformSpawn(linkedSoldier, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text));
+
+                //confirm fielding
+                linkedSoldier.fielded = true;
+                transform.Find("PopupBox").gameObject.SetActive(false);
+                linkedSoldier.CheckSpecialityColor(linkedSoldier.soldierSpeciality);
             }
         }
     }

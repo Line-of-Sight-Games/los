@@ -36,7 +36,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, binocularsUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
@@ -993,7 +993,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             activeSoldier.CalculateActiveStats();
 
             //set los check if P, C, SR is changed
-            if (code == "P" | code == "C" || code == "SR")
+            if (code == "P" || code == "C" || code == "SR")
                 activeSoldier.SetLosCheck($"statChange({code})|baseStatChange(override)"); //losCheck
 
             //run melee control re-eval if R, Str, M, F is changed
@@ -4020,6 +4020,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             "Ammo_Sh" => "Reload Shotgun?",
             "Ammo_SMG_Pi" => "Reload Sub-Machine Gun or Pistol?",
             "Ammo_Sn" => "Reload Sniper?",
+            "Binoculars" => $"Use binoculars ({itemUsed.GetBinocularMode(itemUsedFromSlotName)} Mode)",
             "Claymore" => "Place Claymore?",
             "Deployment_Beacon" => "Place Deployment Beacon?",
             "E_Tool" => "Dig?",
@@ -4416,7 +4417,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-        claymoreUI.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("Terrain").GetComponentInChildren<TMP_Dropdown>().value = 0;
         claymoreUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>().text = "";
         claymoreUI.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>().text = "";
     }
@@ -4444,6 +4444,24 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         ClearDeploymentBeaconUI();
         deploymentBeaconUI.SetActive(false);
+    }
+    public void OpenBinocularsUI(UseItemUI useItemUI)
+    {
+        binocularsUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
+        binocularsUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
+        binocularsUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
+
+        binocularsUI.SetActive(true);
+    }
+    public void ClearBinocularsUI()
+    {
+        binocularsUI.transform.Find("OptionPanel").Find("FocusPosition").Find("XPos").GetComponent<TMP_InputField>().text = "";
+        binocularsUI.transform.Find("OptionPanel").Find("FocusPosition").Find("YPos").GetComponent<TMP_InputField>().text = "";
+    }
+    public void CloseBinocularsUI()
+    {
+        ClearBinocularsUI();
+        binocularsUI.SetActive(false);
     }
     public void OpenThermalCamUI(UseItemUI useItemUI)
     {

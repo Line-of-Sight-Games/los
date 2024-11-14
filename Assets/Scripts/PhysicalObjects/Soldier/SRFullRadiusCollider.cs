@@ -77,7 +77,7 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
 
                 //flag that the soldier is within the collider
                 if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
-                    detector.soldiersWithinAnyCollider.Add(detectee.Id); 
+                    detector.soldiersWithinAnyCollider.Add(detectee.Id);
 
                 if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                 {
@@ -115,14 +115,17 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
                 Soldier detector = LinkedSoldier;
                 Soldier detectee = soldierThatExited.LinkedSoldier;
 
-                detector.soldiersWithinAnyCollider.Remove(detectee.Id); //flag that the soldier has left the collider
-
-                if (detector.IsOppositeTeamAs(detectee))
+                if (detector.soldiersWithinAnyCollider.Contains(detectee.Id))
                 {
-                    if (detector.IsOppositeTeamAs(detectee))
+                    detector.soldiersWithinAnyCollider.Remove(detectee.Id); //flag that the soldier has left the collider
+
+                    if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                     {
-                        menu.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, DetermineDetecteeLabel(detector, detectee));
-                        print($"{soldierThatExited.LinkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
+                        if (detector.IsOppositeTeamAs(detectee))
+                        {
+                            menu.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, DetermineDetecteeLabel(detector, detectee));
+                            print($"{soldierThatExited.LinkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
+                        }
                     }
                 }
             }

@@ -20,14 +20,13 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
         placedBy = menu.soldierManager.FindSoldierById(placedById);
     }
 
-    public DeploymentBeacon Init(Tuple<Vector3, string> location, string placedBySoldierId)
+    public DeploymentBeacon Init(Vector3 location, string placedBySoldierId)
     {
         Id = GenerateGuid();
         poiType = "depbeacon";
-        X = (int)location.Item1.x;
-        Y = (int)location.Item1.y;
-        Z = (int)location.Item1.z;
-        TerrainOn = location.Item2;
+        X = (int)location.x;
+        Y = (int)location.y;
+        Z = (int)location.z;
         MapPhysicalPosition(x, y, z);
         placedById = placedBySoldierId;
         placedBy = menu.soldierManager.FindSoldierById(placedById);

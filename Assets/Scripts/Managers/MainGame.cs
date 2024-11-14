@@ -731,6 +731,39 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 print("Invalid Input");
         }
     }
+    public void PerformSpawn(Soldier movingSoldier, Tuple<Vector3, string> moveToLocation)
+    {
+        movingSoldier.moveResolvedFlag = false;
+        FileUtility.WriteToReport($"{movingSoldier.soldierName} spawned at {moveToLocation}");
+
+        //save start position
+        movingSoldier.startX = (int)moveToLocation.Item1.x;
+        movingSoldier.startY = (int)moveToLocation.Item1.y;
+        movingSoldier.startZ = (int)moveToLocation.Item1.z;
+
+        //perform the move
+        movingSoldier.transform.position = HelperFunctions.ConvertMathPosToPhysicalPos(moveToLocation.Item1);
+        movingSoldier.x = (int)moveToLocation.Item1.x;
+        movingSoldier.y = (int)moveToLocation.Item1.y;
+        movingSoldier.z = (int)moveToLocation.Item1.z;
+        movingSoldier.TerrainOn = moveToLocation.Item2;
+
+        //check deployment beacons
+        CheckDeploymentBeacons(movingSoldier);
+
+        //patriot ability
+        movingSoldier.SetPatriotic();
+
+        //check for smoke clouds
+        if (!movingSoldier.CheckSmokeClouds() && movingSoldier.IsInSmoke())
+            movingSoldier.UnsetSmoked();
+
+        //check for tabun clouds
+        if (!movingSoldier.CheckTabunClouds() && movingSoldier.IsInTabun())
+            movingSoldier.UnsetTabun();
+
+        movingSoldier.SetLosCheck("losChange|move|spawn"); //losCheck
+    }
     public void PerformMove(Soldier movingSoldier, int ap, Tuple<Vector3, string> moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance, bool freeMove)
     {
         movingSoldier.moveResolvedFlag = false;
@@ -745,9 +778,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //fill the tempMove variable in case move needs to be reverted
         Vector3 oldPos = new(movingSoldier.X, movingSoldier.Y, movingSoldier.Z);
         tempMove = Tuple.Create(oldPos, movingSoldier.TerrainOn, ap, 1);
-
-        //losCheck
-        movingSoldier.SetLosCheck("losChange|move");
 
         //perform the move
         movingSoldier.x = (int)moveToLocation.Item1.x;
@@ -795,6 +825,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //check broken soldier leaving field
         CheckBrokenFlee(movingSoldier);
+
+        movingSoldier.SetLosCheck("losChange|move"); //losCheck
     }
     public void CheckBrokenFlee(Soldier movingSoldier)
     {
@@ -2727,34 +2759,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Ammo_Sh":
             case "Ammo_SMG_Pi":
             case "Ammo_Sn":
-                itemUsed.UseItem(linkedIcon, itemUsedOn, null);
-                break;
-            case "Claymore":
-                menu.OpenClaymoreUI(useItemUI);
-                break;
-            case "Deployment_Beacon":
-                menu.OpenDeploymentBeaconUI(useItemUI);
-                break;
-            case "Thermal_Camera":
-                menu.OpenThermalCamUI(useItemUI);
-                break;
             case "Poison_Satchel":
                 itemUsed.UseItem(linkedIcon, itemUsedOn, null);
-                break;
-            case "Grenade_Flashbang":
-            case "Grenade_Frag":
-            case "Grenade_Smoke":
-            case "Grenade_Tabun":
-                menu.OpenGrenadeUI(useItemUI);
                 break;
             case "Medikit_Small":
             case "Medikit_Medium":
             case "Medikit_Large":
-                itemUsed.UseItem(linkedIcon, null, soldierUsedOn);
-                break;
-            case "Riot_Shield":
-                menu.OpenRiotShieldUI(useItemUI);
-                break;
             case "Syringe_Amphetamine":
             case "Syringe_Androstenedione":
             case "Syringe_Cannabinoid":
@@ -2765,6 +2775,27 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Syringe_Trenbolone":
             case "Syringe_Unlabelled":
                 itemUsed.UseItem(linkedIcon, null, soldierUsedOn);
+                break;
+            case "Grenade_Flashbang":
+            case "Grenade_Frag":
+            case "Grenade_Smoke":
+            case "Grenade_Tabun":
+                menu.OpenGrenadeUI(useItemUI);
+                break;
+            case "Binoculars":
+                menu.OpenBinocularsUI(useItemUI);
+                break;
+            case "Claymore":
+                menu.OpenClaymoreUI(useItemUI);
+                break;
+            case "Deployment_Beacon":
+                menu.OpenDeploymentBeaconUI(useItemUI);
+                break;
+            case "Riot_Shield":
+                menu.OpenRiotShieldUI(useItemUI);
+                break;
+            case "Thermal_Camera":
+                menu.OpenThermalCamUI(useItemUI);
                 break;
             case "UHF_Radio":
                 menu.OpenUHFUI(useItemUI);
@@ -3108,22 +3139,38 @@ public class MainGame : MonoBehaviour, IDataPersistence
             menu.CloseDropUI();
         }
     }
+    public void ConfirmBinoculars(UseItemUI useBinoculars)
+    {
+        
+        TMP_InputField focusX = useBinoculars.transform.Find("OptionPanel").Find("FocusPosition").Find("XPos").GetComponent<TMP_InputField>();
+        TMP_InputField focusY = useBinoculars.transform.Find("OptionPanel").Find("FocusPosition").Find("YPos").GetComponent<TMP_InputField>();
+
+        if (menu.ValidateIntInput(focusX, out int x) && menu.ValidateIntInput(focusY, out int y))
+        {
+            useBinoculars.itemUsed.UseItem(useBinoculars.itemUsedIcon, useBinoculars.itemUsedOn, useBinoculars.soldierUsedOn);
+
+            //activeSoldier.SetUseBinoculars(useBinoculars.itemUsedFromSlotName);
+            activeSoldier.SetLosCheck($"losChange|binocularsActive|{useBinoculars.itemUsed.GetBinocularMode(useBinoculars.itemUsedFromSlotName)}"); //loscheck
+            Instantiate(poiManager.binocularStripPrefab).Init(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), Tuple.Create(x, y, activeSoldier.Id));
+
+            menu.CloseBinocularsUI();
+        }
+    }
     public void ConfirmClaymore(UseItemUI useClaymore)
     {
         TMP_InputField placedX = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField placedY = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField placedZ = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("ZPos").GetComponent<TMP_InputField>();
-        TMP_Dropdown terrainOn = useClaymore.transform.Find("OptionPanel").Find("ClaymorePlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
         TMP_InputField facingX = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField facingY = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
 
 
-        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy) && terrainOn.value != 0)
+        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy))
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                Instantiate(poiManager.claymorePrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id));
+                Instantiate(poiManager.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseClaymoreUI();
@@ -3137,9 +3184,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField placedX = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField placedY = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField placedZ = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("ZPos").GetComponent<TMP_InputField>();
-        TMP_Dropdown terrainOn = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
 
-        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && terrainOn.value != 0)
+        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z))
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
@@ -3147,7 +3193,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 soundManager.PlayUseDepBeacon();
 
                 useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
-                Instantiate(poiManager.deploymentBeaconPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), activeSoldier.Id);
+                Instantiate(poiManager.deploymentBeaconPrefab).Init(new(x, y, z), activeSoldier.Id);
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseDeploymentBeaconUI();
@@ -3161,18 +3207,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField placedX = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField placedY = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField placedZ = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("ZPos").GetComponent<TMP_InputField>();
-        TMP_Dropdown terrainOn = useThermalCam.transform.Find("OptionPanel").Find("CamPlacing").Find("Terrain").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
         TMP_InputField facingX = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField facingY = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("YPos").GetComponent<TMP_InputField>();
 
-        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy) && terrainOn.value != 0)
+        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy))
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 
                 SetLosCheckAll("losChange|thermalCamActive"); //loscheck all
-                Instantiate(poiManager.thermalCamPrefab).Init(Tuple.Create(new Vector3(x, y, z), terrainOn.captionText.text), Tuple.Create(fx, fy, activeSoldier.Id));
+                Instantiate(poiManager.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseThermalCamUI();

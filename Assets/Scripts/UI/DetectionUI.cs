@@ -12,10 +12,12 @@ public class DetectionUI : MonoBehaviour
     public List<SoldierAlertLOS> allSoldierDetectionAlerts;
     public List<ClaymoreAlertLOS> allClaymoreDetectionAlerts;
     public List<ThermalCamAlertLOS> allThermalCamDetectionAlerts;
+    public List<BinocularAlertLOS> allBinocularDetectionAlerts;
 
     public SoldierAlertLOS soldierAlertLOSPrefab;
     public ClaymoreAlertLOS claymoreAlertLosPrefab;
     public ThermalCamAlertLOS thermalCamAlertLosPrefab;
+    public BinocularAlertLOS binocularAlertLosPrefab;
 
     //los alerts soldiers
     public bool LOSAlertAlreadyExists(Soldier s1, Soldier s2)
@@ -204,7 +206,75 @@ public class DetectionUI : MonoBehaviour
 
 
 
-    
+
+    //binocular alerts
+    public bool LOSAlertBinocularAlreadyExists(BinocularBeam bb, Soldier s1)
+    {
+        foreach (BinocularAlertLOS alert in allBinocularDetectionAlerts)
+        {
+            if (alert.detector == bb.placedBy && alert.detectee == s1) //alert already exists
+                return true;
+        }
+        return false;
+    }
+    public BinocularAlertLOS ExistingBinocularLOSAlert(BinocularBeam bb, Soldier s1)
+    {
+        foreach (BinocularAlertLOS alert in allBinocularDetectionAlerts)
+        {
+            if (alert.detector == bb.placedBy && alert.detectee == s1) //alert already exists
+                return alert;
+        }
+        return null;
+    }
+    public BinocularAlertLOS CreateLOSAlertBinocular(BinocularBeam bb, Soldier s1)
+    {
+        //create and add to list
+        BinocularAlertLOS detectionAlert = Instantiate(binocularAlertLosPrefab, detectionAlertsPanel).Init(bb, s1);
+        allBinocularDetectionAlerts.Add(detectionAlert);
+
+        //try to open detectionUI
+        menu.StartCoroutine(menu.OpenDetectionAlertUI());
+
+        return detectionAlert;
+    }
+    public void LOSAlertBinocularSoldierStart(BinocularBeam bb, Soldier detectee)
+    {
+        BinocularAlertLOS detectionAlert;
+        if (LOSAlertBinocularAlreadyExists(bb, detectee))
+            detectionAlert = ExistingBinocularLOSAlert(bb, detectee);
+        else
+            detectionAlert = CreateLOSAlertBinocular(bb, detectee);
+
+        //update alert
+        detectionAlert.entered = true;
+        detectionAlert.UpdateStartBoundary();
+        detectionAlert.UpdateLabel();
+    }
+    public void LOSAlertBinocularSoldierStay(BinocularBeam bb, Soldier detectee)
+    {
+        BinocularAlertLOS detectionAlert;
+        if (LOSAlertBinocularAlreadyExists(bb, detectee))
+            detectionAlert = ExistingBinocularLOSAlert(bb, detectee);
+        else
+            detectionAlert = CreateLOSAlertBinocular(bb, detectee);
+
+        //update alert
+        detectionAlert.UpdateEndBoundary();
+        detectionAlert.UpdateLabel();
+    }
+    public void LOSAlertBinocularSoldierEnd(BinocularBeam bb, Soldier detectee)
+    {
+        BinocularAlertLOS detectionAlert;
+        if (LOSAlertBinocularAlreadyExists(bb, detectee))
+            detectionAlert = ExistingBinocularLOSAlert(bb, detectee);
+        else
+            detectionAlert = CreateLOSAlertBinocular(bb, detectee);
+
+        //update alert
+        detectionAlert.exited = true;
+        detectionAlert.UpdateEndBoundary();
+        detectionAlert.UpdateLabel();
+    }
     //clear alerts
     public void ClearAllAlerts()
     {
@@ -215,10 +285,13 @@ public class DetectionUI : MonoBehaviour
             Destroy(alert.gameObject);
         foreach (ThermalCamAlertLOS alert in allThermalCamDetectionAlerts)
             Destroy(alert.gameObject);
+        foreach (BinocularAlertLOS alert in allBinocularDetectionAlerts)
+            Destroy(alert.gameObject);
 
         //clear lists
         allSoldierDetectionAlerts.Clear();
         allClaymoreDetectionAlerts.Clear();
         allThermalCamDetectionAlerts.Clear();
+        allBinocularDetectionAlerts.Clear();
     }
 }
