@@ -3148,10 +3148,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (menu.ValidateIntInput(focusX, out int x) && menu.ValidateIntInput(focusY, out int y))
         {
             useBinoculars.itemUsed.UseItem(useBinoculars.itemUsedIcon, useBinoculars.itemUsedOn, useBinoculars.soldierUsedOn);
-
-            //activeSoldier.SetUseBinoculars(useBinoculars.itemUsedFromSlotName);
-            activeSoldier.SetLosCheck($"losChange|binocularsActive|{useBinoculars.itemUsed.GetBinocularMode(useBinoculars.itemUsedFromSlotName)}"); //loscheck
-            Instantiate(poiManager.binocularStripPrefab).Init(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), Tuple.Create(x, y, activeSoldier.Id));
+            string useMode = useBinoculars.itemUsed.GetBinocularMode(useBinoculars.itemUsedFromSlotName);
+            StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), useMode));
 
             menu.CloseBinocularsUI();
         }

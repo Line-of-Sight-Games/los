@@ -32,12 +32,12 @@ public class BinocularBeamTriggerCollider : SoldierTriggerCollider
                 Soldier detector = LinkedSoldier;
                 Soldier detectee = soldierThatEntered.LinkedSoldier;
 
-                //flag that the soldier is within the collider
-                if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
-                    detector.soldiersWithinAnyCollider.Add(detectee.Id);
-
                 if (detector.IsOppositeTeamAs(detectee))
                 {
+                    //flag that the soldier is within the collider
+                    if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
+                        detector.soldiersWithinAnyCollider.Add(detectee.Id);
+
                     if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                     {
                         menu.detectionUI.LOSAlertSoldierSoldierStart(detector, detectee, DetermineDetecteeLabel(detector, detectee));
@@ -72,13 +72,13 @@ public class BinocularBeamTriggerCollider : SoldierTriggerCollider
                 Soldier detector = LinkedSoldier;
                 Soldier detectee = soldierThatStayed.LinkedSoldier;
 
-                //flag that the soldier is within the collider
-                if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
-                    detector.soldiersWithinAnyCollider.Add(detectee.Id);
-
-                if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
+                if (detector.IsOppositeTeamAs(detectee))
                 {
-                    if (detector.IsOppositeTeamAs(detectee))
+                    //flag that the soldier is within the collider
+                    if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
+                        detector.soldiersWithinAnyCollider.Add(detectee.Id);
+
+                    if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                     {
                         menu.detectionUI.LOSAlertSoldierSoldierStay(detector, detectee, DetermineDetecteeLabel(detector, detectee));
                         print($"{soldierThatStayed.LinkedSoldier.soldierName} stayed in the binocular beam of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatStayed)}");
@@ -112,13 +112,13 @@ public class BinocularBeamTriggerCollider : SoldierTriggerCollider
                 Soldier detector = LinkedSoldier;
                 Soldier detectee = soldierThatExited.LinkedSoldier;
 
-                if (detector.soldiersWithinAnyCollider.Contains(detectee.Id))
+                if (detector.IsOppositeTeamAs(detectee))
                 {
-                    detector.soldiersWithinAnyCollider.Remove(detectee.Id); //flag that the soldier has left the collider
-
-                    if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
+                    if (detector.soldiersWithinAnyCollider.Contains(detectee.Id))
                     {
-                        if (detector.IsOppositeTeamAs(detectee))
+                        detector.soldiersWithinAnyCollider.Remove(detectee.Id); //flag that the soldier has left the collider
+
+                        if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                         {
                             menu.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, DetermineDetecteeLabel(detector, detectee));
                             print($"{soldierThatExited.LinkedSoldier.soldierName} exited the binocular beam of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");

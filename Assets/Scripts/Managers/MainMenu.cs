@@ -7,6 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -48,7 +49,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public float turnTime;
     public string meleeChargeIndicator;
     public Soldier activeSoldier;
-    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
+    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite fist, explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
     public Color normalTextColour = new(0.196f, 0.196f, 0.196f);
@@ -1795,7 +1796,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         print("triggered");
         //wait for everything else to resolve
-        yield return new WaitUntil(() => MovementResolvedFlag() && explosionResolvedFlag && shotResolvedFlag && meleeResolvedFlag && inspirerResolvedFlag);
+        yield return new WaitUntil(() => MovementResolvedFlag() && explosionResolvedFlag && shotResolvedFlag && meleeResolvedFlag && inspirerResolvedFlag && binocularsFlashResolvedFlag);
         print("opening");
         CloseSoldierStatsUI();
 
@@ -1834,6 +1835,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //play detection alarm sfx
             soundManager.PlayDetectionAlarm();
         }
+        else
+            ConfirmDetections(); //required to kill los flags if no alerts actually appear
     }
     public void CloseGMAlertDetectionUI()
     {
@@ -1971,10 +1974,33 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     Soldier counter = sAlert.s2;
 
                     //do checks for s1 (detector)(left side)
-                    //if not a glimpse or a retreat detection, soldier has ended in SR
-                    if (!sAlert.s1Label.text.Contains("GLIMPSE") && !sAlert.s1Label.text.Contains("RETREAT"))
+                    if (sAlert.s1Label.text.Contains("GLIMPSE") || sAlert.s1Label.text.Contains("RETREAT") || counter.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
                     {
-                        if (sAlert.s1Toggle.isOn == true)
+                        allSoldiersNotRevealingOutOfSR[counter.Id].Add(detector.Id);
+
+                        if (sAlert.s1Toggle.isOn == true) //LOS paid
+                        {
+                            if (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH")) //detection
+                            {
+                                //create the glimpse alert for team
+                                AddLosGlimpseAlert(detector, sAlert.s1Label.text);
+                                StartCoroutine(OpenLostLOSList());
+
+                                //check for overwatch shot
+                                if (sAlert.s1Label.text.Contains("OVERWATCH"))
+                                    StartCoroutine(OpenOverwatchShotUI(counter, detector));
+
+                                //pay xp for binoc detection (only if it's a "new" detection)
+                                if (counter.IsUsingBinocularsInFlashMode() && !counter.losToTheseSoldiersAndRevealingList.Contains(detector.Id))
+                                    AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars.", true);
+                            }
+                            else //avoidance
+                                AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
+                        }
+                    }
+                    else //if it's a standard SR alert
+                    {
+                        if (sAlert.s1Toggle.isOn == true) //paid by GM
                         {
                             if (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH"))
                             {
@@ -1984,33 +2010,45 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 if (sAlert.s1Label.text.Contains("OVERWATCH"))
                                     StartCoroutine(OpenOverwatchShotUI(counter, detector));
                             }
-                            else
+                            else //avoidance
                             {
                                 allSoldiersNotRevealingHidden[counter.Id].Add(detector.Id);
-
-                                //check for xp
-                                AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true);
+                                AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
                             }
-
-                            //check for xp
-                            if (detector.ActiveC > 2)
-                                AddXpAlert(counter, detector.ActiveC + counter.ShadowXpBonus(detector.IsRevoker()), $"Detected soldier ({detector.soldierName}) with C > 2.", true);
                         }
                         else
                             allSoldiersNotRevealingNoLos[counter.Id].Add(detector.Id);
-                    }
-                    else
-                    {
-                        allSoldiersNotRevealingOutOfSR[counter.Id].Add(detector.Id);
-                        AddLosGlimpseAlert(detector, sAlert.s1Label.text);
-                        StartCoroutine(OpenLostLOSList());
+                        
                     }
 
                     //do checks for s2 (counter)(right side)
-                    //if not a glimpse or a retreat detection, add soldier to revealing list
-                    if (!sAlert.s2Label.text.Contains("GLIMPSE") && !sAlert.s2Label.text.Contains("RETREAT"))
+                    if (sAlert.s2Label.text.Contains("GLIMPSE") || sAlert.s2Label.text.Contains("RETREAT") || detector.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
                     {
-                        if (sAlert.s2Toggle.isOn == true)
+                        allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
+
+                        if (sAlert.s2Toggle.isOn == true) //LOS paid
+                        {
+                            if (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH")) //detection
+                            {
+                                //create glimpse alert for team
+                                AddLosGlimpseAlert(counter, sAlert.s2Label.text);
+                                StartCoroutine(OpenLostLOSList());
+
+                                //check for overwatch shot
+                                if (sAlert.s2Label.text.Contains("OVERWATCH"))
+                                    StartCoroutine(OpenOverwatchShotUI(detector, counter));
+
+                                //pay xp for binoc detection (only if it's a "new" detection)
+                                if (detector.IsUsingBinocularsInFlashMode() && !detector.losToTheseSoldiersAndRevealingList.Contains(counter.Id))
+                                    AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars.", true);
+                            }
+                            else //avoidance
+                                AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
+                        }
+                    }
+                    else //if it's a standard SR alert
+                    {
+                        if (sAlert.s2Toggle.isOn == true) //LOS paid
                         {
                             if (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH"))
                             {
@@ -2029,18 +2067,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         else
                             allSoldiersNotRevealingNoLos[detector.Id].Add(counter.Id);
                     }
-                    else
-                    {
-                        AddLosGlimpseAlert(counter, sAlert.s2Label.text);
-                        StartCoroutine(OpenLostLOSList());
-                        allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
-                    }
 
-                    //if soldier was paid revealed either by glimpse or in SR and has c > 2 xp check
+                    //if detector revealed either by glimpse or in SR a soldier with c > 2 xp check
                     if (sAlert.s2Toggle.isOn == true && (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH")))
                     {
                         if (counter.ActiveC > 2)
                             AddXpAlert(detector, counter.ActiveC + detector.ShadowXpBonus(counter.IsRevoker()), $"Detected soldier ({counter.soldierName}) with C > 2.", true); //xp
+                    }
+
+                    //if counter revealed either by glimpse or in SR a soldier with c > 2 xp check
+                    if (sAlert.s1Toggle.isOn == true && (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH")))
+                    {
+                        if (detector.ActiveC > 2)
+                            AddXpAlert(counter, detector.ActiveC + counter.ShadowXpBonus(detector.IsRevoker()), $"Detected soldier ({detector.soldierName}) with C > 2.", true); //xp
                     }
                 }
                 else if (child.GetComponent<ClaymoreAlertLOS>() != null)
@@ -2133,14 +2172,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     s.AddSoldierRevealingThisSoldier(soldierRevealingThisSoldier);
 
                 s.UnsetLosCheck(); //clear the losCheck trigger
-            }
 
-            //only close the detectionUI if it's open
-            if (detectionUI.gameObject.activeInHierarchy)
-            {
-                detectionUI.ClearAllAlerts();
-                CloseDetectionUI();
+                //deactivate flash mode binoculars
+                if (s.IsUsingBinocularsInFlashMode())
+                    s.UnsetUsingBinoculars();
             }
+            
+            //close detection UI
+            CloseDetectionUI();
         }
         else
             print("Haven't scrolled all the way to the bottom");
@@ -2148,6 +2187,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void CloseDetectionUI()
     {
         SetDetectionResolvedFlagTo(true);
+        detectionUI.ClearAllAlerts();
         detectionUI.gameObject.SetActive(false);
     }
     public void AddLostLosAlert(Soldier soldier)

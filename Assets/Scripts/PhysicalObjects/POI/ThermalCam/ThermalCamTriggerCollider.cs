@@ -14,12 +14,12 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
                     Soldier detector = LinkedThermalCamera.placedBy;
                     Soldier detectee = soldierThatEntered.LinkedSoldier;
 
-                    //flag that the soldier is within the collider
-                    if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
-                        detector.soldiersWithinAnyCollider.Add(detectee.Id);
-
                     if (detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
                     {
+                        //flag that the soldier is within the collider
+                        if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
+                            detector.soldiersWithinAnyCollider.Add(detectee.Id);
+
                         if (detectee.losCheck && (detectee.causeOfLosCheck.Contains("move") || detectee.causeOfLosCheck.Contains("thermalCam"))) //only trigger if a change has happened and it's a move or the placement of the cam
                         {
                             menu.detectionUI.LOSAlertThermalCamSoldierStart(LinkedThermalCamera, detectee);
@@ -41,12 +41,12 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
                     Soldier detector = LinkedThermalCamera.placedBy;
                     Soldier detectee = soldierThatStayed.LinkedSoldier;
 
-                    //flag that the soldier is within the collider
-                    if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
-                        detector.soldiersWithinAnyCollider.Add(detectee.Id);
-
                     if (detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
                     {
+                        //flag that the soldier is within the collider
+                        if (!detector.soldiersWithinAnyCollider.Contains(detectee.Id))
+                            detector.soldiersWithinAnyCollider.Add(detectee.Id);
+
                         if (detectee.losCheck && (detectee.causeOfLosCheck.Contains("move") || detectee.causeOfLosCheck.Contains("thermalCam"))) //only trigger if a change has happened and it's a move or the placement of the cam
                         {
                             menu.detectionUI.LOSAlertThermalCamSoldierStay(LinkedThermalCamera, detectee);
@@ -68,15 +68,17 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
                     Soldier detector = LinkedThermalCamera.placedBy;
                     Soldier detectee = soldierThatExited.LinkedSoldier;
 
-                    //flag that the soldier has left the collider
-                    detector.soldiersWithinAnyCollider.Remove(detectee.Id);
-
                     if (detectee.IsOppositeTeamAs(LinkedThermalCamera.placedBy))
                     {
-                        if (detectee.losCheck && (detectee.causeOfLosCheck.Contains("move") || detectee.causeOfLosCheck.Contains("thermalCam"))) //only trigger if a change has happened and it's a move or the placement of the cam
+                        if (detector.soldiersWithinAnyCollider.Contains(detectee.Id))
                         {
-                            menu.detectionUI.LOSAlertThermalCamSoldierEnd(LinkedThermalCamera, detectee);
-                            print($"{soldierThatExited.LinkedSoldier.soldierName} exited the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatExited)}");
+                            detector.soldiersWithinAnyCollider.Remove(detectee.Id); //flag that the soldier has left the collider
+
+                            if (detectee.losCheck && (detectee.causeOfLosCheck.Contains("move") || detectee.causeOfLosCheck.Contains("thermalCam"))) //only trigger if a change has happened and it's a move or the placement of the cam
+                            {
+                                menu.detectionUI.LOSAlertThermalCamSoldierEnd(LinkedThermalCamera, detectee);
+                                print($"{soldierThatExited.LinkedSoldier.soldierName} exited the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatExited)}");
+                            }
                         }
                     }
                 }

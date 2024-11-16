@@ -19,8 +19,8 @@ public class SRMinRadiusCollider : SoldierTriggerCollider
         {
             if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
             {
-                SafeAddToList(soldierThatEntered.LinkedSoldier);
-                print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
+                if (LinkedSoldier.IsOppositeTeamAs(soldierThatEntered.LinkedSoldier))
+                    SafeAddToList(soldierThatEntered.LinkedSoldier);
             }
         }
     }
@@ -30,8 +30,8 @@ public class SRMinRadiusCollider : SoldierTriggerCollider
         {
             if (bodyThatStayed.TryGetComponent(out SoldierBodyCollider soldierThatStayed))
             {
-                SafeAddToList(soldierThatStayed.LinkedSoldier);
-                print($"{soldierThatStayed.LinkedSoldier.soldierName} stayed in the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatStayed)}");
+                if (LinkedSoldier.IsOppositeTeamAs(soldierThatStayed.LinkedSoldier))
+                    SafeAddToList(soldierThatStayed.LinkedSoldier);
             }
         }
     }
@@ -41,8 +41,8 @@ public class SRMinRadiusCollider : SoldierTriggerCollider
         {
             if (bodyThatExited.TryGetComponent(out SoldierBodyCollider soldierThatExited))
             {
-                RemoveFromList(soldierThatExited.LinkedSoldier);
-                print($"{soldierThatExited.LinkedSoldier.soldierName} exited the SRMinRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
+                if (LinkedSoldier.IsOppositeTeamAs(soldierThatExited.LinkedSoldier))
+                    RemoveFromList(soldierThatExited.LinkedSoldier);
             }
         }
     }

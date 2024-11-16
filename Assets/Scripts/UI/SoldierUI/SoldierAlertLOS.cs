@@ -14,6 +14,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public Soldier s1;
     public TextMeshProUGUI s1Label, s1StartBoundary, s1EndBoundary;
     public SoldierPortrait s1Portrait;
+    public GameObject s1BinocularImage;
     public Toggle s1Toggle;
 
     public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, nullArrow;
@@ -23,6 +24,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public Soldier s2;
     public TextMeshProUGUI s2Label, s2StartBoundary, s2EndBoundary;
     public SoldierPortrait s2Portrait;
+    public GameObject s2BinocularImage;
     public Toggle s2Toggle;
 
     public GameObject causeOfLosCheckDetectorObject;
@@ -51,7 +53,11 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         causeOfLosCheckDetector.text = $"{s1.causeOfLosCheck}";
         causeOfLosCheckCounter.text = $"{s2.causeOfLosCheck}";
         s1Portrait.Init(s1);
-        s2Portrait.Init(s2);  
+        s2Portrait.Init(s2);
+        if (s1.IsUsingBinoculars())
+            s1BinocularImage.SetActive(true);
+        if (s2.IsUsingBinoculars())
+            s2BinocularImage.SetActive(true);
     }
     public void UpdateS1Label(string label)
     {
@@ -188,20 +194,8 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     }
     public void UpdateToggles()
     {
-        //no physical change to los
-        if (!s1.causeOfLosCheck.Contains("losChange") && !s2.causeOfLosCheck.Contains("losChange"))
+        if (!s1.causeOfLosCheck.Contains("losChange") && !s2.causeOfLosCheck.Contains("losChange")) //no physical change to los at all
         {
-            //s2 toggle
-            if (s1.SoldiersOutOfSR.Contains(s2.Id) || s1.NoLOSToTheseSoldiers.Contains(s2.Id))
-            {
-                s2Toggle.interactable = false;
-            }
-            else if (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))
-            {
-                s2Toggle.isOn = true;
-                s2Toggle.interactable = false;
-            }
-
             //s1 toggle
             if (s2.SoldiersOutOfSR.Contains(s1.Id) || s2.NoLOSToTheseSoldiers.Contains(s1.Id))
             {
@@ -212,23 +206,38 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
+            else
+                s1Toggle.interactable = true;
+
+            //s2 toggle
+            if (s1.SoldiersOutOfSR.Contains(s2.Id) || s1.NoLOSToTheseSoldiers.Contains(s2.Id))
+            {
+                s2Toggle.interactable = false;
+            }
+            else if (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))
+            {
+                s2Toggle.isOn = true;
+                s2Toggle.interactable = false;
+            }
+            else
+                s2Toggle.interactable = true;
         }
         else
         {
             //locking options for s1 toggle
-            if (s1Label.text.Equals("OUT OF SR"))
+            if (s1Label.text.Equals("OUT OF SR")) //s1 is out of s2 SR
                 s1Toggle.interactable = false;
-            else if (s2.trenXRayEffect)
+            else if (s2.trenXRayEffect) //s2 has xray effect
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
-            else if (s1Label.text.Contains("RETREAT DETECT") && s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id))
+            else if (LabelIndicatesDetectOrOverwatch(s1Label) && s1Label.text.Contains("RETREAT") && s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id)) //s1 was detected leaving s2 SR and was previously revealed
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
-            else if (s1Label.text.Contains("RETREAT AVOID") && s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))
+            else if (LabelIndicatesAvoidance(s1Label) && s1Label.text.Contains("RETREAT") && s2.LOSToTheseSoldiersButHidden.Contains(s1.Id)) //s1 avoided while leaving s2 SR and was previously hidden
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
@@ -237,19 +246,19 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s1Toggle.interactable = true;
 
             //locking options for s2 toggle
-            if (s2Label.text.Equals("OUT OF SR"))
+            if (s2Label.text.Equals("OUT OF SR")) //s2 out of s1 SR
                 s2Toggle.interactable = false;
-            else if (s1.trenXRayEffect)
+            else if (s1.trenXRayEffect) //s1 has xray effect
             {
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
-            else if (s2Label.text.Contains("RETREAT DETECT") && s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id))
+            else if (LabelIndicatesDetectOrOverwatch(s2Label) && s2Label.text.Contains("RETREAT") && s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id)) //s2 was detected leaving s1 SR and was previously revealed
             {
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
-            else if (s2Label.text.Contains("RETREAT AVOID") && s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))
+            else if (LabelIndicatesAvoidance(s2Label) && s2Label.text.Contains("RETREAT") && s1.LOSToTheseSoldiersButHidden.Contains(s2.Id)) //s2 avoided while leaving s1 SR and was previously hidden
             {
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
@@ -257,6 +266,18 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             else
                 s2Toggle.interactable = true;
         }
+    }
+    public bool LabelIndicatesDetectOrOverwatch(TextMeshProUGUI label)
+    {
+        if (label.text.Contains("DETECT") || s2Label.text.Contains("OVERWATCH"))
+            return true;
+        return false;
+    }
+    public bool LabelIndicatesAvoidance(TextMeshProUGUI label)
+    {
+        if (label.text.Contains("AVOID"))
+            return true;
+        return false;
     }
 
     //pointer hover functions

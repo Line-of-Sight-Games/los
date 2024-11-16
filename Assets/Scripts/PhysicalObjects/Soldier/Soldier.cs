@@ -25,7 +25,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, stunnedTurnsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
-    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId;
     public Statline stats;
     public Inventory inventory;
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
@@ -172,6 +172,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "trenSRShrinkEffect", trenSRShrinkEffect },
             { "riotXPoint", riotXPoint },
             { "riotYPoint", riotYPoint },
+            { "binocularBeamId", binocularBeamId },
 
             //save ability details
             { "plannerDonatedMove", plannerDonatedMove },
@@ -278,6 +279,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         trenSRShrinkEffect = (bool)details["trenSRShrinkEffect"];
         riotXPoint = Convert.ToInt32(details["riotXPoint"]);
         riotYPoint = Convert.ToInt32(details["riotYPoint"]);
+        binocularBeamId = (string)details["binocularBeamId"];
 
         //load ability details
         plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);
@@ -2837,7 +2839,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         losCheck = true;
         this.causeOfLosCheck = causeOfLosCheck;
-        //actual check will run from collider change
     }
     public void UnsetLosCheck()
     {
@@ -3549,6 +3550,50 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (Inventory.HasItemOfType("Logistics_Belt"))
             return true;
         return false;
+    }
+    public bool IsUsingBinoculars()
+    {
+        if (!binocularBeamId.Equals(string.Empty))
+            return true;
+        return false;
+    }
+    public bool IsUsingBinocularsInFlashMode()
+    {
+        if (IsUsingBinoculars() && binocularBeamId.Split('|')[1].Equals("Flash"))
+            return true;
+        return false;
+    }
+    public bool IsUsingBinocularsInReconMode()
+    {
+        if (IsUsingBinoculars() && binocularBeamId.Split('|')[1].Equals("Recon"))
+            return true;
+        return false;
+    }
+    public IEnumerator SetUsingBinoculars(Vector2 xy, string mode)
+    {
+        BinocularBeam binocularBeam = Instantiate(menu.poiManager.binocularStripPrefab).Init(new(X, Y, Z), Tuple.Create((int)xy.x, (int)xy.y, Id));
+        binocularBeamId = $"{binocularBeam.Id}|{mode}";
+
+        if (IsUsingBinocularsInFlashMode())
+            menu.binocularsFlashResolvedFlag = false;
+
+        SetLosCheck($"losChange|statChange(P)|binocularsActive|{mode}"); //losCheck
+
+        yield return new WaitForSeconds(1.5f);
+
+        if (IsUsingBinocularsInFlashMode())
+        {
+            menu.binocularsFlashResolvedFlag = true;
+            UnsetUsingBinoculars();
+        }
+            
+    }
+    public void UnsetUsingBinoculars()
+    {
+        menu.poiManager.DestroyPOI(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]));
+        binocularBeamId = string.Empty;
+
+        SetLosCheck("losChange|statChange(P)|binocularsDeactive"); //losCheck
     }
     public bool IsValidLoadout()
     {
