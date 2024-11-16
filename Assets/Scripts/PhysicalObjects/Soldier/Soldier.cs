@@ -3583,14 +3583,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (IsUsingBinocularsInFlashMode())
         {
+            menu.poiManager.DestroyPOI(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]));
             menu.binocularsFlashResolvedFlag = true;
-            UnsetUsingBinoculars();
         }
             
     }
     public void UnsetUsingBinoculars()
     {
-        menu.poiManager.DestroyPOI(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]));
         binocularBeamId = string.Empty;
 
         SetLosCheck("losChange|statChange(P)|binocularsDeactive"); //losCheck

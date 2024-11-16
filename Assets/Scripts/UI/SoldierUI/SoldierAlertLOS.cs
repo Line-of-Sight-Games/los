@@ -232,12 +232,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
-            else if (LabelIndicatesDetectOrOverwatch(s1Label) && s1Label.text.Contains("RETREAT") && s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id)) //s1 was detected leaving s2 SR and was previously revealed
-            {
-                s1Toggle.isOn = true;
-                s1Toggle.interactable = false;
-            }
-            else if (LabelIndicatesAvoidance(s1Label) && s1Label.text.Contains("RETREAT") && s2.LOSToTheseSoldiersButHidden.Contains(s1.Id)) //s1 avoided while leaving s2 SR and was previously hidden
+            else if ( s1Label.text.Contains("RETREAT") && (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))) //s1 was detected or avoided leaving s2 SR and had LOS pre-approved
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
@@ -253,12 +248,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
-            else if (LabelIndicatesDetectOrOverwatch(s2Label) && s2Label.text.Contains("RETREAT") && s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id)) //s2 was detected leaving s1 SR and was previously revealed
-            {
-                s2Toggle.isOn = true;
-                s2Toggle.interactable = false;
-            }
-            else if (LabelIndicatesAvoidance(s2Label) && s2Label.text.Contains("RETREAT") && s1.LOSToTheseSoldiersButHidden.Contains(s2.Id)) //s2 avoided while leaving s1 SR and was previously hidden
+            else if (s2Label.text.Contains("RETREAT") && (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))) //s2 was detected or avoided leaving s1 SR and had LOS pre-approved
             {
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
