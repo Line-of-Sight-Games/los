@@ -104,7 +104,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		"Smoke","Grenade","Frag","Tabun","Flashbang","Knife","Riot Shield","Binoculars","Deployment","Beacon","Etool","E tool","E-tool","Suppressor","Thermal","Camera","ULF","UHF","Radio",
 		"Backpack","Bag","Brace","Belt","Logistics","Poison","Satchel","Syringe","Garand","Carbine","Arisaka","ACOG-FAL","ACOGFAL","ACOGFAL","AK","LSW","SAW","Intervention","Barrett",
 		"Dragunov","Thompson","UMP","SPAS","Ithaca","Olympus","Glock","Sidearm","Magnum","Rifle","MG","LMG","Sniper","Shotgun","SMG","Recruit","Private","Lieutenant","Sergeant","Corporal",
-		"Captain","Major","Colonel","Brigadier","General","Commander","Spartan","Survivor","Runner","Evader","Assassin","Reservist","Brawler","Seeker","Chameleon","Scout","Leadership","Health","Resilience",
+		"Captain","Major","Colonel","Brigadier","General","Commander","Spartan","Survivor","Runner","Evader","Assassin","Seeker","Chameleon","Scout","Leadership","Health","Resilience",
 		"Speed","Evasion","Fight","Perception","Camouflage","Sightradius","Meleed","Melee","Infantryman","Operator","Earthquake","Hunter","Cyclone","Hammer","Wolf","Strength","Diplomacy",
 		"Electronics","Healing","Hercules","Diplomat","Technician","Medic","Jesus","Heyzeus","Allah","Alah","Alla","Ala","Asspipe","Niga","Nigga","Adept","Aficionado","Avenger","Exactor",
 		"Masochist","Bull","Colossus","Calculator","Daredevil","Spider","Dissuader","Chemist","Brawler","Pugilist","Guardsman","Sentinel","Gunner","Cannoneer","Ghost","Informer","Double Agent",

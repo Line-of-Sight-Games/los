@@ -118,7 +118,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         { "Survivor (R)", "Resilience", "R"},
         { "Runner (S)", "Speed", "S" },
         { "Evader (E)", "Evasion", "E" },
-        { "Reservist (F)", "Fight", "F" },
+        { "Assassin (F)", "Fight", "F" },
         { "Seeker (P)", "Perceptiveness", "P" },
         { "Chameleon (C)", "Camouflage", "C" },
         { "Scout (SR)", "Sight Radius", "SR" },
