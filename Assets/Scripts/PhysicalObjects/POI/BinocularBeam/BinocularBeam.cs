@@ -9,6 +9,8 @@ public class BinocularBeam : POI, IDataPersistence
     public int facingX, facingY;
     public float beamHeight, beamWidth;
     public Beam beam;
+    public bool flashMode;
+    public int turnsActive;
 
     private void Start()
     {
@@ -21,7 +23,7 @@ public class BinocularBeam : POI, IDataPersistence
     {
         placedBy = menu.soldierManager.FindSoldierById(placedById);
     }
-    public BinocularBeam Init(Vector3 location, Tuple<int, int, string> otherDetails)
+    public BinocularBeam Init(Vector3 location, Tuple<int, int, int, string> otherDetails, string mode)
     {
         id = GenerateGuid();
         poiType = "binocularBeam";
@@ -32,12 +34,17 @@ public class BinocularBeam : POI, IDataPersistence
 
         facingX = otherDetails.Item1;
         facingY = otherDetails.Item2;
-        placedById = otherDetails.Item3;
+        turnsActive = otherDetails.Item3;
+        placedById = otherDetails.Item4;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
         beamHeight = game.maxZ;
         beamWidth = GetBeamSize();
         beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, 0)), beamHeight, beamWidth);
+
+        //set flash mode
+        if (mode.Equals("Flash"))
+            flashMode = true;
 
         return this;
     }
@@ -54,6 +61,7 @@ public class BinocularBeam : POI, IDataPersistence
 
             facingX = Convert.ToInt32(details["facingX"]);
             facingY = Convert.ToInt32(details["facingY"]);
+            turnsActive = Convert.ToInt32(details["turnsActive"]);
             placedById = (string)details["placedById"];
             beamHeight = Convert.ToInt32(details["beamHeight"]);
             beamWidth = Convert.ToInt32(details["beamWidth"]);
@@ -72,6 +80,7 @@ public class BinocularBeam : POI, IDataPersistence
             { "z", z },
             { "facingX", facingX },
             { "facingY", facingY },
+            { "turnsActive", turnsActive },
             { "placedById", placedById },
             { "beamHeight", beamHeight },
             { "beamWidth", beamWidth },

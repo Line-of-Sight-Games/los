@@ -410,6 +410,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (s.loudActionTurnsVulnerable == 0)
                     s.UnsetLoudRevealed();
             }
+
+            //increment recon binoculars
+            if (s.IsUsingBinocularsInReconMode())
+            {
+                if (poiManager.FindPOIById(s.binocularBeamId.Split("|")[0]) is BinocularBeam binocBeam)
+                    binocBeam.turnsActive++;
+            }
         }
 
         menu.CheckXP();

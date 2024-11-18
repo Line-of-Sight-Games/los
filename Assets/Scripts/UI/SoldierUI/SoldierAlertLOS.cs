@@ -282,7 +282,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     }
     public bool LabelIndicatesDetectOrOverwatch(TextMeshProUGUI label)
     {
-        if (label.text.Contains("DETECT") || s2Label.text.Contains("OVERWATCH"))
+        if (label.text.Contains("DETECT") || label.text.Contains("OVERWATCH"))
             return true;
         return false;
     }

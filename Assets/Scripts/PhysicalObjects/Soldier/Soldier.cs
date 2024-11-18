@@ -3571,22 +3571,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public IEnumerator SetUsingBinoculars(Vector2 xy, string mode)
     {
-        BinocularBeam binocularBeam = Instantiate(menu.poiManager.binocularStripPrefab).Init(new(X, Y, Z), Tuple.Create((int)xy.x, (int)xy.y, Id));
+        BinocularBeam binocularBeam = Instantiate(menu.poiManager.binocularStripPrefab).Init(new(X, Y, Z), Tuple.Create((int)xy.x, (int)xy.y, 0, Id), mode);
         binocularBeamId = $"{binocularBeam.Id}|{mode}";
 
-        if (IsUsingBinocularsInFlashMode())
-            menu.binocularsFlashResolvedFlag = false;
-
+        menu.binocularsFlashResolvedFlag = false;
         SetLosCheck($"losChange|statChange(P)|binocularsActive|{mode}"); //losCheck
 
         yield return new WaitForSeconds(1.5f);
 
+        menu.binocularsFlashResolvedFlag = true;
         if (IsUsingBinocularsInFlashMode())
-        {
             menu.poiManager.DestroyPOI(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]));
-            menu.binocularsFlashResolvedFlag = true;
-        }
-            
     }
     public void UnsetUsingBinoculars()
     {
@@ -4389,6 +4384,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return ulfState;
     }
+    public string GetBinocsState()
+    {
+        string binocsState = "";
+
+        if (IsUsingBinocularsInFlashMode())
+            binocsState += ", <color=green>Binoculars(Flash)</color>";
+        else if (IsUsingBinocularsInReconMode())
+        {
+            binocsState += $", <color=green>Binoculars(Recon)(+{(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).turnsActive / 2})</color>";
+        }
+
+        return binocsState;
+    }
     public string GetPlannerBuffState()
     {
         if (plannerDonatedMove > 0)
@@ -4455,6 +4463,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetTabunedState();
             status += GetDrugState();
             status += GetULFState();
+            status += GetBinocsState();
 
             status += GetPlannerBuffState();
             status += GetPatriotState();

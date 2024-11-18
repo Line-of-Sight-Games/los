@@ -5,11 +5,11 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
     public ThermalCamera linkedThermalCam;
     public void OnTriggerEnter(Collider colliderThatEntered)
     {
-        if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
+        if (LinkedThermalCamera.placedBy != null)
         {
-            if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
+            if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))
             {
-                if (LinkedThermalCamera.placedBy != null)
+                if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
                 {
                     Soldier detector = LinkedThermalCamera.placedBy;
                     Soldier detectee = soldierThatEntered.LinkedSoldier;
@@ -32,11 +32,11 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
     }
     public void OnTriggerStay(Collider colliderThatStayed)
     {
-        if (IsValidBodyCollision(colliderThatStayed, out BaseBodyCollider bodyThatStayed))
+        if (LinkedThermalCamera.placedBy != null)
         {
-            if (bodyThatStayed.TryGetComponent(out SoldierBodyCollider soldierThatStayed))
+            if (IsValidBodyCollision(colliderThatStayed, out BaseBodyCollider bodyThatStayed))
             {
-                if (LinkedThermalCamera.placedBy != null)
+                if (bodyThatStayed.TryGetComponent(out SoldierBodyCollider soldierThatStayed))
                 {
                     Soldier detector = LinkedThermalCamera.placedBy;
                     Soldier detectee = soldierThatStayed.LinkedSoldier;
@@ -59,11 +59,11 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
     }
     public void OnTriggerExit(Collider colliderThatExited)
     {
-        if (IsValidBodyCollision(colliderThatExited, out BaseBodyCollider bodyThatExited))
+        if (LinkedThermalCamera.placedBy != null)
         {
-            if (bodyThatExited.TryGetComponent(out SoldierBodyCollider soldierThatExited))
+            if (IsValidBodyCollision(colliderThatExited, out BaseBodyCollider bodyThatExited))
             {
-                if (LinkedThermalCamera.placedBy != null)
+                if (bodyThatExited.TryGetComponent(out SoldierBodyCollider soldierThatExited))
                 {
                     Soldier detector = LinkedThermalCamera.placedBy;
                     Soldier detectee = soldierThatExited.LinkedSoldier;
