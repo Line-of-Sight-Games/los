@@ -1234,18 +1234,19 @@ MonoBehaviour:
   s1Toggle: {fileID: 9017973726624343781}
   detection1WayLeft: {fileID: 21300000, guid: 68ea53dbce81364498119494380e5f7e, type: 3}
   detection1WayRight: {fileID: 21300000, guid: 9336740efbb0f2d46abe7f6475837f3f, type: 3}
-  avoidance1WayLeft: {fileID: 21300000, guid: 362fa6abc7365414f8e64b1151832eac, type: 3}
-  avoidance1WayRight: {fileID: 21300000, guid: f5f1361d24c4d57499770fa79fed275d, type: 3}
   detection2Way: {fileID: 21300000, guid: 404b126033496ba49aa8463d821a11d2, type: 3}
-  avoidance2Way: {fileID: 21300000, guid: 6ea5d10d58731b64e9e4f5bfafbac3cf, type: 3}
   avoidance2WayLeft: {fileID: 21300000, guid: f552727111b28b24486c1d9a18cb7cb8, type: 3}
   avoidance2WayRight: {fileID: 21300000, guid: 2b07148e07e56744aae3a8c9049cd998, type: 3}
+  avoidance1WayLeft: {fileID: 21300000, guid: 362fa6abc7365414f8e64b1151832eac, type: 3}
+  avoidance1WayRight: {fileID: 21300000, guid: f5f1361d24c4d57499770fa79fed275d, type: 3}
+  avoidance2Way: {fileID: 21300000, guid: 6ea5d10d58731b64e9e4f5bfafbac3cf, type: 3}
   detectionOverwatch2WayLeft: {fileID: 21300000, guid: d66ad3ec2c601d841ba0265195bb0e25, type: 3}
   detectionOverwatch2WayRight: {fileID: 21300000, guid: 9ba247b331f0db343a4600ec2bea3874, type: 3}
   avoidanceOverwatch2WayLeft: {fileID: 21300000, guid: 8182d388d083bdb45b72d7184537f8e3, type: 3}
   avoidanceOverwatch2WayRight: {fileID: 21300000, guid: 823bd40156932324a9db5de6c2c730c5, type: 3}
   overwatch1WayLeft: {fileID: 21300000, guid: f5b54c3d30bbdd240bf97233601b0b9f, type: 3}
   overwatch1WayRight: {fileID: 21300000, guid: ce3b14bae67b1aa4f901c6465a451919, type: 3}
+  overwatch2Way: {fileID: 21300000, guid: da0e04fceda0d984aa5e1c18e2460865, type: 3}
   noDetect2Way: {fileID: 21300000, guid: 209b8d457a62ecc4fb6f8aa124ceecfe, type: 3}
   nullArrow: {fileID: 21300000, guid: 209b8d457a62ecc4fb6f8aa124ceecfe, type: 3}
   arrow: {fileID: 8170715373945922119}

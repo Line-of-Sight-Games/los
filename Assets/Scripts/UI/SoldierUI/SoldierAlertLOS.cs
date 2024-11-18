@@ -17,7 +17,17 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public GameObject s1BinocularImage;
     public Toggle s1Toggle;
 
-    public Sprite detection1WayLeft, detection1WayRight, avoidance1WayLeft, avoidance1WayRight, detection2Way, avoidance2Way, avoidance2WayLeft, avoidance2WayRight, detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight, overwatch1WayLeft, overwatch1WayRight, noDetect2Way, nullArrow;
+    public Sprite detection1WayLeft, detection1WayRight, detection2Way;
+
+    public Sprite avoidance2WayLeft, avoidance2WayRight;
+
+    public Sprite avoidance1WayLeft, avoidance1WayRight, avoidance2Way;
+
+    public Sprite detectionOverwatch2WayLeft, detectionOverwatch2WayRight, avoidanceOverwatch2WayLeft, avoidanceOverwatch2WayRight;
+
+    public Sprite overwatch1WayLeft, overwatch1WayRight, overwatch2Way; 
+        
+    public Sprite noDetect2Way, nullArrow;
 
     public Image arrow;
 
@@ -98,8 +108,6 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             colorPrefix = "<color=green>";
         else if (label.Contains("OVERWATCH"))
             colorPrefix = "<color=yellow>";
-        else if (label.Contains("OUT OF SR"))
-            colorPrefix = "<color=grey>";
 
         return $"{colorPrefix}{prefix}{label}{colorSuffix}";
     }
@@ -189,6 +197,17 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             else if (s1Label.text.Contains("OVERWATCH"))
                 arrowType = "overwatch1WayLeft";
         }
+        else if (s2Label.text.Contains("OVERWATCH"))
+        {
+            if (s1Label.text.Contains("AVOID"))
+                arrowType = "avoidanceOverwatch2WayRight";
+            else if (s1Label.text.Contains("DETECT"))
+                arrowType = "detectionOverwatch2WayRight";
+            else if (s1Label.text.Contains("OUT OF SR"))
+                arrowType = "overwatch1WayRight";
+            else if (s1Label.text.Contains("OVERWATCH"))
+                arrowType = "overwatch2Way";
+        }
 
         arrow.sprite = (Sprite)GetType().GetField(arrowType).GetValue(this);
     }
@@ -227,12 +246,14 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             //locking options for s1 toggle
             if (s1Label.text.Equals("OUT OF SR")) //s1 is out of s2 SR
                 s1Toggle.interactable = false;
+            else if (s2.IsOnOverwatch() && !s2.PhysicalObjectWithinOverwatchCone(s1)) //s1 is not in the overwatch cone of s2
+                s1Toggle.interactable = false;
             else if (s2.trenXRayEffect) //s2 has xray effect
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
-            else if ( s1Label.text.Contains("RETREAT") && (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))) //s1 was detected or avoided leaving s2 SR and had LOS pre-approved
+            else if (s1Label.text.Contains("RETREAT") && (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))) //s1 was detected or avoided leaving s2 SR and had LOS pre-approved
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
@@ -242,6 +263,8 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
             //locking options for s2 toggle
             if (s2Label.text.Equals("OUT OF SR")) //s2 out of s1 SR
+                s2Toggle.interactable = false;
+            else if (s1.IsOnOverwatch() && !s1.PhysicalObjectWithinOverwatchCone(s2)) //s2 is not in the overwatch cone of s1
                 s2Toggle.interactable = false;
             else if (s1.trenXRayEffect) //s1 has xray effect
             {

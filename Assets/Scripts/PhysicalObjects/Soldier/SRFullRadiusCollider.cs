@@ -19,15 +19,10 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
     }
     public string DetermineDetecteeLabel(Soldier detector, Soldier detectee)
     {
-        if (detector.IsOnOverwatch())
-        {
-            if (detector.PhysicalObjectWithinOverwatchCone(detectee))
-                return "OVERWATCH";
-            else
-                return "OUT OF SR";
-        }
-        else if (detectee.ActiveC > detector.ActivePForDetection(ActivePMultiplier(detectee)))
+        if (detectee.ActiveC > detector.ActivePForDetection(ActivePMultiplier(detectee)))
             return "AVOID";
+        else if (detector.IsOnOverwatch())
+            return "OVERWATCH";
         else
             return "DETECT";
     }

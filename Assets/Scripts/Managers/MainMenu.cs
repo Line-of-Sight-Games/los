@@ -280,10 +280,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (SecondOverrideKeyDown())
             {
                 CreateLOSArrows();
-                if (activeSoldier != null)
-                {
-                    RevealSightRadiusSpheres();
-                }
+                RevealSightRadiusSpheres();
             }
 
             //reveal GM objects while held
@@ -299,9 +296,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //destroy gizmos upon key release
             if (SecondOverrideKeyUp())
             {
-                HideSightRadiusSphere();
                 DestroyLOSArrows();
-                DestroyOverwatchSectors();
+                HideSightRadiusSphere();
+                
             }
         }
     }
@@ -385,6 +382,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             activeSoldier.SRColliderMinRenderer.enabled = false;
             activeSoldier.SRColliderHalfRenderer.enabled = false;
             activeSoldier.SRColliderFullRenderer.enabled = false;
+
+            DestroyOverwatchSectors();
         }
     }
     public string PrintArray(Array array)
