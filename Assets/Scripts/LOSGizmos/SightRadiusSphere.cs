@@ -3,12 +3,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SightRadiusSphere : LOSGizmo
+public class OverwatchSectorSphere : MonoBehaviour
 {
     readonly int segments = 100;
     public SphereCollider losSphereCollider;
     public GameObject losSpherePhysical;
-    public SightRadiusSphere Init(Soldier from)
+    public OverwatchSectorSphere Init(Soldier from)
     {
         transform.position = from.transform.position;
         if (from.IsOnOverwatch())

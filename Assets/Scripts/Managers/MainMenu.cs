@@ -41,7 +41,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
-    public SightRadiusSphere sightRadiusSpherePrefab;
+    public OverwatchSectorSphere overwatchSectorSpherePrefab;
     public List<Button> actionButtons;
     public List<Sprite> insignia;
     public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton;
@@ -301,6 +301,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 HideSightRadiusSphere();
                 DestroyLOSArrows();
+                DestroyOverwatchSectors();
             }
         }
     }
@@ -359,6 +360,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (LOSArrow arrow in LOSArrows)
             Destroy(arrow.gameObject);
     }
+    public void DestroyOverwatchSectors()
+    {
+        var overwatchSectors = FindObjectsByType<OverwatchSectorSphere>(FindObjectsInactive.Include, default);
+        foreach (OverwatchSectorSphere overwatchSector in overwatchSectors)
+            Destroy(overwatchSector.gameObject);
+    }
     public void RevealSightRadiusSpheres()
     {
         if (activeSoldier != null)
@@ -366,6 +373,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             activeSoldier.SRColliderMinRenderer.enabled = true;
             activeSoldier.SRColliderHalfRenderer.enabled = true;
             activeSoldier.SRColliderFullRenderer.enabled = true;
+
+            if (activeSoldier.IsOnOverwatch())
+                Instantiate(overwatchSectorSpherePrefab, activeSoldier.transform).Init(activeSoldier);
         }
     }
     public void HideSightRadiusSphere()
