@@ -416,6 +416,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         return false;
     }
+    public bool IsAbleToUseItems()
+    {
+        if (IsConscious() && !IsStunned() && !IsPlayingDead() && !IsUsingBinocularsInReconMode())
+            return true;
+
+        return false;
+    }
     public bool IsBlind()
     {
         if (!IsAbleToSee())
@@ -3577,17 +3584,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         menu.binocularsFlashResolvedFlag = false;
         SetLosCheck($"losChange|statChange(P)|binocularsActive|{mode}"); //losCheck
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(0.5f);
 
         menu.binocularsFlashResolvedFlag = true;
         if (IsUsingBinocularsInFlashMode())
-            menu.poiManager.DestroyPOI(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]));
+            UnsetUsingBinoculars();
     }
     public void UnsetUsingBinoculars()
     {
-        binocularBeamId = string.Empty;
-
         SetLosCheck("losChange|statChange(P)|binocularsDeactive"); //losCheck
+
+        menu.poiManager.DestroyPOI((menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).DestroyBeam());
+        binocularBeamId = string.Empty;
     }
     public bool IsValidLoadout()
     {

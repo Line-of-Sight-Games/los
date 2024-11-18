@@ -1431,8 +1431,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (game.gameOver)
             GreyAll("Game Over");
-        //else if (OverrideView)
-        //    GreyOutButtons(AddAllButtons(buttonStates), "Override");
         else if (activeSoldier.IsDead())
             GreyOutButtons(AddAllButtons(buttonStates), "Dead");
         else if (activeSoldier.IsUnconscious())
@@ -1443,6 +1441,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), playdeadButton), "<color=yellow>Playdead</color>");
         else if (activeSoldier.ap == 0)
             GreyOutButtons(AddAllButtons(buttonStates), "No AP");
+        else if (activeSoldier.IsUsingBinocularsInReconMode())
+            GreyOutButtons(AddAllButtons(buttonStates), "<color=green>Binoculars (Recon)</color>");
         else if (activeSoldier.IsFrozen() && game.frozenTurn)
         {
             GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), shotButton), "<color=orange>Frozen</color>");
@@ -4508,6 +4508,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         binocularsUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
         binocularsUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
 
+        binocularsUI.SetActive(true);
+    }
+    public void OpenBinocularsUI(Item binocs, ItemIcon binocsIcon) //opening it from relocate popup
+    {
+        binocularsUI.GetComponent<UseItemUI>().itemUsed = binocs;
+        binocularsUI.GetComponent<UseItemUI>().itemUsedIcon = binocsIcon;
+        binocularsUI.GetComponent<UseItemUI>().itemUsedFromSlotName = binocs.whereEquipped;
+
+        CloseSoldierStatsUI();
         binocularsUI.SetActive(true);
     }
     public void ClearBinocularsUI()

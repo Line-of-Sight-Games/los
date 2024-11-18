@@ -15,11 +15,13 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public IHaveInventory originalInventoryObject;
     public DropthrowPopup dropThrowPopup;
     public SpyJamPopup spyJamPopup;
+    public BinocReconPopup binocReconPopup;
 
     void Start()
     {
         dropThrowPopup = FindFirstObjectByType<DropthrowPopup>(FindObjectsInactive.Include);
         spyJamPopup = FindFirstObjectByType<SpyJamPopup>(FindObjectsInactive.Include);
+        binocReconPopup = FindFirstObjectByType<BinocReconPopup>(FindObjectsInactive.Include);
     }
 
     public ItemIcon Init(Item item)
@@ -190,7 +192,22 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.OverrideView)
         {
-            if (item.IsUsable())
+            if (item.IsBinoculars() && item.SoldierNestedOn().IsUsingBinocularsInReconMode()) //give option to relocate or stop Recon binocs
+            {
+                Vector2 mousePosition = Input.mousePosition;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    binocReconPopup.transform.parent.GetComponent<RectTransform>(),
+                    mousePosition,
+                    null,
+                    out Vector2 localPoint
+                );
+
+                binocReconPopup.binocsUsed = item;
+                binocReconPopup.binocsItemIcon = this;
+                binocReconPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                binocReconPopup.ShowBinocReconPopup();
+            }
+            else if (item.SoldierNestedOn().IsAbleToUseItems() && item.IsUsable())
             {
                 if (item.IsULF())
                 {
@@ -206,6 +223,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     spyJamPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
                     spyJamPopup.ShowSpyJamPopup();
                 }
+                
                 else
                 {
                     int ap = item.usageAP;
@@ -223,6 +241,9 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     }
                 }
             }
+            else
+                menu.generalAlertUI.Activate("This soldier is currently unable to use items.");
+
         }
     }
     public void DropThrowItem()

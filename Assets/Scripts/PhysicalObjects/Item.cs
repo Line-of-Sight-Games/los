@@ -1157,6 +1157,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
+    public bool IsBinoculars()
+    {
+        if (itemName.Equals("Binoculars"))
+            return true;
+        return false;
+    }
     public bool IsUHF()
     {
         if (itemName.Equals("UHF_Radio"))
@@ -1169,6 +1175,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
+
     public void SetSpying()
     {
         spyingForTurns = 2;

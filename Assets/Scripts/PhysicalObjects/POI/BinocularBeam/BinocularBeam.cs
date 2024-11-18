@@ -9,6 +9,7 @@ public class BinocularBeam : POI, IDataPersistence
     public int facingX, facingY;
     public float beamHeight, beamWidth;
     public Beam beam;
+    public BinocularBeamTriggerCollider linkedCollider;
     public bool flashMode;
     public int turnsActive;
 
@@ -18,7 +19,6 @@ public class BinocularBeam : POI, IDataPersistence
         game = FindFirstObjectByType<MainGame>();
         poiManager = FindFirstObjectByType<POIManager>();
     }
-
     private void Update()
     {
         placedBy = menu.soldierManager.FindSoldierById(placedById);
@@ -48,7 +48,6 @@ public class BinocularBeam : POI, IDataPersistence
 
         return this;
     }
-
     public override void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
@@ -69,7 +68,6 @@ public class BinocularBeam : POI, IDataPersistence
             beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)), beamHeight, beamWidth);
         }
     }
-
     public override void SaveData(ref GameData data)
     {
         details = new()
@@ -91,6 +89,12 @@ public class BinocularBeam : POI, IDataPersistence
             data.allPOIDetails.Remove(id);
 
         data.allPOIDetails.Add(id, details);
+    }
+    public BinocularBeam ForceOnTriggerExit()
+    {
+        //FIX beam does not throw an exit message when it is deleted
+
+        return this;
     }
     public float GetBeamSize()
     {
