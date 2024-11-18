@@ -1024,6 +1024,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         stats.Dip.BaseVal = 0;
         stats.Elec.BaseVal = 0;
 
+        //unset binoculars
+        if (IsUsingBinoculars())
+            UnsetUsingBinoculars();
+
         //remove all engagements
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
@@ -2638,6 +2642,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
             DropHandheldItems();
 
+            //unset binoculars
+            if (IsUsingBinoculars())
+                UnsetUsingBinoculars();
+
             //remove all engagements
             if (IsMeleeEngaged())
                 StartCoroutine(game.DetermineMeleeControllerMultiple(this));
@@ -2721,6 +2729,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         DropHandheldItems();
 
+        //unset binoculars
+        if (IsUsingBinoculars())
+            UnsetUsingBinoculars();
+
         //remove all engagements
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
@@ -2773,6 +2785,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 //remove all reveals and revealedby
                 RemoveAllLOSToAllSoldiers();
+
+                //unset binoculars
+                if (IsUsingBinoculars())
+                    UnsetUsingBinoculars();
 
                 //remove all engagements
                 if (IsMeleeEngaged())
