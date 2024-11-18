@@ -1999,9 +1999,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 if (sAlert.s1Label.text.Contains("OVERWATCH"))
                                     StartCoroutine(OpenOverwatchShotUI(counter, detector));
 
-                                //pay xp for binoc detection (only if it's a "new" detection)
-                                if (counter.IsUsingBinocularsInFlashMode() && !counter.losToTheseSoldiersAndRevealingList.Contains(detector.Id))
-                                    AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars.", true);
+                                //pay xp for binoc flash detection (only if it's a "new" detection)
+                                if (counter.IsUsingBinocularsInFlashMode() && detector.IsHidden())
+                                    AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Flash).", true);
                             }
                             else //avoidance
                                 AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
@@ -2018,6 +2018,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 //check for overwatch shot
                                 if (sAlert.s1Label.text.Contains("OVERWATCH"))
                                     StartCoroutine(OpenOverwatchShotUI(counter, detector));
+
+                                //pay xp for binoc flash detection (only if it's a "new" detection)
+                                if (counter.IsUsingBinocularsInReconMode() && detector.IsHidden())
+                                    AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Recon).", true);
                             }
                             else //avoidance
                             {
@@ -2048,8 +2052,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                     StartCoroutine(OpenOverwatchShotUI(detector, counter));
 
                                 //pay xp for binoc detection (only if it's a "new" detection)
-                                if (detector.IsUsingBinocularsInFlashMode() && !detector.losToTheseSoldiersAndRevealingList.Contains(counter.Id))
-                                    AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars.", true);
+                                if (detector.IsUsingBinocularsInFlashMode() && counter.IsHidden())
+                                    AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Flash).", true);
                             }
                             else //avoidance
                                 AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
@@ -2066,6 +2070,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 //check for overwatch shot
                                 if (sAlert.s2Label.text.Contains("OVERWATCH"))
                                     StartCoroutine(OpenOverwatchShotUI(detector, counter));
+
+                                //pay xp for binoc detection (only if it's a "new" detection)
+                                if (detector.IsUsingBinocularsInReconMode() && counter.IsHidden())
+                                    AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Recon).", true);
                             }
                             else
                             {
