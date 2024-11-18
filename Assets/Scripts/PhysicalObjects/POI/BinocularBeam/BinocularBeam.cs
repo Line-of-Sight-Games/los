@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -90,11 +91,15 @@ public class BinocularBeam : POI, IDataPersistence
 
         data.allPOIDetails.Add(id, details);
     }
-    public BinocularBeam ForceOnTriggerExit()
+    public IEnumerator DestroyBeam()
     {
-        //FIX beam does not throw an exit message when it is deleted
+        //squish beam to zero to trigger collider exits 
+        beam.Init(Vector3.zero, Vector3.zero, 0, 0);
+        beam.SetBeam(Vector3.zero, Vector3.zero, 0, 0);
 
-        return this;
+        yield return new WaitForSeconds(0.01f);
+
+        poiManager.DestroyPOI(this);
     }
     public float GetBeamSize()
     {

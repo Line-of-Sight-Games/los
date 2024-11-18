@@ -3594,7 +3594,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public IEnumerator SetUsingBinoculars(Vector2 xy, string mode)
     {
-        BinocularBeam binocularBeam = Instantiate(menu.poiManager.binocularStripPrefab).Init(new(X, Y, Z), Tuple.Create((int)xy.x, (int)xy.y, 0, Id), mode);
+        BinocularBeam binocularBeam;
+        if (!binocularBeamId.Equals(string.Empty)) //beam already exists, so init maintaining turns active
+        {
+            binocularBeam = (menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam);
+            binocularBeam.Init(new(X, Y, Z), Tuple.Create((int)xy.x, (int)xy.y, binocularBeam.turnsActive, Id), mode);
+        }
+        else //create fresh beam
+            binocularBeam = Instantiate(menu.poiManager.binocularStripPrefab).Init(new(X, Y, Z), Tuple.Create((int)xy.x, (int)xy.y, 0, Id), mode);
         binocularBeamId = $"{binocularBeam.Id}|{mode}";
 
         menu.binocularsFlashResolvedFlag = false;
@@ -3610,7 +3617,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         SetLosCheck("losChange|statChange(P)|binocularsDeactive"); //losCheck
 
-        menu.poiManager.DestroyPOI((menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).DestroyBeam());
+        StartCoroutine((menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).DestroyBeam());
         binocularBeamId = string.Empty;
     }
     public bool IsValidLoadout()

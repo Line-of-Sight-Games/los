@@ -410,13 +410,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (s.loudActionTurnsVulnerable == 0)
                     s.UnsetLoudRevealed();
             }
-
-            //increment recon binoculars
-            if (s.IsUsingBinocularsInReconMode())
-            {
-                if (poiManager.FindPOIById(s.binocularBeamId.Split("|")[0]) is BinocularBeam binocBeam)
-                    binocBeam.turnsActive++;
-            }
         }
 
         menu.CheckXP();
@@ -442,6 +435,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 s.bleedoutTurns--;
                 if (s.bleedoutTurns <= 0)
                     StartCoroutine(s.BleedoutKill());    
+            }
+
+            //increment recon binoculars
+            if (s.IsUsingBinocularsInReconMode())
+            {
+                if (poiManager.FindPOIById(s.binocularBeamId.Split("|")[0]) is BinocularBeam binocBeam)
+                {
+                        binocBeam.turnsActive++;
+                        if (binocBeam.turnsActive % 2 == 0)
+                            s.SetLosCheck("statChange(P)|binocIncrease|Recon");
+                }
             }
         }
     }

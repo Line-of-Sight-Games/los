@@ -1983,106 +1983,117 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     Soldier counter = sAlert.s2;
 
                     //do checks for s1 (detector)(left side)
-                    if (sAlert.s1Label.text.Contains("GLIMPSE") || sAlert.s1Label.text.Contains("RETREAT") || counter.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
-                    {
+                    if (sAlert.s1Label.text.Equals("OUT OF SR")) //formally out of sr
                         allSoldiersNotRevealingOutOfSR[counter.Id].Add(detector.Id);
-
-                        if (sAlert.s1Toggle.isOn == true) //LOS paid
-                        {
-                            if (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH")) //detection
-                            {
-                                //create the glimpse alert for team
-                                AddLosGlimpseAlert(detector, sAlert.s1Label.text);
-                                StartCoroutine(OpenLostLOSList());
-
-                                //check for overwatch shot
-                                if (sAlert.s1Label.text.Contains("OVERWATCH"))
-                                    StartCoroutine(OpenOverwatchShotUI(counter, detector));
-
-                                //pay xp for binoc flash detection (only if it's a "new" detection)
-                                if (counter.IsUsingBinocularsInFlashMode() && detector.IsHidden())
-                                    AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Flash).", true);
-                            }
-                            else //avoidance
-                                AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
-                        }
-                    }
-                    else //if it's a standard SR alert
+                    else
                     {
-                        if (sAlert.s1Toggle.isOn == true) //paid by GM
+                        if (sAlert.s1Label.text.Contains("GLIMPSE") || sAlert.s1Label.text.Contains("RETREAT") || counter.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
                         {
-                            if (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH"))
-                            {
-                                allSoldiersRevealing[counter.Id].Add(detector.Id);
+                            allSoldiersNotRevealingOutOfSR[counter.Id].Add(detector.Id);
 
-                                //check for overwatch shot
-                                if (sAlert.s1Label.text.Contains("OVERWATCH"))
-                                    StartCoroutine(OpenOverwatchShotUI(counter, detector));
-
-                                //pay xp for binoc flash detection (only if it's a "new" detection)
-                                if (counter.IsUsingBinocularsInReconMode() && detector.IsHidden())
-                                    AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Recon).", true);
-                            }
-                            else //avoidance
+                            if (sAlert.s1Toggle.isOn == true) //LOS paid
                             {
-                                allSoldiersNotRevealingHidden[counter.Id].Add(detector.Id);
-                                AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
+                                if (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH")) //detection
+                                {
+                                    //create the glimpse alert for team
+                                    AddLosGlimpseAlert(detector, sAlert.s1Label.text);
+                                    StartCoroutine(OpenLostLOSList());
+
+                                    //check for overwatch shot
+                                    if (sAlert.s1Label.text.Contains("OVERWATCH"))
+                                        StartCoroutine(OpenOverwatchShotUI(counter, detector));
+
+                                    //pay xp for binoc flash detection (only if it's a "new" detection)
+                                    if (counter.IsUsingBinocularsInFlashMode() && detector.IsHidden())
+                                        AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Flash).", true);
+                                }
+                                else //avoidance
+                                    AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
                             }
                         }
-                        else
-                            allSoldiersNotRevealingNoLos[counter.Id].Add(detector.Id);
-                        
-                    }
-
-                    //do checks for s2 (counter)(right side)
-                    if (sAlert.s2Label.text.Contains("GLIMPSE") || sAlert.s2Label.text.Contains("RETREAT") || detector.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
-                    {
-                        allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
-
-                        if (sAlert.s2Toggle.isOn == true) //LOS paid
+                        else //if it's a standard SR alert
                         {
-                            if (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH")) //detection
+                            if (sAlert.s1Toggle.isOn == true) //paid by GM
                             {
-                                //create glimpse alert for team
-                                AddLosGlimpseAlert(counter, sAlert.s2Label.text);
-                                StartCoroutine(OpenLostLOSList());
+                                if (sAlert.s1Label.text.Contains("DETECT") || sAlert.s1Label.text.Contains("OVERWATCH"))
+                                {
+                                    allSoldiersRevealing[counter.Id].Add(detector.Id);
 
-                                //check for overwatch shot
-                                if (sAlert.s2Label.text.Contains("OVERWATCH"))
-                                    StartCoroutine(OpenOverwatchShotUI(detector, counter));
+                                    //check for overwatch shot
+                                    if (sAlert.s1Label.text.Contains("OVERWATCH"))
+                                        StartCoroutine(OpenOverwatchShotUI(counter, detector));
 
-                                //pay xp for binoc detection (only if it's a "new" detection)
-                                if (detector.IsUsingBinocularsInFlashMode() && counter.IsHidden())
-                                    AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Flash).", true);
-                            }
-                            else //avoidance
-                                AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
-                        }
-                    }
-                    else //if it's a standard SR alert
-                    {
-                        if (sAlert.s2Toggle.isOn == true) //LOS paid
-                        {
-                            if (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH"))
-                            {
-                                allSoldiersRevealing[detector.Id].Add(counter.Id);
-
-                                //check for overwatch shot
-                                if (sAlert.s2Label.text.Contains("OVERWATCH"))
-                                    StartCoroutine(OpenOverwatchShotUI(detector, counter));
-
-                                //pay xp for binoc detection (only if it's a "new" detection)
-                                if (detector.IsUsingBinocularsInReconMode() && counter.IsHidden())
-                                    AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Recon).", true);
+                                    //pay xp for binoc flash detection (only if it's a "new" detection)
+                                    if (counter.IsUsingBinocularsInReconMode() && detector.IsHidden())
+                                        AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Recon).", true);
+                                }
+                                else //avoidance
+                                {
+                                    allSoldiersNotRevealingHidden[counter.Id].Add(detector.Id);
+                                    AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
+                                }
                             }
                             else
+                                allSoldiersNotRevealingNoLos[counter.Id].Add(detector.Id);
+
+                        }
+                    }
+                    
+
+                    //do checks for s2 (counter)(right side)
+                    if (sAlert.s2Label.text.Equals("OUT OF SR")) //formally out of sr
+                        allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
+                    else
+                    {
+                        if (sAlert.s2Label.text.Contains("GLIMPSE") || sAlert.s2Label.text.Contains("RETREAT") || detector.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
+                        {
+                            allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
+
+                            if (sAlert.s2Toggle.isOn == true) //LOS paid
                             {
-                                allSoldiersNotRevealingHidden[detector.Id].Add(counter.Id);
-                                AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
+                                if (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH")) //detection
+                                {
+                                    //create glimpse alert for team
+                                    AddLosGlimpseAlert(counter, sAlert.s2Label.text);
+                                    StartCoroutine(OpenLostLOSList());
+
+                                    //check for overwatch shot
+                                    if (sAlert.s2Label.text.Contains("OVERWATCH"))
+                                        StartCoroutine(OpenOverwatchShotUI(detector, counter));
+
+                                    //pay xp for binoc detection (only if it's a "new" detection)
+                                    if (detector.IsUsingBinocularsInFlashMode() && counter.IsHidden())
+                                        AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Flash).", true);
+                                }
+                                else //avoidance
+                                    AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
                             }
                         }
-                        else
-                            allSoldiersNotRevealingNoLos[detector.Id].Add(counter.Id);
+                        else //if it's a standard SR alert
+                        {
+                            if (sAlert.s2Toggle.isOn == true) //LOS paid
+                            {
+                                if (sAlert.s2Label.text.Contains("DETECT") || sAlert.s2Label.text.Contains("OVERWATCH"))
+                                {
+                                    allSoldiersRevealing[detector.Id].Add(counter.Id);
+
+                                    //check for overwatch shot
+                                    if (sAlert.s2Label.text.Contains("OVERWATCH"))
+                                        StartCoroutine(OpenOverwatchShotUI(detector, counter));
+
+                                    //pay xp for binoc detection (only if it's a "new" detection)
+                                    if (detector.IsUsingBinocularsInReconMode() && counter.IsHidden())
+                                        AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Recon).", true);
+                                }
+                                else
+                                {
+                                    allSoldiersNotRevealingHidden[detector.Id].Add(counter.Id);
+                                    AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
+                                }
+                            }
+                            else
+                                allSoldiersNotRevealingNoLos[detector.Id].Add(counter.Id);
+                        }
                     }
 
                     //if detector revealed either by glimpse or in SR a soldier with c > 2 xp check
@@ -4518,6 +4529,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         CloseSoldierStatsUI();
         binocularsUI.SetActive(true);
+
     }
     public void ClearBinocularsUI()
     {

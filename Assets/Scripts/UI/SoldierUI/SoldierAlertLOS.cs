@@ -220,13 +220,16 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             {
                 s1Toggle.interactable = false;
             }
-            if (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))
+            else if (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
             else
+            {
                 s1Toggle.interactable = true;
+            }
+                
 
             //s2 toggle
             if (s1.SoldiersOutOfSR.Contains(s2.Id) || s1.NoLOSToTheseSoldiers.Contains(s2.Id))

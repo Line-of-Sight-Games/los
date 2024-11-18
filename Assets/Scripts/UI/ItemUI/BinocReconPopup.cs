@@ -10,6 +10,7 @@ public class BinocReconPopup : MonoBehaviour
     public Button relocateButton, stopButton;
     public Item binocsUsed;
     public ItemIcon binocsItemIcon;
+    public GameObject notEnoughApIndicator;
 
     void Update()
     {
@@ -20,6 +21,16 @@ public class BinocReconPopup : MonoBehaviour
     }
     public void ShowBinocReconPopup()
     {
+        if (menu.activeSoldier.ap >= 2)
+        {
+            relocateButton.interactable = true;
+            notEnoughApIndicator.SetActive(false);
+        }
+        else
+        {
+            relocateButton.interactable = false;
+            notEnoughApIndicator.SetActive(true);
+        }
         gameObject.SetActive(true);
     }
     public void HideBinocReconPopup()
@@ -35,9 +46,8 @@ public class BinocReconPopup : MonoBehaviour
 
     public void RelocateButtonClick()
     {
-        binocsUsed.SoldierNestedOn().UnsetUsingBinoculars();
+        menu.activeSoldier.DeductAP(2);
         menu.OpenBinocularsUI(binocsUsed, binocsItemIcon);
-        
         HideBinocReconPopup();
     }
 }
