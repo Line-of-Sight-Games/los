@@ -1831,7 +1831,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     else
                         menu.AddXpAlert(targetSoldier, 10, $"Dodged shot with a {chances.Item1}% chance from {shooter.soldierName}!", false);
 
-                    //push the no damage attack through for abilities trigger
+                    //push a zero damage attack through for abilities trigger
                     targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });
                 }
             }
@@ -2552,14 +2552,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             soundManager.PlaySoldierMeleeBreakeven(activeSoldier.soldierSpeciality);
 
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
-
-                            //push the no damage attack through for abilities trigger
-                            defender.TakeDamage(attacker, meleeDamage, true, damageType);
                         }
                     }
 
                     //reset bloodrage even if non-successful attack
                     attacker.UnsetBloodRage();
+
+                    //push a zero damage attack to the defender for abilities trigger
+                    defender.TakeDamage(attacker, 0, true, damageType);
                 }
 
                 //add xp for successful melee attack

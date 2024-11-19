@@ -1289,6 +1289,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     soldierAbilities.Clear();
                     soldierAbilities.Add("Witness");
                     soldierAbilities.AddRange(damagedBy.soldierAbilities);
+                    soldierAbilities = soldierAbilities.Distinct().ToList(); //make sure only unique abilities are represented
 
                     //store fresh abilities
                     witnessStoredAbilities.AddRange(damagedBy.soldierAbilities);

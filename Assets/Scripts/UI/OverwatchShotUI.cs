@@ -203,7 +203,7 @@ public class OverwatchShotUI : MonoBehaviour
                     targetSoldier.Z = finalLocation.Item3;
                     targetSoldier.terrainOn = finalLocation.Item4;
 
-                    //push the no damage attack through for abilities trigger
+                    //push a zero damage attack through for abilities trigger
                     targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });
                 }
 
