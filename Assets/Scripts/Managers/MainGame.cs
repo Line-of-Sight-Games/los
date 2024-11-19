@@ -1196,7 +1196,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float smokeMod = 0;
 
         if (shooter.IsSmokeBlinded())
-            smokeMod = 0.4f;
+            smokeMod = 0.9f;
+        else if (shooter.IsSmokeCovered())
+            smokeMod = 0.45f;
 
         //report parameters
         shotParameters.Add(Tuple.Create("smoke", $"{1 - smokeMod}"));

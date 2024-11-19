@@ -895,15 +895,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (IsSmokeBlinded())
             {
                 stats.E.Val += 6;
+                stats.P.Val -= 2;
                 if (!IsWearingThermalGoggles())
-                    stats.SR.Val = 0;
+                    stats.SR.Val -= 120;
             }
             else if (IsSmokeCovered())
             {
                 stats.E.Val += 3;
+                stats.P.Val -= 1;
                 if (!IsWearingThermalGoggles())
-                    stats.SR.Val -= 70;
-                stats.P.Val -= 2;
+                    stats.SR.Val -= 60;
+                
             }
         }
     }
@@ -1627,8 +1629,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         float smokeModMove = 0;
 
-        if (IsSmokeCovered())
-            smokeModMove = 0.4f;
+        if (IsSmokeBlinded())
+            smokeModMove = 0.9f;
+        else if (IsSmokeCovered())
+            smokeModMove = 0.45f;
 
         return 1 - smokeModMove;
     }
