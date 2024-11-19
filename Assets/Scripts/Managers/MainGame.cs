@@ -832,6 +832,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 launchMelee = "Half Charge Attack";
             else if (moveUI.moveTypeDropdown.value == 2)
                 launchMelee = "3cm Charge Attack";
+            StartCoroutine(menu.OpenMeleeUI(launchMelee));
         }
 
         //check broken soldier leaving field
