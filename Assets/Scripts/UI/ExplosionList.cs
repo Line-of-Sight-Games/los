@@ -50,7 +50,7 @@ public class ExplosionList : MonoBehaviour
                                     item.SetTriggered();
                                 }
                                 else
-                                    item.DamageItem(explodedBy, damage);
+                                    item.TakeDamage(explodedBy, damage, new() { "Explosive" });
                             }
                         }
                     }
@@ -84,15 +84,7 @@ public class ExplosionList : MonoBehaviour
                         if (int.TryParse(child.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int damage) && int.TryParse(child.Find("Stun").Find("StunDamageIndicator").GetComponent<TextMeshProUGUI>().text, out int stun))
                         {
                             if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
-                            {
-                                /*if (transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
-                                {
-                                    if (stun == 0)
-                                        menu.AddXpAlert(hitSoldier, 2, $"Resisted stunning from flashbang.", true);
-                                    else
-                                        hitSoldier.SetStunned(stun); //non-resistable stunnage on flashbang grenades only   
-                                }*/
-                                
+                            {   
                                 hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
                                 int actualStun = hitSoldier.TakeStun(stun);
 

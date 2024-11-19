@@ -899,9 +899,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         owner?.Inventory.RemoveItemFromSlot(this, whereEquipped);
         itemManager.DestroyItem(this);
     }
-    public void DamageItem(Soldier damagedBy, int damage)
+    public void TakeDamage(Soldier damagedBy, int damage, List<string> damageSource)
     {
-        if ((damage >= 5 && IsBreakable()) || (damage > 0 && IsFragile()))
+        if ((damage >= 5 && IsBreakable()) || (damage > 0 && IsFragile() && damageSource.Contains("Explosive")) || (damage > 0 && IsFragile() && !IsBeingProtected()))
             DestroyItem(damagedBy);
     }
     public void DestroyItem(Soldier destroyedBy)
@@ -967,7 +967,13 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool IsFragile()
     {
-        if (traits.Contains("Fragile") && !(owner != null && owner is Item parentItem && parentItem.IsProtecting()))
+        if (traits.Contains("Fragile"))
+            return true;
+        return false;
+    }
+    public bool IsBeingProtected()
+    {
+        if (owner != null && owner is Item parentItem && parentItem.IsProtecting())
             return true;
         return false;
     }

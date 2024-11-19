@@ -3074,7 +3074,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     if (itemWillBreak.activeInHierarchy)
                     {
-                        throwItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+                        throwItemUI.itemUsed.TakeDamage(activeSoldier, 1, new() { "Fall" }); //destroy item
                     }
                     else if (catcher.activeInHierarchy)
                     {
@@ -3121,7 +3121,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
         {
             if (itemWillBreak.activeInHierarchy)
-                dropItemUI.itemUsed.DamageItem(activeSoldier, 1); //destroy item
+                dropItemUI.itemUsed.TakeDamage(activeSoldier, 1, new() { "Fall" }); //destroy item
             else if (catcher.activeInHierarchy)
             {
                 if (dropItemUI.itemUsed.IsCatchable())
