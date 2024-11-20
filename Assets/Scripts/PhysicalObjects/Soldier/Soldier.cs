@@ -3911,17 +3911,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
-    public bool IsLocator()
+    public bool IsLocater()
     {
         if (IsConscious())
-            if (soldierAbilities.Contains("Locator"))
+            if (soldierAbilities.Contains("Locater"))
                 return true;
 
         return false;
     }
-    public int LocatorBonus()
+    public int LocaterBonus()
     {
-        if (IsLocator())
+        if (IsLocater())
             return 1;
 
         return 0;

@@ -7,7 +7,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class MainMenu : MonoBehaviour, IDataPersistence
 {
@@ -37,19 +36,20 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, binocularsUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
-    
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, binocularsUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
+
+    public InventorySourcePanel inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab;
+
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public OverwatchSectorSphere overwatchSectorSpherePrefab;
     public List<Button> actionButtons;
-    public List<Sprite> insignia;
     public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton;
     private float playTimeTotal;
     public float turnTime;
     public string meleeChargeIndicator;
     public Soldier activeSoldier;
-    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen;
+    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite fist, explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
     public Color normalTextColour = new(0.196f, 0.196f, 0.196f);
@@ -3378,7 +3378,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //configure functions - menu
     public void AddGroundInventorySourceButton()
     {
-        GameObject groundInventoryPanel = Instantiate(inventoryPanelGroundPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(null).gameObject;
+        InventorySourcePanel groundInventoryPanel = Instantiate(inventoryPanelGroundPrefab, configUI.externalItemSourcesPanel.transform).Init(null);
         InventorySourceIcon groundInventoryButton = Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
         foreach (Item i in game.FindNearbyItems())
         {
@@ -3400,7 +3400,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (s.IsFielded() && activeSoldier.PhysicalObjectWithinItemRadius(s) && (activeSoldier.IsSameTeamAs(s) || s.IsUnconscious() || s.IsDead()) && s.IsInteractable())
             {
-                InventorySourceIcon allyInventoryButton = Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(s).gameObject), inventorySourceIconsUI.transform);
+                InventorySourceIcon allyInventoryButton = Instantiate(allyInventoryIconPrefab.GetComponent<InventorySourceIconAlly>().Init(s, Instantiate(inventoryPanelAllyPrefab, configUI.externalItemSourcesPanel.transform).Init(s)), inventorySourceIconsUI.transform);
 
                 if (activeSoldier.IsBlind())
                     allyInventoryButton.Grey("Blind");
@@ -3420,12 +3420,29 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (activeSoldier.PhysicalObjectWithinItemRadius(gb))
             {
                 poisNearby = true;
-                InventorySourceIcon gbInventoryButton = Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(gb).gameObject), inventorySourceIconsUI.transform);
-                
+                InventorySourceIcon gbInventoryButton = Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).Init(gb)), inventorySourceIconsUI.transform);
+
                 if (activeSoldier.IsBlind())
                     gbInventoryButton.Grey("Blind");
                 else
                     gbInventoryButton.UnGrey();
+            }
+            else if (activeSoldier.IsLocater()) //locater ability
+            {
+                bool gbIsRevealed = false;
+                foreach (Soldier s in game.AllFieldedFriendlySoldiers())
+                {
+                    if (s.IsAbleToSee() && s.PhysicalObjectWithinMaxRadius(gb))
+                        gbIsRevealed = true;
+                }
+
+                if (gbIsRevealed)
+                {
+                    InventorySourceIcon gbInventoryButton = Instantiate(gbInventoryIconPrefab.GetComponent<InventorySourceIconGoodyBox>().Init(gb, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).Init(gb)), inventorySourceIconsUI.transform);
+
+                    (gbInventoryButton as InventorySourceIconGoodyBox).SetLocated();
+                }
+                    
             }
         }
                 
@@ -3434,12 +3451,29 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (activeSoldier.PhysicalObjectWithinItemRadius(dc))
             {
                 poisNearby = true;
-                InventorySourceIcon dcInventoryButton = Instantiate(dcInventoryIconPrefab.GetComponent<InventorySourceIconDrugCabinet>().Init(dc, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).GetComponent<InventorySourcePanel>().Init(dc).gameObject), inventorySourceIconsUI.transform);
+                InventorySourceIcon dcInventoryButton = Instantiate(dcInventoryIconPrefab.GetComponent<InventorySourceIconDrugCabinet>().Init(dc, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).Init(dc)), inventorySourceIconsUI.transform);
                 
                 if (activeSoldier.IsBlind())
                     dcInventoryButton.Grey("Blind");
                 else
                     dcInventoryButton.UnGrey();
+            }
+            else if (activeSoldier.IsLocater()) //locater ability
+            {
+                bool dcIsRevealed = false;
+                foreach (Soldier s in game.AllFieldedFriendlySoldiers())
+                {
+                    if (s.IsAbleToSee() && s.PhysicalObjectWithinMaxRadius(dc))
+                        dcIsRevealed = true;
+                }
+
+                if (dcIsRevealed)
+                {
+                    InventorySourceIcon dcInventoryButton = Instantiate(dcInventoryIconPrefab.GetComponent<InventorySourceIconDrugCabinet>().Init(dc, Instantiate(inventoryPanelGoodyBoxPrefab, configUI.externalItemSourcesPanel.transform).Init(dc)), inventorySourceIconsUI.transform);
+
+                    (dcInventoryButton as InventorySourceIconDrugCabinet).SetLocated();
+                }
+
             }
         }
 
@@ -3451,7 +3485,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddGlobalInventorySourceButton()
     {
-        Instantiate(globalInventoryIconPrefab, inventorySourceIconsUI.transform).GetComponent<InventorySourceIcon>().Init(configUI.transform.Find("AllItemsPanel").gameObject);
+        Instantiate(globalInventoryIconPrefab, inventorySourceIconsUI.transform).GetComponent<InventorySourceIcon>().Init(configUI.transform.Find("AllItemsPanel").GetComponent<InventorySourcePanel>());
     }
     public void OpenConfigureUI()
     {
@@ -3467,7 +3501,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //populate ally icons
         AddAllyInventorySourceButtons();
         
-        //populate gb icons
+        //populate gb and dc icons
         AddPOIInventorySourceButtons();
 
         configUI.gameObject.SetActive(true);
@@ -3486,9 +3520,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (child.GetComponent<InventorySourcePanel>() != null)
                 Destroy(child.gameObject);
     }
-    public void OpenInventoryPanel(GameObject itemPanel)
+    public void OpenInventoryPanel(InventorySourcePanel inventoryPanel)
     {
-        itemPanel.SetActive(true);
+        inventoryPanel.gameObject.SetActive(true);
     }
     public void ClearInventoryPanel(GameObject itemPanel)
     {

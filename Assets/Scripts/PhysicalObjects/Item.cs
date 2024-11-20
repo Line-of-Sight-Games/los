@@ -581,12 +581,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (linkedSoldier != null)
         {
-            int dip = linkedSoldier.stats.Dip.Val, elec = linkedSoldier.stats.Elec.Val;
-            //locator and politician bonus
-            if (linkedSoldier.IsLocator())
-                elec++;
-            if (linkedSoldier.IsPolitician())
-                dip++;
+            //locater and politician bonus
+            int dip = linkedSoldier.stats.Dip.Val + linkedSoldier.PoliticianBonus();
+            int elec = linkedSoldier.stats.Elec.Val + linkedSoldier.LocaterBonus();
 
             //keep values within bounds
             if (dip > 9)
@@ -604,12 +601,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (linkedSoldier != null)
         {
-            int dip = linkedSoldier.stats.Dip.Val, elec = linkedSoldier.stats.Elec.Val;
-            //locator and politician bonus
-            if (linkedSoldier.IsLocator())
-                elec++;
-            if (linkedSoldier.IsPolitician())
-                dip++;
+            //locater and politician bonus
+            int dip = linkedSoldier.stats.Dip.Val + linkedSoldier.PoliticianBonus();
+            int elec = linkedSoldier.stats.Elec.Val + linkedSoldier.LocaterBonus();
 
             int avgDipElec = (dip + elec + 1) / 2;
 

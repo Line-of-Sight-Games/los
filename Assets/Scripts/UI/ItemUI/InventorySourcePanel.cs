@@ -34,6 +34,7 @@ public class InventorySourcePanel : MonoBehaviour
 
     public void CloseInventorySourcePanel()
     {
+        menu.inventorySourceViewOnly = false; //locater ability
         menu.CloseInventoryPanel(gameObject);
     }
 
