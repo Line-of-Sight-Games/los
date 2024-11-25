@@ -3388,16 +3388,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
             else
-            {
                 terminalDisabled = true;
-            }
 
             if (!terminalDisabled)
             {
                 int targetLevel = dipelecUI.dipElecLevelDropdown.value + 1;
                 if (passCount >= targetLevel)
                 {
-                    for (int i = 1; i <= targetLevel; i++)
+                    for (int i = targetLevel; i >= 1; i--)
                     {
                         menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=green>{resultString} successful</color>";
                         GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
