@@ -1250,7 +1250,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool IsThermalGoggles()
     {
-        if (name.Contains("Armour_Stim"))
+        if (name.Contains("Thermal_Goggles"))
             return true;
         return false;
     }
