@@ -723,7 +723,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                 if (moveUI.meleeToggle.isOn)
                                     soundManager.PlaySoldierMeleeMove(activeSoldier.soldierSpeciality); //play melee move dialogue
                                 else
-                                    soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality); //play standard move dialogue
+                                {
+                                    if (!moveUI.moveTypeDropdown.captionText.text.Contains("Tile"))
+                                        soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality); //play standard move dialogue
+                                }
 
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
                             }

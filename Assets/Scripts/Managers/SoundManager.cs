@@ -2542,7 +2542,7 @@ public class SoundManager : MonoBehaviour
         int enemyCount = 0;
         foreach (Soldier s in game.AllSoldiers())
         {
-            if (s.IsOppositeTeamAs(soldier) && s.IsAlive())
+            if (s.IsOppositeTeamAs(soldier) && !s.IsDead())
                 enemyCount++;
         }
         return enemyCount;
