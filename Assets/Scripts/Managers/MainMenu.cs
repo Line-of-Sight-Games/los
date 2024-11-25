@@ -904,7 +904,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         weather.CurrentVis = dropdown.captionText.text;
         
         if (!weather.CurrentVis.Equals(oldVis))
-            game.SetLosCheckAll("statChange(SR)|weatherChange(override)"); //losCheckAll
+            game.SetLosCheckAll("statChange(SR)|weatherChange(override)"); //loscheckall
     }
     public void SetOverrideWindSpeed()
     {
@@ -1042,8 +1042,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if ((xyz.Equals("X") && newlocationInput >= 1 && newlocationInput <= game.maxX) || (xyz.Equals("Y") && newlocationInput >= 1 && newlocationInput <= game.maxY) || (xyz.Equals("Z") && newlocationInput >= 0 && newlocationInput <= game.maxZ))
             {
-                //losCheck
-                activeSoldier.SetLosCheck("losChange|move(override)");
+                activeSoldier.SetLosCheck("losChange|move(override)"); //losCheck
 
                 if (xyz.Equals("X"))
                     activeSoldier.X = newlocationInput;

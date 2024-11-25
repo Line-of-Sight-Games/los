@@ -209,7 +209,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void SetLosCheckAll(string causeOfLosCheck)
     {
         foreach (Soldier s in AllFieldedSoldiers())
-            s.SetLosCheck(causeOfLosCheck);
+            s.SetLosCheck(causeOfLosCheck); //loscheck
     }
 
 
@@ -444,7 +444,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                         binocBeam.turnsActive++;
                         if (binocBeam.turnsActive % 2 == 0)
-                            s.SetLosCheck("statChange(P)|binocIncrease|Recon");
+                            s.SetLosCheck("statChange(P)|binocIncrease|Recon"); //loscheck
                 }
             }
         }
@@ -495,7 +495,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //run los checks only if weather changes
         if (CheckWeatherChange(weather.LastTurnVis, weather.CurrentVis) != "false")
-            SetLosCheckAll("statChange(SR)|weatherChange");
+            SetLosCheckAll("statChange(SR)|weatherChange"); //loscheckall
         //losCheck will automatically run due to collider change
     }
     public void StartRound()
@@ -2722,7 +2722,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 disarmedItem = itemManager.SpawnItem("Deployment_Beacon");
             else if (poiToDisarm is ThermalCamera)
             {
-                SetLosCheckAll("losChange|thermalCamDeactive");
+                SetLosCheckAll("losChange|thermalCamDeactive"); //loscheckall
                 disarmedItem = itemManager.SpawnItem("Thermal_Camera");
             }
                 
@@ -3228,7 +3228,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 
-                SetLosCheckAll("losChange|thermalCamActive"); //loscheck all
+                SetLosCheckAll("losChange|thermalCamActive"); //loscheckall
                 Instantiate(poiManager.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
@@ -4096,7 +4096,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         foreach (Soldier s in AllSoldiers())
             s.RemoveAllLOSToAllSoldiers();
 
-        SetLosCheckAll("losChange|losCheck"); //losCheckAll
+        SetLosCheckAll("losChange|losCheck"); //loscheckall
     }
 
 

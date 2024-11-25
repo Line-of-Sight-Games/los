@@ -1034,16 +1034,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsMeleeEngaged())
             StartCoroutine(game.DetermineMeleeControllerMultiple(this));
 
-        //losCheck
-        SetLosCheck("losChange|statChange(SR)(C)|playdeadActive"); 
+        SetLosCheck("losChange|statChange(SR)(C)|playdeadActive"); //losCheck
     }
 
     public void UnsetPlaydead()
     {
         UnsetState("Playdead");
 
-        //losCheck
-        SetLosCheck("losChange|statChange(SR)(C)|playdeadDeactive"); 
+        SetLosCheck("losChange|statChange(SR)(C)|playdeadDeactive"); //losCheck
     }
     public void TakeDrug(string drugName, Soldier administeredBy)
     {
@@ -2437,7 +2435,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         SetState("SmokeBlinded");
         menu.AddDamageAlert(this, $"Covered by smoke cloud (<color=red>Blind Zone</color>).", false, true);
 
-        SetLosCheck("statChange(SR)|smokeActive(blindzone)"); //losCheck
+        SetLosCheck("statChange(P)(SR)|smokeActive(blindzone)"); //losCheck
     }
     public void UnsetSmoked()
     {
