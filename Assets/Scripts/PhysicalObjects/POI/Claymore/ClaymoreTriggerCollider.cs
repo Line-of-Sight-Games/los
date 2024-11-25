@@ -9,8 +9,11 @@ public class ClaymoreTriggerCollider : BaseTriggerCollider
         {
             if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
             {
-                if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
-                    LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
+                if (!LinkedClaymore.Triggered)
+                {
+                    if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
+                        LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
+                }
             }
         }
     }
@@ -20,8 +23,11 @@ public class ClaymoreTriggerCollider : BaseTriggerCollider
         {
             if (bodyThatEntered.TryGetComponent(out SoldierBodyCollider soldierThatEntered))
             {
-                if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
-                    LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
+                if (!LinkedClaymore.Triggered)
+                {
+                    if (LinkedClaymore.CheckClaymoreTriggered(soldierThatEntered.LinkedSoldier))
+                        LinkedClaymore.CheckExplosionClaymore(soldierThatEntered.LinkedSoldier, false);
+                }
             }
         }
     }
