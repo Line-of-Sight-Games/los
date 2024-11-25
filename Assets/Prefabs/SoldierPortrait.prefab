@@ -804,6 +804,7 @@ MonoBehaviour:
   soldierRank: {fileID: 7177674919149698236}
   armourImage: {fileID: 1124927400623524748}
   brokenArmourImage: {fileID: 9141416978744803195}
+  hpDisplayImage: {fileID: 855990136811820732}
   hpDisplay: {fileID: 3155235585769130665}
   soldierPosition: {fileID: 1256156467774827679}
   soldierName: {fileID: 6113069928798171869}

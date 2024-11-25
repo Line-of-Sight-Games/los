@@ -311,7 +311,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     if (currentRound == maxRounds)
-                        GameOver("No Winner");
+                        GameOver("Resolve Victory Conditions");
                     else
                     {
                         currentTeam = 1;

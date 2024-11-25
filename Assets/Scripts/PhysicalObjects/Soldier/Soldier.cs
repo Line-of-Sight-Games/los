@@ -4210,7 +4210,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         int fullHealth = stats.H.Val;
         int halfHealth = stats.H.Val / 2;
-        int criticalThreshhold = 3;
+        int criticalThreshhold = 2;
 
         if (hp > fullHealth)
             return "<color=green>Overhealth</color>";

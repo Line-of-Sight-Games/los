@@ -10,6 +10,7 @@ public class SoldierPortrait : MonoBehaviour
     public Image soldierRank;
     public Image armourImage;
     public Image brokenArmourImage;
+    public Image hpDisplayImage;
     public TextMeshProUGUI hpDisplay;
     public Image soldierPosition;
     public TextMeshProUGUI soldierName, soldierLocation;
@@ -36,13 +37,24 @@ public class SoldierPortrait : MonoBehaviour
             soldierRank.sprite = linkedSoldier.LoadInsignia(linkedSoldier.rank);
 
             //load hp
-            armourImage.gameObject.SetActive(false);
-            brokenArmourImage.gameObject.SetActive(false);
-            if (linkedSoldier.IsWearingBodyArmour(true) || linkedSoldier.IsWearingJuggernautArmour(true))
-                armourImage.gameObject.SetActive(true);
-            else if (linkedSoldier.IsWearingBodyArmour(false) || linkedSoldier.IsWearingJuggernautArmour(false))
-                brokenArmourImage.gameObject.SetActive(true);
-            hpDisplay.text = $"{linkedSoldier.GetFullHP()}";
+            if (linkedSoldier.IsOnturn() || linkedSoldier.menu.OverrideView)
+            {
+                armourImage.gameObject.SetActive(false);
+                brokenArmourImage.gameObject.SetActive(false);
+                if (linkedSoldier.IsWearingBodyArmour(true) || linkedSoldier.IsWearingJuggernautArmour(true))
+                    armourImage.gameObject.SetActive(true);
+                else if (linkedSoldier.IsWearingBodyArmour(false) || linkedSoldier.IsWearingJuggernautArmour(false))
+                    brokenArmourImage.gameObject.SetActive(true);
+                hpDisplayImage.gameObject.SetActive(true);
+                hpDisplay.text = $"{linkedSoldier.GetFullHP()}";
+            }
+            else //hide all hp details 
+            {
+                armourImage.gameObject.SetActive(false);
+                brokenArmourImage.gameObject.SetActive(false);
+                hpDisplayImage.gameObject.SetActive(false);
+                hpDisplay.text = string.Empty;
+            }
 
             //load body position
             if (linkedSoldier.IsUnconscious() || linkedSoldier.IsPlayingDead())
