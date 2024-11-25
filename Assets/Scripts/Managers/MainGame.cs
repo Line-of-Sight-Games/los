@@ -4161,6 +4161,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         insertObjectsUI.terminalTypeUI.SetActive(false);
         insertObjectsUI.allItemsPanelUI.SetActive(false);
+        insertObjectsUI.allDrugsPanelUI.SetActive(false);
 
         if (insertObjectsUI.objectTypeDropdown.value == 1)
         {

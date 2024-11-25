@@ -4624,7 +4624,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         insertObjectsUI.zPos.text = string.Empty;
         insertObjectsUI.terrainDropdown.value = 0;
 
-        foreach (Transform child in insertObjectsUI.gbItemsPanel)
+        foreach (Transform child in insertObjectsUI.gbItemsPanel) //clear gb
+        {
+            ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
+            if (itemIcon != null && itemIcon.pickupNumber > 0)
+                itemIcon.pickupNumber = 0;
+        }
+        foreach (Transform child in insertObjectsUI.dcItemsPanel) //clear dc
         {
             ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
             if (itemIcon != null && itemIcon.pickupNumber > 0)
