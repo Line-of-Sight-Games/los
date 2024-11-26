@@ -34,12 +34,33 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public string poisonedBy;
     public int jammingForTurns;
     public int spyingForTurns;
+    public int maxClip;
+    public int damage;
+    public int critDamage;
+    public int cQBU;
+    public int cQBA;
+    public int shortU;
+    public int shortA;
+    public int medU;
+    public int medA;
+    public int longU;
+    public int longA;
+    public int coriolisU;
+    public int coriolisA;
+    public int suppressDrain;
+    public int cQBSupPen;
+    public int shortSupPen;
+    public int medSupPen;
+    public int longSupPen;
+    public int corSupPen;
+    public int cQBCovDamage;
+    public int shortCovDamage;
+    public int medCovDamage;
+    public int longCovDamage;
 
     public Inventory inventory;
     public List<string> inventoryList;
     public Dictionary<string, string> inventorySlots;
-
-    public Dictionary<string, int> gunTraits;
 
     private Soldier linkedSoldier;
 
@@ -87,14 +108,39 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         jammingForTurns = reader.allItems.items[itemIndex].JammingForTurns;
         spyingForTurns = reader.allItems.items[itemIndex].SpyingForTurns;
 
+        if (traits.Contains("Gun"))
+        {
+            maxClip = reader.allItems.items[itemIndex].MaxClip;
+            damage = reader.allItems.items[itemIndex].Damage;
+            critDamage = reader.allItems.items[itemIndex].CritDamage;
+            cQBU = reader.allItems.items[itemIndex].CQBU;
+            cQBA = reader.allItems.items[itemIndex].CQBA;
+            shortU = reader.allItems.items[itemIndex].ShortU;
+            shortA = reader.allItems.items[itemIndex].ShortA;
+            medU = reader.allItems.items[itemIndex].MedU;
+            medA = reader.allItems.items[itemIndex].MedA;
+            longU = reader.allItems.items[itemIndex].LongU;
+            longA = reader.allItems.items[itemIndex].LongA; 
+            coriolisU = reader.allItems.items[itemIndex].CoriolisU;
+            coriolisA = reader.allItems.items[itemIndex].CoriolisA;
+            suppressDrain = reader.allItems.items[itemIndex].SuppressDrain;
+            cQBSupPen = reader.allItems.items[itemIndex].CQBSupPen;
+            shortSupPen = reader.allItems.items[itemIndex].ShortSupPen;
+            medSupPen = reader.allItems.items[itemIndex].MedSupPen;
+            longSupPen = reader.allItems.items[itemIndex].LongSupPen;
+            corSupPen = reader.allItems.items[itemIndex].CorSupPen;
+            cQBCovDamage = reader.allItems.items[itemIndex].CQBCovDamage;
+            shortCovDamage = reader.allItems.items[itemIndex].ShortCovDamage;
+            medCovDamage = reader.allItems.items[itemIndex].MedCovDamage;
+            longCovDamage = reader.allItems.items[itemIndex].LongCovDamage;
+        }
+
         if (traits.Contains("Storage"))
         {
             inventory = new Inventory(this);
             inventorySlots = reader.allItems.items[itemIndex].InventorySlots;
         }
 
-        if (traits.Contains("Gun"))
-            gunTraits = reader.allItems.items[itemIndex].GunTraits;
 
         itemManager.RefreshItemList();
         return this;
@@ -281,17 +327,39 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             z = Convert.ToInt32(details["z"]);
             MapPhysicalPosition(x, y, z);
 
-            if (HasInventory())
+            if (IsGun()) //load gun info
             {
-                //load inventory info
+                maxClip = Convert.ToInt32(details["maxClip"]);
+                damage = Convert.ToInt32(details["damage"]);
+                critDamage = Convert.ToInt32(details["critDamage"]);
+                cQBU = Convert.ToInt32(details["cQBU"]);
+                cQBA = Convert.ToInt32(details["cQBA"]);
+                shortU = Convert.ToInt32(details["shortU"]);
+                shortA = Convert.ToInt32(details["shortA"]);
+                medU = Convert.ToInt32(details["medU"]);
+                medA = Convert.ToInt32(details["medA"]);
+                longU = Convert.ToInt32(details["longU"]);
+                longA = Convert.ToInt32(details["longA"]);
+                coriolisU = Convert.ToInt32(details["coriolisU"]);
+                coriolisA = Convert.ToInt32(details["coriolisA"]);
+                suppressDrain = Convert.ToInt32(details["suppressDrain"]);
+                cQBSupPen = Convert.ToInt32(details["cQBSupPen"]);
+                shortSupPen = Convert.ToInt32(details["shortSupPen"]);
+                medSupPen = Convert.ToInt32(details["medSupPen"]);
+                longSupPen = Convert.ToInt32(details["longSupPen"]);
+                corSupPen = Convert.ToInt32(details["corSupPen"]);
+                cQBCovDamage = Convert.ToInt32(details["cQBCovDamage"]);
+                shortCovDamage = Convert.ToInt32(details["shortCovDamage"]);
+                medCovDamage = Convert.ToInt32(details["medCovDamage"]);
+                longCovDamage = Convert.ToInt32(details["longCovDamage"]);
+            }
+
+            if (HasInventory()) //load inventory info
+            {
                 inventory = new Inventory(this);
                 inventoryList = (details["inventory"] as JArray).Select(token => token.ToString()).ToList();
                 inventorySlots = JsonConvert.DeserializeObject<Dictionary<string, string>>(details["inventorySlots"].ToString());
             }
-
-            if (IsGun())
-                gunTraits = JsonConvert.DeserializeObject<Dictionary<string, int>>(details["gunTraits"].ToString());
-
         }
     }
 
@@ -318,15 +386,38 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             { "z", z },
         };
 
-        if (HasInventory())
+        if (IsGun()) //save gun info
         {
-            //save inventory
+            details.Add("maxClip", maxClip);
+            details.Add("damage", damage);
+            details.Add("critDamage", critDamage);
+            details.Add("cQBU", cQBU);
+            details.Add("cQBA", cQBA);
+            details.Add("shortU", shortU);
+            details.Add("shortA", shortA);
+            details.Add("medU", medU);
+            details.Add("medA", medA);
+            details.Add("longU", longU);
+            details.Add("longA", longA);
+            details.Add("coriolisU", coriolisU);
+            details.Add("coriolisA", coriolisA);
+            details.Add("suppressDrain", suppressDrain);
+            details.Add("cQBSupPen", cQBSupPen);
+            details.Add("shortSupPen", shortSupPen);
+            details.Add("medSupPen", medSupPen);
+            details.Add("longSupPen", longSupPen);
+            details.Add("corSupPen", corSupPen);
+            details.Add("cQBCovDamage", cQBCovDamage);
+            details.Add("shortCovDamage", shortCovDamage);
+            details.Add("medCovDamage", medCovDamage);
+            details.Add("longCovDamage", longCovDamage);
+        }
+
+        if (HasInventory()) //save inventory info
+        {
             details.Add("inventory", Inventory.AllItemIds);
             details.Add("inventorySlots", inventorySlots);
         }
-
-        if (IsGun())
-            details.Add("gunTraits", gunTraits);
 
         //add the item in
         if (data.allItemDetails.ContainsKey(id))
@@ -435,7 +526,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     if (!linkedSoldier.gunnerGunsBlessed.Contains(this.Id))
                     {
                         //one time 1.5 bonus to max clip
-                        gunTraits["MaxClip"] = Mathf.FloorToInt(gunTraits["MaxClip"] * 1.5f);
+                        maxClip = Mathf.FloorToInt(maxClip * 1.5f);
 
                         //get ammo increase minimum 1
                         int ammoIncrease = Mathf.FloorToInt(ammo * 0.5f);
@@ -454,8 +545,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     if (!linkedSoldier.plannerGunsBlessed.Contains(this.Id))
                     {
                         ammo += game.DiceRoll();
-                        if (ammo > gunTraits["MaxClip"])
-                            ammo = gunTraits["MaxClip"];
+                        if (ammo > maxClip)
+                            ammo = maxClip;
 
                         linkedSoldier.plannerGunsBlessed.Add(this.Id);
                     }
@@ -514,12 +605,10 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         return false;
     }
-
     public void SpendSingleAmmo()
     {
         ammo--;
     }
-
     public void SpendSpecificAmmo(int ammo, bool fromSuppression)
     {
         if (linkedSoldier != null)
@@ -529,6 +618,10 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             this.ammo -= ammo;
         }
+    }
+    public int GetSuppressionValue(string suppressionBracket)
+    {
+        return (int)GetType().GetField(suppressionBracket).GetValue(this);
     }
     public int TakeAblativeDamage(Soldier damagedBy, int damage, List<string> damageSource)
     {
@@ -556,10 +649,10 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public string DisplayGunCoverDamage()
     {
-        if (gunTraits["LongCovDamage"].Equals(gunTraits["CQBCovDamage"]))
-            return $"({gunTraits["CQBCovDamage"]})";
+        if (longCovDamage.Equals(cQBCovDamage))
+            return $"({cQBCovDamage})";
         else
-            return $"({gunTraits["CQBCovDamage"]},{gunTraits["ShortCovDamage"]},{gunTraits["MedCovDamage"]},{gunTraits["LongCovDamage"]}-c,s,m,l)";
+            return $"({cQBCovDamage},{shortCovDamage},{medCovDamage},{longCovDamage}-c,s,m,l)";
     }
     public void MoveItem(IHaveInventory fromOwner, string fromSlot, IHaveInventory toOwner, string toSlot)
     {
