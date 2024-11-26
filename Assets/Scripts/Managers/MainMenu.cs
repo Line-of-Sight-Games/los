@@ -147,84 +147,75 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         data.playTimeTotal = playTimeTotal;
         data.turnTime = turnTime;
     }
-    public string FindStringInColXReturnStringInColYInMatrix(string[,] matrix, string searchString, int x, int y)
+    //navigation functions - menu
+    public void ReturnToMenu()
     {
-        for (int i = 0; i < matrix.GetLength(0); i++)
-            if (matrix[i, x] == searchString)
-                return matrix[i, y];
-        return null;
+        SceneManager.LoadScene("Menu");
     }
     void Start()
     {
-        //check you are in corrrect scene
-        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
+        UnfreezeTimer();
+        //check the game has started and weather exists
+        if (game.currentRound > 0 && weather.savedWeather.Count > 0)
         {
-            UnfreezeTimer();
-            //check the game has started and weather exists
-            if (game.currentRound > 0 && weather.savedWeather.Count > 0)
-            {
-                setupMenuUI.SetActive(false);
-                gameMenuUI.SetActive(true);
-            }
+            setupMenuUI.SetActive(false);
+            gameMenuUI.SetActive(true);
         }
     }
 
     void Update()
     {
-        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
+        //check the game has started and weather exists
+        if (game.currentRound > 0 && weather.savedWeather.Count > 0)
         {
-            //check the game has started and weather exists
-            if (game.currentRound > 0 && weather.savedWeather.Count > 0)
+            //check if game has not run out of turns
+            if (game.currentRound <= game.maxRounds)
             {
-                //check if game has not run out of turns
-                if (game.currentRound <= game.maxRounds)
-                {
-                    //always count play time
-                    playTimeTotal += Time.unscaledDeltaTime;
+                //always count play time
+                playTimeTotal += Time.unscaledDeltaTime;
 
-                    //don't count turn time if timerstopped
-                    if (!TimerStop)
-                        turnTime += Time.deltaTime;
+                //don't count turn time if timerstopped
+                if (!TimerStop)
+                    turnTime += Time.deltaTime;
 
-                    DisplayWeather();
-                }
-                if (!game.gameOver)
-                {
-                    DisplaySoldiers();
-                    RenderSoldierVisuals();
-                    CheckWinConditions();
-                }
+                DisplayWeather();
+            }
+            if (!game.gameOver)
+            {
+                DisplaySoldiers();
+                RenderSoldierVisuals();
+                CheckWinConditions();
+            }
 
-                //check for game mute
-                if (Input.GetKeyDown(KeyCode.M))
-                {
-                    if (OverrideKey())
-                        ToggleMute();
-                }
+            //check for game mute
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                if (OverrideKey())
+                    ToggleMute();
+            }
 
-                if (!OverrideView)
-                {
-                    //show/hide end turn button
-                    if (activeSoldier == null)
-                        endTurnButton.SetActive(true);
-                    else
-                        endTurnButton.SetActive(false);
-                }
+            if (!OverrideView)
+            {
+                //show/hide end turn button
+                if (activeSoldier == null)
+                    endTurnButton.SetActive(true);
+                else
+                    endTurnButton.SetActive(false);
+            }
 
-                DisplayItems();
-                gameTimer.text = FormatFloatTime(playTimeTotal);
-                turnTimer.text = FormatFloatTime(game.maxTurnTime - turnTime);
-                TurnTimerColour();
-                ChangeRoundIndicators();
+            DisplayItems();
+            gameTimer.text = FormatFloatTime(playTimeTotal);
+            turnTimer.text = FormatFloatTime(game.maxTurnTime - turnTime);
+            TurnTimerColour();
+            ChangeRoundIndicators();
 
-                //show LOS gizmos
-                DisplayLOSGizmos();
+            //show LOS gizmos
+            DisplayLOSGizmos();
 
-                if (activeSoldier != null)
-                {
-                    DisplayActiveSoldier();
-                    DisplayActionMenu();
-                }
+            if (activeSoldier != null)
+            {
+                DisplayActiveSoldier();
+                DisplayActionMenu();
             }
         }
     }
@@ -1778,19 +1769,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
 
-    //navigation functions - menu
-    public void CreateClicked()
-    {
-        SceneManager.LoadScene("Create");
-    }
-    public void QuitClicked()
-    {
-        Application.Quit();
-    }
-    public void ReturnToMenu()
-    {
-        SceneManager.LoadScene("Menu");
-    }
+    
 
 
 

@@ -47,4 +47,11 @@ public static class HelperFunctions
 
         return Mathf.RoundToInt(100 * (1 - (1 - fExistingSup) * (1 - fAddingSup)));
     }
+    public static string FindStringInColXReturnStringInColYInMatrix(string[,] matrix, string searchString, int x, int y)
+    {
+        for (int i = 0; i < matrix.GetLength(0); i++)
+            if (matrix[i, x] == searchString)
+                return matrix[i, y];
+        return null;
+    }
 }

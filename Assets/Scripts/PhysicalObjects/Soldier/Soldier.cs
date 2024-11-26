@@ -603,7 +603,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string PrintSoldierSpeciality()
     {
-        return menu.FindStringInColXReturnStringInColYInMatrix(menu.specialtiesStats, soldierSpeciality, 1, 0);
+        return HelperFunctions.FindStringInColXReturnStringInColYInMatrix(menu.specialtiesStats, soldierSpeciality, 1, 0);
     }
     public void IncrementXP(int xp, bool learnerEnabled)
     {

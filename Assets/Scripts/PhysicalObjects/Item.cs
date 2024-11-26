@@ -141,7 +141,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             inventorySlots = reader.allItems.items[itemIndex].InventorySlots;
         }
 
-
         itemManager.RefreshItemList();
         return this;
     }
