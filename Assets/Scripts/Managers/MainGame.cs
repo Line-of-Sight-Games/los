@@ -42,7 +42,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Soldier tempSoldier;
     public List<string> tempDamageSource;
 
-    public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI, soldierDisplayPanelUI;
+    public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI;
     public Soldier activeSoldier;
 
     public MainGame Init()

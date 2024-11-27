@@ -6,6 +6,7 @@ public class SoldierUI : MonoBehaviour
 {
     public MainMenu menu;
     public MainGame game;
+    public SoldierManager soldierManager;
     public SoundManager soundManager;
     public Soldier linkedSoldier;
     public TMP_InputField xSize, ySize, zSize;
@@ -20,9 +21,17 @@ public class SoldierUI : MonoBehaviour
     {
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
+        soldierManager = FindFirstObjectByType<SoldierManager>();
         soundManager = FindFirstObjectByType<SoundManager>();
     }
-
+    public void DisplayInFriendlyColumn()
+    {
+        transform.SetParent(soldierManager.friendlyDisplayColumn.transform);
+    }
+    public void DisplayInEnemyColumn()
+    {
+        transform.SetParent(soldierManager.enemyDisplayColumn.transform);
+    }
     public void FieldButtonClicked()
     {
         //play button press sfx
@@ -88,7 +97,8 @@ public class SoldierUI : MonoBehaviour
         linkedSoldier.SetActiveSoldier();
         
         //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
-        menu.menuUI.transform.Find("GameMenu").Find("UnitDisplayPanel").gameObject.SetActive(false);
+        soldierManager.enemyDisplayColumn.gameObject.SetActive(false);
+        soldierManager.friendlyDisplayColumn.gameObject.SetActive(false);
         menu.menuUI.transform.Find("GameMenu").Find("SoldierOptions").gameObject.SetActive(true);
         /*if (type == "frozen")
             menu.turnTitle.text = "<color=orange>F R O Z E N    T U R N</color>";

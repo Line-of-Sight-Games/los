@@ -1734,7 +1734,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 game.EndFrozenTurn();
             activeSoldier.UnsetActiveSoldier();
             soldierOptionsUI.SetActive(false);
-            menuUI.transform.Find("GameMenu").Find("UnitDisplayPanel").gameObject.SetActive(true);
+            soldierManager.enemyDisplayColumn.gameObject.SetActive(true);
+            soldierManager.friendlyDisplayColumn.gameObject.SetActive(true);
             //turnTitle.text = "L I N E    O F    S I G H T";
         }
     }

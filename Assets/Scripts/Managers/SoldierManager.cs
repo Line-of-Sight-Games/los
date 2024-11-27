@@ -10,6 +10,38 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     public List<Soldier> allSoldiers = new();
     public Soldier soldierPrefab;
 
+    public GameObject friendlyDisplayColumn, enemyDisplayColumn;
+    private void Update()
+    {
+        foreach (SoldierUI soldierUI in FindObjectsByType<SoldierUI>(default))
+        {
+            if (soldierUI.linkedSoldier != null)
+            {
+                if (soldierUI.linkedSoldier.IsOnturn())
+                    soldierUI.DisplayInFriendlyColumn();
+                else
+                    soldierUI.DisplayInEnemyColumn();
+            }
+        }
+        
+        //order soldiers by display priority
+        SetSiblingIndexByPriority();
+    }
+    public void SetSiblingIndexByPriority()
+    {
+        // Get all sibling components
+        Soldier[] allSoldiers = FindObjectsByType<Soldier>(default);
+
+        // Sort siblings by soldierDisplayPriority in ascending order
+        System.Array.Sort(allSoldiers, (x, y) => x.soldierDisplayPriority.CompareTo(y.soldierDisplayPriority));
+
+        // Set the sibling index of the soldiers and their linkedUI based on the sorted order
+        for (int i = 0; i < allSoldiers.Length; i++)
+        {
+            allSoldiers[i].transform.SetSiblingIndex(i);
+            allSoldiers[i].soldierUI.transform.SetSiblingIndex(i);
+        }
+    }
     public void LoadData(GameData data)
     {
         //destroy existing soldiers ready to regenerate them
@@ -27,13 +59,11 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
             newSoldier.id = id;
             newSoldier.LoadData(data);
 
-            if (game.soldierDisplayPanelUI != null)
-                newSoldier.LinkWithUI(game.soldierDisplayPanelUI);
+            if (newSoldier.IsOnturn())
+                newSoldier.LinkWithUI(friendlyDisplayColumn.transform);
+            else
+                newSoldier.LinkWithUI(enemyDisplayColumn.transform);
         }
-
-        //order soldiers by display priority
-        SetSiblingIndexByPriority();
-
         RefreshSoldierList();
     }
 
@@ -51,23 +81,6 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     {
         allSoldiers = FindObjectsByType<Soldier>(default).ToList();
     }
-
-    public void SetSiblingIndexByPriority()
-    {
-        // Get all sibling components
-        Soldier[] allSoldiers = FindObjectsByType<Soldier>(default);
-
-        // Sort siblings by soldierDisplayPriority in ascending order
-        System.Array.Sort(allSoldiers, (x, y) => x.soldierDisplayPriority.CompareTo(y.soldierDisplayPriority));
-
-        // Set the sibling index of the soldiers and their linkedUI based on the sorted order
-        for (int i = 0; i < allSoldiers.Length; i++)
-        {
-            allSoldiers[i].transform.SetSiblingIndex(i);
-            allSoldiers[i].soldierUI.transform.SetSiblingIndex(i);
-        }
-    }
-
     public Soldier FindSoldierByName(string name)
     {
         foreach (Soldier s in allSoldiers)

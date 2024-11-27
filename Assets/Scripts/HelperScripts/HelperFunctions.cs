@@ -4,7 +4,7 @@ public static class HelperFunctions
 {
     public static Vector3 ConvertPhysicalPosToMathPos(Vector3 physicalPos)
     {
-        return new(Mathf.RoundToInt(physicalPos.x + 0.5f), Mathf.RoundToInt(physicalPos.z), Mathf.RoundToInt(physicalPos.y + 0.5f));
+        return new(Mathf.CeilToInt(physicalPos.x + 0.5f), Mathf.CeilToInt(physicalPos.z), Mathf.CeilToInt(physicalPos.y + 0.5f));
     }
     public static Vector3 ConvertMathPosToPhysicalPos(Vector3 mathPos)
     {

@@ -2807,6 +2807,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 //re-render as dead
                 CheckSpecialityColor(soldierSpeciality);
 
+                //change display index to render at bottom of column
+                soldierDisplayPriority += 100;
+
                 if (killedBy != null)
                 {
                     //pay xp for relevant damage type kill
