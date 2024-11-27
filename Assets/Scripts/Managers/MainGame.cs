@@ -2855,7 +2855,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_Dropdown strikeOption = useUHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>();
 
         int dipelecScore = itemManager.scoreTable[activeSoldier.stats.Dip.Val, activeSoldier.stats.Elec.Val];
-        Tuple<int, string, int, int, int> strike = itemManager.GetStrike(dipelecScore);
+        Tuple<int, string, int, int, int> strike = itemManager.GetStrike(strikeOption.captionText.text);
         int rolls = strike.Item4;
         int radius = strike.Item3;
         int damage = strike.Item5;
@@ -2895,6 +2895,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
                     {
+                        strikeOption.interactable = false;
                         targetX.text = $"{newX}";
                         targetX.interactable = false;
                         targetY.text = $"{newY}";
@@ -3267,13 +3268,21 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Explosion explosion1 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(radius / 2, position);
         Explosion explosion2 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(radius, position);
 
-        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
+        foreach (PhysicalObject obj in AllBattlefieldObjects())
         {
+            print($"testing object -> {obj.name}");
             float damagef = 0;
             if (obj.IsWithinSphere(explosion1.BodyCollider))
+            {
+                print($"obj {obj.name} is within inner sphere");
                 damagef = damage;
+            }
             else if (obj.IsWithinSphere(explosion2.BodyCollider))
+            {
+                print($"obj {obj.name} is within outer sphere");
                 damagef = damage / 2.0f;
+            }
+                
 
             if (damagef > 0)
             {
@@ -4152,9 +4161,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetInsertLocation(out Tuple<Vector3, string> insertLocation)
     {
         insertLocation = default;
-        if (menu.ValidateIntInput(insertObjectsUI.xPos, out int x) && menu.ValidateIntInput(insertObjectsUI.yPos, out int y) && menu.ValidateIntInput(insertObjectsUI.zPos, out int z) && insertObjectsUI.terrainDropdown.value != 0)
+        if (menu.ValidateIntInput(insertObjectsUI.xPos, out int x) && menu.ValidateIntInput(insertObjectsUI.yPos, out int y) && menu.ValidateIntInput(insertObjectsUI.zPos, out int z))
         {
-            insertLocation = Tuple.Create(new Vector3(x, y, z), insertObjectsUI.terrainDropdown.captionText.text);
+            insertLocation = Tuple.Create(new Vector3(x, y, z), string.Empty);
 
             return true;
         }

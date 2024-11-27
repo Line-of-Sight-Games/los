@@ -131,7 +131,7 @@ MonoBehaviour:
   game: {fileID: 0}
   menu: {fileID: 0}
   poiManager: {fileID: 0}
-  poiType: terminal
+  poiType: 
   poiPortrait: {fileID: 0}
   terminalType: 
   terminalEnabled: 0

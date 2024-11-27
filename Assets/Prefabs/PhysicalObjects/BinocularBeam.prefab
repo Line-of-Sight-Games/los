@@ -64,6 +64,9 @@ MonoBehaviour:
   beamHeight: 0
   beamWidth: 0
   beam: {fileID: 5430844220833104398}
+  linkedCollider: {fileID: 0}
+  flashMode: 0
+  turnsActive: 0
 --- !u!1001 &2486529684757761801
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -164,4 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menu: {fileID: 0}
   linkedObject: {fileID: 8801930071501971075}
+  linkedSoldier: {fileID: 0}
   linkedBinocularBeam: {fileID: 8801930071501971075}

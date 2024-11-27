@@ -4394,6 +4394,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ClearUHFUI()
     {
+        UHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
+        UHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>().interactable = true;
         UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
         UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
         UHFUI.transform.Find("OptionPanel").Find("UHFTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
@@ -4601,7 +4603,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         insertObjectsUI.xPos.text = string.Empty;
         insertObjectsUI.yPos.text = string.Empty;
         insertObjectsUI.zPos.text = string.Empty;
-        insertObjectsUI.terrainDropdown.value = 0;
 
         foreach (Transform child in insertObjectsUI.gbItemsPanel) //clear gb
         {

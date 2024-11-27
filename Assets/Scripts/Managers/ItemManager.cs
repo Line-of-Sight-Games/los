@@ -120,11 +120,13 @@ public class ItemManager : MonoBehaviour, IDataPersistence
             }
         }
     }
-    public Tuple<int, string, int, int, int> GetStrike(int score)
+    public Tuple<int, string, int, int, int> GetStrike(string strikeName)
     {
-        for (int i = strikeTable.Length - 1; i >= 0; i--)
-            if (strikeTable[i].Item1 <= score)
-                return strikeTable[i];
+        foreach (Tuple<int, string, int, int, int> strike in strikeTable)
+        {
+            if (strike.Item2.Equals(strikeName))
+                return strike;
+        }
         return null;
     }
     public List<string> GetStrikeAndLowerNames(int score)
