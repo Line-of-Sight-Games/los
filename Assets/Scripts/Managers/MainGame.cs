@@ -3270,20 +3270,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         foreach (PhysicalObject obj in AllBattlefieldObjects())
         {
-            print($"testing object -> {obj.name}");
             float damagef = 0;
             if (obj.IsWithinSphere(explosion1.BodyCollider))
-            {
-                print($"obj {obj.name} is within inner sphere");
                 damagef = damage;
-            }
             else if (obj.IsWithinSphere(explosion2.BodyCollider))
-            {
-                print($"obj {obj.name} is within outer sphere");
                 damagef = damage / 2.0f;
-            }
                 
-
             if (damagef > 0)
             {
                 if (obj is Item hitItem)
