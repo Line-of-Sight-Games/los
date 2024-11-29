@@ -140,9 +140,11 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
     {
         if (item != null)
         {
+            print($"trying to add {item.itemName} to {slotName}");
             Transform targetSlot = transform.FindRecursively(slotName);
             targetSlot.GetComponent<ItemSlot>().AssignItemIcon(Instantiate(itemIconPrefab, targetSlot).GetComponent<ItemIcon>().Init(item));
-        }   
+            print($"successfully added {item.itemName} to {targetSlot.name}");
+        }
     }
     private void Update()
     {
