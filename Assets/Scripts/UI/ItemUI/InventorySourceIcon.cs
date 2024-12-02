@@ -20,12 +20,6 @@ public class InventorySourceIcon : MonoBehaviour
 
     public void OpenItemPanel()
     {
-        //locater ability
-        if (this is InventorySourceIconGoodyBox gbIcon)
-            menu.inventorySourceViewOnly = gbIcon.inventorySourceViewOnly;
-        else if (this is InventorySourceIconDrugCabinet dcIcon)
-            menu.inventorySourceViewOnly = dcIcon.inventorySourceViewOnly;
-
         menu.OpenInventoryPanel(linkedInventoryPanel);
     }
     public void Grey(string reason)

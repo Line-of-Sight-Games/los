@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class InventoryDisplayPanelSoldier : MonoBehaviour
 {
@@ -343,8 +344,9 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
     public bool CheckSlotContainsSuppressibleGun(string slotName)
     {
         string[] gunNameList = { "AR_ACOG_FAL", "AR_AK_47", "AR_M_16", "LMG_LSW", "LMG_M_60", "LMG_SAW", "Pi_357", "Pi_Glock", "Pi_Sidearm", "Sh_Ithaca", "Sh_Olympus", "Sh_SPAS_12", "SMG_P_90", "SMG_Thompson", "SMG_UMP_40", "Sn_Barrett", "Sn_Dragunov", "Sn_Intervention" };
+        print($"{slotName}");
         Transform targetTransform = transform.FindRecursively(slotName);
-        if (targetTransform.GetComponent<ItemSlot>() != null)
+        if (targetTransform != null)
             foreach (Transform child in targetTransform)
                 if (gunNameList.Contains(child.name))
                     return true;

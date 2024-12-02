@@ -333,8 +333,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1974124470051086783}
-        m_TargetAssemblyTypeName: InventorySourceIcon, Assembly-CSharp
-        m_MethodName: OpenItemPanel
+        m_TargetAssemblyTypeName: InventorySourceIconGoodyBox, Assembly-CSharp
+        m_MethodName: OpenGBItemPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -443,6 +443,7 @@ MonoBehaviour:
   disabledReasonText: {fileID: 3279815705273210208}
   linkedGB: {fileID: 0}
   locaterDisplay: {fileID: 1921343324989623521}
+  inventorySourceViewOnly: 0
 --- !u!1001 &456104615074806623
 PrefabInstance:
   m_ObjectHideFlags: 0

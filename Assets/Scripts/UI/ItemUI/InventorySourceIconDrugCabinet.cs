@@ -23,4 +23,18 @@ public class InventorySourceIconDrugCabinet : InventorySourceIcon
         locaterDisplay.SetActive(true);
         inventorySourceViewOnly = true;
     }
+
+    public void OpenDCItemPanel()
+    {
+        if (locaterDisplay.activeSelf) //locater ability
+        {
+            if (menu.OverrideKey())
+            {
+                menu.inventorySourceViewOnly = this.inventorySourceViewOnly;
+                OpenItemPanel();
+            }
+        }
+        else
+            OpenItemPanel();
+    }
 }

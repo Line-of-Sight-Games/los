@@ -24,4 +24,18 @@ public class InventorySourceIconGoodyBox : InventorySourceIcon
         locaterDisplay.SetActive(true);
         inventorySourceViewOnly = true;
     }
+
+    public void OpenGBItemPanel()
+    {
+        if (locaterDisplay.activeSelf) //locater ability
+        {
+            if (menu.OverrideKey())
+            {
+                menu.inventorySourceViewOnly = this.inventorySourceViewOnly;
+                OpenItemPanel();
+            }
+        }
+        else
+            OpenItemPanel();
+    }
 }

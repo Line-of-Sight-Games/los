@@ -23,7 +23,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, stunnedTurnsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId;
     public Statline stats;
@@ -146,6 +146,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "usedAP", usedAP },
             { "usedMP", usedMP },
             { "loudActionTurnsVulnerable", loudActionTurnsVulnerable },
+            { "lastLoudActionCounter", lastLoudActionCounter },
+            { "lastLoudRadius", lastLoudRadius },
             { "stunnedTurnsVulnerable", stunnedTurnsVulnerable },
             { "overwatchShotCounter", overwatchShotCounter },
             { "overwatchXPoint", overwatchXPoint },
@@ -253,6 +255,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         usedAP = (bool)details["usedAP"];
         usedMP = (bool)details["usedMP"];
         loudActionTurnsVulnerable = Convert.ToInt32(details["loudActionTurnsVulnerable"]);
+        lastLoudActionCounter = Convert.ToInt32(details["lastLoudActionCounter"]);
+        lastLoudRadius = Convert.ToInt32(details["lastLoudRadius"]);
         stunnedTurnsVulnerable = Convert.ToInt32(details["stunnedTurnsVulnerable"]);
         overwatchShotCounter = Convert.ToInt32(details["overwatchShotCounter"]);
         overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
@@ -1697,6 +1701,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
+    public void SetLoudActionDisplayDetails(int loudActionRadius)
+    {
+        if (loudActionRadius > lastLoudRadius)
+        {
+            lastLoudRadius = loudActionRadius;
+            lastLoudActionCounter = 6;
+        }
+    }
     public void PerformLoudAction(int loudActionRadius)
     {
         int maxVulnerableTurns = 0;
@@ -1704,6 +1716,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //shadow ability
         if (IsShadow())
             loudActionRadius = Mathf.CeilToInt(loudActionRadius / 2.0f);
+
+        //set display values
+        SetLoudActionDisplayDetails(loudActionRadius);
 
         foreach (Soldier s in game.AllSoldiers())
         {
@@ -1737,6 +1752,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void PerformLoudAction()
     {
         int maxVulnerableTurns = 0;
+
+        //set display values
+        SetLoudActionDisplayDetails(999);
 
         foreach (Soldier s in game.AllSoldiers())
         {
@@ -4329,10 +4347,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return $", <color=green>Overwatch ({overwatchXPoint},{overwatchYPoint})</color>";
         return "";
     }
-    public string GetLoudDetectedState()
+    public string GetLoudActionState()
     {
-        if (loudActionTurnsVulnerable > 0)
-            return $", <color=red>Vulnerable({loudActionTurnsVulnerable})</color>";
+        if (lastLoudActionCounter > 0)
+        {
+            string loudRadiusString;
+            if (lastLoudRadius.Equals(999))
+                loudRadiusString = "Max";
+            else
+                loudRadiusString = lastLoudRadius.ToString();
+            return $", <color=red>Loud({loudRadiusString})Turns({lastLoudActionCounter})</color>";
+        }
         return "";
     }
 
@@ -4489,7 +4514,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetFightState();
             status += GetStunnedState();
             status += GetHungerState();
-            status += GetLoudDetectedState();
+            status += GetLoudActionState();
             status += GetMeleeControlState();
             status += GetOverwatchState();
             status += GetCoverState();

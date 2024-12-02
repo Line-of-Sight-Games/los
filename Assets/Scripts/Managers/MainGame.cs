@@ -410,6 +410,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (s.loudActionTurnsVulnerable == 0)
                     s.UnsetLoudRevealed();
             }
+
+            //decrement loud action worst case counter
+            if (s.lastLoudActionCounter > 0)
+                s.lastLoudActionCounter--;
         }
 
         menu.CheckXP();

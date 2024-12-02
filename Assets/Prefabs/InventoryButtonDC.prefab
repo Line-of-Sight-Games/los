@@ -197,8 +197,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: -6827855469164738763}
-        m_TargetAssemblyTypeName: InventorySourceIcon, Assembly-CSharp
-        m_MethodName: OpenItemPanel
+        m_TargetAssemblyTypeName: InventorySourceIconDrugCabinet, Assembly-CSharp
+        m_MethodName: OpenDCItemPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -443,6 +443,7 @@ MonoBehaviour:
   disabledReasonText: {fileID: 6041226716611573573}
   linkedDC: {fileID: 0}
   locaterDisplay: {fileID: 2236856100896040897}
+  inventorySourceViewOnly: 0
 --- !u!1001 &4511119565390590864
 PrefabInstance:
   m_ObjectHideFlags: 0
