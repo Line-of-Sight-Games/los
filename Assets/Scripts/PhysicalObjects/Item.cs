@@ -1129,6 +1129,18 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
+    public bool IsSuppressibleGun()
+    {
+        if (IsGun() && !IsRifle())
+            return true;
+        return false;
+    }
+    public bool HasSuppressorAttached()
+    {
+        if (IsSuppressibleGun() && Inventory.HasItemOfType("Suppressor"))
+            return true;
+        return false;
+    }
     public bool IsGrenade()
     {
         if (name.Contains("Grenade"))

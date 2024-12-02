@@ -211,7 +211,10 @@ public class OverwatchShotUI : MonoBehaviour
                 shooter.DecrementOverwatch();
 
                 //trigger loud action
-                shooter.PerformLoudAction();
+                if (gun.HasSuppressorAttached()) //suppressor
+                    shooter.PerformLoudAction(20);
+                else
+                    shooter.PerformLoudAction();
 
                 menu.OpenShotResultUI(false);
 

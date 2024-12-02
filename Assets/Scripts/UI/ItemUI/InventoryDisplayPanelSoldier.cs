@@ -52,25 +52,25 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         {
             LinkSlots(new() { "JArmour1", "JArmour2", "JArmour3", "JArmour4" }, headItem);
             AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour1"), "JArmour1");
-            if (headItem.Inventory.GetItemInSlot("JArmour1") is Item gunItem1 && gunItem1.IsGun() && gunItem1.HasInventory())
+            if (headItem.Inventory.GetItemInSlot("JArmour1") is Item gunItem1 && gunItem1.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"JArmour1Suppressor" }, gunItem1);
                 AddItemIconInSlot(gunItem1.Inventory.GetItemInSlot("Suppressor"), $"JArmour1Suppressor");
             }
             AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour2"), "JArmour2");
-            if (headItem.Inventory.GetItemInSlot("JArmour2") is Item gunItem2 && gunItem2.IsGun() && gunItem2.HasInventory())
+            if (headItem.Inventory.GetItemInSlot("JArmour2") is Item gunItem2 && gunItem2.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"JArmour2Suppressor" }, gunItem2);
                 AddItemIconInSlot(gunItem2.Inventory.GetItemInSlot("Suppressor"), $"JArmour2Suppressor");
             }
             AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour3"), "JArmour3");
-            if (headItem.Inventory.GetItemInSlot("JArmour3") is Item gunItem3 && gunItem3.IsGun() && gunItem3.HasInventory())
+            if (headItem.Inventory.GetItemInSlot("JArmour3") is Item gunItem3 && gunItem3.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"JArmour3Suppressor" }, gunItem3);
                 AddItemIconInSlot(gunItem3.Inventory.GetItemInSlot("Suppressor"), $"JArmour3Suppressor");
             }
             AddItemIconInSlot(headItem.Inventory.GetItemInSlot("JArmour4"), "JArmour4");
-            if (headItem.Inventory.GetItemInSlot("JArmour4") is Item gunItem4 && gunItem4.IsGun() && gunItem4.HasInventory())
+            if (headItem.Inventory.GetItemInSlot("JArmour4") is Item gunItem4 && gunItem4.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"JArmour3Suppressor" }, gunItem4);
                 AddItemIconInSlot(gunItem4.Inventory.GetItemInSlot("Suppressor"), $"JArmour4Suppressor");
@@ -84,13 +84,13 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         {
             LinkSlots(new() { "BArmour1", "BArmour2" }, chestItem);
             AddItemIconInSlot(chestItem.Inventory.GetItemInSlot("BArmour1"), "BArmour1");
-            if (chestItem.Inventory.GetItemInSlot("BArmour1") is Item gunItem5 && gunItem5.IsGun() && gunItem5.HasInventory())
+            if (chestItem.Inventory.GetItemInSlot("BArmour1") is Item gunItem5 && gunItem5.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"BArmour1Suppressor" }, gunItem5);
                 AddItemIconInSlot(gunItem5.Inventory.GetItemInSlot("Suppressor"), $"BArmour1Suppressor");
             }
             AddItemIconInSlot(chestItem.Inventory.GetItemInSlot("BArmour2"), "BArmour2");
-            if (chestItem.Inventory.GetItemInSlot("BArmour2") is Item gunItem6 && gunItem6.IsGun() && gunItem6.HasInventory())
+            if (chestItem.Inventory.GetItemInSlot("BArmour2") is Item gunItem6 && gunItem6.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"BArmour2Suppressor" }, gunItem6);
                 AddItemIconInSlot(gunItem6.Inventory.GetItemInSlot("Suppressor"), $"BArmour2Suppressor");
@@ -104,19 +104,19 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         {
             LinkSlots(new() { "Backpack1", "Backpack2", "Backpack3", "BackpackMedM", "BackpackMedS" }, backItem);
             AddItemIconInSlot(backItem.Inventory.GetItemInSlot("Backpack1"), "Backpack1");
-            if (backItem.Inventory.GetItemInSlot("Backpack1") is Item gunItem7 && gunItem7.IsGun() && gunItem7.HasInventory())
+            if (backItem.Inventory.GetItemInSlot("Backpack1") is Item gunItem7 && gunItem7.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"Backpack1Suppressor" }, gunItem7);
                 AddItemIconInSlot(gunItem7.Inventory.GetItemInSlot("Suppressor"), $"Backpack1Suppressor");
             }
             AddItemIconInSlot(backItem.Inventory.GetItemInSlot("Backpack2"), "Backpack2");
-            if (backItem.Inventory.GetItemInSlot("Backpack2") is Item gunItem8 && gunItem8.IsGun() && gunItem8.HasInventory())
+            if (backItem.Inventory.GetItemInSlot("Backpack2") is Item gunItem8 && gunItem8.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"Backpack2Suppressor" }, gunItem8);
                 AddItemIconInSlot(gunItem8.Inventory.GetItemInSlot("Suppressor"), $"Backpack2Suppressor");
             }
             AddItemIconInSlot(backItem.Inventory.GetItemInSlot("Backpack3"), "Backpack3");
-            if (backItem.Inventory.GetItemInSlot("Backpack3") is Item gunItem9 && gunItem9.IsGun() && gunItem9.HasInventory())
+            if (backItem.Inventory.GetItemInSlot("Backpack3") is Item gunItem9 && gunItem9.IsSuppressibleGun())
             {
                 LinkSlots(new() { $"Backpack3Suppressor" }, gunItem9);
                 AddItemIconInSlot(gunItem9.Inventory.GetItemInSlot("Suppressor"), $"Backpack3Suppressor");
@@ -159,7 +159,7 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
 
         //left hand slot
         AddItemIconInSlot(s.Inventory.GetItemInSlot("LeftHand"), "LeftHand");
-        if (s.Inventory.GetItemInSlot("LeftHand") is Item gunItem10 && gunItem10.IsGun() && gunItem10.HasInventory())
+        if (s.Inventory.GetItemInSlot("LeftHand") is Item gunItem10 && gunItem10.IsSuppressibleGun())
         {
             LinkSlots(new() { $"LeftHandSuppressor" }, gunItem10);
             AddItemIconInSlot(gunItem10.Inventory.GetItemInSlot("Suppressor"), $"LeftHandSuppressor");
@@ -168,7 +168,7 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
 
         //right hand item
         AddItemIconInSlot(s.Inventory.GetItemInSlot("RightHand"), "RightHand");
-        if (s.Inventory.GetItemInSlot("RightHand") is Item gunItem11 && gunItem11.IsGun() && gunItem11.HasInventory())
+        if (s.Inventory.GetItemInSlot("RightHand") is Item gunItem11 && gunItem11.IsSuppressibleGun())
         {
             LinkSlots(new() { $"RightHandSuppressor" }, gunItem11);
             AddItemIconInSlot(gunItem11.Inventory.GetItemInSlot("Suppressor"), $"RightHandSuppressor");
