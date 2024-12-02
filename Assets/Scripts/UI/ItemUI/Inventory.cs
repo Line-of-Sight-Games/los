@@ -24,6 +24,7 @@ public class Inventory
         {
             foreach (Item i in itemList)
             {
+                Debug.Log($"slotname:{slotName} itemname:{i.itemName}|{i.name}");
                 if (i.Id == linkedInventoryObject.InventorySlots[linkedInventoryObject.InventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key])
                     return i;
             }

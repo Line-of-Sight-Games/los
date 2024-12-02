@@ -120,7 +120,12 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                             targetSlotName = targetSlot.name;
 
                             InventoryDisplayPanelSoldier soldierInventory = targetSlot.GetComponentInParent<InventoryDisplayPanelSoldier>();
-                            if (targetSlotName.Contains("Backpack"))
+                            if (targetSlotName.Contains("Suppressor"))
+                            {
+                                targetInventoryId = soldierInventory.GetItemInSlot($"{targetSlotName.Split("Suppressor")[0]}").Id;
+                                targetSlotName = "Suppressor";
+                            }
+                            else if (targetSlotName.Contains("Backpack"))
                                 targetInventoryId = soldierInventory.GetItemInSlot("Back").Id;
                             else if (targetSlotName.Contains("LeftBrace"))
                             {

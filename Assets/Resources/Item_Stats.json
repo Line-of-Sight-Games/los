@@ -74,7 +74,7 @@
     },
     {
       "Name": "AR_ACOG_FAL",
-      "Traits": [ "Gun", "Assault Rifle", "Fragile" ],
+      "Traits": [ "Gun", "Assault Rifle", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 2,
@@ -102,11 +102,14 @@
       "CQBCovDamage": 2,
       "ShortCovDamage": 2,
       "MedCovDamage": 2,
-      "LongCovDamage": 2
+      "LongCovDamage": 2,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "AR_AK_47",
-      "Traits": [ "Gun", "Assault Rifle", "Fragile" ],
+      "Traits": [ "Gun", "Assault Rifle", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 3,
@@ -134,11 +137,14 @@
       "CQBCovDamage": 3,
       "ShortCovDamage": 3,
       "MedCovDamage": 3,
-      "LongCovDamage": 3
+      "LongCovDamage": 3,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "AR_M_16",
-      "Traits": [ "Gun", "Assault Rifle", "Fragile" ],
+      "Traits": [ "Gun", "Assault Rifle", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 3,
@@ -166,7 +172,10 @@
       "CQBCovDamage": 2,
       "ShortCovDamage": 2,
       "MedCovDamage": 2,
-      "LongCovDamage": 2
+      "LongCovDamage": 2,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Armour_Body",
@@ -387,7 +396,7 @@
     },
     {
       "Name": "LMG_LSW",
-      "Traits": [ "Gun", "Light Machine Gun", "Fragile" ],
+      "Traits": [ "Gun", "Light Machine Gun", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 5,
@@ -415,11 +424,14 @@
       "CQBCovDamage": 4,
       "ShortCovDamage": 4,
       "MedCovDamage": 4,
-      "LongCovDamage": 4
+      "LongCovDamage": 4,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "LMG_M_60",
-      "Traits": [ "Gun", "Light Machine Gun", "Fragile" ],
+      "Traits": [ "Gun", "Light Machine Gun", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 6,
@@ -447,11 +459,14 @@
       "CQBCovDamage": 3,
       "ShortCovDamage": 3,
       "MedCovDamage": 3,
-      "LongCovDamage": 3
+      "LongCovDamage": 3,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "LMG_SAW",
-      "Traits": [ "Gun", "Light Machine Gun", "Fragile" ],
+      "Traits": [ "Gun", "Light Machine Gun", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 6,
@@ -479,7 +494,10 @@
       "CQBCovDamage": 3,
       "ShortCovDamage": 3,
       "MedCovDamage": 3,
-      "LongCovDamage": 3
+      "LongCovDamage": 3,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Logistics_Belt",
@@ -490,7 +508,7 @@
     },
     {
       "Name": "Pi_357",
-      "Traits": [ "Gun", "Pistol" ],
+      "Traits": [ "Gun", "Pistol", "Storage" ],
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 1,
@@ -518,11 +536,14 @@
       "CQBCovDamage": 1,
       "ShortCovDamage": 1,
       "MedCovDamage": 1,
-      "LongCovDamage": 1
+      "LongCovDamage": 1,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Pi_Glock",
-      "Traits": [ "Gun", "Pistol" ],
+      "Traits": [ "Gun", "Pistol", "Storage" ],
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 1,
@@ -550,11 +571,14 @@
       "CQBCovDamage": 0,
       "ShortCovDamage": 0,
       "MedCovDamage": 0,
-      "LongCovDamage": 0
+      "LongCovDamage": 0,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Pi_Sidearm",
-      "Traits": [ "Gun", "Pistol" ],
+      "Traits": [ "Gun", "Pistol", "Storage" ],
       "EquippableSlots": [ "Backpack", "Posterior", "Lateral", "Brace", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 1,
@@ -582,7 +606,10 @@
       "CQBCovDamage": 1,
       "ShortCovDamage": 1,
       "MedCovDamage": 1,
-      "LongCovDamage": 1
+      "LongCovDamage": 1,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Poison_Satchel",
@@ -701,7 +728,7 @@
     },
     {
       "Name": "Sh_Ithaca",
-      "Traits": [ "Gun", "Shotgun", "Fragile" ],
+      "Traits": [ "Gun", "Shotgun", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 3,
@@ -729,11 +756,14 @@
       "CQBCovDamage": 3,
       "ShortCovDamage": 2,
       "MedCovDamage": 1,
-      "LongCovDamage": 0
+      "LongCovDamage": 0,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Sh_Olympus",
-      "Traits": [ "Gun", "Shotgun", "Fragile" ],
+      "Traits": [ "Gun", "Shotgun", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 3,
@@ -761,11 +791,14 @@
       "CQBCovDamage": 2,
       "ShortCovDamage": 1,
       "MedCovDamage": 0,
-      "LongCovDamage": 0
+      "LongCovDamage": 0,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Sh_SPAS_12",
-      "Traits": [ "Gun", "Shotgun", "Fragile" ],
+      "Traits": [ "Gun", "Shotgun", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 2,
@@ -793,11 +826,14 @@
       "CQBCovDamage": 4,
       "ShortCovDamage": 2,
       "MedCovDamage": 1,
-      "LongCovDamage": 0
+      "LongCovDamage": 0,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "SMG_P_90",
-      "Traits": [ "Gun", "Sub-Machine Gun" ],
+      "Traits": [ "Gun", "Sub-Machine Gun", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 2,
@@ -825,11 +861,14 @@
       "CQBCovDamage": 1,
       "ShortCovDamage": 1,
       "MedCovDamage": 1,
-      "LongCovDamage": 1
+      "LongCovDamage": 1,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "SMG_Thompson",
-      "Traits": [ "Gun", "Sub-Machine Gun" ],
+      "Traits": [ "Gun", "Sub-Machine Gun", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 3,
@@ -857,11 +896,14 @@
       "CQBCovDamage": 1,
       "ShortCovDamage": 1,
       "MedCovDamage": 1,
-      "LongCovDamage": 1
+      "LongCovDamage": 1,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "SMG_UMP_40",
-      "Traits": [ "Gun", "Sub-Machine Gun" ],
+      "Traits": [ "Gun", "Sub-Machine Gun", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 2,
@@ -889,11 +931,14 @@
       "CQBCovDamage": 1,
       "ShortCovDamage": 1,
       "MedCovDamage": 1,
-      "LongCovDamage": 1
+      "LongCovDamage": 1,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Sn_Barrett",
-      "Traits": [ "Gun", "Sniper Rifle", "Fragile" ],
+      "Traits": [ "Gun", "Sniper Rifle", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 5,
@@ -921,11 +966,14 @@
       "CQBCovDamage": 4,
       "ShortCovDamage": 4,
       "MedCovDamage": 4,
-      "LongCovDamage": 4
+      "LongCovDamage": 4,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Sn_Dragunov",
-      "Traits": [ "Gun", "Sniper Rifle", "Fragile" ],
+      "Traits": [ "Gun", "Sniper Rifle", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 4,
@@ -953,11 +1001,14 @@
       "CQBCovDamage": 2,
       "ShortCovDamage": 2,
       "MedCovDamage": 2,
-      "LongCovDamage": 2
+      "LongCovDamage": 2,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Sn_Intervention",
-      "Traits": [ "Gun", "Sniper Rifle", "Fragile" ],
+      "Traits": [ "Gun", "Sniper Rifle", "Fragile", "Storage" ],
       "EquippableSlots": [ "Backpack", "Armour", "Hand" ],
       "WhereEquipped": "",
       "Weight": 4,
@@ -985,12 +1036,15 @@
       "CQBCovDamage": 3,
       "ShortCovDamage": 3,
       "MedCovDamage": 3,
-      "LongCovDamage": 3
+      "LongCovDamage": 3,
+      "inventorySlots": { 
+        "Suppressor": ""
+      }
     },
     {
       "Name": "Suppressor",
       "Traits": [ "Throwable" ],
-      "EquippableSlots": [ "Misc" ],
+      "EquippableSlots": [ "Suppressor" ],
       "WhereEquipped": "",
       "Weight": 1
     },
