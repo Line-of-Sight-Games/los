@@ -1878,7 +1878,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             shooter.PerformLoudAction();
 
-        menu.OpenShotResultUI(runSecondShot);
+        StartCoroutine(menu.OpenShotResultUI(runSecondShot));
         menu.CloseShotUI();
     }
 

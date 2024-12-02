@@ -987,8 +987,15 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void TakeDamage(Soldier damagedBy, int damage, List<string> damageSource)
     {
-        if ((damage >= 5 && IsBreakable()) || (damage > 0 && IsFragile() && damageSource.Contains("Explosive")) || (damage > 0 && IsFragile() && !IsBeingProtected()))
+        if ((damage >= 5 && IsBreakable()))
             DestroyItem(damagedBy);
+        else if (damage > 0 && IsFragile())
+        {
+            if (!IsBeingProtected())
+                DestroyItem(damagedBy);
+            else if (damageSource.Contains("Explosive") && !ItemNestedOn().IsBackpack())
+                DestroyItem(damagedBy);
+        }
     }
     public void DestroyItem(Soldier destroyedBy)
     {
@@ -1059,9 +1066,15 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public bool IsBeingProtected()
     {
-        if (owner != null && owner is Item parentItem && parentItem.IsProtecting())
+        if (ItemNestedOn() != null && ItemNestedOn().IsProtecting())
             return true;
         return false;
+    }
+    public Item ItemNestedOn()
+    {
+        if (owner != null && owner is Item parentItem)
+            return parentItem;
+        return null;
     }
     public bool IsUnbreakable()
     {

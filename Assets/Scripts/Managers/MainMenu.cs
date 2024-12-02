@@ -2691,8 +2691,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         overwatchShotUI.ConfirmShotOverwatch(true);
     }
-    public void OpenShotResultUI(bool runSecondShot)
+    public IEnumerator OpenShotResultUI(bool runSecondShot)
     {
+        yield return new WaitUntil(() => explosionResolvedFlag);
+
         if (runSecondShot)
             shotResultUI.transform.Find("RunSecondShot").gameObject.SetActive(true);
         else
