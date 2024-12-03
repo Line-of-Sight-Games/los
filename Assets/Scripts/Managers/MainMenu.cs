@@ -1987,7 +1987,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                         AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Flash).", true);
                                 }
                                 else //avoidance
-                                    AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
+                                    AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection.", true); //xp
                             }
                         }
                         else //if it's a standard SR alert
@@ -2009,7 +2009,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 else //avoidance
                                 {
                                     allSoldiersNotRevealingHidden[counter.Id].Add(detector.Id);
-                                    AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection ({counter.soldierName}).", true); //xp
+                                    AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection.", true); //xp
                                 }
                             }
                             else
@@ -2045,7 +2045,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                         AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Flash).", true);
                                 }
                                 else //avoidance
-                                    AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
+                                    AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection.", true); //xp
                             }
                         }
                         else //if it's a standard SR alert
@@ -2067,7 +2067,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                 else
                                 {
                                     allSoldiersNotRevealingHidden[detector.Id].Add(counter.Id);
-                                    AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection ({detector.soldierName}).", true); //xp
+                                    AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection.", true); //xp
                                 }
                             }
                             else
