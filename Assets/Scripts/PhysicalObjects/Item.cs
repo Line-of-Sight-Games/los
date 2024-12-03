@@ -1256,12 +1256,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             return true;
         return false;
     }
-    public bool SuppressorAttached()
-    {
-        if (IsGun() && false)
-            return true;
-        return false;
-    }
     public bool IsAmmo()
     {
         if (traits.Contains("Ammo"))

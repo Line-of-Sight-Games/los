@@ -205,49 +205,46 @@ public class SoundManager : MonoBehaviour
     {
         if (gun.IsAssaultRifle())
         {
-            if (gun.SuppressorAttached())
+            if (gun.HasSuppressorAttached())
                 PlaySound(shotSilencedLMG_SMG_AR);
             else
                 PlaySound(shotAR);
         }
         else if (gun.IsLMG())
         {
-            if (gun.SuppressorAttached())
+            if (gun.HasSuppressorAttached())
                 PlaySound(shotSilencedLMG_SMG_AR);
             else
                 PlaySound(shotLMG);
         }
         else if (gun.IsPistol())
         {
-            if (gun.SuppressorAttached())
+            if (gun.HasSuppressorAttached())
                 PlaySound(shotSilencedPi_Ri_Sn_Sh);
             else
                 PlaySound(shotPi);
         }
         else if (gun.IsRifle())
         {
-            if (gun.SuppressorAttached())
-                PlaySound(shotSilencedPi_Ri_Sn_Sh);
-            else
-                PlaySound(shotRi);
+            PlaySound(shotRi);
         }
         else if (gun.IsShotgun())
         {
-            if (gun.SuppressorAttached())
+            if (gun.HasSuppressorAttached())
                 PlaySound(shotSilencedPi_Ri_Sn_Sh);
             else
                 PlaySound(shotSh);
         }
         else if (gun.IsSMG())
         {
-            if (gun.SuppressorAttached())
+            if (gun.HasSuppressorAttached())
                 PlaySound(shotSilencedLMG_SMG_AR);
             else
                 PlaySound(shotSMG);
         }
         else if (gun.IsSniper())
         {
-            if (gun.SuppressorAttached())
+            if (gun.HasSuppressorAttached())
                 PlaySound(shotSilencedPi_Ri_Sn_Sh);
             else
                 PlaySound(shotSn);
