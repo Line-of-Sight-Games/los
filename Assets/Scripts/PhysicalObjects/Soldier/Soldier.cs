@@ -552,8 +552,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void FrozenMultiShot()
     {
-        if (HasAnyAmmo() && !IsMeleeControlled())
-            game.StartFrozenTurn(this);
+        if (!IsMeleeControlled())
+        {
+            if (HasAnyAmmo())
+                game.StartFrozenTurn(this);
+            else if (HasGunsInInventory())
+            {
+                DropHandheldItems();
+                Item inventoryGun = RandomGunFromInventory();
+                inventoryGun.MoveItem(this, inventoryGun.whereEquipped, this, "LeftHand");
+            }
+        }
     }
 
     public void DestroyAllBreakableItems(Soldier destroyedBy)
@@ -3435,6 +3444,24 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         
         return false;
+    }
+    public bool HasGunsInInventory()
+    {
+        foreach (Item item in itemManager.allItems)
+        {
+            if (item.IsGun() && item.IsNestedOnSoldier() && item.SoldierNestedOn() == this)
+                return true;
+        }
+        return false;
+    }
+    public Item RandomGunFromInventory()
+    {
+        foreach (Item item in itemManager.allItems)
+        {
+            if (item.IsGun() && item.IsNestedOnSoldier() && item.SoldierNestedOn() == this)
+                return item;
+        }
+        return null;
     }
     public bool HasGunsEquipped()
     {
