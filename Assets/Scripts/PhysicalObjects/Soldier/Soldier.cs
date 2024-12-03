@@ -560,7 +560,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 DropHandheldItems();
                 Item inventoryGun = RandomGunFromInventory();
-                inventoryGun.MoveItem(this, inventoryGun.whereEquipped, this, "LeftHand");
+                inventoryGun.MoveItem(inventoryGun.owner, inventoryGun.whereEquipped, this, "LeftHand");
+                if (HasAnyAmmo())
+                    game.StartFrozenTurn(this);
             }
         }
     }

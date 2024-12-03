@@ -96,7 +96,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
         GameObject targetDrop = eventData.pointerEnter;
-        string originalInventoryId = "none", targetInventoryId = "none", originalSlotName = originalSlot.name, targetSlotName = "none";
+        string originalInventoryId = "none", targetInventoryId = "none", originalSlotName = item.whereEquipped, targetSlotName = "none";
         if (!menu.onItemUseScreen && !menu.inventorySourceViewOnly)
         {
             if (targetDrop != null)
