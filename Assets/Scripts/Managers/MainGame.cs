@@ -2733,24 +2733,35 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             POI poiToDisarm = poiManager.FindPOIById(menu.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item disarmedItem = null;
+            Soldier placedBy = null;
 
-            if (poiToDisarm is Claymore)
+            if (poiToDisarm is Claymore claymoreToDisarm)
+            {
                 disarmedItem = itemManager.SpawnItem("Claymore");
-            else if (poiToDisarm is DeploymentBeacon)
+                placedBy = claymoreToDisarm.placedBy;
+            }
+            else if (poiToDisarm is DeploymentBeacon depbeaconToDisarm)
+            {
                 disarmedItem = itemManager.SpawnItem("Deployment_Beacon");
-            else if (poiToDisarm is ThermalCamera)
+                placedBy = depbeaconToDisarm.placedBy;
+            }
+            else if (poiToDisarm is ThermalCamera thermalcamToDisarm)
             {
                 SetLosCheckAll("losChange|thermalCamDeactive"); //loscheckall
                 disarmedItem = itemManager.SpawnItem("Thermal_Camera");
+                placedBy = thermalcamToDisarm.placedBy;
             }
-                
+
+            //xp for disarming enemy objects
+            if (placedBy != null && activeSoldier.IsOppositeTeamAs(placedBy))
+                menu.AddXpAlert(activeSoldier, 2, "Disarmed enemy device.", true);
 
             //set item to same position as poi and destroy poi
             disarmedItem.X = poiToDisarm.X;
             disarmedItem.Y = poiToDisarm.Y;
             disarmedItem.Z = poiToDisarm.Z;
             menu.poiManager.DestroyPOI(poiToDisarm);
-
+            
             activeSoldier.PerformLoudAction(6);
             menu.CloseDisarmUI();
         }
