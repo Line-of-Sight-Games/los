@@ -206,6 +206,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 return disarmable;
         return null;
     }
+    public void SetLosCheckAllEnemies(string causeOfLosCheck)
+    {
+        foreach (Soldier s in AllFieldedEnemySoldiers())
+            s.SetLosCheck(causeOfLosCheck); //loscheck
+    }
     public void SetLosCheckAll(string causeOfLosCheck)
     {
         foreach (Soldier s in AllFieldedSoldiers())
@@ -2747,7 +2752,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else if (poiToDisarm is ThermalCamera thermalcamToDisarm)
             {
-                SetLosCheckAll("losChange|thermalCamDeactive"); //loscheckall
+                SetLosCheckAllEnemies("losChange|thermalCamDeactive"); //loscheckallenemies
                 disarmedItem = itemManager.SpawnItem("Thermal_Camera");
                 placedBy = thermalcamToDisarm.placedBy;
             }
@@ -3258,7 +3263,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 
-                SetLosCheckAll("losChange|thermalCamActive"); //loscheckall
+                SetLosCheckAllEnemies("losChange|thermalCamActive"); //loscheckallenemies
                 Instantiate(poiManager.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
