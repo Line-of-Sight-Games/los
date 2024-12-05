@@ -34,7 +34,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public GameObject SRColliderFullPhysical, SRColliderHalfPhysical, SRColliderMinPhysical;
     public SphereCollider SRColliderFull, SRColliderHalf, SRColliderMin, tileCollider;
     public Renderer SRColliderFullRenderer, SRColliderHalfRenderer, SRColliderMinRenderer;
-    public new Renderer renderer;
+    public Renderer renderer;
     public Dictionary<string, string> inventorySlots = new()
     {
         { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }
