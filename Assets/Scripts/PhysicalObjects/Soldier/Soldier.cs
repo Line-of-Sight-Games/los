@@ -39,7 +39,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }
     };
-    public string madeUnconBy;
+    public string madeUnconBy, beingDraggedBy;
     public List<string> madeUnconBydamageList;
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
@@ -894,7 +894,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             stats.SR.Val = 0;
             stats.E.Val = 0;
-            stats.C.Val = 0;
+            if (soldierManager.FindSoldierById(beingDraggedBy) != null)
+                stats.C.Val = soldierManager.FindSoldierById(beingDraggedBy).ActiveC;
+            else
+                stats.C.Val = 0;
             stats.M.Val = 0;
         }
     }
@@ -2998,6 +3001,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
+    public bool DraggableInRange()
+    {
+        foreach (Soldier s in game.AllSoldiers())
+            if (PhysicalObjectWithinMeleeRadius(s) && !IsWearingJuggernautArmour(false) && (s.IsDead() || s.IsPlayingDead() || s.IsUnconscious() || s.IsMeleeControlledBy(this)))
+                return true;
+
+        return false;
+    }
     public Terminal ClosestTerminal()
     {
         List<Tuple<float, Terminal>> soldierDistanceToTerminals = new();
@@ -3305,6 +3316,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool IsMeleeControlledBy(Soldier s)
+    {
+        if (IsMeleeControlled() && controlledBySoldiersList.Contains(s.Id))
+            return true;
+        return false;
+    }
     public bool IsMeleeControlling()
     {
         if (controllingSoldiersList.Count > 0 && controlledBySoldiersList.Count == 0)
@@ -3411,7 +3428,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return false;
     }
-
+    public int GetMaxDragRange()
+    {
+        return stats.Str.Val * ap;
+    }
 
 
 

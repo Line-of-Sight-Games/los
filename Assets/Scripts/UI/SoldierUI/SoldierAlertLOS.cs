@@ -220,12 +220,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             {
                 s1Toggle.interactable = false;
             }
-            else if (s1Label.text.Contains("DETECT") && s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id))
-            {
-                s1Toggle.isOn = true;
-                s1Toggle.interactable = false;
-            }
-            else if (s1Label.text.Contains("AVOID") && s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))
+            else if ((s1Label.text.Contains("DETECT") || s1Label.text.Contains("AVOID")) && (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id)))
             {
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
@@ -239,12 +234,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             {
                 s2Toggle.interactable = false;
             }
-            else if (s2Label.text.Contains("DETECT") && s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id))
-            {
-                s2Toggle.isOn = true;
-                s2Toggle.interactable = false;
-            }
-            else if (s2Label.text.Contains("AVOID") && s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))
+            else if ((s2Label.text.Contains("DETECT") || s2Label.text.Contains("AVOID")) && (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id)))
             {
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;

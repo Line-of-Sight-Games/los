@@ -32,6 +32,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public DipElecUI dipelecUI;
     public DamageEventUI damageEventUI;
     public OverwatchUI overwatchUI;
+    public DragUI dragUI;
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
@@ -44,7 +45,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public LOSArrow LOSArrowPrefab;
     public OverwatchSectorSphere overwatchSectorSpherePrefab;
     public List<Button> actionButtons;
-    public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton;
+    public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton;
     private float playTimeTotal;
     public float turnTime;
     public string meleeChargeIndicator;
@@ -1534,6 +1535,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(disarmButton, "No Devices");
             else if (activeSoldier.IsBlind())
                 buttonStates.Add(disarmButton, "Blind");
+
+            //block drag button
+            if (!activeSoldier.DraggableInRange())
+                buttonStates.Add(dragButton, "No Targets");
+            else if (activeSoldier.IsBlind())
+                buttonStates.Add(dragButton, "Blind");
+            else if (activeSoldier.IsLastStand())
+                buttonStates.Add(dragButton, "Last Stand");
 
             GreyOutButtons(buttonStates, "");
         }
@@ -3711,6 +3720,65 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
     }
+
+
+
+
+
+
+
+
+
+
+    //drag functions
+    public void OpenDragUI()
+    {
+        List<TMP_Dropdown.OptionData> dragOptionDataList = new();
+        TMP_Dropdown.OptionData dragOptionData;
+
+        foreach (Soldier soldier in game.AllSoldiers())
+        {
+            if (activeSoldier.PhysicalObjectWithinMeleeRadius(soldier) && (soldier.IsDead() || soldier.IsPlayingDead() || soldier.IsUnconscious() || soldier.IsMeleeControlledBy(activeSoldier)))
+            {
+                dragOptionData = new(soldier.Id, soldier.soldierPortrait, Color.white);
+                dragOptionDataList.Add(dragOptionData);
+            }
+        }
+
+        dragUI.targetDropdown.AddOptions(dragOptionDataList);
+        dragUI.gameObject.SetActive(true);
+    }
+    public void CloseDragUI()
+    {
+        ClearDragUI();
+        dragUI.gameObject.SetActive(false);
+    }
+    public void ClearDragUI()
+    {
+        dragUI.pressCount = 0;
+        dragUI.legitMove = false;
+        dragUI.legitDrop = false;
+        dragUI.targetDropdown.ClearOptions();
+        dragUI.targetDropdown.interactable = true;
+        dragUI.xPos.text = "";
+        dragUI.yPos.text = "";
+        dragUI.zPos.text = "";
+        dragUI.terrainDropdown.value = 0;
+        dragUI.xPosD.text = "";
+        dragUI.yPosD.text = "";
+        dragUI.zPosD.text = "";
+        dragUI.terrainDropdownD.value = 0;
+        dragUI.moveObjects.SetActive(false);
+        dragUI.dropObjects.SetActive(false);
+        dragUI.backButton.SetActive(true);
+        dragUI.moveOutOfRange.SetActive(false);
+        dragUI.dropOutOfRange.SetActive(false);
+    }
+
+
+
+
+
 
 
 

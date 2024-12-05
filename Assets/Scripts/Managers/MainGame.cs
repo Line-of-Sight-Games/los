@@ -2729,7 +2729,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
             menu.CloseConfigureUI();
         }
     }
-    //disarm function
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //disarm functions
     public void ConfirmDisarm()
     {
         if (activeSoldier.CheckAP(1))
@@ -2771,6 +2784,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
             menu.CloseDisarmUI();
         }
     }
+
+
+
 
 
 
