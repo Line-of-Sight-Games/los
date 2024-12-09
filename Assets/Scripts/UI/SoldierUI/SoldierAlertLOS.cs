@@ -102,6 +102,10 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         else if (!entered && exited) //retreat
             prefix = "RETREAT ";
 
+        //reset entered and exited flags
+        entered = false;
+        exited = false;
+
         if (label.Contains("DETECT"))
             colorPrefix = "<color=red>";
         else if (label.Contains("AVOID"))
