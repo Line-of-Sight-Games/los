@@ -87,8 +87,8 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
             game.maxRounds = maxRounds;
             game.maxTurnTime = maxTurnTime * 60;
             game.maxX = x;
-            game.maxY = z;
-            game.maxZ = y;
+            game.maxY = y;
+            game.maxZ = z;
 
             weather.GenerateWeather();
             dipelec.GenerateDipelec();
