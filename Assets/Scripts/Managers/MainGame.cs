@@ -588,7 +588,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (activeSoldier.CheckAP(2))
             {
                 //play overwatch confirm dialogue
-                soundManager.PlaySoldierEnterOverwatch(activeSoldier.soldierSpeciality);
+                soundManager.PlaySoldierEnterOverwatch(activeSoldier);
 
                 activeSoldier.DrainAP();
                 activeSoldier.SetOverwatch(x, y, r, a);
@@ -696,9 +696,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         {
                             //play move dialogue
                             if (moveUI.meleeToggle.isOn)
-                                soundManager.PlaySoldierMeleeMove(activeSoldier.soldierSpeciality); //play melee move dialogue
+                                soundManager.PlaySoldierMeleeMove(activeSoldier); //play melee move dialogue
                             else
-                                soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality); //play standard move dialogue
+                                soundManager.PlaySoldierConfirmMove(activeSoldier); //play standard move dialogue
 
                             PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
 
@@ -739,11 +739,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             {
                                 //play move dialogue
                                 if (moveUI.meleeToggle.isOn)
-                                    soundManager.PlaySoldierMeleeMove(activeSoldier.soldierSpeciality); //play melee move dialogue
+                                    soundManager.PlaySoldierMeleeMove(activeSoldier); //play melee move dialogue
                                 else
                                 {
                                     if (!moveUI.moveTypeDropdown.captionText.text.Contains("Tile"))
-                                        soundManager.PlaySoldierConfirmMove(activeSoldier.soldierSpeciality); //play standard move dialogue
+                                        soundManager.PlaySoldierConfirmMove(activeSoldier); //play standard move dialogue
                                 }
 
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
@@ -1740,7 +1740,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     //play shot miss dialogue
-                    soundManager.PlaySoldierShotMiss(shooter.soldierSpeciality);
+                    soundManager.PlaySoldierShotMiss(shooter);
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
@@ -1766,7 +1766,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     //play shot miss dialogue
-                    soundManager.PlaySoldierShotMiss(shooter.soldierSpeciality);
+                    soundManager.PlaySoldierShotMiss(shooter);
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
@@ -1828,7 +1828,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 else
                 {
                     //play shot miss dialogue
-                    soundManager.PlaySoldierShotMiss(shooter.soldierSpeciality);
+                    soundManager.PlaySoldierShotMiss(shooter);
 
                     //set sound flags after ally misses shot
                     foreach (Soldier s in AllSoldiers())
@@ -1866,7 +1866,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             soundManager.PlaySuppressionResolution(gun);
 
             //play suppression dialogue
-            soundManager.PlaySoldierSuppressEnemy(shooter.soldierSpeciality);
+            soundManager.PlaySoldierSuppressEnemy(shooter);
 
             FileUtility.WriteToReport($"{shooter.soldierName} suppressing {target}");
 
@@ -2576,7 +2576,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             //play melee breakeven sfx
                             soundManager.PlayMeleeResolution("breakeven");
                             //play melee breakeven dialogue
-                            soundManager.PlaySoldierMeleeBreakeven(activeSoldier.soldierSpeciality);
+                            soundManager.PlaySoldierMeleeBreakeven(activeSoldier);
 
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
                         }

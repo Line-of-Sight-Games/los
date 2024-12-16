@@ -350,790 +350,821 @@ public class SoundManager : MonoBehaviour
 
 
 
-    //soldier voices
-    public void PlayRandomVoice(AudioClip[] audioClipArray)
+    //s voices
+    public void PlayVoice(Soldier s, AudioClip clip)
     {
-        if (audioClipArray.Any())
+        if (!isMute)
         {
-            if (game.CoinFlip()) //50% chance of silence
+            // Check if the sound is already playing
+            if (!playingSounds.ContainsKey(clip))
             {
-                PlaySound(audioClipArray[HelperFunctions.RandomNumber(0, audioClipArray.Length - 1)]);
+                if (!s.isSpeaking) //block if s is already speaking
+                {
+                    s.isSpeaking = true;
+
+                    // Start the coroutine to play the sound and track it
+                    Coroutine soundCoroutine = StartCoroutine(PlayAndTrackVoice(s, clip));
+                    playingSounds.Add(clip, soundCoroutine);
+                }
             }
         }
     }
-    public void PlaySoldierConfigNearGB(string specialty)
+    private IEnumerator PlayAndTrackVoice(Soldier s, AudioClip clip)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderConfigNearGB);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanConfigNearGB);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorConfigNearGB);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerConfigNearGB);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderConfigNearGB);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistConfigNearGB);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerConfigNearGB);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerConfigNearGB);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutConfigNearGB);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanConfigNearGB);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorConfigNearGB);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeConfigNearGB);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterConfigNearGB);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneConfigNearGB);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerConfigNearGB);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfConfigNearGB);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesConfigNearGB);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatConfigNearGB);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianConfigNearGB);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicConfigNearGB);
+        // Play the sound using PlayOneShot
+        audioSource.PlayOneShot(clip);
+
+        // Wait for the clip to finish
+        yield return new WaitForSeconds(clip.length);
+
+        // Remove the sound from the tracking dictionary after it finishes
+        playingSounds.Remove(clip);
+        s.isSpeaking = false;
     }
-    public void PlaySoldierConfirmMove(string specialty)
+
+    public void PlayRandomVoice(Soldier s, AudioClip[] audioClipArray)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderConfirmMove);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanConfirmMove);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorConfirmMove);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerConfirmMove);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderConfirmMove);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistConfirmMove);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerConfirmMove);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerConfirmMove);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutConfirmMove);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanConfirmMove);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorConfirmMove);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeConfirmMove);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterConfirmMove);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneConfirmMove);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerConfirmMove);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfConfirmMove);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesConfirmMove);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatConfirmMove);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianConfirmMove);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicConfirmMove);
+        if (audioClipArray.Any())
+        {
+            if (true) //game.CoinFlip()) //50% chance of silence
+            {
+                PlayVoice(s, audioClipArray[HelperFunctions.RandomNumber(0, audioClipArray.Length - 1)]);
+            }
+        }
     }
-    public void PlaySoldierDetectClaymore(string specialty)
+    public void PlaySoldierConfigNearGB(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderDetectClaymore);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanDetectClaymore);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorDetectClaymore);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerDetectClaymore);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderDetectClaymore);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistDetectClaymore);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerDetectClaymore);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerDetectClaymore);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutDetectClaymore);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanDetectClaymore);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorDetectClaymore);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeDetectClaymore);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterDetectClaymore);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneDetectClaymore);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerDetectClaymore);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfDetectClaymore);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesDetectClaymore);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatDetectClaymore);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianDetectClaymore);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicDetectClaymore);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianConfigNearGB);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicConfigNearGB);
     }
-    public void PlaySoldierEnterOverwatch(string specialty)
+    public void PlaySoldierConfirmMove(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderEnterOverwatch);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanEnterOverwatch);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorEnterOverwatch);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerEnterOverwatch);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderEnterOverwatch);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistEnterOverwatch);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerEnterOverwatch);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerEnterOverwatch);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutEnterOverwatch);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanEnterOverwatch);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorEnterOverwatch);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeEnterOverwatch);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterEnterOverwatch);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneEnterOverwatch);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerEnterOverwatch);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfEnterOverwatch);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesEnterOverwatch);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatEnterOverwatch);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianEnterOverwatch);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicEnterOverwatch);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderConfirmMove);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanConfirmMove);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorConfirmMove);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerConfirmMove);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderConfirmMove);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistConfirmMove);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerConfirmMove);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerConfirmMove);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutConfirmMove);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanConfirmMove);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorConfirmMove);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeConfirmMove);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterConfirmMove);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneConfirmMove);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerConfirmMove);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfConfirmMove);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesConfirmMove);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatConfirmMove);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianConfirmMove);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicConfirmMove);
     }
-    public void PlaySoldierHealAlly(string specialty)
+    public void PlaySoldierDetectClaymore(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderHealAlly);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanHealAlly);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorHealAlly);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerHealAlly);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderHealAlly);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistHealAlly);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerHealAlly);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerHealAlly);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutHealAlly);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanHealAlly);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorHealAlly);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeHealAlly);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterHealAlly);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneHealAlly);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerHealAlly);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfHealAlly);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesHealAlly);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatHealAlly);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianHealAlly);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicHealAlly);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianDetectClaymore);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicDetectClaymore);
     }
-    public void PlaySoldierEquipArmour(string specialty)
+    public void PlaySoldierEnterOverwatch(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderEquipArmour);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanEquipArmour);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorEquipArmour);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerEquipArmour);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderEquipArmour);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistEquipArmour);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerEquipArmour);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerEquipArmour);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutEquipArmour);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanEquipArmour);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorEquipArmour);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeEquipArmour);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterEquipArmour);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneEquipArmour);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerEquipArmour);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfEquipArmour);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesEquipArmour);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatEquipArmour);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianEquipArmour);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicEquipArmour);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianEnterOverwatch);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicEnterOverwatch);
     }
-    public void PlaySoldierPlaceClaymore(string specialty)
+    public void PlaySoldierHealAlly(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderPlaceClaymore);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanPlaceClaymore);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorPlaceClaymore);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerPlaceClaymore);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderPlaceClaymore);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistPlaceClaymore);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerPlaceClaymore);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerPlaceClaymore);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutPlaceClaymore);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanPlaceClaymore);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorPlaceClaymore);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakePlaceClaymore);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterPlaceClaymore);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cyclonePlaceClaymore);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerPlaceClaymore);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfPlaceClaymore);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesPlaceClaymore);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatPlaceClaymore);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianPlaceClaymore);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicPlaceClaymore);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderHealAlly);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanHealAlly);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorHealAlly);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerHealAlly);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderHealAlly);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistHealAlly);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerHealAlly);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerHealAlly);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutHealAlly);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanHealAlly);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorHealAlly);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeHealAlly);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterHealAlly);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneHealAlly);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerHealAlly);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfHealAlly);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesHealAlly);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatHealAlly);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianHealAlly);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicHealAlly);
     }
-    public void PlaySoldierUseGrenade(string specialty)
+    public void PlaySoldierEquipArmour(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderUseGrenade);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanUseGrenade);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorUseGrenade);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerUseGrenade);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderUseGrenade);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistUseGrenade);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerUseGrenade);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerUseGrenade);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutUseGrenade);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanUseGrenade);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorUseGrenade);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeUseGrenade);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterUseGrenade);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneUseGrenade);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerUseGrenade);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfUseGrenade);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesUseGrenade);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatUseGrenade);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianUseGrenade);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicUseGrenade);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderEquipArmour);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanEquipArmour);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorEquipArmour);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerEquipArmour);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderEquipArmour);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistEquipArmour);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerEquipArmour);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerEquipArmour);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutEquipArmour);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanEquipArmour);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorEquipArmour);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeEquipArmour);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterEquipArmour);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneEquipArmour);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerEquipArmour);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfEquipArmour);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesEquipArmour);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatEquipArmour);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianEquipArmour);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicEquipArmour);
     }
-    public void PlaySoldierUseTabun(string specialty)
+    public void PlaySoldierPlaceClaymore(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderUseTabun);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanUseTabun);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorUseTabun);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerUseTabun);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderUseTabun);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistUseTabun);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerUseTabun);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerUseTabun);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutUseTabun);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanUseTabun);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorUseTabun);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeUseTabun);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterUseTabun);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneUseTabun);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerUseTabun);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfUseTabun);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesUseTabun);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatUseTabun);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianUseTabun);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicUseTabun);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakePlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cyclonePlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianPlaceClaymore);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicPlaceClaymore);
     }
-    public void PlaySoldierUseSmoke(string specialty)
+    public void PlaySoldierUseGrenade(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderUseSmoke);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanUseSmoke);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorUseSmoke);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerUseSmoke);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderUseSmoke);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistUseSmoke);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerUseSmoke);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerUseSmoke);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutUseSmoke);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanUseSmoke);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorUseSmoke);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeUseSmoke);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterUseSmoke);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneUseSmoke);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerUseSmoke);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfUseSmoke);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesUseSmoke);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatUseSmoke);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianUseSmoke);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicUseSmoke);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderUseGrenade);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanUseGrenade);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorUseGrenade);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerUseGrenade);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderUseGrenade);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistUseGrenade);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerUseGrenade);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerUseGrenade);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutUseGrenade);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanUseGrenade);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorUseGrenade);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeUseGrenade);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterUseGrenade);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneUseGrenade);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerUseGrenade);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfUseGrenade);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesUseGrenade);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatUseGrenade);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianUseGrenade);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicUseGrenade);
     }
-    public void PlaySoldierKillEnemy(string specialty)
+    public void PlaySoldierUseTabun(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderKillEnemy);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanKillEnemy);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorKillEnemy);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerKillEnemy);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderKillEnemy);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistKillEnemy);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerKillEnemy);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerKillEnemy);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutKillEnemy);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanKillEnemy);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorKillEnemy);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeKillEnemy);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterKillEnemy);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneKillEnemy);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerKillEnemy);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfKillEnemy);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesKillEnemy);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatKillEnemy);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianKillEnemy);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicKillEnemy);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderUseTabun);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanUseTabun);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorUseTabun);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerUseTabun);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderUseTabun);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistUseTabun);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerUseTabun);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerUseTabun);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutUseTabun);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanUseTabun);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorUseTabun);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeUseTabun);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterUseTabun);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneUseTabun);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerUseTabun);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfUseTabun);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesUseTabun);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatUseTabun);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianUseTabun);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicUseTabun);
     }
-    public void PlaySoldierMeleeBreakeven(string specialty)
+    public void PlaySoldierUseSmoke(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderMeleeBreakeven);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanMeleeBreakeven);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorMeleeBreakeven);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerMeleeBreakeven);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderMeleeBreakeven);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistMeleeBreakeven);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerMeleeBreakeven);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerMeleeBreakeven);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutMeleeBreakeven);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanMeleeBreakeven);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorMeleeBreakeven);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeMeleeBreakeven);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterMeleeBreakeven);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneMeleeBreakeven);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerMeleeBreakeven);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfMeleeBreakeven);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesMeleeBreakeven);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatMeleeBreakeven);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianMeleeBreakeven);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicMeleeBreakeven);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderUseSmoke);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanUseSmoke);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorUseSmoke);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerUseSmoke);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderUseSmoke);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistUseSmoke);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerUseSmoke);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerUseSmoke);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutUseSmoke);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanUseSmoke);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorUseSmoke);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeUseSmoke);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterUseSmoke);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneUseSmoke);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerUseSmoke);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfUseSmoke);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesUseSmoke);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatUseSmoke);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianUseSmoke);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicUseSmoke);
     }
-    public void PlaySoldierMeleeMove(string specialty)
+    public void PlaySoldierKillEnemy(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderMeleeMove);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanMeleeMove);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorMeleeMove);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerMeleeMove);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderMeleeMove);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistMeleeMove);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerMeleeMove);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerMeleeMove);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutMeleeMove);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanMeleeMove);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorMeleeMove);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeMeleeMove);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterMeleeMove);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneMeleeMove);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerMeleeMove);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfMeleeMove);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesMeleeMove);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatMeleeMove);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianMeleeMove);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicMeleeMove);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderKillEnemy);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanKillEnemy);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorKillEnemy);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerKillEnemy);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderKillEnemy);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistKillEnemy);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerKillEnemy);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerKillEnemy);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutKillEnemy);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanKillEnemy);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorKillEnemy);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeKillEnemy);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterKillEnemy);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneKillEnemy);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerKillEnemy);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfKillEnemy);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesKillEnemy);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatKillEnemy);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianKillEnemy);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicKillEnemy);
     }
-    public void PlaySoldierShotMiss(string specialty)
+    public void PlaySoldierMeleeBreakeven(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderShotMiss);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanShotMiss);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorShotMiss);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerShotMiss);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderShotMiss);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistShotMiss);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerShotMiss);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerShotMiss);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutShotMiss);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanShotMiss);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorShotMiss);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeShotMiss);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterShotMiss);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneShotMiss);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerShotMiss);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfShotMiss);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesShotMiss);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatShotMiss);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianShotMiss);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicShotMiss);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianMeleeBreakeven);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicMeleeBreakeven);
     }
-    public void PlaySoldierPickupUHF(string specialty)
+    public void PlaySoldierMeleeMove(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderPickupUHF);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanPickupUHF);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorPickupUHF);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerPickupUHF);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderPickupUHF);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistPickupUHF);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerPickupUHF);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerPickupUHF);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutPickupUHF);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanPickupUHF);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorPickupUHF);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakePickupUHF);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterPickupUHF);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cyclonePickupUHF);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerPickupUHF);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfPickupUHF);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesPickupUHF);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatPickupUHF);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianPickupUHF);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicPickupUHF);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderMeleeMove);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanMeleeMove);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorMeleeMove);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerMeleeMove);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderMeleeMove);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistMeleeMove);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerMeleeMove);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerMeleeMove);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutMeleeMove);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanMeleeMove);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorMeleeMove);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeMeleeMove);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterMeleeMove);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneMeleeMove);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerMeleeMove);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfMeleeMove);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesMeleeMove);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatMeleeMove);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianMeleeMove);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicMeleeMove);
     }
-    public void PlaySoldierPickupULF(string specialty)
+    public void PlaySoldierShotMiss(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderPickupULF);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanPickupULF);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorPickupULF);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerPickupULF);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderPickupULF);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistPickupULF);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerPickupULF);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerPickupULF);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutPickupULF);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanPickupULF);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorPickupULF);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakePickupULF);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterPickupULF);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cyclonePickupULF);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerPickupULF);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfPickupULF);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesPickupULF);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatPickupULF);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianPickupULF);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicPickupULF);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderShotMiss);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanShotMiss);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorShotMiss);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerShotMiss);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderShotMiss);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistShotMiss);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerShotMiss);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerShotMiss);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutShotMiss);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanShotMiss);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorShotMiss);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeShotMiss);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterShotMiss);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneShotMiss);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerShotMiss);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfShotMiss);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesShotMiss);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatShotMiss);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianShotMiss);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicShotMiss);
     }
-    public void PlaySoldierSeeEnemy(string specialty)
+    public void PlaySoldierPickupUHF(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderSeeEnemy);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanSeeEnemy);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorSeeEnemy);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerSeeEnemy);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderSeeEnemy);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistSeeEnemy);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSeeEnemy);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerSeeEnemy);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSeeEnemy);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSeeEnemy);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSeeEnemy);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSeeEnemy);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSeeEnemy);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSeeEnemy);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerSeeEnemy);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfSeeEnemy);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesSeeEnemy);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSeeEnemy);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianSeeEnemy);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicSeeEnemy);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderPickupUHF);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanPickupUHF);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorPickupUHF);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerPickupUHF);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderPickupUHF);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistPickupUHF);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerPickupUHF);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerPickupUHF);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutPickupUHF);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanPickupUHF);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorPickupUHF);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakePickupUHF);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterPickupUHF);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cyclonePickupUHF);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerPickupUHF);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfPickupUHF);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesPickupUHF);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatPickupUHF);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianPickupUHF);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicPickupUHF);
     }
-    public void PlaySoldierSuppressEnemy(string specialty)
+    public void PlaySoldierPickupULF(Soldier s)
     {
-        if (specialty.Equals("Leadership"))
-            PlayRandomVoice(commanderSuppressEnemy);
-        else if (specialty.Equals("Health"))
-            PlayRandomVoice(spartanSuppressEnemy);
-        else if (specialty.Equals("Resilience"))
-            PlayRandomVoice(survivorSuppressEnemy);
-        else if (specialty.Equals("Speed"))
-            PlayRandomVoice(runnerSuppressEnemy);
-        else if (specialty.Equals("Evasion"))
-            PlayRandomVoice(evaderSuppressEnemy);
-        else if (specialty.Equals("Fight"))
-            PlayRandomVoice(reservistSuppressEnemy);
-        else if (specialty.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSuppressEnemy);
-        else if (specialty.Equals("Camouflage"))
-            PlayRandomVoice(seekerSuppressEnemy);
-        else if (specialty.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSuppressEnemy);
-        else if (specialty.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSuppressEnemy);
-        else if (specialty.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSuppressEnemy);
-        else if (specialty.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSuppressEnemy);
-        else if (specialty.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSuppressEnemy);
-        else if (specialty.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSuppressEnemy);
-        else if (specialty.Equals("Shotgun"))
-            PlayRandomVoice(hammerSuppressEnemy);
-        else if (specialty.Equals("Melee"))
-            PlayRandomVoice(wolfSuppressEnemy);
-        else if (specialty.Equals("Strength"))
-            PlayRandomVoice(herculesSuppressEnemy);
-        else if (specialty.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSuppressEnemy);
-        else if (specialty.Equals("Electronics"))
-            PlayRandomVoice(technicianSuppressEnemy);
-        else if (specialty.Equals("Healing"))
-            PlayRandomVoice(medicSuppressEnemy);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderPickupULF);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanPickupULF);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorPickupULF);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerPickupULF);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderPickupULF);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistPickupULF);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerPickupULF);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerPickupULF);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutPickupULF);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanPickupULF);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorPickupULF);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakePickupULF);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterPickupULF);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cyclonePickupULF);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerPickupULF);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfPickupULF);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesPickupULF);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatPickupULF);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianPickupULF);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicPickupULF);
+    }
+    public void PlaySoldierSeeEnemy(Soldier s)
+    {
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSeeEnemy);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSeeEnemy);
+    }
+    public void PlaySoldierSuppressEnemy(Soldier s)
+    {
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSuppressEnemy);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSuppressEnemy);
     }
     public void PlayUHFDialUp()
     {
@@ -1162,1384 +1193,1384 @@ public class SoundManager : MonoBehaviour
 
 
 
-    //soldier selection dialogue
-    public void UnsetAllSoldierSelectionSoundFlags(Soldier soldier)
+    //s selection dialogue
+    public void UnsetAllSoldierSelectionSoundFlags(Soldier s)
     {
-        soldierTakenDamage.Remove(soldier.Id);
-        soldierAllyKilledJA.Remove(soldier.Id);
-        soldierAllyKilledOrUncon.Remove(soldier.Id);
-        soldierEnemyUseULF.Remove(soldier.Id);
-        soldierEnemyUseUHF.Remove(soldier.Id);
-        soldierEnemyUseTabun.Remove(soldier.Id);
-        soldierEnemyUseSmoke.Remove(soldier.Id);
-        soldierHeardSound.Remove(soldier.Id);
-        soldierEnemyKilledJA.Remove(soldier.Id);
-        soldierEnemyKilled.Remove(soldier.Id);
-        soldierAllyMissesShot.Remove(soldier.Id);
-        soldierEnemyMissesShot.Remove(soldier.Id);
-        soldierAllyUseULF.Remove(soldier.Id);
-        soldierAllyUseUHF.Remove(soldier.Id);
+        soldierTakenDamage.Remove(s.Id);
+        soldierAllyKilledJA.Remove(s.Id);
+        soldierAllyKilledOrUncon.Remove(s.Id);
+        soldierEnemyUseULF.Remove(s.Id);
+        soldierEnemyUseUHF.Remove(s.Id);
+        soldierEnemyUseTabun.Remove(s.Id);
+        soldierEnemyUseSmoke.Remove(s.Id);
+        soldierHeardSound.Remove(s.Id);
+        soldierEnemyKilledJA.Remove(s.Id);
+        soldierEnemyKilled.Remove(s.Id);
+        soldierAllyMissesShot.Remove(s.Id);
+        soldierEnemyMissesShot.Remove(s.Id);
+        soldierAllyUseULF.Remove(s.Id);
+        soldierAllyUseUHF.Remove(s.Id);
     }
-    public void SetSoundFlag(Soldier soldier, List<string> soldierList)
+    public void SetSoundFlag(Soldier s, List<string> soldierList)
     {
-        if (soldier.IsConscious())
+        if (s.IsConscious())
         {
-            if (!soldierList.Contains(soldier.Id))
-                soldierList.Add(soldier.Id);
+            if (!soldierList.Contains(s.Id))
+                soldierList.Add(s.Id);
         }
     }
-    public void SetSoldierSelectionSoundFlagAfterDamage(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterDamage(Soldier s)
     {
-        SetSoundFlag(soldier, soldierTakenDamage);
+        SetSoundFlag(s, soldierTakenDamage);
     }
-    public void SetSoldierSelectionSoundFlagAfterAllyKilledJA(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterAllyKilledJA(Soldier s)
     {
-        SetSoundFlag(soldier, soldierAllyKilledJA);
+        SetSoundFlag(s, soldierAllyKilledJA);
     }
-    public void SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(Soldier s)
     {
-        SetSoundFlag(soldier, soldierAllyKilledOrUncon);
+        SetSoundFlag(s, soldierAllyKilledOrUncon);
     }
-    public void SetSoldierSelectionSoundFlagAfterEnemyUseULF(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterEnemyUseULF(Soldier s)
     {
-        SetSoundFlag(soldier, soldierEnemyUseULF);
+        SetSoundFlag(s, soldierEnemyUseULF);
     }
-    public void SetSoldierSelectionSoundFlagAfterEnemyUseUHF(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterEnemyUseUHF(Soldier s)
     {
-        SetSoundFlag(soldier, soldierEnemyUseUHF);
+        SetSoundFlag(s, soldierEnemyUseUHF);
     }
-    public void SetSoldierSelectionSoundFlagAfterEnemyUseTabun(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterEnemyUseTabun(Soldier s)
     {
-        SetSoundFlag(soldier, soldierEnemyUseTabun);
+        SetSoundFlag(s, soldierEnemyUseTabun);
     }
-    public void SetSoldierSelectionSoundFlagAfterEnemyUseSmoke(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterEnemyUseSmoke(Soldier s)
     {
-        SetSoundFlag(soldier, soldierEnemyUseSmoke);
+        SetSoundFlag(s, soldierEnemyUseSmoke);
     }
-    public void SetSoldierSelectionSoundFlagAfterHeardSound(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterHeardSound(Soldier s)
     {
-        SetSoundFlag(soldier, soldierHeardSound);
+        SetSoundFlag(s, soldierHeardSound);
     }
-    public void SetSoldierSelectionSoundFlagAfterEnemyKilledJA(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterEnemyKilledJA(Soldier s)
     {
-        SetSoundFlag(soldier, soldierEnemyKilledJA);
+        SetSoundFlag(s, soldierEnemyKilledJA);
     }
-    public void SetSoldierSelectionSoundFlagAfterEnemyKilled(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterEnemyKilled(Soldier s)
     {
-        SetSoundFlag(soldier, soldierEnemyKilled);
+        SetSoundFlag(s, soldierEnemyKilled);
     }
-    public void SetSoldierSelectionSoundFlagAfterAllyMissesShot(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterAllyMissesShot(Soldier s)
     {
-        SetSoundFlag(soldier, soldierAllyMissesShot);
+        SetSoundFlag(s, soldierAllyMissesShot);
     }
-    public void SetSoldierSelectionSoundFlagAfterEnemyMissesShot(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterEnemyMissesShot(Soldier s)
     {
-        SetSoundFlag(soldier, soldierEnemyMissesShot);
+        SetSoundFlag(s, soldierEnemyMissesShot);
     }
-    public void SetSoldierSelectionSoundFlagAfterAllyUseULF(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterAllyUseULF(Soldier s)
     {
-        SetSoundFlag(soldier, soldierAllyUseULF);
+        SetSoundFlag(s, soldierAllyUseULF);
     }
-    public void SetSoldierSelectionSoundFlagAfterAllyUseUHF(Soldier soldier)
+    public void SetSoldierSelectionSoundFlagAfterAllyUseUHF(Soldier s)
     {
-        SetSoundFlag(soldier, soldierAllyUseUHF);
+        SetSoundFlag(s, soldierAllyUseUHF);
     }
-    public void PlaySoldierSelection(Soldier soldier)
+    public void PlaySoldierSelection(Soldier s)
     {
-        if (soldier.IsConscious())
+        if (s.IsConscious())
         {
-            if (soldierTakenDamage.Contains(soldier.Id))
-                PlaySoldierSelectionAfterDamage(soldier);
-            else if (soldierAllyKilledJA.Contains(soldier.Id))
-                PlaySoldierSelectionAfterAllyKilledJA(soldier);
-            else if (soldierAllyKilledOrUncon.Contains(soldier.Id))
-                PlaySoldierSelectionAfterAllyKilledOrUncon(soldier);
-            else if (soldierEnemyUseULF.Contains(soldier.Id))
-                PlaySoldierSelectionAfterEnemyUseULF(soldier);
-            else if (soldierEnemyUseUHF.Contains(soldier.Id))
-                PlaySoldierSelectionAfterEnemyUseUHF(soldier);
-            else if (soldierEnemyUseTabun.Contains(soldier.Id))
-                PlaySoldierSelectionAfterEnemyUseTabun(soldier);
-            else if (soldierEnemyUseSmoke.Contains(soldier.Id))
-                PlaySoldierSelectionAfterEnemyUseSmoke(soldier);
-            else if (soldierHeardSound.Contains(soldier.Id))
-                PlaySoldierSelectionAfterHeardSound(soldier);
-            else if (soldierEnemyKilledJA.Contains(soldier.Id))
-                PlaySoldierSelectionAfterEnemyKilledJA(soldier);
-            else if (soldierEnemyKilled.Contains(soldier.Id))
-                PlaySoldierSelectionAfterEnemyKilled(soldier);
-            else if (soldierAllyMissesShot.Contains(soldier.Id))
-                PlaySoldierSelectionAfterAllyMissesShot(soldier);
-            else if (soldierEnemyMissesShot.Contains(soldier.Id))
-                PlaySoldierSelectionAfterEnemyMissesShot(soldier);
-            else if (soldierAllyUseULF.Contains(soldier.Id))
-                PlaySoldierSelectionAfterAllyUseULF(soldier);
-            else if (soldierAllyUseUHF.Contains(soldier.Id))
-                PlaySoldierSelectionAfterAllyUseUHF(soldier);
-            else if (soldier.HasGunsEquipped() && soldier.HasOneAmmo())
-                PlaySoldierSelectionWhileOneAmmo(soldier);
-            else if (soldier.HasGunsEquipped() && soldier.HasNoAmmo())
-                PlaySoldierSelectionWhileNoAmmo(soldier);
-            else if (soldier.HasBrokenAllies())
-                PlaySoldierSelectionWhileAllyBroken(soldier);
-            else if (soldier.IsPoisoned())
-                PlaySoldierSelectionWhilePoisoned(soldier);
-            else if (soldier.IsBroken())
-                PlaySoldierSelectionWhileBroken(soldier);
-            else if (soldier.IsFrozen())
-                PlaySoldierSelectionWhileFrozen(soldier);
-            else if (soldier.IsShaken())
-                PlaySoldierSelectionWhileShaken(soldier);
-            else if (soldier.IsWavering())
-                PlaySoldierSelectionWhileWavering(soldier);
-            else if (OneEnemyLeft(soldier))
-                PlaySoldierSelectionWhileOneEnemyLeft(soldier);
-            else if (TwoEnemyLeft(soldier))
-                PlaySoldierSelectionWhileTwoEnemyLeft(soldier);
-            else if (ThreeEnemyLeft(soldier))
-                PlaySoldierSelectionWhileThreeEnemyLeft(soldier);
-            else if (soldier.GetKd() <= -3)
-                PlaySoldierSelectionWhileKdNegThreeOrLess(soldier);
-            else if (soldier.hp <= 4)
-                PlaySoldierSelectionWhileHPFourOrLess(soldier);
+            if (soldierTakenDamage.Contains(s.Id))
+                PlaySoldierSelectionAfterDamage(s);
+            else if (soldierAllyKilledJA.Contains(s.Id))
+                PlaySoldierSelectionAfterAllyKilledJA(s);
+            else if (soldierAllyKilledOrUncon.Contains(s.Id))
+                PlaySoldierSelectionAfterAllyKilledOrUncon(s);
+            else if (soldierEnemyUseULF.Contains(s.Id))
+                PlaySoldierSelectionAfterEnemyUseULF(s);
+            else if (soldierEnemyUseUHF.Contains(s.Id))
+                PlaySoldierSelectionAfterEnemyUseUHF(s);
+            else if (soldierEnemyUseTabun.Contains(s.Id))
+                PlaySoldierSelectionAfterEnemyUseTabun(s);
+            else if (soldierEnemyUseSmoke.Contains(s.Id))
+                PlaySoldierSelectionAfterEnemyUseSmoke(s);
+            else if (soldierHeardSound.Contains(s.Id))
+                PlaySoldierSelectionAfterHeardSound(s);
+            else if (soldierEnemyKilledJA.Contains(s.Id))
+                PlaySoldierSelectionAfterEnemyKilledJA(s);
+            else if (soldierEnemyKilled.Contains(s.Id))
+                PlaySoldierSelectionAfterEnemyKilled(s);
+            else if (soldierAllyMissesShot.Contains(s.Id))
+                PlaySoldierSelectionAfterAllyMissesShot(s);
+            else if (soldierEnemyMissesShot.Contains(s.Id))
+                PlaySoldierSelectionAfterEnemyMissesShot(s);
+            else if (soldierAllyUseULF.Contains(s.Id))
+                PlaySoldierSelectionAfterAllyUseULF(s);
+            else if (soldierAllyUseUHF.Contains(s.Id))
+                PlaySoldierSelectionAfterAllyUseUHF(s);
+            else if (s.HasGunsEquipped() && s.HasOneAmmo())
+                PlaySoldierSelectionWhileOneAmmo(s);
+            else if (s.HasGunsEquipped() && s.HasNoAmmo())
+                PlaySoldierSelectionWhileNoAmmo(s);
+            else if (s.HasBrokenAllies())
+                PlaySoldierSelectionWhileAllyBroken(s);
+            else if (s.IsPoisoned())
+                PlaySoldierSelectionWhilePoisoned(s);
+            else if (s.IsBroken())
+                PlaySoldierSelectionWhileBroken(s);
+            else if (s.IsFrozen())
+                PlaySoldierSelectionWhileFrozen(s);
+            else if (s.IsShaken())
+                PlaySoldierSelectionWhileShaken(s);
+            else if (s.IsWavering())
+                PlaySoldierSelectionWhileWavering(s);
+            else if (OneEnemyLeft(s))
+                PlaySoldierSelectionWhileOneEnemyLeft(s);
+            else if (TwoEnemyLeft(s))
+                PlaySoldierSelectionWhileTwoEnemyLeft(s);
+            else if (ThreeEnemyLeft(s))
+                PlaySoldierSelectionWhileThreeEnemyLeft(s);
+            else if (s.GetKd() <= -3)
+                PlaySoldierSelectionWhileKdNegThreeOrLess(s);
+            else if (s.hp <= 4)
+                PlaySoldierSelectionWhileHPFourOrLess(s);
             else
-                PlaySoldierSelectionGeneric(soldier);
+                PlaySoldierSelectionGeneric(s);
 
             
             
         }
 
         //unset other flags
-        UnsetAllSoldierSelectionSoundFlags(soldier);
+        UnsetAllSoldierSelectionSoundFlags(s);
     }
-    public void PlaySoldierSelectionAfterDamage(Soldier soldier)
+    public void PlaySoldierSelectionAfterDamage(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterDamage);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterDamage);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterDamage);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterDamage);
     }
-    public void PlaySoldierSelectionAfterAllyKilledJA(Soldier soldier)
+    public void PlaySoldierSelectionAfterAllyKilledJA(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterAllyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterAllyKilledJA);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterAllyKilledJA);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterAllyKilledJA);
     }
-    public void PlaySoldierSelectionAfterAllyKilledOrUncon(Soldier soldier)
+    public void PlaySoldierSelectionAfterAllyKilledOrUncon(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterAllyKilledOrUncon);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterAllyKilledOrUncon);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterAllyKilledOrUncon);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterAllyKilledOrUncon);
     }
-    public void PlaySoldierSelectionAfterEnemyUseULF(Soldier soldier)
+    public void PlaySoldierSelectionAfterEnemyUseULF(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterEnemyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterEnemyUseULF);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterEnemyUseULF);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterEnemyUseULF);
     }
-    public void PlaySoldierSelectionAfterEnemyUseUHF(Soldier soldier)
+    public void PlaySoldierSelectionAfterEnemyUseUHF(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterEnemyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterEnemyUseUHF);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterEnemyUseUHF);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterEnemyUseUHF);
     }
-    public void PlaySoldierSelectionAfterEnemyUseTabun(Soldier soldier)
+    public void PlaySoldierSelectionAfterEnemyUseTabun(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterEnemyUseTabun);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterEnemyUseTabun);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterEnemyUseTabun);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterEnemyUseTabun);
     }
-    public void PlaySoldierSelectionAfterEnemyUseSmoke(Soldier soldier)
+    public void PlaySoldierSelectionAfterEnemyUseSmoke(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterEnemyUseSmoke);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterEnemyUseSmoke);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterEnemyUseSmoke);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterEnemyUseSmoke);
     }
-    public void PlaySoldierSelectionAfterHeardSound(Soldier soldier)
+    public void PlaySoldierSelectionAfterHeardSound(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterHeardSound);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterHeardSound);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterHeardSound);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterHeardSound);
     }
-    public void PlaySoldierSelectionAfterEnemyKilledJA(Soldier soldier)
+    public void PlaySoldierSelectionAfterEnemyKilledJA(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterEnemyKilledJA);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterEnemyKilledJA);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterEnemyKilledJA);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterEnemyKilledJA);
     }
-    public void PlaySoldierSelectionAfterEnemyKilled(Soldier soldier)
+    public void PlaySoldierSelectionAfterEnemyKilled(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterEnemyKilled);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterEnemyKilled);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterEnemyKilled);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterEnemyKilled);
     }
-    public void PlaySoldierSelectionAfterAllyMissesShot(Soldier soldier)
+    public void PlaySoldierSelectionAfterAllyMissesShot(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterAllyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterAllyMissesShot);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterAllyMissesShot);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterAllyMissesShot);
     }
-    public void PlaySoldierSelectionAfterEnemyMissesShot(Soldier soldier)
+    public void PlaySoldierSelectionAfterEnemyMissesShot(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterEnemyMissesShot);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterEnemyMissesShot);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterEnemyMissesShot);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterEnemyMissesShot);
     }
-    public void PlaySoldierSelectionAfterAllyUseULF(Soldier soldier)
+    public void PlaySoldierSelectionAfterAllyUseULF(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterAllyUseULF);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterAllyUseULF);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterAllyUseULF);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterAllyUseULF);
     }
-    public void PlaySoldierSelectionAfterAllyUseUHF(Soldier soldier)
+    public void PlaySoldierSelectionAfterAllyUseUHF(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionAfterAllyUseUHF);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionAfterAllyUseUHF);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionAfterAllyUseUHF);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionAfterAllyUseUHF);
     }
-    public void PlaySoldierSelectionWhileOneAmmo(Soldier soldier)
+    public void PlaySoldierSelectionWhileOneAmmo(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileOneAmmo);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileOneAmmo);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileOneAmmo);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileOneAmmo);
     }
-    public void PlaySoldierSelectionWhileNoAmmo(Soldier soldier)
+    public void PlaySoldierSelectionWhileNoAmmo(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileNoAmmo);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileNoAmmo);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileNoAmmo);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileNoAmmo);
     }
-    public void PlaySoldierSelectionWhileAllyBroken(Soldier soldier)
+    public void PlaySoldierSelectionWhileAllyBroken(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileAllyBroken);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileAllyBroken);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileAllyBroken);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileAllyBroken);
     }
-    public void PlaySoldierSelectionWhilePoisoned(Soldier soldier)
+    public void PlaySoldierSelectionWhilePoisoned(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhilePoisoned);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhilePoisoned);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhilePoisoned);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhilePoisoned);
     }
-    public void PlaySoldierSelectionWhileBroken(Soldier soldier)
+    public void PlaySoldierSelectionWhileBroken(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileBroken);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileBroken);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileBroken);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileBroken);
     }
-    public void PlaySoldierSelectionWhileFrozen(Soldier soldier)
+    public void PlaySoldierSelectionWhileFrozen(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileFrozen);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileFrozen);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileFrozen);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileFrozen);
     }
-    public void PlaySoldierSelectionWhileShaken(Soldier soldier)
+    public void PlaySoldierSelectionWhileShaken(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileShaken);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileShaken);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileShaken);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileShaken);
     }
-    public void PlaySoldierSelectionWhileWavering(Soldier soldier)
+    public void PlaySoldierSelectionWhileWavering(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileWavering);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileWavering);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileWavering);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileWavering);
     }
-    public void PlaySoldierSelectionWhileOneEnemyLeft(Soldier soldier)
+    public void PlaySoldierSelectionWhileOneEnemyLeft(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileOneEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileOneEnemyLeft);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileOneEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileOneEnemyLeft);
     }
-    public void PlaySoldierSelectionWhileTwoEnemyLeft(Soldier soldier)
+    public void PlaySoldierSelectionWhileTwoEnemyLeft(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileTwoEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileTwoEnemyLeft);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileTwoEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileTwoEnemyLeft);
     }
-    public void PlaySoldierSelectionWhileThreeEnemyLeft(Soldier soldier)
+    public void PlaySoldierSelectionWhileThreeEnemyLeft(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileThreeEnemyLeft);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileThreeEnemyLeft);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileThreeEnemyLeft);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileThreeEnemyLeft);
     }
-    public void PlaySoldierSelectionWhileKdNegThreeOrLess(Soldier soldier)
+    public void PlaySoldierSelectionWhileKdNegThreeOrLess(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileKdNegThreeOrLess);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileKdNegThreeOrLess);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileKdNegThreeOrLess);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileKdNegThreeOrLess);
     }
-    public void PlaySoldierSelectionWhileHPFourOrLess(Soldier soldier)
+    public void PlaySoldierSelectionWhileHPFourOrLess(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionWhileHPFourOrLess);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionWhileHPFourOrLess);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionWhileHPFourOrLess);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionWhileHPFourOrLess);
     }
-    public void PlaySoldierSelectionGeneric(Soldier soldier)
+    public void PlaySoldierSelectionGeneric(Soldier s)
     {
-        if (soldier.soldierSpeciality.Equals("Leadership"))
-            PlayRandomVoice(commanderSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Health"))
-            PlayRandomVoice(spartanSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Resilience"))
-            PlayRandomVoice(survivorSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Speed"))
-            PlayRandomVoice(runnerSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Evasion"))
-            PlayRandomVoice(evaderSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Fight"))
-            PlayRandomVoice(reservistSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Perceptiveness"))
-            PlayRandomVoice(seekerSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Camouflage"))
-            PlayRandomVoice(seekerSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Sight Radius"))
-            PlayRandomVoice(scoutSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Rifle"))
-            PlayRandomVoice(infantrymanSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Assault Rifle"))
-            PlayRandomVoice(operatorSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Light Machine Gun"))
-            PlayRandomVoice(earthquakeSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Sniper Rifle"))
-            PlayRandomVoice(hunterSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Sub-Machine Gun"))
-            PlayRandomVoice(cycloneSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Shotgun"))
-            PlayRandomVoice(hammerSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Melee"))
-            PlayRandomVoice(wolfSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Strength"))
-            PlayRandomVoice(herculesSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Diplomacy"))
-            PlayRandomVoice(diplomatSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Electronics"))
-            PlayRandomVoice(technicianSelectionGeneric);
-        else if (soldier.soldierSpeciality.Equals("Healing"))
-            PlayRandomVoice(medicSelectionGeneric);
+        if (s.soldierSpeciality.Equals("Leadership"))
+            PlayRandomVoice(s, commanderSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Health"))
+            PlayRandomVoice(s, spartanSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Resilience"))
+            PlayRandomVoice(s, survivorSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Speed"))
+            PlayRandomVoice(s, runnerSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Evasion"))
+            PlayRandomVoice(s, evaderSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Fight"))
+            PlayRandomVoice(s, reservistSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Perceptiveness"))
+            PlayRandomVoice(s, seekerSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Camouflage"))
+            PlayRandomVoice(s, seekerSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Sight Radius"))
+            PlayRandomVoice(s, scoutSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Rifle"))
+            PlayRandomVoice(s, infantrymanSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Assault Rifle"))
+            PlayRandomVoice(s, operatorSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Light Machine Gun"))
+            PlayRandomVoice(s, earthquakeSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Sniper Rifle"))
+            PlayRandomVoice(s, hunterSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Sub-Machine Gun"))
+            PlayRandomVoice(s, cycloneSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Shotgun"))
+            PlayRandomVoice(s, hammerSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Melee"))
+            PlayRandomVoice(s, wolfSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Strength"))
+            PlayRandomVoice(s, herculesSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Diplomacy"))
+            PlayRandomVoice(s, diplomatSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Electronics"))
+            PlayRandomVoice(s, technicianSelectionGeneric);
+        else if (s.soldierSpeciality.Equals("Healing"))
+            PlayRandomVoice(s, medicSelectionGeneric);
     }
-    public bool OneEnemyLeft(Soldier soldier)
+    public bool OneEnemyLeft(Soldier s)
     {
-        if (EnemyCount(soldier) == 1)
+        if (EnemyCount(s) == 1)
             return true;
         return false;
     }
-    public bool TwoEnemyLeft(Soldier soldier)
+    public bool TwoEnemyLeft(Soldier s)
     {
-        if (EnemyCount(soldier) == 2)
+        if (EnemyCount(s) == 2)
             return true;
         return false;
     }
-    public bool ThreeEnemyLeft(Soldier soldier)
+    public bool ThreeEnemyLeft(Soldier s)
     {
-        if (EnemyCount(soldier) == 3)
+        if (EnemyCount(s) == 3)
             return true;
         return false;
     }
-    public int EnemyCount(Soldier soldier) 
+    public int EnemyCount(Soldier s) 
     {
         int enemyCount = 0;
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s1 in game.AllSoldiers())
         {
-            if (s.IsOppositeTeamAs(soldier) && !s.IsDead())
+            if (s.IsOppositeTeamAs(s1) && !s1.IsDead())
                 enemyCount++;
         }
         return enemyCount;

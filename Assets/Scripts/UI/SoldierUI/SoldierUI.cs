@@ -79,7 +79,7 @@ public class SoldierUI : MonoBehaviour
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
                 //play move confirm dialogue
-                soundManager.PlaySoldierConfirmMove(linkedSoldier.soldierSpeciality);
+                soundManager.PlaySoldierConfirmMove(linkedSoldier);
 
                 //deploy the soldier
                 game.PerformSpawn(linkedSoldier, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text));

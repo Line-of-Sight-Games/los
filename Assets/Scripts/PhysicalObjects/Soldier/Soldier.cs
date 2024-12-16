@@ -19,7 +19,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking;
     public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
@@ -1899,7 +1899,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
             //play see enemy dialogue
             if (IsOnturn())
-                game.soundManager.PlaySoldierSeeEnemy(soldierSpeciality);
+                game.soundManager.PlaySoldierSeeEnemy(this);
         }
 
         //add reference of this soldier revealing others
@@ -2809,7 +2809,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 //play kill enemy dialogue
                 if (killedBy != null && killedBy.IsOnturn() && killedBy.IsConscious())
-                    game.soundManager.PlaySoldierKillEnemy(killedBy.soldierSpeciality);
+                    game.soundManager.PlaySoldierKillEnemy(killedBy);
 
                 menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}. He is now <color=red>Dead</color>", false, false);
 

@@ -445,7 +445,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 game.soundManager.PlayEquipArmour();
 
                 //play equip armour dialogue
-                game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
+                game.soundManager.PlaySoldierEquipArmour(linkedSoldier);
 
                 //unset cover
                 linkedSoldier.UnsetCover();
@@ -480,7 +480,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 game.soundManager.PlayEquipArmour();
 
                 //play pickup armour dialogue
-                game.soundManager.PlaySoldierEquipArmour(linkedSoldier.soldierSpeciality);
+                game.soundManager.PlaySoldierEquipArmour(linkedSoldier);
             }
             else if (IsBackpack())
             {
@@ -506,9 +506,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 linkedSoldier.ap++;
             }
             else if (IsUHF())
-                game.soundManager.PlaySoldierPickupUHF(linkedSoldier.soldierSpeciality);
+                game.soundManager.PlaySoldierPickupUHF(linkedSoldier);
             else if (IsULF())
-                game.soundManager.PlaySoldierPickupULF(linkedSoldier.soldierSpeciality);
+                game.soundManager.PlaySoldierPickupULF(linkedSoldier);
             else if (itemName.Equals("Syringe_Unlabelled"))
             {
                 //label unlabelled syringes
@@ -780,7 +780,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
                         //play heal ally dialogue
                         if (linkedSoldier != soldierUsedOn) //only if it's an ally you're healing
-                            game.soundManager.PlaySoldierHealAlly(linkedSoldier.soldierSpeciality);
+                            game.soundManager.PlaySoldierHealAlly(linkedSoldier);
 
                         soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
                     }

@@ -2105,7 +2105,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     Claymore claymore = cAlert.claymore;
 
                     //play claymore detect dialogue
-                    soundManager.PlaySoldierDetectClaymore(detector.soldierSpeciality);
+                    soundManager.PlaySoldierDetectClaymore(detector);
 
                     claymore.revealed = true;
                 }
@@ -3470,7 +3470,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (activeSoldier.IsAbleToSee() && poisNearby)
         {
             //play configure near GB dialogue
-            soundManager.PlaySoldierConfigNearGB(activeSoldier.soldierSpeciality);
+            soundManager.PlaySoldierConfigNearGB(activeSoldier);
         }
     }
     public void AddGlobalInventorySourceButton()
@@ -4519,11 +4519,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         //play grenade use dialogue
         if (useItemUI.itemUsed.IsTabun())
-            soundManager.PlaySoldierUseTabun(activeSoldier.soldierSpeciality);
+            soundManager.PlaySoldierUseTabun(activeSoldier);
         else if (useItemUI.itemUsed.IsSmoke())
-            soundManager.PlaySoldierUseSmoke(activeSoldier.soldierSpeciality);
+            soundManager.PlaySoldierUseSmoke(activeSoldier);
         else
-            soundManager.PlaySoldierUseGrenade(activeSoldier.soldierSpeciality);
+            soundManager.PlaySoldierUseGrenade(activeSoldier);
 
 
         grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
@@ -4556,7 +4556,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //play claymore placement sfx
         soundManager.PlayPlaceClaymore();
         //play claymore placement dialogue
-        soundManager.PlaySoldierPlaceClaymore(activeSoldier.soldierSpeciality);
+        soundManager.PlaySoldierPlaceClaymore(activeSoldier);
 
         claymoreUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         claymoreUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
