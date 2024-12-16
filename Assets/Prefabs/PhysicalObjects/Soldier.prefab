@@ -196,6 +196,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   linkedBody: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
+  physicalSoldier: {fileID: 928312497079157461}
 --- !u!33 &7115050985051285636
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -562,6 +563,8 @@ MonoBehaviour:
   roundsFieldedConscious: 0
   roundsWithoutFood: 0
   loudActionTurnsVulnerable: 0
+  lastLoudActionCounter: 0
+  lastLoudRadius: 0
   stunnedTurnsVulnerable: 0
   overwatchShotCounter: 0
   suppressionValue: 0
@@ -583,6 +586,7 @@ MonoBehaviour:
   poisonedBy: 
   isSpotting: 
   glucoState: 
+  binocularBeamId: 
   inventory:
     itemPrefab: {fileID: 0}
   state: []
@@ -612,6 +616,7 @@ MonoBehaviour:
   SRColliderMinRenderer: {fileID: 5560352495560163868}
   renderer: {fileID: 2165351343985628743}
   madeUnconBy: 
+  beingDraggedBy: 
   madeUnconBydamageList: []
   selectedMaterial: {fileID: 2100000, guid: 11f5df4d1eaf47f468e4296dce19665b, type: 2}
   deadMaterial: {fileID: 2100000, guid: df535cf857aaded49849689743f5a5f3, type: 2}
