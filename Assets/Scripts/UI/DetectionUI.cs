@@ -55,7 +55,7 @@ public class DetectionUI : MonoBehaviour
             detectionAlert = CreateLOSAlert(detector, detectee);
 
         //update alert
-        detectionAlert.entered = true;
+        detectionAlert.UpdateEntered(detectee);
         detectionAlert.UpdateStartBoundary(detectee);
         detectionAlert.UpdateLabel(detectee, detecteeLabel);
     }
@@ -80,7 +80,7 @@ public class DetectionUI : MonoBehaviour
             detectionAlert = CreateLOSAlert(detector, detectee);
 
         //update alert
-        detectionAlert.exited = true;
+        detectionAlert.UpdateExited(detectee);
         detectionAlert.UpdateEndBoundary(detectee);
         detectionAlert.UpdateLabel(detectee, detecteeLabel);
     }

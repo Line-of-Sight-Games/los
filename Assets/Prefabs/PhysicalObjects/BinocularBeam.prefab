@@ -64,7 +64,7 @@ MonoBehaviour:
   beamHeight: 0
   beamWidth: 0
   beam: {fileID: 5430844220833104398}
-  linkedCollider: {fileID: 0}
+  linkedCollider: {fileID: 207414688759933485}
   flashMode: 0
   turnsActive: 0
 --- !u!1001 &2486529684757761801

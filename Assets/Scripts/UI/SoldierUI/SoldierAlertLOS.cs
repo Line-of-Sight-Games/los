@@ -9,7 +9,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
     public MainMenu menu;
 
-    public bool entered, exited; 
+    public bool s1Entered, s1Exited, s2Entered, s2Exited; 
 
     public Soldier s1;
     public TextMeshProUGUI s1Label, s1StartBoundary, s1EndBoundary;
@@ -71,16 +71,14 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     }
     public void UpdateS1Label(string label)
     {
-        s1Label.text = label;
+        s1Label.text = ColourLabel(s1, label);
     }
     public void UpdateS2Label(string label)
     {
-        s2Label.text = label;
+        s2Label.text = ColourLabel(s2, label);
     }
     public void UpdateLabel(Soldier s, string label)
     {
-        label = ColourLabel(label);
-
         if (s == s1)
             UpdateS1Label(label);
         else if (s == s2)
@@ -89,22 +87,45 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         UpdateArrowType();
         UpdateToggles();
     }
-    public string ColourLabel(string label)
+    public void UpdateEntered(Soldier s)
     {
+        if (s == s1)
+            s1Entered = true;
+        else if (s == s2)
+            s2Entered = true;
+    }
+    public void UpdateExited(Soldier s)
+    {
+        if (s == s1)
+            s1Exited = true;
+        else if (s == s2)
+            s2Exited = true;
+    }
+    public string ColourLabel(Soldier s, string label)
+    {
+        
         string prefix = "";
         string colorPrefix = "";
         string colorSuffix = "</color>";
 
-        if (entered && !exited) //standard (ended in SR)
-        { }
-        else if (entered && exited) //glimpse
-            prefix = "GLIMPSE ";
-        else if (!entered && exited) //retreat
-            prefix = "RETREAT ";
-
-        //reset entered and exited flags
-        entered = false;
-        exited = false;
+        if (s == s1)
+        {
+            if (s1Entered && !s1Exited) //standard (ended in SR)
+            { }
+            else if (s1Entered && s1Exited) //glimpse
+                prefix = "GLIMPSE ";
+            else if (!s1Entered && s1Exited) //retreat
+                prefix = "RETREAT ";
+        }
+        else if (s == s2)
+        {
+            if (s2Entered && !s2Exited) //standard (ended in SR)
+            { }
+            else if (s2Entered && s2Exited) //glimpse
+                prefix = "GLIMPSE ";
+            else if (!s2Entered && s2Exited) //retreat
+                prefix = "RETREAT ";
+        }
 
         if (label.Contains("DETECT"))
             colorPrefix = "<color=red>";

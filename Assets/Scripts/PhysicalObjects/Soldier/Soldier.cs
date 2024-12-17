@@ -973,6 +973,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (HasActiveRiotShield())
             stats.C.Val = 0;
+
+        if (IsUsingBinocularsInReconMode())
+            stats.P.Val += (menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).turnsActive / 2;
     }
     public void ApplyLoudActionMods()
     {
@@ -4503,7 +4506,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             binocsState += ", <color=green>Binoculars(Flash)</color>";
         else if (IsUsingBinocularsInReconMode())
         {
-            binocsState += $", <color=green>Binoculars(Recon)(+{(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).turnsActive / 2})</color>";
+            binocsState += $", <color=green>Binoculars(Recon)(+{(menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).turnsActive / 2}P)</color>";
         }
 
         return binocsState;

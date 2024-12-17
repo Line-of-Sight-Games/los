@@ -2221,11 +2221,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddLosGlimpseAlert(Soldier soldier, string description)
     {
+        //block duplicate lostlos alerts being created
+        foreach (Transform child in lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
+            if (child.GetComponent<SoldierAlert>().soldier == soldier && child.Find("LosGlimpseTitle") != null)
+                Destroy(child.gameObject);
+
         GameObject losGlimpseAlert = Instantiate(losGlimpseAlertPrefab, lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
         losGlimpseAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
         losGlimpseAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
-        //losGlimpseAlert.transform.Find("LosGlimpseTitle").GetComponent<TextMeshProUGUI>().text = ;
         losGlimpseAlert.transform.Find("LosGlimpseDescription").GetComponent<TextMeshProUGUI>().text = $"{soldier.soldierName} was glimpsed {description}.";
     }
     public IEnumerator OpenLostLOSList()
