@@ -36,8 +36,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
+    public BinocularsUI binocularsUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, binocularsUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
 
     public InventorySourcePanel inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab;
 
@@ -1832,8 +1833,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //play detection alarm sfx
             soundManager.PlayDetectionAlarm();
         }
-        else
-            ConfirmDetections(); //required to kill los flags if no alerts actually appear
     }
     public void CloseGMAlertDetectionUI()
     {
@@ -1975,7 +1974,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         allSoldiersNotRevealingOutOfSR[counter.Id].Add(detector.Id);
                     else
                     {
-                        if (sAlert.s1Label.text.Contains("GLIMPSE") || sAlert.s1Label.text.Contains("RETREAT") || counter.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
+                        if (sAlert.s1Label.text.Contains("GLIMPSE") || sAlert.s1Label.text.Contains("RETREAT")) //if it's a glimpse or retreat alert
                         {
                             allSoldiersNotRevealingOutOfSR[counter.Id].Add(detector.Id);
 
@@ -1991,9 +1990,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                     if (sAlert.s1Label.text.Contains("OVERWATCH"))
                                         StartCoroutine(OpenOverwatchShotUI(counter, detector));
 
-                                    //pay xp for binoc flash detection (only if it's a "new" detection)
-                                    if (counter.IsUsingBinocularsInFlashMode() && detector.IsHidden())
-                                        AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Flash).", true);
+                                    //pay xp for binoc detection (only if it's a "new" detection)
+                                    if (counter.IsUsingBinoculars() && detector.IsHidden())
+                                        AddXpAlert(counter, 4, $"Detected {detector.soldierName} with binoculars ({counter.BinocularUseMode()}).", true);
                                 }
                                 else //avoidance
                                     AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection.", true); //xp
@@ -2011,9 +2010,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                     if (sAlert.s1Label.text.Contains("OVERWATCH"))
                                         StartCoroutine(OpenOverwatchShotUI(counter, detector));
 
-                                    //pay xp for binoc flash detection (only if it's a "new" detection)
-                                    if (counter.IsUsingBinocularsInReconMode() && detector.IsHidden())
-                                        AddXpAlert(counter, 5, $"Detected {detector.soldierName} with binoculars (Recon).", true);
+                                    //pay xp for binoc detection (only if it's a "new" detection)
+                                    if (counter.IsUsingBinoculars() && detector.IsHidden())
+                                        AddXpAlert(counter, 4, $"Detected {detector.soldierName} with binoculars ({counter.BinocularUseMode()}).", true);
                                 }
                                 else //avoidance
                                 {
@@ -2033,7 +2032,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                         allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
                     else
                     {
-                        if (sAlert.s2Label.text.Contains("GLIMPSE") || sAlert.s2Label.text.Contains("RETREAT") || detector.IsUsingBinocularsInFlashMode()) //if it's a glimpse or retreat alert
+                        if (sAlert.s2Label.text.Contains("GLIMPSE") || sAlert.s2Label.text.Contains("RETREAT")) //if it's a glimpse or retreat alert
                         {
                             allSoldiersNotRevealingOutOfSR[detector.Id].Add(counter.Id);
 
@@ -2050,8 +2049,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                         StartCoroutine(OpenOverwatchShotUI(detector, counter));
 
                                     //pay xp for binoc detection (only if it's a "new" detection)
-                                    if (detector.IsUsingBinocularsInFlashMode() && counter.IsHidden())
-                                        AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Flash).", true);
+                                    if (detector.IsUsingBinoculars() && counter.IsHidden())
+                                        AddXpAlert(detector, 4, $"Detected {counter.soldierName} with binoculars ({detector.BinocularUseMode()}).", true);
                                 }
                                 else //avoidance
                                     AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection.", true); //xp
@@ -2070,8 +2069,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                                         StartCoroutine(OpenOverwatchShotUI(detector, counter));
 
                                     //pay xp for binoc detection (only if it's a "new" detection)
-                                    if (detector.IsUsingBinocularsInReconMode() && counter.IsHidden())
-                                        AddXpAlert(detector, 5, $"Detected {counter.soldierName} with binoculars (Recon).", true);
+                                    if (detector.IsUsingBinoculars() && counter.IsHidden())
+                                        AddXpAlert(detector, 4, $"Detected {counter.soldierName} with binoculars ({detector.BinocularUseMode()}).", true);
                                 }
                                 else
                                 {
@@ -3742,7 +3741,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         foreach (Soldier soldier in game.AllSoldiers())
         {
-            if (activeSoldier.PhysicalObjectWithinMeleeRadius(soldier) && (soldier.IsDead() || soldier.IsPlayingDead() || soldier.IsUnconscious() || soldier.IsMeleeControlledBy(activeSoldier)))
+            if (activeSoldier.PhysicalObjectWithinMeleeRadius(soldier) && !soldier.IsWearingJuggernautArmour(false) && (soldier.IsDead() || soldier.IsPlayingDead() || soldier.IsUnconscious() || soldier.IsMeleeControlledBy(activeSoldier)))
             {
                 dragOptionData = new(soldier.Id, soldier.soldierPortrait, Color.white);
                 dragOptionDataList.Add(dragOptionData);
@@ -4602,33 +4601,24 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         ClearDeploymentBeaconUI();
         deploymentBeaconUI.SetActive(false);
     }
-    public void OpenBinocularsUI(UseItemUI useItemUI)
+    public void OpenBinocularsUI(Item binocs, ItemIcon binocsIcon, string useMode)
     {
-        binocularsUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
-        binocularsUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
-        binocularsUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
-
-        binocularsUI.SetActive(true);
-    }
-    public void OpenBinocularsUI(Item binocs, ItemIcon binocsIcon) //opening it from relocate popup
-    {
-        binocularsUI.GetComponent<UseItemUI>().itemUsed = binocs;
-        binocularsUI.GetComponent<UseItemUI>().itemUsedIcon = binocsIcon;
-        binocularsUI.GetComponent<UseItemUI>().itemUsedFromSlotName = binocs.whereEquipped;
+        binocularsUI.binocularsUsed = binocs;
+        binocularsUI.binocularsUsedIcon = binocsIcon;
+        binocularsUI.binocularMode = useMode;
 
         CloseSoldierStatsUI();
-        binocularsUI.SetActive(true);
-
+        binocularsUI.gameObject.SetActive(true);
     }
     public void ClearBinocularsUI()
     {
-        binocularsUI.transform.Find("OptionPanel").Find("FocusPosition").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        binocularsUI.transform.Find("OptionPanel").Find("FocusPosition").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        binocularsUI.xPos.text = string.Empty;
+        binocularsUI.yPos.text = string.Empty;
     }
     public void CloseBinocularsUI()
     {
         ClearBinocularsUI();
-        binocularsUI.SetActive(false);
+        binocularsUI.gameObject.SetActive(false);
     }
     public void OpenThermalCamUI(UseItemUI useItemUI)
     {

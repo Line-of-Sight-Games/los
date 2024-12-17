@@ -2851,7 +2851,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 menu.OpenGrenadeUI(useItemUI);
                 break;
             case "Binoculars":
-                menu.OpenBinocularsUI(useItemUI);
+                menu.OpenBinocularsUI(itemUsed, linkedIcon, "Flash");
                 break;
             case "Claymore":
                 menu.OpenClaymoreUI(useItemUI);
@@ -3208,17 +3208,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
             menu.CloseDropUI();
         }
     }
-    public void ConfirmBinoculars(UseItemUI useBinoculars)
+    public void ConfirmBinoculars()
     {
-        
-        TMP_InputField focusX = useBinoculars.transform.Find("OptionPanel").Find("FocusPosition").Find("XPos").GetComponent<TMP_InputField>();
-        TMP_InputField focusY = useBinoculars.transform.Find("OptionPanel").Find("FocusPosition").Find("YPos").GetComponent<TMP_InputField>();
-
-        if (menu.ValidateIntInput(focusX, out int x) && menu.ValidateIntInput(focusY, out int y))
+        if (menu.ValidateIntInput(menu.binocularsUI.xPos, out int x) && menu.ValidateIntInput(menu.binocularsUI.yPos, out int y))
         {
-            useBinoculars.itemUsed.UseItem(useBinoculars.itemUsedIcon, useBinoculars.itemUsedOn, useBinoculars.soldierUsedOn);
-            string useMode = useBinoculars.itemUsed.GetBinocularMode(useBinoculars.itemUsedFromSlotName);
-            StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), useMode));
+            menu.binocularsUI.binocularsUsed.UseItem(menu.binocularsUI.binocularsUsedIcon, null, null);
+            StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), menu.binocularsUI.binocularMode));
 
             menu.CloseBinocularsUI();
         }

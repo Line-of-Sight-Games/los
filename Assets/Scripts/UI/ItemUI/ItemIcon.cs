@@ -16,12 +16,14 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public DropthrowPopup dropThrowPopup;
     public SpyJamPopup spyJamPopup;
     public BinocReconPopup binocReconPopup;
+    public BinocInHandPopup binocInHandPopup;
 
     void Start()
     {
         dropThrowPopup = FindFirstObjectByType<DropthrowPopup>(FindObjectsInactive.Include);
         spyJamPopup = FindFirstObjectByType<SpyJamPopup>(FindObjectsInactive.Include);
         binocReconPopup = FindFirstObjectByType<BinocReconPopup>(FindObjectsInactive.Include);
+        binocInHandPopup = FindFirstObjectByType<BinocInHandPopup>(FindObjectsInactive.Include);
     }
 
     public ItemIcon Init(Item item)
@@ -197,7 +199,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.OverrideView)
         {
-            if (item.IsBinoculars() && item.SoldierNestedOn().IsUsingBinocularsInReconMode()) //give option to relocate or stop Recon binocs
+            if (item.IsBinoculars() && item.SoldierNestedOn().IsUsingBinocularsInReconMode()) //give option to relocate or stop recon
             {
                 Vector2 mousePosition = Input.mousePosition;
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -211,6 +213,21 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 binocReconPopup.binocsItemIcon = this;
                 binocReconPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
                 binocReconPopup.ShowBinocReconPopup();
+            }
+            else if (item.IsBinoculars() && item.whereEquipped.Contains("Hand")) //give option to use either recon or flash mode
+            {
+                Vector2 mousePosition = Input.mousePosition;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    binocInHandPopup.transform.parent.GetComponent<RectTransform>(),
+                    mousePosition,
+                    null,
+                    out Vector2 localPoint
+                );
+
+                binocInHandPopup.binocsUsed = item;
+                binocInHandPopup.binocsItemIcon = this;
+                binocInHandPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                binocInHandPopup.ShowBinocInHandPopup();
             }
             else if (item.SoldierNestedOn().IsAbleToUseItems() && item.IsUsable())
             {
@@ -228,7 +245,6 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     spyJamPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
                     spyJamPopup.ShowSpyJamPopup();
                 }
-                
                 else
                 {
                     int ap = item.usageAP;

@@ -47,7 +47,7 @@ public class BinocReconPopup : MonoBehaviour
     public void RelocateButtonClick()
     {
         menu.activeSoldier.DrainAP();
-        menu.OpenBinocularsUI(binocsUsed, binocsItemIcon);
+        menu.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Recon");
         HideBinocReconPopup();
     }
 }

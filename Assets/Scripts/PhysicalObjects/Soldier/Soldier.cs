@@ -3007,7 +3007,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool DraggableInRange()
     {
         foreach (Soldier s in game.AllSoldiers())
-            if (PhysicalObjectWithinMeleeRadius(s) && !IsWearingJuggernautArmour(false) && (s.IsDead() || s.IsPlayingDead() || s.IsUnconscious() || s.IsMeleeControlledBy(this)))
+            if (PhysicalObjectWithinMeleeRadius(s) && !s.IsWearingJuggernautArmour(false) && (s.IsDead() || s.IsPlayingDead() || s.IsUnconscious() || s.IsMeleeControlledBy(this)))
                 return true;
 
         return false;
@@ -3656,6 +3656,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public string BinocularUseMode()
+    {
+        return binocularBeamId.Split('|')[1];
+    }
     public bool IsUsingBinocularsInFlashMode()
     {
         if (IsUsingBinoculars() && binocularBeamId.Split('|')[1].Equals("Flash"))
@@ -3680,17 +3684,24 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             binocularBeam = Instantiate(menu.poiManager.binocularStripPrefab).Init(new(X, Y, Z), Tuple.Create((int)xy.x, (int)xy.y, 0, Id), mode);
         binocularBeamId = $"{binocularBeam.Id}|{mode}";
 
-        menu.binocularsFlashResolvedFlag = false;
         SetLosCheck($"losChange|statChange(P)|binocularsActive|{mode}"); //losCheck
 
-        yield return new WaitForSeconds(0.5f);
 
-        menu.binocularsFlashResolvedFlag = true;
         if (IsUsingBinocularsInFlashMode())
-            UnsetUsingBinoculars();
+        {
+            menu.binocularsFlashResolvedFlag = false;
+
+            yield return new WaitForSeconds(0.5f);
+
+            menu.binocularsFlashResolvedFlag = true;
+
+            if (menu.detectionUI.detectionAlertsPanel.childCount.Equals(0)) //no detections appeared
+                UnsetUsingBinoculars();
+        }
     }
     public void UnsetUsingBinoculars()
     {
+        menu.binocularsFlashResolvedFlag = true;
         SetLosCheck("losChange|statChange(P)|binocularsDeactive"); //losCheck
 
         StartCoroutine((menu.poiManager.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).DestroyBeam());
