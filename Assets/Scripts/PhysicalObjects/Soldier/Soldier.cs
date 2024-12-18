@@ -3007,7 +3007,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool DraggableInRange()
     {
         foreach (Soldier s in game.AllSoldiers())
-            if (PhysicalObjectWithinMeleeRadius(s) && !s.IsWearingJuggernautArmour(false) && (s.IsDead() || s.IsPlayingDead() || s.IsUnconscious() || s.IsMeleeControlledBy(this)))
+            if (PhysicalObjectWithinMeleeRadius(s) && !s.IsWearingJuggernautArmour(false) && (s.IsSameTeamAs(this) || s.IsDead() || s.IsPlayingDead() || s.IsUnconscious() || s.IsMeleeControlledBy(this)))
                 return true;
 
         return false;

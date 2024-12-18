@@ -3740,7 +3740,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         foreach (Soldier soldier in game.AllSoldiers())
         {
-            if (activeSoldier.PhysicalObjectWithinMeleeRadius(soldier) && !soldier.IsWearingJuggernautArmour(false) && (soldier.IsDead() || soldier.IsPlayingDead() || soldier.IsUnconscious() || soldier.IsMeleeControlledBy(activeSoldier)))
+            if (activeSoldier.PhysicalObjectWithinMeleeRadius(soldier) && !soldier.IsWearingJuggernautArmour(false) && (soldier.IsSameTeamAs(activeSoldier) || soldier.IsDead() || soldier.IsPlayingDead() || soldier.IsUnconscious() || soldier.IsMeleeControlledBy(activeSoldier)))
             {
                 dragOptionData = new(soldier.Id, soldier.soldierPortrait, Color.white);
                 dragOptionDataList.Add(dragOptionData);
