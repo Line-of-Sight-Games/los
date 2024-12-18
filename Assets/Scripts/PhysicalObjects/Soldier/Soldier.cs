@@ -762,7 +762,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void CheckSightRadius()
     {
         //reflect changes to colliders
-        SRColliderMin.radius = Mathf.Min(3, stats.SR.Val + 0.5f);
+        SRColliderMin.radius = Mathf.Min(3, stats.SR.Val);
         SRColliderHalf.radius = Mathf.Max(SRColliderMin.radius, (stats.SR.Val / 2));
         SRColliderFull.radius = Mathf.Max(SRColliderMin.radius, stats.SR.Val);
         
@@ -1531,7 +1531,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsAbleToWalk())
         {
-            instantSpeed = (int)((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove() * ApplySmokeModsMove() * ApplyTabunModsMove()) + stats.Str.Val + ApplyFightModsMove();
+            instantSpeed = Mathf.RoundToInt(((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove() * ApplySmokeModsMove() * ApplyTabunModsMove()) + stats.Str.Val + ApplyFightModsMove());
 
             //halve movement for team 1 on first turn
             if (soldierTeam == 1 && game.currentRound == 1)
