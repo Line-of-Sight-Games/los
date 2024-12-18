@@ -2525,7 +2525,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (hitByExplosion.IsWearingJuggernautArmour(true))
             {
                 damage /= 2;
-                stunRounds = 0;
                 explosionAlert.transform.Find("JA").gameObject.SetActive(true);
             }
 

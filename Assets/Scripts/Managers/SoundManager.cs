@@ -1335,9 +1335,6 @@ public class SoundManager : MonoBehaviour
                 PlaySoldierSelectionWhileHPFourOrLess(s);
             else
                 PlaySoldierSelectionGeneric(s);
-
-            
-            
         }
 
         //unset other flags
