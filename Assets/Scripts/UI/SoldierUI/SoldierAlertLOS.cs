@@ -241,7 +241,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (!s1.causeOfLosCheck.Contains("losChange") && !s2.causeOfLosCheck.Contains("losChange")) //no physical change to los at all
         {
             //s1 toggle
-            if (s1Label.text.Equals("OUT OF SR") && (s2.SoldiersOutOfSR.Contains(s1.Id) || s2.NoLOSToTheseSoldiers.Contains(s1.Id)))
+            if (s1Label.text.Equals("OUT OF SR"))
             {
                 s1Toggle.interactable = false;
             }
@@ -255,7 +255,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 
 
             //s2 toggle
-            if (s2Label.text.Equals("OUT OF SR") && (s1.SoldiersOutOfSR.Contains(s2.Id) || s1.NoLOSToTheseSoldiers.Contains(s2.Id)))
+            if (s2Label.text.Equals("OUT OF SR"))
             {
                 s2Toggle.interactable = false;
             }

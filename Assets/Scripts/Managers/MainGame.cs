@@ -2108,6 +2108,21 @@ public class MainGame : MonoBehaviour, IDataPersistence
         meleeParameters.Add(Tuple.Create("aFlank", $"{1 - attackerFlankingMod}"));
         return 1 - attackerFlankingMod;
     }
+    public float AttackerKdMod(Soldier attacker)
+    {
+        float kdMod;
+        int kd = attacker.GetKd();
+
+        if (kd != 0)
+            kdMod = -(2 * kd * 0.01f);
+        else
+            kdMod = 0;
+
+        //report parameters
+        meleeParameters.Add(Tuple.Create("kd", $"{1 - kdMod}"));
+
+        return 1 - kdMod;
+    }
     public float AttackerStrengthMod(Soldier attacker)
     {
         float strengthMod = attacker.stats.Str.Val;
@@ -2180,9 +2195,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         float defenderHealthMod;
         if (defender.IsLastStand())
             defenderHealthMod = 0.8f;
-        else if (defender.hp <= activeSoldier.stats.H.Val / 2)
+        else if (defender.hp <= defender.stats.H.Val / 2)
             defenderHealthMod = 0.4f;
-        else if (defender.hp < activeSoldier.stats.H.Val)
+        else if (defender.hp < defender.stats.H.Val)
             defenderHealthMod = 0.2f;
         else
             defenderHealthMod = 0f;
@@ -2285,11 +2300,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //if it's a normal attack
         if (meleeUI.meleeTypeDropdown.value == 0)
         {
-            meleeDamage = (AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * KdMod(attacker) * FlankingAgainstAttackerMod() * AttackerSuppressionMod(attacker) + AttackerStrengthMod(attacker) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * DefenderSuppressionMod(defender) + DefenderStrengthMod(defender)) - DefenderFightMod(defender) + AttackerFightMod(attacker);
-
-            print($"attacker: {(AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * KdMod(attacker) * FlankingAgainstAttackerMod() * AttackerSuppressionMod(attacker) + AttackerStrengthMod(attacker)}");
-
-            print($"defender: {((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * DefenderSuppressionMod(defender) + DefenderStrengthMod(defender))}");
+            meleeDamage = (AttackerMeleeSkill(attacker) + AttackerWeaponDamage(attackerWeapon)) * AttackerHealthMod(attacker) * AttackerTerrainMod(attacker) * AttackerKdMod(attacker) * FlankingAgainstAttackerMod() * AttackerSuppressionMod(attacker) + AttackerStrengthMod(attacker) - ((DefenderMeleeSkill(defender) + DefenderWeaponDamage(defenderWeapon) + ChargeModifier()) * DefenderHealthMod(defender) * DefenderTerrainMod(defender) * FlankingAgainstDefenderMod(defender) * DefenderSuppressionMod(defender) + DefenderStrengthMod(defender)) - DefenderFightMod(defender) + AttackerFightMod(attacker);
 
             //check bloodletter damage bonus
             if (meleeDamage > 0 && attacker.IsBloodRaged() && !defender.IsRevoker())
@@ -2561,15 +2572,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             //play melee counterattack sfx
                             soundManager.PlayMeleeResolution("counter");
 
-                            if (!defender.IsWearingExoArmour() && attacker.IsWearingJuggernautArmour(false)) //no damage counter against jugs
-                                damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
-                            else
-                            {
-                                counterattack = true;
-                                meleeDamage *= -1;
-                                damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
-                                attacker.TakeDamage(defender, meleeDamage, false, damageType);
-                            }
+                            counterattack = true;
+                            meleeDamage *= -1;
+                            damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
+                            attacker.TakeDamage(defender, meleeDamage, false, damageType);
                         }
                         else
                         {
