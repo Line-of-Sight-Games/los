@@ -317,6 +317,7 @@
       "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
+      "LoudRadius": 5,
       "MeleeDamage": 0,
       "Charges": 1
     },
@@ -327,6 +328,7 @@
       "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
+      "LoudRadius": 5,
       "MeleeDamage": 0,
       "Charges": 1
     },
@@ -337,6 +339,7 @@
       "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
+      "LoudRadius": 5,
       "MeleeDamage": 0,
       "Charges": 1
     },
@@ -347,6 +350,7 @@
       "WhereEquipped": "",
       "UsageAP": 1,
       "Weight": 1,
+      "LoudRadius": 5,
       "MeleeDamage": 0,
       "Charges": 1
     },
