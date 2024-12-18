@@ -308,11 +308,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                 yield return new WaitUntil(() => menu.teamTurnOverFlag == true);
 
+                //set los flags only if weather changes
+                if (weather.CheckVisChange(out string increaseOrDecrease))
+                    SetLosCheckAll($"statChange(SR)|weatherChange({increaseOrDecrease})"); //loscheckall
+
                 currentTurn++;
                 if (currentTeam < maxTeams)
-                {
                     currentTeam++;
-                }
                 else
                 {
                     if (currentRound == maxRounds)
@@ -506,46 +508,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
         }
         menu.CheckXP();
-
-        //run los checks only if weather changes
-        if (CheckWeatherChange(weather.LastTurnVis, weather.CurrentVis) != "false")
-            SetLosCheckAll("statChange(SR)|weatherChange"); //loscheckall
-        //losCheck will automatically run due to collider change
     }
     public void StartRound()
     {
 
     }
 
-    public string CheckWeatherChange(string lastTurnVis, string currentVis)
-    {
-        int lastTurnVisVal, currentVisVal;
 
-        lastTurnVisVal = lastTurnVis switch
-        {
-            "Full" => 0,
-            "Good" => 1,
-            "Moderate" => 2,
-            "Poor" => 3,
-            "Zero" => 4,
-            _ => 0,
-        };
-        currentVisVal = currentVis switch
-        {
-            "Full" => 0,
-            "Good" => 1,
-            "Moderate" => 2,
-            "Poor" => 3,
-            "Zero" => 4,
-            _ => 0,
-        };
-        if (currentVisVal < lastTurnVisVal)
-            return "increase";
-        else if (currentVisVal > lastTurnVisVal)
-            return "decrease";
-        else
-            return "false";
-    }
+
+
 
     //draining soldier AP and MP after use during turn
     public void EndSoldierTurn()
@@ -2308,7 +2279,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             meleeParameters.Add(Tuple.Create("bloodrage", $"{bloodrageMultiplier}"));
             meleeDamage *= bloodrageMultiplier;
-
 
             //rounding based on R
             if (attacker.stats.R.Val > defender.stats.R.Val)

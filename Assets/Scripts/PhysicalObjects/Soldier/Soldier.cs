@@ -762,7 +762,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void CheckSightRadius()
     {
         //reflect changes to colliders
-        SRColliderMin.radius = Mathf.Min(3, stats.SR.Val);
+        SRColliderMin.radius = Mathf.Min(3, stats.SR.Val + 0.5f);
         SRColliderHalf.radius = Mathf.Max(SRColliderMin.radius, (stats.SR.Val / 2));
         SRColliderFull.radius = Mathf.Max(SRColliderMin.radius, stats.SR.Val);
         
@@ -781,13 +781,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (!IsWearingThermalGoggles())
         {
-            if (game.weather.CurrentWeather.Contains("Zero visibility"))
+            if (game.weather.IsZeroVis())
                 stats.SR.Val -= 100;
-            else if (game.weather.CurrentWeather.Contains("Poor visibility"))
+            else if (game.weather.IsPoorVis())
                 stats.SR.Val -= 90;
-            else if (game.weather.CurrentWeather.Contains("Moderate visibility"))
+            else if (game.weather.IsModerateVis())
                 stats.SR.Val -= 70;
-            else if (game.weather.CurrentWeather.Contains("Good visibility"))
+            else if (game.weather.IsGoodVis())
                 stats.SR.Val -= 40;
         }
     }

@@ -238,6 +238,63 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
 
         return increasedRain;
     }
+    public bool CheckVisChange(out string increaseOrDecrease)
+    {
+        increaseOrDecrease = string.Empty;
+        int currentVisVal, nextTurnVisVal;
+
+        currentVisVal = CurrentVis switch
+        {
+            "Full" => 0,
+            "Good" => 1,
+            "Moderate" => 2,
+            "Poor" => 3,
+            "Zero" => 4,
+            _ => 0,
+        };
+        nextTurnVisVal = NextTurnVis switch
+        {
+            "Full" => 0,
+            "Good" => 1,
+            "Moderate" => 2,
+            "Poor" => 3,
+            "Zero" => 4,
+            _ => 0,
+        };
+
+        if (currentVisVal < nextTurnVisVal)
+        {
+            increaseOrDecrease = "decrease";
+            return true;
+        }
+        else if (currentVisVal > nextTurnVisVal)
+        {
+            increaseOrDecrease = "increase";
+            return true;
+        }
+        
+        return false;
+    }
+    public bool IsZeroVis()
+    {
+        return CurrentVis.Equals("Zero");
+    }
+    public bool IsPoorVis()
+    {
+        return CurrentVis.Equals("Poor");
+    }
+    public bool IsModerateVis()
+    {
+        return CurrentVis.Equals("Moderate");
+    }
+    public bool IsGoodVis()
+    {
+        return CurrentVis.Equals("Good");
+    }
+    public bool IsFullVis()
+    {
+        return CurrentVis.Equals("Full");
+    }
     public string CurrentWeather
     {
         get { return savedWeather[game.currentTurn]; }

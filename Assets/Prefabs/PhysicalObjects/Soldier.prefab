@@ -551,6 +551,7 @@ MonoBehaviour:
   trenSRShrinkEffect: 0
   moveResolvedFlag: 1
   losCheck: 0
+  isSpeaking: 0
   causeOfLosCheck: no change
   hp: 6
   ap: 0
@@ -762,7 +763,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
-  linkedSoldier: {fileID: 0}
+  linkedSoldier: {fileID: 4380717690802720386}
 --- !u!135 &4952051446501971680
 SphereCollider:
   m_ObjectHideFlags: 0
