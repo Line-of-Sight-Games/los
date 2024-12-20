@@ -1061,23 +1061,14 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public Soldier SoldierNestedOn()
     {
-        print($"trying to find owner");
         if (owner != null)
         {
-            print($"owner is not null");
             if (owner is Soldier owningSoldier)
-            {
-                print($"owner is a soldier {owningSoldier.Id}");
                 return owningSoldier;
-            }
             else if (owner is Item owningItem)
             {
-                print($"owner is an item {owningItem.Id}");
                 if (owningItem.owner is Soldier owningSoldier2)
-                {
-                    print($"owner of the owning item is a soldier {owningSoldier2.Id}");
                     return owningSoldier2;
-                }
             }
         }
         return null;

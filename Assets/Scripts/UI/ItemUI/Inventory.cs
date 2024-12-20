@@ -24,7 +24,7 @@ public class Inventory
         {
             foreach (Item i in itemList)
             {
-                if (i.Id == linkedInventoryObject.InventorySlots[linkedInventoryObject.InventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key])
+                if (slotName == i.whereEquipped)
                     return i;
             }
         }

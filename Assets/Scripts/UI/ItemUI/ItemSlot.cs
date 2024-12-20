@@ -5,7 +5,7 @@ public class ItemSlot : MonoBehaviour
     public IHaveInventory linkedInventoryObject;
     public Item item; // The item currently in the slot
     public bool unavailable;
-    public ItemIcon nestedIcon, parentIcon;
+    public ItemIcon parentIcon;
 
     public ItemSlot Init(IHaveInventory linkedInventoryObject)
     {
