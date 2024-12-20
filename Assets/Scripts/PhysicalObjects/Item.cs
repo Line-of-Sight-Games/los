@@ -14,6 +14,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public ItemReader reader;
     public ItemManager itemManager;
     public IHaveInventory owner;
+    public string ownerId;
     public string markedForAction;
 
     public Sprite itemImage;
@@ -85,7 +86,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public Item Init(string name)
     {
-        owner = null;
         itemIndex = GetIndex(name);
         itemImage = GetSprite(name);
         //print(itemIndex);
@@ -310,6 +310,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             itemName = (string)details["itemName"];
             Init(itemName);
             id = tempId;
+            ownerId = (string)details["ownerId"];
             equippableSlots = (details["equippableSlots"] as JArray).Select(token => token.ToString()).ToList();
             whereEquipped = (string)details["whereEquipped"];
             weight = Convert.ToInt32(details["weight"]);
@@ -368,6 +369,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         {
             //save basic information
             { "itemName", itemName },
+            { "ownerId", ownerId },
             { "weight", weight },
             { "ammo", ammo },
             { "ablativeHealth", ablativeHealth },
@@ -423,6 +425,19 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             data.allItemDetails.Remove(id);
 
         data.allItemDetails.Add(id, details);
+    }
+    public void SetOwner(IHaveInventory owner)
+    {
+        this.owner = owner;
+        this.ownerId = owner.Id;
+        transform.SetParent(owner.GameObject.transform, true);
+        transform.localPosition = Vector3.zero;
+    }
+    public void UnsetOwner()
+    {
+        this.owner = null;
+        this.ownerId = string.Empty;
+        transform.SetParent(null, true);
     }
     public void RunPickupEffect(Soldier linkedSoldier)
     {
@@ -1046,14 +1061,23 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public Soldier SoldierNestedOn()
     {
+        print($"trying to find owner");
         if (owner != null)
         {
+            print($"owner is not null");
             if (owner is Soldier owningSoldier)
+            {
+                print($"owner is a soldier {owningSoldier.Id}");
                 return owningSoldier;
+            }
             else if (owner is Item owningItem)
             {
+                print($"owner is an item {owningItem.Id}");
                 if (owningItem.owner is Soldier owningSoldier2)
+                {
+                    print($"owner of the owning item is a soldier {owningSoldier2.Id}");
                     return owningSoldier2;
+                }
             }
         }
         return null;

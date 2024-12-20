@@ -10,7 +10,7 @@ public class BinocInHandPopup : MonoBehaviour
     public Button reconButton, flashButton;
     public Item binocsUsed;
     public ItemIcon binocsItemIcon;
-    public GameObject notEnoughApIndicator;
+    public GameObject notEnoughApIndicator, handsFullIndicator;
 
     void Update()
     {
@@ -26,6 +26,17 @@ public class BinocInHandPopup : MonoBehaviour
             reconButton.interactable = true;
             flashButton.interactable = true;
             notEnoughApIndicator.SetActive(false);
+
+            if (binocsUsed.whereEquipped.Contains("Hand") && !menu.activeSoldier.HasAHandFree(true))
+            {
+                reconButton.interactable = false;
+                handsFullIndicator.SetActive(true);
+            }
+            else
+            {
+                reconButton.interactable = true;
+                handsFullIndicator.SetActive(false);
+            }
         }
         else
         {

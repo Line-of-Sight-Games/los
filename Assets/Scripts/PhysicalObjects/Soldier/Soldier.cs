@@ -422,10 +422,28 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsAbleToUseItems()
     {
-        if (IsConscious() && !IsStunned() && !IsPlayingDead() && !IsUsingBinocularsInReconMode())
-            return true;
-
-        return false;
+        if (IsUnconscious())
+        {
+            menu.generalAlertUI.Activate($"{soldierName} cannot use items (<color=blue>Uncon</color>)");
+            return false;
+        }
+        else if (IsStunned())
+        {
+            menu.generalAlertUI.Activate($"{soldierName} cannot use items (<color=red>Stunner</color>)");
+            return false;
+        }
+        else if (IsPlayingDead())
+        {
+            menu.generalAlertUI.Activate($"{soldierName} cannot use items (<color=yellow>Playdead</color>)");
+            return false;
+        }
+        else if (IsUsingBinocularsInReconMode())
+        {
+            menu.generalAlertUI.Activate($"{soldierName} cannot use items (Using binoculars)");
+            return false;
+        }
+        
+        return true;
     }
     public bool IsBlind()
     {

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -12,7 +13,14 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     public ItemSlot originalSlot, currentSlot;
-    public IHaveInventory originalInventoryObject;
+
+    public ItemSlot suppressor;
+    public ItemSlot medikit1;
+    public ItemSlot medikit2;
+    public TextMeshProUGUI weightIndicator;
+    public TextMeshProUGUI ammoIndicator;
+    public TMP_InputField overrideAmmoIndicator;
+
     public DropthrowPopup dropThrowPopup;
     public SpyJamPopup spyJamPopup;
     public BinocReconPopup binocReconPopup;
@@ -28,6 +36,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public ItemIcon Init(Item item)
     {
+        print($"trying to initialise prefab of {item.itemName}({item.Id})");
         this.item = item;
         gameObject.name = item.itemName;
         menu = FindFirstObjectByType<MainMenu>();
@@ -35,9 +44,30 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         canvasGroup = GetComponent<CanvasGroup>();
         originalSlot = transform.parent.GetComponent<ItemSlot>();
         currentSlot = originalSlot;
-        originalInventoryObject = originalSlot.linkedInventoryObject;
         item.markedForAction = string.Empty;
         transform.Find("ItemImage").GetComponent<Image>().sprite = FindFirstObjectByType<ItemAssets>().GetSprite(item.itemName);
+
+        //show suppressor slot
+        if (item.IsSuppressibleGun())
+            ShowSuppressor();
+        else
+            suppressor.gameObject.SetActive(false);
+
+        //show medikit slots
+        if (item.IsBackpack() || item.IsBrace() || item.IsBag())
+        {
+            print($"{item.Id} is a brace/bag/backpack");
+            ShowMedikit1();
+            if (item.IsBackpack())
+                ShowMedikit2();
+            else
+                medikit2.gameObject.SetActive(false);
+        }
+        else
+        {
+            medikit1.gameObject.SetActive(false);
+            medikit2.gameObject.SetActive(false);
+        }
 
         return this;
     }
@@ -49,40 +79,93 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void DisplayItemDetails()
     {
-        if (item.owner is Soldier linkedSoldier && linkedSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
-            transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{1}";
+        //show item weight
+        if (item.weight > 0)
+        {
+            weightIndicator.gameObject.SetActive(true);
+            if (item.owner is Soldier linkedSoldier && linkedSoldier.IsBull() && (item.IsGun() || item.IsAmmo()))
+                weightIndicator.text = $"{1}";
+            else
+                weightIndicator.text = $"{item.weight}";
+        }
         else
-            transform.Find("ItemWeight").GetComponent<TextMeshProUGUI>().text = $"{item.weight}";
+            weightIndicator.gameObject.SetActive(false);
+
+        //show ammo indicator
         if (item.IsGun() || item.IsAmmo())
         {
-            transform.Find("Ammo").gameObject.SetActive(true);
-            transform.Find("Ammo").GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
+            ammoIndicator.gameObject.SetActive(true);
+            ammoIndicator.text = $"{item.ammo}";
         }
+        else
+            ammoIndicator.gameObject.SetActive(false);
 
+        //show override ammo field
         if (menu.OverrideView)
         {
             if (item.IsGun() || item.IsAmmo())
             {
-                transform.Find("OverrideAmmo").gameObject.SetActive(true);
-                transform.Find("OverrideAmmo").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
+                overrideAmmoIndicator.gameObject.SetActive(true);
+                overrideAmmoIndicator.placeholder.GetComponent<TextMeshProUGUI>().text = $"{item.ammo}";
             }
+            else
+                overrideAmmoIndicator.gameObject.SetActive(false);
         }
         else
-            transform.Find("OverrideAmmo").gameObject.SetActive(false);
+            overrideAmmoIndicator.gameObject.SetActive(false);
+    }
+    public void AddItemIconInSlot(Item item, ItemSlot slot)
+    {
+        print($"trying to add item icon to slot for item: {item.Id}");
+        if (item != null && slot != null)
+        {
+            print($"item and slot are not null");
+            if (slot.item == null)
+            {
+                print("targetslot is empty");
+                ItemIcon newItemIcon = Instantiate(menu.itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item);
+                print($"{newItemIcon.name} @ {newItemIcon.transform}");
+                slot.AssignItemIcon(newItemIcon);
+            }
+        }
+    }
+    public void ShowSuppressor()
+    {
+        if (item.Inventory.GetItemInSlot("Suppressor") != null)
+            AddItemIconInSlot(item.Inventory.GetItem("Suppressor"), suppressor);
+
+        suppressor.gameObject.SetActive(true);
+    }
+    public void ShowMedikit1()
+    {
+        print($"trying to show medikits in item {item.Id}");
+        if (item.Inventory.GetItemInSlot("Medikit1") != null)
+            AddItemIconInSlot(item.Inventory.GetItemInSlot("Medikit1"), medikit1);
+
+        medikit1.gameObject.SetActive(true);
+    }
+    public void ShowMedikit2()
+    {
+        print($"searching inventory of item: {item.Id} trying to show medikit2");
+        if (item.Inventory.GetItemInSlot("Medikit2") != null)
+        {
+            print($"found medikit2 item in inventory of item: {item.Id}");
+            AddItemIconInSlot(item.Inventory.GetItemInSlot("Medikit2"), medikit2);
+        }
+        
+        medikit2.gameObject.SetActive(true);
     }
     public void ChangeAmmo()
     {
-        TMP_InputField ammoInput = transform.Find("OverrideAmmo").GetComponent<TMP_InputField>();
-
-        if (int.TryParse(ammoInput.text, out int newAmmo))
+        if (int.TryParse(overrideAmmoIndicator.text, out int newAmmo))
             if (newAmmo >= 0)
                 item.ammo = newAmmo;
 
-        ammoInput.text = "";
+        overrideAmmoIndicator.text = "";
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
-        
+        transform.localScale = new(0.5f, 0.5f);
         canvasGroup.alpha = 0.6f;
         canvasGroup.blocksRaycasts = false;
         transform.SetParent(GetComponentInParent<Canvas>().transform);
@@ -105,8 +188,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             {
                 ItemSlot targetSlot = targetDrop.GetComponent<ItemSlot>();
                 InventorySourcePanel targetPanel = targetDrop.GetComponentInParent<InventorySourcePanel>();
-                if (originalInventoryObject != null)
-                    originalInventoryId = originalInventoryObject.Id;
+                originalInventoryId = item.ownerId;
 
                 if (item.IsOnlyRemovableFromCorpse() && item.IsNestedOnSoldier() && item.SoldierNestedOn().IsAlive())
                     ReturnToOldSlot();
@@ -123,10 +205,9 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
                             InventoryDisplayPanelSoldier soldierInventory = targetSlot.GetComponentInParent<InventoryDisplayPanelSoldier>();
                             if (targetSlotName.Contains("Suppressor"))
-                            {
-                                targetInventoryId = soldierInventory.GetItemInSlot($"{targetSlotName.Split("Suppressor")[0]}").Id;
-                                targetSlotName = "Suppressor";
-                            }
+                                targetInventoryId = targetSlot.parentIcon.item.Id;
+                            else if (targetSlotName.Contains("Medikit"))
+                                targetInventoryId = targetSlot.parentIcon.item.Id;
                             else if (targetSlotName.Contains("Backpack"))
                                 targetInventoryId = soldierInventory.GetItemInSlot("Back").Id;
                             else if (targetSlotName.Contains("LeftBrace"))
@@ -159,7 +240,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     else if (targetPanel != null)
                     {
 
-                        if (targetPanel.linkedInventorySource == originalInventoryObject)
+                        if (targetPanel.linkedInventorySource == item.owner)
                         {
                             ReturnToOriginalSlot();
 
@@ -199,72 +280,75 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (menu.onItemUseScreen && !menu.OverrideView)
         {
-            if (item.IsBinoculars() && item.SoldierNestedOn().IsUsingBinocularsInReconMode()) //give option to relocate or stop recon
+            if (item.IsUsable())
             {
-                Vector2 mousePosition = Input.mousePosition;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    binocReconPopup.transform.parent.GetComponent<RectTransform>(),
-                    mousePosition,
-                    null,
-                    out Vector2 localPoint
-                );
-
-                binocReconPopup.binocsUsed = item;
-                binocReconPopup.binocsItemIcon = this;
-                binocReconPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
-                binocReconPopup.ShowBinocReconPopup();
-            }
-            else if (item.IsBinoculars() && item.whereEquipped.Contains("Hand")) //give option to use either recon or flash mode
-            {
-                Vector2 mousePosition = Input.mousePosition;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    binocInHandPopup.transform.parent.GetComponent<RectTransform>(),
-                    mousePosition,
-                    null,
-                    out Vector2 localPoint
-                );
-
-                binocInHandPopup.binocsUsed = item;
-                binocInHandPopup.binocsItemIcon = this;
-                binocInHandPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
-                binocInHandPopup.ShowBinocInHandPopup();
-            }
-            else if (item.SoldierNestedOn().IsAbleToUseItems() && item.IsUsable())
-            {
-                if (item.IsULF())
+                if (item.IsBinoculars() && item.SoldierNestedOn().IsUsingBinocularsInReconMode()) //give option to relocate or stop recon
                 {
                     Vector2 mousePosition = Input.mousePosition;
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                        spyJamPopup.transform.parent.GetComponent<RectTransform>(),
+                        binocReconPopup.transform.parent.GetComponent<RectTransform>(),
                         mousePosition,
                         null,
                         out Vector2 localPoint
                     );
 
-                    spyJamPopup.ulfUsed = item;
-                    spyJamPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
-                    spyJamPopup.ShowSpyJamPopup();
+                    binocReconPopup.binocsUsed = item;
+                    binocReconPopup.binocsItemIcon = this;
+                    binocReconPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                    binocReconPopup.ShowBinocReconPopup();
                 }
-                else
+                else if (item.IsBinoculars() && item.whereEquipped.Contains("Hand")) //give option to use either recon or flash mode
                 {
-                    int ap = item.usageAP;
-                    //adept ability
-                    if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
-                        ap--;
-                    //gunner ability
-                    if (menu.activeSoldier.IsGunner() && item.IsAmmo())
-                        ap = 1;
+                    Vector2 mousePosition = Input.mousePosition;
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        binocInHandPopup.transform.parent.GetComponent<RectTransform>(),
+                        mousePosition,
+                        null,
+                        out Vector2 localPoint
+                    );
 
-                    if (menu.activeSoldier.CheckAP(ap))
+                    binocInHandPopup.binocsUsed = item;
+                    binocInHandPopup.binocsItemIcon = this;
+                    binocInHandPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                    binocInHandPopup.ShowBinocInHandPopup();
+                }
+                else if (item.SoldierNestedOn().IsAbleToUseItems())
+                {
+                    if (item.IsULF())
                     {
-                        if (menu.activeSoldier.HandsFreeToUseItem(item))
-                            menu.OpenUseItemUI(item, transform.parent.name, this, ap);
+                        Vector2 mousePosition = Input.mousePosition;
+                        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                            spyJamPopup.transform.parent.GetComponent<RectTransform>(),
+                            mousePosition,
+                            null,
+                            out Vector2 localPoint
+                        );
+
+                        spyJamPopup.ulfUsed = item;
+                        spyJamPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                        spyJamPopup.ShowSpyJamPopup();
+                    }
+                    else
+                    {
+                        int ap = item.usageAP;
+                        //adept ability
+                        if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
+                            ap--;
+                        //gunner ability
+                        if (menu.activeSoldier.IsGunner() && item.IsAmmo())
+                            ap = 1;
+
+                        if (menu.activeSoldier.CheckAP(ap))
+                        {
+                            if (menu.activeSoldier.HandsFreeToUseItem(item))
+                                menu.OpenUseItemUI(item, transform.parent.name, this, ap);
+                        }
                     }
                 }
+                
             }
             else
-                menu.generalAlertUI.Activate("This soldier is currently unable to use items.");
-
+                menu.generalAlertUI.Activate("This item is not usable in this way.");
         }
     }
     public void DropThrowItem()
@@ -305,51 +389,31 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             return true;
         return false;
     }
-    /*public bool CheckInventorySlotsAreFree(GameObject targetDrop)
-    {
-        if (item.HasInventory())
-        {
-            InventorySourcePanel targetPanel = targetDrop.GetComponentInParent<InventorySourcePanel>();
-            if (targetPanel is InventoryDisplayPanelSoldier inventoryDisplay)
-            {
-                if (inventoryDisplay != null)
-                {
-                    if (item.itemName == "Backpack")
-                        if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Backpack1").GetComponent<ItemSlot>())
-                            || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Backpack2").GetComponent<ItemSlot>())
-                            || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Backpack3").GetComponent<ItemSlot>()))
-                            return false;
-                        else if (item.itemName == "Armour_Body" || item.itemName == "Armour_Juggernaut")
-                            if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour1").GetComponent<ItemSlot>())
-                                || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour2").GetComponent<ItemSlot>())
-                                || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour3").GetComponent<ItemSlot>())
-                                || !CheckEmptySlot(inventoryDisplay.transform.FindRecursively("Armour4").GetComponent<ItemSlot>()))
-                                return false;
-                            else if (item.itemName == "Brace" && currentSlot.name == "LeftLeg")
-                                if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("LeftBrace").GetComponent<ItemSlot>()))
-                                    return false;
-                                else if (item.itemName == "Brace" && currentSlot.name == "RightLeg")
-                                    if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively("RightBrace").GetComponent<ItemSlot>()))
-                                        return false;
-                }
-            }
-        }
-        return true;
-    }*/
     public bool CheckBlockedSlotsAreFree(ItemSlot targetSlot)
     {
         InventoryDisplayPanelSoldier inventoryDisplay = targetSlot.GetComponentInParent<InventoryDisplayPanelSoldier>();
         if (inventoryDisplay != null)
+        {
             for (int i = 0; i < inventoryDisplay.blockedSlotMatrix.GetLength(0); i++)
+            {
                 for (int j = 0; j < inventoryDisplay.blockedSlotMatrix.GetLength(1); j++)
+                {
                     if (inventoryDisplay.blockedSlotMatrix[i, 0] == item.itemName && inventoryDisplay.blockedSlotMatrix[0, j] == targetSlot.name)
                     {
                         List<string> slotNames = inventoryDisplay.blockedSlotMatrix[i, j].ToString().Split('|').ToList();
                         foreach (string slotName in slotNames)
+                        {
                             if (slotName != "")
+                            {
                                 if (!CheckEmptySlot(inventoryDisplay.transform.FindRecursively(slotName).GetComponent<ItemSlot>()))
-                                    return false; 
+                                    return false;
+                            }
+                        }
                     }
+                }
+            }
+        }
+                    
         return true;                
     }
     public void ReturnToOriginalSlot()

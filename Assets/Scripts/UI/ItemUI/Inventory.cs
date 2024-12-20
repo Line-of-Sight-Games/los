@@ -24,7 +24,6 @@ public class Inventory
         {
             foreach (Item i in itemList)
             {
-                Debug.Log($"slotname:{slotName} itemname:{i.itemName}|{i.name}");
                 if (i.Id == linkedInventoryObject.InventorySlots[linkedInventoryObject.InventorySlots.FirstOrDefault(kvp => kvp.Key == slotName).Key])
                     return i;
             }
@@ -76,17 +75,13 @@ public class Inventory
     {
         itemList.Add(item);
         itemIds.Add(item.Id);
-        item.transform.SetParent(linkedInventoryObject.GameObject.transform, true);
-        item.transform.localPosition = new Vector3(0, 0, 0);
-        item.owner = linkedInventoryObject;
+        item.SetOwner(this.linkedInventoryObject);
     }
     public void RemoveItem(Item item)
     {
-        //print("ran remove item");
         itemList.Remove(item);
         itemIds.Remove(item.Id);
-        item.transform.SetParent(null, true);
-        item.owner = null;
+        item.UnsetOwner();
     }
 
     public bool HasItem(string id)

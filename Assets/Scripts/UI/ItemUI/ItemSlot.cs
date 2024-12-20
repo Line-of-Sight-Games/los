@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class ItemSlot : MonoBehaviour
 {
-    public bool unavailable;
-    public Item item; // The item currently in the slot
     public IHaveInventory linkedInventoryObject;
+    public Item item; // The item currently in the slot
+    public bool unavailable;
+    public ItemIcon nestedIcon, parentIcon;
 
     public ItemSlot Init(IHaveInventory linkedInventoryObject)
     {
@@ -14,13 +15,14 @@ public class ItemSlot : MonoBehaviour
     }
     public ItemSlot AssignItemIcon(ItemIcon itemIcon)
     {
+        print($"trying to assign the item icon: {itemIcon.name}|{itemIcon.item.itemName}");
+        // Set the item in the target slot
+        item = itemIcon.item;
+
         itemIcon.transform.SetParent(transform);
         itemIcon.rectTransform.localPosition = Vector3.zero;
         itemIcon.rectTransform.sizeDelta = Vector2.zero;
         itemIcon.rectTransform.localScale = Vector2.one;
-
-        // Set the item in the target slot
-        item = itemIcon.item;
 
         return this;
     }

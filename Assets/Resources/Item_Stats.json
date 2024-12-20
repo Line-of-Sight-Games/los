@@ -234,8 +234,8 @@
         "Backpack1": "",
         "Backpack2": "",
         "Backpack3": "",
-        "BackpackMedS": "",
-        "BackpackMedM": ""
+        "Medikit1": "",
+        "Medikit2": ""
       }
     },
     {
@@ -245,7 +245,7 @@
       "WhereEquipped": "",
       "Weight": 2,
       "inventorySlots": { 
-        "BagMedM": ""
+        "Medikit1": ""
       }
     },
     {
@@ -265,7 +265,7 @@
       "Weight": 1,
       "inventorySlots": { 
         "Brace1": "",
-        "BraceMedS": ""
+        "Medikit1": ""
       }
     },
     {
@@ -379,7 +379,7 @@
     {
       "Name": "Medikit_Medium",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
-      "EquippableSlots": [ "MedM" ],
+      "EquippableSlots": [ "Medikit" ],
       "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 0,
@@ -390,7 +390,7 @@
     {
       "Name": "Medikit_Small",
       "Traits": [ "Usable", "Consumable", "Poisonable" ],
-      "EquippableSlots": [ "MedS" ],
+      "EquippableSlots": [ "Medikit" ],
       "WhereEquipped": "",
       "UsageAP": 3,
       "Weight": 0,
