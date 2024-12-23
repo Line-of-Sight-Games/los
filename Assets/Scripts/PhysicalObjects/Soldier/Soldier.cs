@@ -19,7 +19,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed;
     public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
@@ -189,7 +189,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "overwatchFirstShotUsed", overwatchFirstShotUsed },
             { "witnessStoredAbilities", witnessStoredAbilities },
             { "plannerGunsBlessed", plannerGunsBlessed },
-            { "gunnerGunsBlessed", gunnerGunsBlessed }
+            { "gunnerGunsBlessed", gunnerGunsBlessed },
+            { "politicianUsed", politicianUsed }
         };
 
         //add the soldier in
@@ -299,6 +300,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         witnessStoredAbilities = (details["witnessStoredAbilities"] as JArray).Select(token => token.ToString()).ToList();
         plannerGunsBlessed = (details["plannerGunsBlessed"] as JArray).Select(token => token.ToString()).ToList();
         gunnerGunsBlessed = (details["gunnerGunsBlessed"] as JArray).Select(token => token.ToString()).ToList();
+        politicianUsed = (bool)details["politicianUsed"];
 
         //link to maingame object
         game = FindFirstObjectByType<MainGame>();

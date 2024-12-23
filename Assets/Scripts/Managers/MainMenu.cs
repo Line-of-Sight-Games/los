@@ -38,7 +38,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public GeneralAlertUI generalAlertUI;
     public BinocularsUI binocularsUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
 
     public InventorySourcePanel inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab;
 
@@ -46,7 +46,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public LOSArrow LOSArrowPrefab;
     public OverwatchSectorSphere overwatchSectorSpherePrefab;
     public List<Button> actionButtons;
-    public Button shotButton, moveButton, meleeButton, configureButton, lastandicideButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton;
+    public Button shotButton, moveButton, meleeButton, configureButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton, lastandicideButton, politicsButton;
     private float playTimeTotal;
     public float turnTime;
     public string meleeChargeIndicator;
@@ -1421,6 +1421,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else
             lastandicideButton.gameObject.SetActive(false);
 
+        //display politics button - politician ability
+        if (activeSoldier.IsPolitician())
+            politicsButton.gameObject.SetActive(true);
+        else
+            politicsButton.gameObject.SetActive(false);
+
         if (game.gameOver)
             GreyAll("Game Over");
         else if (activeSoldier.IsDead())
@@ -1544,6 +1550,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 buttonStates.Add(dragButton, "Blind");
             else if (activeSoldier.IsLastStand())
                 buttonStates.Add(dragButton, "Last Stand");
+
+            //block politics button
+            if (activeSoldier.politicianUsed)
+                buttonStates.Add(politicsButton, "Already Used");
 
             GreyOutButtons(buttonStates, "");
         }
@@ -3864,6 +3874,32 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting")) {}
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+    //politician functions
+    public void OpenPoliticianUI()
+    {
+        politicianUI.SetActive(true);
+    }
+    public void ClosePoliticianUI()
+    {
+        politicianUI.SetActive(false);
+    }
+    public void ConfirmPoliticianUI()
+    {
+        activeSoldier.politicianUsed = true;
+        ClosePoliticianUI();
+    }
 
 
 

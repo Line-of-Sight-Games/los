@@ -382,6 +382,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                 //unset suppression
                 s.UnsetSuppression();
+
+                //unset politicianUsed
+                s.politicianUsed = false;
             }
             else if (s.IsOffturnAndAlive()) //run things that trigger at the end of enemy team turn
             {
