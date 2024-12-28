@@ -21,7 +21,7 @@ public class DetectionUI : MonoBehaviour
     {
         foreach (SoldierAlertLOS alert in allSoldierDetectionAlerts)
         {
-            if ((alert.s1 == s1 && alert.s2 == s2) || (alert.s2 == s1 && alert.s2 == s1)) //alert already exists
+            if ((alert.s1 == s1 && alert.s2 == s2) || (alert.s1 == s2 && alert.s2 == s1)) //alert already exists
                 return true;
         }
         return false;

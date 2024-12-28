@@ -250,6 +250,10 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
+            else if ((s1Label.text.Contains("DETECT") || s1Label.text.Contains("AVOID")) && (s2.NoLOSToTheseSoldiers.Contains(s1.Id)))
+            {
+                s1Toggle.interactable = false;
+            }
             else
                 s1Toggle.interactable = true;
                 
@@ -262,6 +266,10 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             else if ((s2Label.text.Contains("DETECT") || s2Label.text.Contains("AVOID")) && (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id)))
             {
                 s2Toggle.isOn = true;
+                s2Toggle.interactable = false;
+            }
+            else if ((s2Label.text.Contains("DETECT") || s2Label.text.Contains("AVOID")) && (s1.NoLOSToTheseSoldiers.Contains(s2.Id)))
+            {
                 s2Toggle.interactable = false;
             }
             else
