@@ -379,30 +379,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             DestroyOverwatchSectors();
         }
     }
-    public string PrintArray(Array array)
-    {
-        string str = "[";
-        foreach (object obj in array)
-        {
-            str += obj.ToString();
-            str += ", ";
-        }
-        str += "]";
-        return str;
-    }
-    public string PrintList<T>(List<T> list)
-    {
-        string str = "";
-        //str += "[";
-        foreach (object obj in list)
-        {
-            str += obj.ToString();
-            if (list.Count > 1 && obj != (object)list.Last())
-                str += ", ";
-        }
-        //str += "]";
-        return str;
-    }
     public List<string> ReadStringToList(string stringToList)
     {
         return Regex.Split(stringToList, @"(?:,\s+)|(['""].+['""])(?:,\s+)").ToList();
@@ -419,7 +395,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (force || !OverrideView)
         {
-            print("freezing timer");
             TimerStop = true;
             timeStopIcon.SetActive(true);
         }
@@ -428,7 +403,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (force || !OverrideView)
         {
-            print("unfreezing timer");
             TimerStop = false;
             timeStopIcon.SetActive(false);
         }
@@ -1665,7 +1639,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     soldierStatsUI.Find("Stats").Find("OverrideBase").gameObject.SetActive(true);
                     soldierStatsUI.Find("Stats").Find("OverrideBase").Find(s[0]).GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.stats.GetStat(s[0].ToString()).BaseVal.ToString();
                     soldierStatsUI.Find("General").Find("OverrideAbility").gameObject.SetActive(true);
-                    soldierStatsUI.Find("General").Find("OverrideAbility").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = PrintList(activeSoldier.soldierAbilities);
+                    soldierStatsUI.Find("General").Find("OverrideAbility").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = HelperFunctions.PrintList(activeSoldier.soldierAbilities);
                     soldierStatsUI.Find("General").Find("OverrideLocation").gameObject.SetActive(true);
                     soldierStatsUI.Find("General").Find("OverrideLocation").Find("OverrideLocationX").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
                     soldierStatsUI.Find("General").Find("OverrideLocation").Find("OverrideLocationY").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
@@ -1698,7 +1672,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             soldierStatsUI.Find("General").Find("Name").GetComponent<TextMeshProUGUI>().text = activeSoldier.soldierName;
             soldierStatsUI.Find("General").Find("Rank").GetComponent<TextMeshProUGUI>().text = activeSoldier.rank;
             soldierStatsUI.Find("General").Find("Specialty").GetComponent<TextMeshProUGUI>().text = activeSoldier.PrintSoldierSpeciality();
-            soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = PrintList(activeSoldier.soldierAbilities);
+            soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = HelperFunctions.PrintList(activeSoldier.soldierAbilities);
             soldierStatsUI.Find("General").Find("Location").Find("LocationX").GetComponent<TextMeshProUGUI>().text = activeSoldier.X.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationY").GetComponent<TextMeshProUGUI>().text = activeSoldier.Y.ToString();
             soldierStatsUI.Find("General").Find("Location").Find("LocationZ").GetComponent<TextMeshProUGUI>().text = activeSoldier.Z.ToString();
@@ -1802,10 +1776,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //detection functions - menu
     public IEnumerator OpenDetectionAlertUI()
     {
-        print("triggered");
         //wait for everything else to resolve
         yield return new WaitUntil(() => MovementResolvedFlag() && explosionResolvedFlag && shotResolvedFlag && meleeResolvedFlag && inspirerResolvedFlag && binocularsFlashResolvedFlag);
-        print("opening");
         CloseSoldierStatsUI();
 
         detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
@@ -2714,7 +2686,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public IEnumerator OpenShotResultUI(bool runSecondShot)
     {
+        print("trying to open shot result");
         yield return new WaitUntil(() => explosionResolvedFlag);
+        print("explosion flag is resolved, opening shot result");
 
         if (runSecondShot)
             shotResultUI.transform.Find("RunSecondShot").gameObject.SetActive(true);
@@ -2930,6 +2904,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public IEnumerator OpenMeleeUI(string meleeCharge)
     {
         yield return new WaitUntil(() => MovementResolvedFlag() && detectionResolvedFlag);
+        yield return new WaitForSeconds(0.5f);
+        yield return new WaitUntil(() => detectionResolvedFlag && shotResolvedFlag);
+
         //set attacker
         Soldier attacker = activeSoldier;
         meleeUI.attackerID.text = attacker.id;

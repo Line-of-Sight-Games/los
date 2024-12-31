@@ -1220,12 +1220,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (damagedBy != null && HasActiveAndCorrectlyAngledRiotShield(new(damagedBy.X, damagedBy.Y)))
             {
-                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Riot Shield.", true, false);
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Riot Shield.", true, false);
                 damage = 0;
             }
             if (IsWearingExoArmour() && game.CoinFlip())
             {
-                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Exo Armour.", true, false);
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Exo Armour.", true, false);
                 damage = 0;
             }
         }
@@ -1235,7 +1235,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (IsWearingJuggernautArmour(false) && damagedBy != null && !damagedBy.IsWearingExoArmour())
             {
-                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
             }
         }
@@ -1245,7 +1245,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (IsWearingJuggernautArmour(false))
             {
-                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
+                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
             }
         }
@@ -1261,14 +1261,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 remainingDamage = Inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damagedBy, damage, damageSource);
 
                 if (remainingDamage < damage)
-                    menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
+                    menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
             }
             else if (IsWearingBodyArmour(true))
             {
                 remainingDamage = Inventory.GetItem("Armour_Body").TakeAblativeDamage(damagedBy, damage, damageSource);
 
                 if (remainingDamage < damage)
-                    menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {menu.PrintList(damageSource)} damage with Body Armour.", true, false);
+                    menu.AddDamageAlert(this, $"{soldierName} absorbed {damage - remainingDamage} {HelperFunctions.PrintList(damageSource)} damage with Body Armour.", true, false);
             }
 
             damage = remainingDamage;
@@ -1277,28 +1277,28 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply insulator damage halving
         if (IsInsulator() && ResilienceCheck())
         {
-            menu.AddDamageAlert(this, $"{soldierName} <color=green>Insulated</color> {damage - damage/2} {menu.PrintList(damageSource)} damage.", true, false);
+            menu.AddDamageAlert(this, $"{soldierName} <color=green>Insulated</color> {damage - damage/2} {HelperFunctions.PrintList(damageSource)} damage.", true, false);
             damage /= 2;
         }
 
         //apply andro damage reduction
         if (IsOnDrug("Androstenedione"))
         {
-            menu.AddDamageAlert(this, $"{soldierName} resisted 1 {menu.PrintList(damageSource)} damage with Androstenedione.", true, false);
+            menu.AddDamageAlert(this, $"{soldierName} resisted 1 {HelperFunctions.PrintList(damageSource)} damage with Androstenedione.", true, false);
             damage -= 1;
         }
 
         //apply stim armour damage reduction
         if (IsWearingStimulantArmour())
         {
-            menu.AddDamageAlert(this, $"{soldierName} resisted 2 {menu.PrintList(damageSource)} damage with Stim Armour.", true, false);
+            menu.AddDamageAlert(this, $"{soldierName} resisted 2 {HelperFunctions.PrintList(damageSource)} damage with Stim Armour.", true, false);
             damage -= 2;
         }
 
         //block damage if it's first turn and soldier has not used ap
         if (roundsFielded == 0 && !usedAP)
         {
-            menu.AddDamageAlert(this, $"{soldierName} can't be damaged before using AP. {damage} {menu.PrintList(damageSource)} damage resisted.", true, false);
+            menu.AddDamageAlert(this, $"{soldierName} can't be damaged before using AP. {damage} {HelperFunctions.PrintList(damageSource)} damage resisted.", true, false);
             damage = 0;
         }
 
@@ -1419,7 +1419,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 }
 
                 //add damage alert
-                menu.AddDamageAlert(this, $"{soldierName} took {damage} ({menu.PrintList(damageSource)}) damage.", false, false);
+                menu.AddDamageAlert(this, $"{soldierName} took {damage} ({HelperFunctions.PrintList(damageSource)}) damage.", false, false);
                 
                 //apply stun affect from tranquiliser
                 if (damagedBy != null && damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
@@ -2596,6 +2596,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         SetLosCheck("losChange|overwatchActive"); //losCheck
     }
+    public void RefreshOverwatchForGuardsman()
+    {
+        overwatchShotCounter = 1;
+        SetState("Overwatch");
+    }
     public void DecrementOverwatch()
     {
         if (IsOnOverwatch())
@@ -2834,7 +2839,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (killedBy != null && killedBy.IsOnturn() && killedBy.IsConscious())
                     game.soundManager.PlaySoldierKillEnemy(killedBy);
 
-                menu.AddDamageAlert(this, $"{soldierName} was killed by {menu.PrintList(damageSource)}. He is now <color=red>Dead</color>", false, false);
+                menu.AddDamageAlert(this, $"{soldierName} was killed by {HelperFunctions.PrintList(damageSource)}. He is now <color=red>Dead</color>", false, false);
 
                 //make him dead
                 ClearHealthState();
@@ -3535,21 +3540,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasAnyAmmo()
     {
-        print("checking for any ammo");
         if (HasGunsEquipped())
         {
-            print("found equipped guns");
             foreach (Item gun in EquippedGuns)
             {
-                print($"gun name {gun.itemName}");
                 if (gun.CheckAnyAmmo())
-                {
-                    print("gun has ammo");
                     return true;
-                }
-                    
             }
-                
         }
         return false;
     }
@@ -3565,7 +3562,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasNoAmmo()
     {
-        print($"has no ammo result {!HasAnyAmmo()}");
         return !HasAnyAmmo();
     }
     public bool HasSMGsOrPistolsEquipped()
@@ -4581,7 +4577,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetWitnessState()
     {
         if (IsWitness() && witnessStoredAbilities.Count != 0)
-            return $", <color=green>Witnessing ({menu.PrintList(soldierAbilities.Where(ability => witnessStoredAbilities.Contains(ability)).ToList())})</color>";
+            return $", <color=green>Witnessing ({HelperFunctions.PrintList(soldierAbilities.Where(ability => witnessStoredAbilities.Contains(ability)).ToList())})</color>";
         return "";
     }
     public string GetStatus()

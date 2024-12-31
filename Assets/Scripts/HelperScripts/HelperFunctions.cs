@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
 
 public static class HelperFunctions
 {
@@ -12,9 +15,9 @@ public static class HelperFunctions
     }
     public static int RandomNumber(int min, int max)
     {
-        /*if (Input.GetKey(KeyCode.Mouse1))
+        if (Input.GetKey(KeyCode.Mouse1))
             return min;
-        else*/
+        else
             return Random.Range(min, max + 1);
     }
     public static bool IsWithinAngle(Vector3 pointA, Vector3 pointB, Vector3 centralPoint, float angleThreshold)
@@ -56,5 +59,18 @@ public static class HelperFunctions
             if (matrix[i, x] == searchString)
                 return matrix[i, y];
         return null;
+    }
+    public static string PrintList<T>(List<T> list)
+    {
+        string str = "";
+        //str += "[";
+        foreach (object obj in list)
+        {
+            str += obj.ToString();
+            if (list.Count > 1 && obj != (object)list.Last())
+                str += ", ";
+        }
+        //str += "]";
+        return str;
     }
 }

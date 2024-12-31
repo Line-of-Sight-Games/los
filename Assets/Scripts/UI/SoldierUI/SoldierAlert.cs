@@ -315,7 +315,7 @@ public class SoldierAlert : MonoBehaviour
             soldierStatsUI.Find("General").Find("Rank").GetComponent<TextMeshProUGUI>().text = snapshotSoldier.rank;
             soldierStatsUI.Find("General").Find("Terrain").GetComponent<TextMeshProUGUI>().text = snapshotSoldier.soldierTerrain;
             soldierStatsUI.Find("General").Find("Specialty").GetComponent<TextMeshProUGUI>().text = snapshotSoldier.PrintSoldierSpeciality();
-            soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = menu.PrintList(snapshotSoldier.soldierAbilities);
+            soldierStatsUI.Find("General").Find("Ability").GetComponent<TextMeshProUGUI>().text = HelperFunctions.PrintList(snapshotSoldier.soldierAbilities);
             soldierStatsUI.Find("General").Find("RoundsWithoutFood").GetComponent<TextMeshProUGUI>().text = snapshotSoldier.RoundsWithoutFood.ToString();
             soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().text = snapshotSoldier.tp.ToString();
 
