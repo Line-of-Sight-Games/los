@@ -1233,7 +1233,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to melee damage
         if (damageSource.Contains("Melee"))
         {
-            if (IsWearingJuggernautArmour(false) && damagedBy != null && !damagedBy.IsWearingExoArmour())
+            if (IsWearingJuggernautArmour(false) && !damageSource.Contains("Counter") && damagedBy != null && !damagedBy.IsWearingExoArmour())
             {
                 menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
                 damage = 0;
@@ -1243,11 +1243,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //apply mods that apply to explosive damage
         if (damageSource.Contains("Explosive"))
         {
-            if (IsWearingJuggernautArmour(false))
-            {
-                menu.AddDamageAlert(this, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", true, false);
-                damage = 0;
-            }
+            //these are covered in respective functions (AddExplosionAlerts)
         }
 
         //apply mods that apply to all physical damage

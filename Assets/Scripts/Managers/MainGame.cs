@@ -2542,6 +2542,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else if (meleeDamage < 0)
                         {
+                            damageType.Add("Counter");
+                            
                             //play melee counterattack sfx
                             soundManager.PlayMeleeResolution("counter");
 
