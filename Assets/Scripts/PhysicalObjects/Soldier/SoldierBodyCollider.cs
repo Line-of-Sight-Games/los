@@ -15,18 +15,17 @@ public class SoldierBodyCollider : BaseBodyCollider
     {
         if (linkedSoldier.IsDead() || linkedSoldier.IsUnconscious() || linkedSoldier.IsPlayingDead())
         {
-            //doesn't work cause blocks soldier physical from moving
-            physicalSoldier.transform.position = new(physicalSoldier.transform.position.x, 0.5f, physicalSoldier.transform.position.z);
+            physicalSoldier.transform.localPosition = new(physicalSoldier.transform.localPosition.x, 0.5f, physicalSoldier.transform.localPosition.z);
             physicalSoldier.transform.localScale = new(physicalSoldier.transform.localScale.x, 0.5f, physicalSoldier.transform.localScale.z);
         }
         else if (linkedSoldier.IsLastStand())
         {
-            physicalSoldier.transform.position = new(physicalSoldier.transform.position.x, 1, physicalSoldier.transform.position.z);
+            physicalSoldier.transform.localPosition = new(physicalSoldier.transform.localPosition.x, 1, physicalSoldier.transform.localPosition.z);
             physicalSoldier.transform.localScale = new(physicalSoldier.transform.localScale.x, 1, physicalSoldier.transform.localScale.z);
         }
         else
         {
-            physicalSoldier.transform.position = new(physicalSoldier.transform.position.x, 2, physicalSoldier.transform.position.z);
+            physicalSoldier.transform.localPosition = new(physicalSoldier.transform.localPosition.x, 2, physicalSoldier.transform.localPosition.z);
             physicalSoldier.transform.localScale = new(physicalSoldier.transform.localScale.x, 2, physicalSoldier.transform.localScale.z);
         }
     }
