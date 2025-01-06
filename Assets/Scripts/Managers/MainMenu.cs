@@ -3071,7 +3071,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         foreach (Transform child in meleeResultUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
             if ((child.GetComponent<SoldierAlertDouble>().s1 == attacker && child.GetComponent<SoldierAlertDouble>().s2 == defender) || (child.GetComponent<SoldierAlertDouble>().s1 == defender && child.GetComponent<SoldierAlertDouble>().s2 == attacker))
                 Destroy(child.gameObject);
-
+        
         GameObject meleeAlert = Instantiate(meleeAlertPrefab, meleeResultUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
         meleeAlert.GetComponent<SoldierAlertDouble>().SetSoldiers(attacker, defender);

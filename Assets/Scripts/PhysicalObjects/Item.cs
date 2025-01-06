@@ -657,6 +657,10 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 if (linkedSoldier.IsLastStand() && !linkedSoldier.ResilienceCheck())
                     linkedSoldier.MakeUnconscious(damagedBy, damageSource);
 
+            //apply stun affect from tranquiliser (through armour)
+            if (damagedBy != null && damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !linkedSoldier.IsRevoker())
+                linkedSoldier.TakeStun(1);
+
             return damage;
         }
         return 0;
