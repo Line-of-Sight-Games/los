@@ -23,7 +23,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
-    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, overwatchShotCounter, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
+    public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
     public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId;
     public Statline stats;
@@ -149,7 +149,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "lastLoudActionCounter", lastLoudActionCounter },
             { "lastLoudRadius", lastLoudRadius },
             { "stunnedTurnsVulnerable", stunnedTurnsVulnerable },
-            { "overwatchShotCounter", overwatchShotCounter },
             { "overwatchXPoint", overwatchXPoint },
             { "overwatchYPoint", overwatchYPoint },
             { "overwatchConeRadius", overwatchConeRadius },
@@ -259,7 +258,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         lastLoudActionCounter = Convert.ToInt32(details["lastLoudActionCounter"]);
         lastLoudRadius = Convert.ToInt32(details["lastLoudRadius"]);
         stunnedTurnsVulnerable = Convert.ToInt32(details["stunnedTurnsVulnerable"]);
-        overwatchShotCounter = Convert.ToInt32(details["overwatchShotCounter"]);
         overwatchXPoint = Convert.ToInt32(details["overwatchXPoint"]);
         overwatchYPoint = Convert.ToInt32(details["overwatchYPoint"]);
         overwatchConeRadius = Convert.ToInt32(details["overwatchConeRadius"]);
@@ -2587,30 +2585,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         overwatchConeRadius = r;
         overwatchConeArc = a;
         guardsmanRetryUsed = false;
-        overwatchShotCounter = 1;
         SetState("Overwatch");
 
         SetLosCheck("losChange|overwatchActive"); //losCheck
-    }
-    public void RefreshOverwatchForGuardsman()
-    {
-        overwatchShotCounter = 1;
-        SetState("Overwatch");
-    }
-    public void DecrementOverwatch()
-    {
-        if (IsOnOverwatch())
-        {
-            overwatchShotCounter--;
-            if (overwatchShotCounter == 0)
-                UnsetOverwatch();
-        }
     }
     public void UnsetOverwatch()
     {
         if (IsOnOverwatch())
         {
-            overwatchShotCounter = 0;
             overwatchXPoint = 0;
             overwatchYPoint = 0;
             overwatchConeRadius = 0;

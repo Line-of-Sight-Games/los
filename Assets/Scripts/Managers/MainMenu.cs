@@ -2682,6 +2682,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void GuardsmanOverwatchRetry()
     {
+        activeSoldier.SetState("Overwatch"); //refresh overwatch state for guardsman
         overwatchShotUI.ConfirmShotOverwatch(true);
     }
     public IEnumerator OpenShotResultUI(bool runSecondShot)

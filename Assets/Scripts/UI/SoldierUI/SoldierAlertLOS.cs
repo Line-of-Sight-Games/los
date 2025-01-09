@@ -280,8 +280,6 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
             //locking options for s1 toggle
             if (s1Label.text.Equals("OUT OF SR")) //s1 is out of s2 SR
                 s1Toggle.interactable = false;
-            else if (s2.IsOnOverwatch() && !s2.PhysicalObjectWithinOverwatchCone(s1)) //s1 is not in the overwatch cone of s2
-                s1Toggle.interactable = false;
             else if (s2.trenXRayEffect) //s2 has xray effect
             {
                 s1Toggle.isOn = true;
@@ -292,13 +290,13 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
+            else if (s2.IsOnOverwatch() && !s2.PhysicalObjectWithinOverwatchCone(s1)) //s1 is not in the overwatch cone of s2
+                s1Toggle.interactable = false;
             else
                 s1Toggle.interactable = true;
 
             //locking options for s2 toggle
             if (s2Label.text.Equals("OUT OF SR")) //s2 out of s1 SR
-                s2Toggle.interactable = false;
-            else if (s1.IsOnOverwatch() && !s1.PhysicalObjectWithinOverwatchCone(s2)) //s2 is not in the overwatch cone of s1
                 s2Toggle.interactable = false;
             else if (s1.trenXRayEffect) //s1 has xray effect
             {
@@ -310,6 +308,8 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
+            else if (s1.IsOnOverwatch() && !s1.PhysicalObjectWithinOverwatchCone(s2)) //s2 is not in the overwatch cone of s1
+                s2Toggle.interactable = false;
             else
                 s2Toggle.interactable = true;
         }

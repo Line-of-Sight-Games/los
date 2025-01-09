@@ -1659,8 +1659,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             resistSuppression = shooter.SuppressionCheck();
             gun.SpendSingleAmmo();
 
-            int randNum1 = HelperFunctions.RandomNumber(1, 100);
-            int randNum2 = HelperFunctions.RandomNumber(1, 100);
+            int randNum1 = HelperFunctions.RandomShotNumber();
+            int randNum2 = HelperFunctions.RandomCritNumber();
             Tuple<int, int, int> chances;
             chances = CalculateHitPercentage(shooter, target, gun);
 
@@ -1778,10 +1778,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
                         {
                             //paying xp for hit
-                            if (chances.Item1 >= 10)
-                                menu.AddXpAlert(shooter, 8, $"Critical shot on {targetSoldier.soldierName}!", false);
+                            if (actingHitChance < 10)
+                                menu.AddXpAlert(shooter, 10, $"Critical shot <10% hit on {targetSoldier.soldierName}!", false);
                             else
-                                menu.AddXpAlert(shooter, 10, $"Critical shot with a {chances.Item1}% chance on {targetSoldier.soldierName}!", false);
+                                menu.AddXpAlert(shooter, 8, $"Critical shot hit on {targetSoldier.soldierName}!", false);
                         }
                     }
                     else
@@ -1792,10 +1792,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
                         {
                             //paying xp for hit
-                            if (chances.Item1 >= 10)
-                                menu.AddXpAlert(shooter, 2, $"Shot hit on {targetSoldier.soldierName}.", false);
+                            if (actingHitChance < 10)
+                                menu.AddXpAlert(shooter, 10, $"Shot <10% hit on {targetSoldier.soldierName}!", false);
                             else
-                                menu.AddXpAlert(shooter, 10, $"Shot hit with a {chances.Item1}% chance on {targetSoldier.soldierName}!", false);
+                                menu.AddXpAlert(shooter, 2, $"Shot hit on {targetSoldier.soldierName}.", false);
                         }
                     }
                 }
@@ -1824,10 +1824,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
 
                     //paying xp for dodge
-                    if (chances.Item1 <= 90)
-                        menu.AddXpAlert(targetSoldier, 1, $"Dodged shot from {shooter.soldierName}.", false);
+                    if (actingHitChance > 90)
+                        menu.AddXpAlert(targetSoldier, 10, $"Shot >90% dodged from {shooter.soldierName}!", false);
                     else
-                        menu.AddXpAlert(targetSoldier, 10, $"Dodged shot with a {chances.Item1}% chance from {shooter.soldierName}!", false);
+                        menu.AddXpAlert(targetSoldier, 1, $"Shot dodged from {shooter.soldierName}.", false);
 
                     //push a zero damage attack through for abilities trigger
                     targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });

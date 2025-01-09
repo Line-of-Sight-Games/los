@@ -15,10 +15,17 @@ public static class HelperFunctions
     }
     public static int RandomNumber(int min, int max)
     {
+        return Random.Range(min, max + 1);
+    }
+    public static int RandomShotNumber()
+    {
         if (Input.GetKey(KeyCode.Mouse1))
-            return min;
-        else
-            return Random.Range(min, max + 1);
+            return 1;
+        return RandomNumber(1, 100);
+    }
+    public static int RandomCritNumber()
+    {
+        return RandomNumber(1, 100);
     }
     public static bool IsWithinAngle(Vector3 pointA, Vector3 pointB, Vector3 centralPoint, float angleThreshold)
     {

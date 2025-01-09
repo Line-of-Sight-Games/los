@@ -20,6 +20,7 @@ public class OverwatchShotUI : MonoBehaviour
     public TMP_InputField yPos;
     public TMP_InputField zPos;
     public TMP_Dropdown terrainDropdown;
+    public GameObject shotConfirmUI;
 
     Tuple<int, int, int, string> intendedLocation;
     Tuple<int, int, int, string> locationAtShot;
@@ -85,7 +86,6 @@ public class OverwatchShotUI : MonoBehaviour
                 targetSoldier.Y = locationAtShot.Item2;
                 targetSoldier.Z = locationAtShot.Item3;
                 targetSoldier.TerrainOn = locationAtShot.Item4;
-                shooter.RefreshOverwatchForGuardsman();
                 menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
             }
 
@@ -93,8 +93,8 @@ public class OverwatchShotUI : MonoBehaviour
             game.soundManager.PlayShotResolution(gun);
 
             game.tempShooterTarget = Tuple.Create(shooter, target);
-            int randNum1 = HelperFunctions.RandomNumber(1, 100);
-            int randNum2 = HelperFunctions.RandomNumber(1, 100);
+            int randNum1 = HelperFunctions.RandomShotNumber();
+            int randNum2 = HelperFunctions.RandomCritNumber();
             Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
             gun.SpendSingleAmmo();
             //print($"shotparams: {menu.DisplayShotParameters()}\n\n{chances.Item1}|{chances.Item2}>>>{randNum1}|{randNum2}");
@@ -129,25 +129,25 @@ public class OverwatchShotUI : MonoBehaviour
                 //standard shot crit hits
                 if (randNum2 <= chances.Item2)
                 {
-                    targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Shot" });
+                    targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Overwatch", "Shot" });
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                     //paying xp for hit
-                    if (chances.Item1 >= 10)
-                        menu.AddXpAlert(shooter, 8, "Critical overwatch shot on " + targetSoldier.soldierName + "!", false);
+                    if (actingHitChance < 10)
+                        menu.AddXpAlert(shooter, 10, $"Critical overwatch shot <10% hit on {targetSoldier.soldierName}!", false);
                     else
-                        menu.AddXpAlert(shooter, 10, "Critical overwatch shot with a " + chances.Item1 + "% chance on " + targetSoldier.soldierName + "!", false);
+                        menu.AddXpAlert(shooter, 8, $"Critical overwatch shot hit on {targetSoldier.soldierName}!", false);
                 }
                 else
                 {
-                    targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Shot" });
+                    targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Overwatch", "Shot" });
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                     //paying xp for hit
-                    if (chances.Item1 >= 10)
-                        menu.AddXpAlert(shooter, 2, "Overwatch shot hit on " + targetSoldier.soldierName + ".", false);
+                    if (actingHitChance < 10)
+                        menu.AddXpAlert(shooter, 10, $"Overwatch shot <10% hit on {targetSoldier.soldierName}!", false);
                     else
-                        menu.AddXpAlert(shooter, 10, "Overwatch shot hit with a " + chances.Item1 + "% chance on " + targetSoldier.soldierName + "!", false);
+                        menu.AddXpAlert(shooter, 2, $"Overwatch shot hit on {targetSoldier.soldierName}.", false);
                 }
 
                 //check for overwatch daze
@@ -194,16 +194,20 @@ public class OverwatchShotUI : MonoBehaviour
 
                 //show guardsman retry if gun has ammo
                 if (shooter.IsGuardsman() && shooter.guardsmanRetryUsed == false && shooter.HasAnyAmmo() && !targetSoldier.IsRevoker())
+                {
+                    shooter.guardsmanRetryUsed = true;
                     menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
+                }
                 else
                     menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
 
                 //paying xp for dodge
-                if (chances.Item1 <= 90)
-                    menu.AddXpAlert(targetSoldier, 1, "Dodged overwatch shot from " + shooter.soldierName + ".", false);
+                if (actingHitChance > 90)
+                    menu.AddXpAlert(targetSoldier, 10, $"Overwatch shot >90% dodged from {shooter.soldierName}!", false);
                 else
-                    menu.AddXpAlert(targetSoldier, 10, "Dodged overwatch shot with a " + chances.Item1 + "% chance from " + shooter.soldierName + "!", false);
-                
+                    menu.AddXpAlert(targetSoldier, 1, $"Overwatch shot dodged from {shooter.soldierName}.", false);
+
+
                 //restore actual position of move
                 targetSoldier.X = intendedLocation.Item1;
                 targetSoldier.Y = intendedLocation.Item2;
@@ -215,7 +219,7 @@ public class OverwatchShotUI : MonoBehaviour
             }
 
             //unset overwatch after any shot
-            shooter.DecrementOverwatch();
+            shooter.UnsetOverwatch();
 
             //trigger loud action
             if (gun.HasSuppressorAttached()) //suppressor
@@ -233,14 +237,22 @@ public class OverwatchShotUI : MonoBehaviour
     }
     public void CloseOverwatchShotUI()
     {
+        ClearOverwatchShotUI();
         gameObject.SetActive(false);
+    }
+    public void ClearOverwatchShotUI()
+    {
+        xPos.text = "";
+        yPos.text = "";
+        zPos.text = "";
+        terrainDropdown.value = 0;
+        shotConfirmUI.SetActive(false);
     }
     public void OpenShotOverwatchConfirmUI()
     {
         if (menu.ValidateIntInput(xPos, out int xOver) && menu.ValidateIntInput(yPos, out int yOver) && menu.ValidateIntInput(zPos, out int zOver) && terrainDropdown.value != 0)
         {
             //find shooter
-            GameObject shotConfirmUI = transform.Find("ConfirmShotUI").gameObject;
             Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
             Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item gun = shooter.EquippedGuns.First();
