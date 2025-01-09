@@ -4444,6 +4444,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (activeSoldier.HandsFreeToUseItem(ulfUsed))
             {
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} attempts to {effect} with ulf."); //write to report
+
                 useULFUI.GetComponent<UseItemUI>().itemUsed = ulfUsed;
                 useULFUI.GetComponent<UseItemUI>().itemUsedFromSlotName = effect;
                 useULFUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = effect switch

@@ -686,7 +686,18 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         else
         {
-            fromOwnerString = $"{fromOwner.Id}({fromSlot})";
+            if (fromOwner is Soldier fromOwnerSoldier)
+                fromOwnerString = $"{fromOwnerSoldier.soldierName}({fromSlot})";
+            else if (fromOwner is Item fromOwnerItem)
+            {
+                if (fromOwnerItem.IsNestedOnSoldier())
+                    fromOwnerString = $"{fromOwnerItem.itemName}({fromSlot}) on {fromOwnerItem.SoldierNestedOn().soldierName}";
+                else
+                    fromOwnerString = $"{fromOwnerItem.itemName}({fromSlot})";
+            }
+            else
+                fromOwnerString = $"{fromOwner.Id}({fromSlot})";
+
             fromOwner.Inventory.RemoveItemFromSlot(this, fromSlot);
         }
             
@@ -702,7 +713,18 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         else
         {
-            toOwnerString = $"{toOwner.Id}({toSlot})";
+            if (toOwner is Soldier toOwnerSoldier)
+                toOwnerString = $"{toOwnerSoldier.soldierName}({toSlot})";
+            else if (toOwner is Item toOwnerItem)
+            {
+                if (toOwnerItem.IsNestedOnSoldier())
+                    toOwnerString = $"{toOwnerItem.itemName}({toSlot}) on {toOwnerItem.SoldierNestedOn().soldierName}";
+                else
+                    toOwnerString = $"{toOwnerItem.itemName}({toSlot})";
+            }
+            else
+                toOwnerString = $"{toOwner.Id}({toSlot})";
+
             toOwner.Inventory.AddItemToSlot(this, toSlot);
         }
             
@@ -742,6 +764,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             if (game.DiceRoll() <= avgDipElec)
             {
+                FileUtility.WriteToReport($"{linkedSoldier.soldierName} successfully uses ulf to {effect}."); //write to report
+
                 if (effect.Equals("spy"))
                 {
                     SetSpying();
@@ -767,7 +791,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 }
             }
             else
+            {
+                FileUtility.WriteToReport($"{linkedSoldier.soldierName} fails to use ulf to {effect}."); //write to report
+
                 menu.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
+            }
+                
         }
     }
     public void UseItem(ItemIcon linkedIcon, Item itemUsedOn, Soldier soldierUsedOn)
