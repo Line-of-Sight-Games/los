@@ -2682,7 +2682,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void GuardsmanOverwatchRetry()
     {
-        activeSoldier.SetState("Overwatch"); //refresh overwatch state for guardsman
         overwatchShotUI.ConfirmShotOverwatch(true);
     }
     public IEnumerator OpenShotResultUI(bool runSecondShot)
@@ -3993,7 +3992,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     if (child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Override"))
                         soldier.xp -= xp;
                     soldier.IncrementXP(xp, learnerEnabled);
-                    FileUtility.WriteToReport($"{soldier.soldierName} got {xp} xp for: {child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text}");
+                    FileUtility.WriteToReport($"{soldier.soldierName} got {xp} xp for: {child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text}"); //write to report
                 }
                 xpAlertsList.Add(child);
             }

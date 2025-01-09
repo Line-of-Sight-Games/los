@@ -674,17 +674,39 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void MoveItem(IHaveInventory fromOwner, string fromSlot, IHaveInventory toOwner, string toSlot)
     {
-        if (fromOwner == null) { }
+        string fromOwnerString, toOwnerString;
+        if (fromOwner == null) 
+        {
+            fromOwnerString = "ground";
+        }
         else if (fromOwner is GoodyBox goodyBox)
+        {
+            fromOwnerString = $"goody box at ({goodyBox.X}, {goodyBox.Y}, {goodyBox.Z})";
             goodyBox.Inventory.RemoveItem(this);
+        }
         else
+        {
+            fromOwnerString = $"{fromOwner.Id}({fromSlot})";
             fromOwner.Inventory.RemoveItemFromSlot(this, fromSlot);
+        }
+            
 
-        if (toOwner == null) { }
+        if (toOwner == null) 
+        {
+            toOwnerString = "ground";
+        }
         else if (toOwner is GoodyBox goodyBox)
-            goodyBox.Inventory.AddItem(this); 
+        {
+            toOwnerString = $"goody box at ({goodyBox.X}, {goodyBox.Y}, {goodyBox.Z})";
+            goodyBox.Inventory.AddItem(this);
+        }
         else
+        {
+            toOwnerString = $"{toOwner.Id}({toSlot})";
             toOwner.Inventory.AddItemToSlot(this, toSlot);
+        }
+            
+        FileUtility.WriteToReport($"{this.itemName} moved from {fromOwnerString} to {toOwnerString}.");
 
         markedForAction = string.Empty;
     }
@@ -1006,7 +1028,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     }
     public void TakeDamage(Soldier damagedBy, int damage, List<string> damageSource)
     {
-        if ((damage >= 5 && IsBreakable()))
+        if (damage >= 5 && IsBreakable())
             DestroyItem(damagedBy);
         else if (damage > 0 && IsFragile())
         {

@@ -81,6 +81,9 @@ public class OverwatchShotUI : MonoBehaviour
             //reset parameters for guardsman overwatch retry
             if (retry)
             {
+                FileUtility.WriteToReport($"{shooter.soldierName} attempts Guardsman overwatch retry.");
+                shooter.SetState("Overwatch"); //refresh overwatch state for guardsman
+
                 //set target position back to shot position
                 targetSoldier.X = locationAtShot.Item1;
                 targetSoldier.Y = locationAtShot.Item2;
@@ -88,6 +91,8 @@ public class OverwatchShotUI : MonoBehaviour
                 targetSoldier.TerrainOn = locationAtShot.Item4;
                 menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
             }
+
+            FileUtility.WriteToReport($"{shooter.soldierName} overwatch shoots at {targetSoldier.soldierName}");
 
             //play shot sfx
             game.soundManager.PlayShotResolution(gun);
@@ -106,11 +111,15 @@ public class OverwatchShotUI : MonoBehaviour
 
                 if (shooter.ResilienceCheck())
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} resists suppression.");
+
                     menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
                     actingHitChance = chances.Item1;
                 }
                 else
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} suffers suppression.");
+
                     menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
                     actingHitChance = chances.Item3;
                 }
@@ -124,11 +133,15 @@ public class OverwatchShotUI : MonoBehaviour
             //standard shot hits
             if (randNum1 <= actingHitChance)
             {
+                FileUtility.WriteToReport($"{shooter.soldierName} hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
+
                 menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                 //standard shot crit hits
                 if (randNum2 <= chances.Item2)
                 {
+                    FileUtility.WriteToReport($"The shot is critical!"); //write to report
+
                     targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Overwatch", "Shot" });
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
@@ -155,6 +168,8 @@ public class OverwatchShotUI : MonoBehaviour
                 {
                     if (!targetSoldier.ResilienceCheck())
                     {
+                        FileUtility.WriteToReport($"{targetSoldier.soldierName} resists overwatch daze."); //write to report
+
                         menu.AddXpAlert(targetSoldier, 2, $"Resisted overwatch daze.", false);
                         menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} resisted overwatch daze.", true, true);
 
@@ -166,6 +181,8 @@ public class OverwatchShotUI : MonoBehaviour
                     }
                     else if (targetSoldier.IsGuardsman())
                     {
+                        FileUtility.WriteToReport($"{targetSoldier.soldierName} resists overwatch daze (Guardsman)."); //write to report
+
                         menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} resisted overwatch daze (<color=green>Guardsman</color>).", true, true);
 
                         //restore actual position of move
@@ -176,6 +193,8 @@ public class OverwatchShotUI : MonoBehaviour
                     }
                     else //apply overwatch daze
                     {
+                        FileUtility.WriteToReport($"{targetSoldier.soldierName} suffers overwatch daze."); //write to report
+
                         targetSoldier.ap = 0;
                         menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} suffered overwatch daze at X: {targetSoldier.X}, Y: {targetSoldier.Y}, Z: {targetSoldier.Z}, Ter: {targetSoldier.TerrainOn}.", false, true);
                     }
@@ -186,6 +205,8 @@ public class OverwatchShotUI : MonoBehaviour
             }
             else
             {
+                FileUtility.WriteToReport($"{shooter.soldierName} misses {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
+
                 menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
                 menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {game.RandomShotScatterDistance()}cm {game.RandomShotScatterHorizontal()}, {game.RandomShotScatterDistance()}cm {game.RandomShotScatterVertical()}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
 
@@ -206,7 +227,6 @@ public class OverwatchShotUI : MonoBehaviour
                     menu.AddXpAlert(targetSoldier, 10, $"Overwatch shot >90% dodged from {shooter.soldierName}!", false);
                 else
                     menu.AddXpAlert(targetSoldier, 1, $"Overwatch shot dodged from {shooter.soldierName}.", false);
-
 
                 //restore actual position of move
                 targetSoldier.X = intendedLocation.Item1;

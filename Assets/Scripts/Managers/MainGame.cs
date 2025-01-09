@@ -476,7 +476,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (currentRound <= maxRounds)
         {
-            FileUtility.WriteToReport($"\nRound {currentRound} | Team: {currentTeam}");
+            FileUtility.WriteToReport($"\nRound {currentRound} | Team: {currentTeam}"); //write to report
             if (currentTeam == 1)
                 StartRound();
 
@@ -740,7 +740,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void PerformSpawn(Soldier movingSoldier, Tuple<Vector3, string> moveToLocation)
     {
         movingSoldier.moveResolvedFlag = false;
-        FileUtility.WriteToReport($"{movingSoldier.soldierName} spawned at {moveToLocation}");
+        FileUtility.WriteToReport($"{movingSoldier.soldierName} spawned at ({(int)moveToLocation.Item1.x}, {(int)moveToLocation.Item1.y}, {(int)moveToLocation.Item1.z}) {moveToLocation.Item2}"); //write to report
 
         //save start position
         movingSoldier.startX = (int)moveToLocation.Item1.x;
@@ -773,7 +773,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void PerformMove(Soldier movingSoldier, int ap, Tuple<Vector3, string> moveToLocation, bool meleeToggle, bool coverToggle, string fallDistance, bool freeMove)
     {
         movingSoldier.moveResolvedFlag = false;
-        FileUtility.WriteToReport($"{movingSoldier.soldierName} moved to {moveToLocation}");
+        FileUtility.WriteToReport($"{movingSoldier.soldierName} moved to ({(int)moveToLocation.Item1.x}, {(int)moveToLocation.Item1.y}, {(int)moveToLocation.Item1.z}) {moveToLocation.Item2}"); //write to report
 
         int.TryParse(fallDistance, out int fallDistanceInt);
         string launchMelee = string.Empty;
@@ -1640,7 +1640,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
 
         tempShooterTarget = Tuple.Create(shooter, target);
-        if (runSecondShot || retry) { }
+        if (runSecondShot || retry) 
+        { 
+            if (retry)
+                FileUtility.WriteToReport($"{shooter.soldierName} attempts avenger retry.");
+        }
         else
             activeSoldier.DeductAP(ap);
 
@@ -1648,13 +1652,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (shotUI.shotTypeDropdown.value == 0) //standard shot
         {
+            if (target is Soldier)
+                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {(target as Soldier).soldierName}"); //write to report
+            else
+                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {target.GetType()}"); //write to report
+
             //play shot sfx
             soundManager.PlayShotResolution(gun);
-
-            if (target is Soldier)
-                FileUtility.WriteToReport($"{shooter.soldierName} shooting at {(target as Soldier).soldierName}");
-            else
-                FileUtility.WriteToReport($"{shooter.soldierName} shooting at {target.GetType()}");
 
             resistSuppression = shooter.SuppressionCheck();
             gun.SpendSingleAmmo();
@@ -1671,11 +1675,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                 if (resistSuppression)
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} resists suppression."); //write to report
+
                     menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
                     actingHitChance = chances.Item1;
                 }
                 else
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} suffers suppression."); //write to report
+
                     menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
                     actingHitChance = chances.Item3;
                 }
@@ -1700,6 +1708,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //standard shot hits cover
                 if (randNum1 <= actingHitChance)
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} hits cover at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
+
                     //play cover destruction
                     soundManager.PlayCoverDestruction();
 
@@ -1713,6 +1723,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} misses cover at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
+
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter);
 
@@ -1728,6 +1740,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //standard shot hits barrel
                 if (randNum1 <= actingHitChance)
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} hits explosive barrel at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
+
                     menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                     //critical shot hits barrel
@@ -1739,6 +1753,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} misses explosive barrel at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
+
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter);
 
@@ -1765,13 +1781,22 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         }
                         else
                             menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee and hit intended target.";
+
+                        FileUtility.WriteToReport($"{shooter.soldierName} shoots into melee aiming for {originalTarget.soldierName}, hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
                     }
                     else
+                    {
+                        FileUtility.WriteToReport($"{shooter.soldierName} hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
+
                         menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                    }
+                        
 
                     //standard shot crit hits
                     if (randNum2 <= chances.Item2)
                     {
+                        FileUtility.WriteToReport($"The shot is critical!"); //write to report
+
                         targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Shot" });
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
@@ -1801,6 +1826,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
+                    FileUtility.WriteToReport($"{shooter.soldierName} misses {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
+
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter);
 
@@ -1836,16 +1863,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (shotUI.shotTypeDropdown.value == 1) //supression shot
         {
+            FileUtility.WriteToReport($"{shooter.soldierName} suppresses {(target as Soldier).soldierName}"); //write to report
+
             //play suppression sfx
             soundManager.PlaySuppressionResolution(gun);
 
             //play suppression dialogue
             soundManager.PlaySoldierSuppressEnemy(shooter);
 
-            FileUtility.WriteToReport($"{shooter.soldierName} suppressing {target}");
-
             gun.SpendSpecificAmmo(gun.suppressDrain, true);
-
             int suppressionValue = CalculateRangeBracket(CalculateRange(shooter, target as PhysicalObject)) switch
             {
                 "Melee" or "CQB" => gun.cQBSupPen,
@@ -2699,6 +2725,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         int ap = UpdateConfigureAP();
         if (activeSoldier.CheckAP(ap))
         {
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} configures."); //write to report
+
             activeSoldier.DeductAP(ap);
             foreach (ItemIcon itemIcon in configUI.GetComponentsInChildren<ItemIcon>(true))
             {
@@ -2793,7 +2821,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Soldier soldierUsedOn = useItemUI.soldierUsedOn;
         ItemIcon linkedIcon = useItemUI.itemUsedIcon;
 
-        FileUtility.WriteToReport($"{activeSoldier.soldierName} used {itemUsed.itemName}.");
+        FileUtility.WriteToReport($"{activeSoldier.soldierName} uses {itemUsed.itemName}.");
 
         switch (itemUsed.itemName)
         {
@@ -3156,13 +3184,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
         {
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} drops {dropItemUI.itemUsed.itemName}.");
+
             if (itemWillBreak.activeInHierarchy)
+            {
+                FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} breaks.");
                 dropItemUI.itemUsed.TakeDamage(activeSoldier, 1, new() { "Fall" }); //destroy item
+            }
             else if (catcher.activeInHierarchy)
             {
                 if (dropItemUI.itemUsed.IsCatchable())
                 {
                     Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
+
+                    FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} is caught by {catchingSoldier.soldierName}.");
 
                     //if soldier has left hand free catch it there, otherwise catch in right hand
                     if (catchingSoldier.LeftHandItem == null)
@@ -3193,6 +3228,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (menu.ValidateIntInput(menu.binocularsUI.xPos, out int x) && menu.ValidateIntInput(menu.binocularsUI.yPos, out int y))
         {
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} uses binoculars ({x}, {y}).");
+
             menu.binocularsUI.binocularsUsed.UseItem(menu.binocularsUI.binocularsUsedIcon, null, null);
             StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), menu.binocularsUI.binocularMode));
 
@@ -3212,6 +3249,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} places claymore at ({x}, {y}, {z}).");
+
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
                 Instantiate(poiManager.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id));
 
@@ -3232,6 +3271,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} places deployment beacon at ({x}, {y}, {z}).");
+
                 //play use deployment beacon
                 soundManager.PlayUseDepBeacon();
 
@@ -3257,6 +3298,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} places thermal cam at ({x}, {y}, {z}).");
+
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 
                 SetLosCheckAllEnemies("losChange|thermalCamActive"); //loscheckallenemies
@@ -3398,6 +3441,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             Terminal terminal = poiManager.FindPOIById(dipelecUI.terminalID.text) as Terminal;
 
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} attempts to interact with terminal at ({terminal.X}, {terminal.Y}, {terminal.Z}).");
+
             if (dipelecUI.dipElecTypeDropdown.value == 0)
             {
                 resultString += "Negotiation";
@@ -3426,6 +3471,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 int targetLevel = dipelecUI.dipElecLevelDropdown.value + 1;
                 if (passCount >= targetLevel)
                 {
+                    FileUtility.WriteToReport($"{activeSoldier.soldierName} succeeds at level {targetLevel} {resultString}.");
+
                     for (int i = targetLevel; i >= 1; i--)
                     {
                         menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=green>{resultString} successful</color>";
@@ -3440,6 +3487,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
+                    FileUtility.WriteToReport($"{activeSoldier.soldierName} fails to {resultString}.");
+
                     menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>{resultString} failed</color>";
                     GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                     dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"No reward";
@@ -3449,6 +3498,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else
             {
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} disables terminal at ({terminal.X}, {terminal.Y}, {terminal.Z}).");
+
                 GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                 dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>Terminal disabled</color>";
 
@@ -3645,6 +3696,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
         {
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} bloodlets.");
+
             activeSoldier.TakeBloodlettingDamage();
             menu.CloseDamageEventUI();
         }
