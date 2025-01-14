@@ -35,7 +35,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea;
-    Vector3 boundCrossOne = Vector3.zero, boundCrossTwo = Vector3.zero;
     public List<Tuple<string, string>> shotParameters = new(), meleeParameters = new();
     public Tuple<Vector3, string, int, int> tempMove;
     public Tuple<Soldier, IAmShootable> tempShooterTarget;

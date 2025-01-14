@@ -113,7 +113,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
                     {
                         if (item.Id == itemId)
                         {
-                            inventoryObject.Inventory.AddItemToSlot(item, item.whereEquipped);
+                            inventoryObject.Inventory.AddItemToSlotFromSave(item, item.whereEquipped);
                         }
                     }
                 }

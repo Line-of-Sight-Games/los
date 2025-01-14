@@ -487,7 +487,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     linkedSoldier.UnsetOnDrug(itemManager.drugTable[i]);
 
                 //kil tabun
-                linkedSoldier.UnsetTabun();
+                if (linkedSoldier.IsInTabun())
+                    linkedSoldier.UnsetTabun();
             }
             else if (IsBodyArmour())
             {

@@ -46,6 +46,17 @@ public class Inventory
             }
         }
     }
+    public void AddItemToSlotFromSave(Item item, string slotName)
+    {
+        if (!HasItem(item.id))
+        {
+            AddItem(item);
+            item.whereEquipped = slotName;
+
+            if (linkedInventoryObject != null && linkedInventoryObject.InventorySlots != null)
+                linkedInventoryObject.InventorySlots[slotName] = item.Id;
+        }
+    }
     public void RemoveItemFromSlot(Item item, string slotName)
     {
         if (HasItem(item.id))
