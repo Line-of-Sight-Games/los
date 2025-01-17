@@ -2282,7 +2282,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         damageAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         damageAlert.transform.Find("DamageDescription").GetComponent<TextMeshProUGUI>().text = description;
         damageAlert.transform.SetAsFirstSibling();
-        FileUtility.WriteToReport($"{soldier.soldierName} damage alert: {description}, resisted: {resisted}, nonDamage: {nonDamage}");
+        FileUtility.WriteToReport($"{soldier.soldierName} damage alert: {description}, resisted: {resisted}, nonDamage: {nonDamage}"); //write to report
         //try and open damagealert
         StartCoroutine(OpenDamageList());
     }
@@ -4086,7 +4086,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 confirm = false;
 
             promotionAlertsList.Add(child);
-            FileUtility.WriteToReport($"{child.GetComponent<SoldierAlert>().soldier.soldierName} promotion: {child.GetComponent<SoldierAlert>().soldier.rank}");
+            FileUtility.WriteToReport($"{child.GetComponent<SoldierAlert>().soldier.soldierName} promotion: {child.GetComponent<SoldierAlert>().soldier.rank}"); //write to report
         }
 
         if (confirm)

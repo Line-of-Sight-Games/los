@@ -27,6 +27,17 @@ public static class HelperFunctions
     {
         return RandomNumber(1, 100);
     }
+    public static bool RandomDipelecCoinFlip()
+    {
+        if (Input.GetKey(KeyCode.Mouse1))
+            return true;
+        else
+        {
+            if (HelperFunctions.RandomNumber(0, 1) == 1)
+                return true;
+        }
+        return false;
+    }
     public static bool IsWithinAngle(Vector3 pointA, Vector3 pointB, Vector3 centralPoint, float angleThreshold)
     {
         Debug.Log($"Checking is within angle: {angleThreshold}");

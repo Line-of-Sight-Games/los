@@ -1642,7 +1642,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (runSecondShot || retry) 
         { 
             if (retry)
-                FileUtility.WriteToReport($"{shooter.soldierName} attempts avenger retry.");
+                FileUtility.WriteToReport($"{shooter.soldierName} attempts avenger retry."); //write to report
         }
         else
             activeSoldier.DeductAP(ap);
@@ -2483,7 +2483,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (activeSoldier.CheckAP(ap))
             {
-                FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}");
+                FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}"); //write to report
 
                 //determine if damage is from melee or melee charge
                 List<string> damageType = new() { "Melee" };
@@ -2820,7 +2820,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Soldier soldierUsedOn = useItemUI.soldierUsedOn;
         ItemIcon linkedIcon = useItemUI.itemUsedIcon;
 
-        FileUtility.WriteToReport($"{activeSoldier.soldierName} uses {itemUsed.itemName}.");
+        FileUtility.WriteToReport($"{activeSoldier.soldierName} uses {itemUsed.itemName}."); //write to report
 
         switch (itemUsed.itemName)
         {
@@ -3183,11 +3183,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} drops {dropItemUI.itemUsed.itemName}.");
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} drops {dropItemUI.itemUsed.itemName}."); //write to report
 
             if (itemWillBreak.activeInHierarchy)
             {
-                FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} breaks.");
+                FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} breaks."); //write to report
                 dropItemUI.itemUsed.TakeDamage(activeSoldier, 1, new() { "Fall" }); //destroy item
             }
             else if (catcher.activeInHierarchy)
@@ -3196,7 +3196,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
 
-                    FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} is caught by {catchingSoldier.soldierName}.");
+                    FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} is caught by {catchingSoldier.soldierName}."); //write to report
 
                     //if soldier has left hand free catch it there, otherwise catch in right hand
                     if (catchingSoldier.LeftHandItem == null)
@@ -3227,7 +3227,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (menu.ValidateIntInput(menu.binocularsUI.xPos, out int x) && menu.ValidateIntInput(menu.binocularsUI.yPos, out int y))
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} uses binoculars ({x}, {y}).");
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} uses binoculars ({x}, {y})."); //write to report
 
             menu.binocularsUI.binocularsUsed.UseItem(menu.binocularsUI.binocularsUsedIcon, null, null);
             StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), menu.binocularsUI.binocularMode));
@@ -3248,7 +3248,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} places claymore at ({x}, {y}, {z}).");
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} places claymore at ({x}, {y}, {z})."); //write to report
 
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
                 Instantiate(poiManager.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id));
@@ -3270,7 +3270,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} places deployment beacon at ({x}, {y}, {z}).");
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} places deployment beacon at ({x}, {y}, {z})."); //write to report
 
                 //play use deployment beacon
                 soundManager.PlayUseDepBeacon();
@@ -3297,7 +3297,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} places thermal cam at ({x}, {y}, {z}).");
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} places thermal cam at ({x}, {y}, {z})."); //write to report
 
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 
@@ -3440,7 +3440,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             Terminal terminal = poiManager.FindPOIById(dipelecUI.terminalID.text) as Terminal;
 
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} attempts to interact with terminal at ({terminal.X}, {terminal.Y}, {terminal.Z}).");
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} attempts to interact with terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
 
             if (dipelecUI.dipElecTypeDropdown.value == 0)
             {
@@ -3448,7 +3448,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 terminal.SoldiersAlreadyNegotiated.Add(activeSoldier.Id);
                 for (int i = 0; i < activeSoldier.stats.Dip.Val; i++)
                 {
-                    if (CoinFlip())
+                    if (HelperFunctions.RandomDipelecCoinFlip())
                         passCount++;
                 }
             }
@@ -3458,7 +3458,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 terminal.SoldiersAlreadyHacked.Add(activeSoldier.Id);
                 for (int i = 0; i < activeSoldier.stats.Elec.Val; i++)
                 {
-                    if (CoinFlip())
+                    if (HelperFunctions.RandomDipelecCoinFlip())
                         passCount++;
                 }
             }
@@ -3470,7 +3470,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 int targetLevel = dipelecUI.dipElecLevelDropdown.value + 1;
                 if (passCount >= targetLevel)
                 {
-                    FileUtility.WriteToReport($"{activeSoldier.soldierName} succeeds at level {targetLevel} {resultString}.");
+                    FileUtility.WriteToReport($"{activeSoldier.soldierName} succeeds at level {targetLevel} {resultString}."); //write to report
 
                     for (int i = targetLevel; i >= 1; i--)
                     {
@@ -3486,7 +3486,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
-                    FileUtility.WriteToReport($"{activeSoldier.soldierName} fails to {resultString}.");
+                    FileUtility.WriteToReport($"{activeSoldier.soldierName} fails to {resultString}."); //write to report
 
                     menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>{resultString} failed</color>";
                     GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
@@ -3497,7 +3497,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} disables terminal at ({terminal.X}, {terminal.Y}, {terminal.Z}).");
+                FileUtility.WriteToReport($"{activeSoldier.soldierName} disables terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
 
                 GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                 dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>Terminal disabled</color>";
@@ -3695,7 +3695,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} bloodlets.");
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} bloodlets."); //write to report
 
             activeSoldier.TakeBloodlettingDamage();
             menu.CloseDamageEventUI();

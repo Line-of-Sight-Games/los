@@ -86,7 +86,7 @@ public class SoldierAlert : MonoBehaviour
                     transform.Find("CaptaincyToggle").gameObject.SetActive(false);
 
                     stats = soldier.Promote(choiceStat);
-                    FileUtility.WriteToReport($"{soldier.soldierName} promotion: specialty ({stats[0]}), choice ({stats[1]}), random ({stats[2]})");
+                    FileUtility.WriteToReport($"{soldier.soldierName} promotion: specialty ({stats[0]}), choice ({stats[1]}), random ({stats[2]})"); //write to report
 
                     transform.Find("SpecialtyStat").gameObject.SetActive(true);
                     transform.Find("ChoiceStat").gameObject.SetActive(true);
@@ -112,7 +112,7 @@ public class SoldierAlert : MonoBehaviour
                             if (chance == 0)
                             {
                                 transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Failed to upgrade, no ability gained.";
-                                FileUtility.WriteToReport($"{soldier.soldierName} failed ability upgrade, no ability granted");
+                                FileUtility.WriteToReport($"{soldier.soldierName} failed ability upgrade, no ability granted"); //write to report
 
                                 promotionComplete = true;
 
@@ -128,7 +128,7 @@ public class SoldierAlert : MonoBehaviour
 
                                 string ability = localAbilities[Random.Range(0, localAbilities.Length)][0];
                                 transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Granted random ability: " + ability;
-                                FileUtility.WriteToReport($"{soldier.soldierName} granted random ability: {ability}");
+                                FileUtility.WriteToReport($"{soldier.soldierName} granted random ability: {ability}"); //write to report
 
                                 //actually do the upgrade
                                 soldier.soldierAbilities.Add(ability);
@@ -146,7 +146,7 @@ public class SoldierAlert : MonoBehaviour
                                 string[][] localAbilities = abilities;
                                 localAbilities = localAbilities.Where(val => val[0] == soldier.soldierAbilities.First()).ToArray();
                                 transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Ability upgraded: " + localAbilities[0][1];
-                                FileUtility.WriteToReport($"{soldier.soldierName} upgraded ability: {localAbilities[0][1]}");
+                                FileUtility.WriteToReport($"{soldier.soldierName} upgraded ability: {localAbilities[0][1]}"); //write to report
 
                                 //actually do the upgrade
                                 soldier.soldierAbilities.Remove(localAbilities[0][0]);
@@ -189,7 +189,7 @@ public class SoldierAlert : MonoBehaviour
             transform.Find("AbilityDropdown").gameObject.SetActive(false);
             transform.Find("ConfirmButton2").gameObject.SetActive(false);
             transform.Find("AbilityTitle").GetComponent<TextMeshProUGUI>().text = "Ability gained: " + abilityDropdown.captionText.text;
-            FileUtility.WriteToReport($"{soldier.soldierName} granted chosen ability: {abilityDropdown.captionText.text}");
+            FileUtility.WriteToReport($"{soldier.soldierName} granted chosen ability: {abilityDropdown.captionText.text}"); //write to report
             promotionComplete = true;
 
             //soldier.game.soundManager.PlayPromotion();
