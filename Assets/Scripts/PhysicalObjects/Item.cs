@@ -729,7 +729,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             toOwner.Inventory.AddItemToSlot(this, toSlot);
         }
             
-        FileUtility.WriteToReport($"{this.itemName} moved from {fromOwnerString} to {toOwnerString}.");
+        FileUtility.WriteToReport($"{this.itemName} moved from {fromOwnerString} to {toOwnerString}."); //write to report
 
         markedForAction = string.Empty;
     }

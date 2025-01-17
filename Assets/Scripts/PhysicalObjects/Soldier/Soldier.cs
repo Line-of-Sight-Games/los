@@ -1447,7 +1447,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (tp < 5)
         {
             tp += trauma;
-            FileUtility.WriteToReport($"{soldierName} takes {trauma} trauma points. He is {GetTraumaState()}.");
+            FileUtility.WriteToReport($"{soldierName} takes {trauma} trauma points. He is {GetTraumaState()}."); //write to report
 
             //perform frozen shenanigans
             if (IsFrozen())

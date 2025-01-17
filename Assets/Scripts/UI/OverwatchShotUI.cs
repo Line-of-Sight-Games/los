@@ -81,7 +81,7 @@ public class OverwatchShotUI : MonoBehaviour
             //reset parameters for guardsman overwatch retry
             if (retry)
             {
-                FileUtility.WriteToReport($"{shooter.soldierName} attempts Guardsman overwatch retry.");
+                FileUtility.WriteToReport($"{shooter.soldierName} attempts Guardsman overwatch retry."); //write to report
                 shooter.SetState("Overwatch"); //refresh overwatch state for guardsman
 
                 //set target position back to shot position
@@ -92,7 +92,7 @@ public class OverwatchShotUI : MonoBehaviour
                 menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
             }
 
-            FileUtility.WriteToReport($"{shooter.soldierName} overwatch shoots at {targetSoldier.soldierName}");
+            FileUtility.WriteToReport($"{shooter.soldierName} overwatch shoots at {targetSoldier.soldierName}"); //write to report
 
             //play shot sfx
             game.soundManager.PlayShotResolution(gun);
@@ -111,14 +111,14 @@ public class OverwatchShotUI : MonoBehaviour
 
                 if (shooter.ResilienceCheck())
                 {
-                    FileUtility.WriteToReport($"{shooter.soldierName} resists suppression.");
+                    FileUtility.WriteToReport($"{shooter.soldierName} resists suppression."); //write to report
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
                     actingHitChance = chances.Item1;
                 }
                 else
                 {
-                    FileUtility.WriteToReport($"{shooter.soldierName} suffers suppression.");
+                    FileUtility.WriteToReport($"{shooter.soldierName} suffers suppression."); //write to report
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
                     actingHitChance = chances.Item3;
