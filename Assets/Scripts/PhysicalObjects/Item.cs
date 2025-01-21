@@ -685,6 +685,11 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             fromOwnerString = $"goody box at ({goodyBox.X}, {goodyBox.Y}, {goodyBox.Z})";
             goodyBox.Inventory.RemoveItem(this);
         }
+        else if (fromOwner is DrugCabinet drugCabinet)
+        {
+            fromOwnerString = $"drug cabinet at ({drugCabinet.X}, {drugCabinet.Y}, {drugCabinet.Z})";
+            drugCabinet.Inventory.RemoveItem(this);
+        }
         else
         {
             if (fromOwner is Soldier fromOwnerSoldier)
@@ -701,9 +706,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             fromOwner.Inventory.RemoveItemFromSlot(this, fromSlot);
         }
-            
 
-        if (toOwner == null) 
+
+        if (toOwner == null)
         {
             toOwnerString = "ground";
         }
@@ -711,6 +716,11 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         {
             toOwnerString = $"goody box at ({goodyBox.X}, {goodyBox.Y}, {goodyBox.Z})";
             goodyBox.Inventory.AddItem(this);
+        }
+        else if (toOwner is DrugCabinet drugCabinet)
+        {
+            toOwnerString = $"drug cabinet at ({drugCabinet.X}, {drugCabinet.Y}, {drugCabinet.Z})";
+            drugCabinet.Inventory.AddItem(this);
         }
         else
         {
