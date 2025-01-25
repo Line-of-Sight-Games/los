@@ -520,7 +520,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
 
-    //draining soldier AP and MA (MP below) after use during turn
+    //draining soldier AP and MP after use during turn
     public void EndSoldierTurn()
     {
         activeSoldier.DrainAP();

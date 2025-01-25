@@ -4210,7 +4210,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 return true;
             else
             {
-                menu.generalAlertUI.Activate("Not enough MA to perform move");
+                menu.generalAlertUI.Activate("Not enough MP to perform move");
                 return false;
             }
         }
