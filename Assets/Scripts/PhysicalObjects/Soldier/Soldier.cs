@@ -694,8 +694,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public int RankDifferenceTo(Soldier s)
     {
-        //print((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
-        return (int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f));
+        return Mathf.Abs((int)(Mathf.Log(Convert.ToSingle(MinXPForRank()), 2.0f) - Mathf.Log(Convert.ToSingle(s.MinXPForRank()), 2.0f)));
     }
 
     public string[] Promote(string choiceStat)
@@ -895,7 +894,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (roundsWithoutFood >= 20 && healthRemovedFromStarve == 0)
         {
-            healthRemovedFromStarve = Mathf.RoundToInt(hp / 2.0f);
+            healthRemovedFromStarve = Mathf.CeilToInt(hp / 2.0f);
             TakeDamage(null, healthRemovedFromStarve, true, new() { "Sustenance" });
         }
 

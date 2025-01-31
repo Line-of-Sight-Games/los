@@ -91,7 +91,6 @@ public class SetBattlefieldParameters : MonoBehaviour, IDataPersistence
             game.maxZ = z;
 
             weather.GenerateWeather();
-            dipelec.GenerateDipelec();
 
             DataPersistenceManager.Instance.SaveGame();
 

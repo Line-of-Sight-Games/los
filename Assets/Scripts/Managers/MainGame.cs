@@ -3819,10 +3819,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             int rankDifference = killer.RankDifferenceTo(deadMan);
 
-            if (killer.IsHigherRankThan(deadMan))
+            if (deadMan.IsHigherRankThan(killer))
                 xp = 6 + Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
             else
-                xp = 6 + rankDifference;
+                xp = 6 - rankDifference;
 
             if (xp < 0)
                 xp = 0;
@@ -3836,10 +3836,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             int rankDifference = killer.RankDifferenceTo(deadMan);
 
-            if (killer.IsHigherRankThan(deadMan))
-                xp = 10 + Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
+            if (deadMan.IsHigherRankThan(killer))
+                xp = Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
             else
-                xp = 10 + rankDifference;
+                xp = 10 - rankDifference;
 
             if (xp < 0)
                 xp = 0;
@@ -3853,10 +3853,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             int rankDifference = killer.RankDifferenceTo(deadMan);
 
-            if (killer.IsHigherRankThan(deadMan))
+            if (deadMan.IsHigherRankThan(killer))
                 xp = 20 + Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
             else
-                xp = 20 + rankDifference;
+                xp = 20 - rankDifference;
 
             if (xp < 0)
                 xp = 0;

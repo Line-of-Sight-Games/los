@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DipelecGen : MonoBehaviour, IDataPersistence
+public class DipelecGen : MonoBehaviour
 {
     private readonly string[] l1Dip =
     {
@@ -133,38 +133,6 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
         "L6\nVictory",
     };
 
-    public List<string> savedDip = new();
-    public List<string> savedElec = new();
-
-    public void LoadData(GameData data)
-    {
-        savedDip = data.savedDip;
-        savedElec = data.savedElec;
-    }
-
-    public void SaveData(ref GameData data)
-    {
-        data.savedDip = savedDip;
-        data.savedElec = savedElec;
-    }
-
-    public void GenerateDipelec()
-    {
-        savedDip.Add(l1Dip[Random.Range(0, l1Dip.Length)]);
-        savedDip.Add(l2Dip[Random.Range(0, l2Dip.Length)]);
-        savedDip.Add(l3Dip[Random.Range(0, l3Dip.Length)]);
-        savedDip.Add(l4Dip[Random.Range(0, l4Dip.Length)]);
-        savedDip.Add(l5Dip[Random.Range(0, l5Dip.Length)]);
-        savedDip.Add(l6Dip[0]);
-
-        savedElec.Add(l1Elec[Random.Range(0, l1Elec.Length)]);
-        savedElec.Add(l2Elec[Random.Range(0, l2Elec.Length)]);
-        savedElec.Add(l3Elec[Random.Range(0, l3Elec.Length)]);
-        savedElec.Add(l4Elec[Random.Range(0, l4Elec.Length)]);
-        savedElec.Add(l5Elec[Random.Range(0, l5Elec.Length)]);
-        savedElec.Add(l6Elec[0]);
-    }
-
     public string GetLevelDip(int level)
     {
         return _ = level switch
@@ -193,51 +161,51 @@ public class DipelecGen : MonoBehaviour, IDataPersistence
     }
     public string L1Dip
     {
-        get { return savedDip[0]; }
+        get { return l1Dip[Random.Range(0, l1Dip.Length)]; }
     }
     public string L2Dip
     {
-        get { return savedDip[1]; }
+        get { return l2Dip[Random.Range(0, l2Dip.Length)]; }
     }
     public string L3Dip
     {
-        get { return savedDip[2]; }
+        get { return l3Dip[Random.Range(0, l3Dip.Length)]; }
     }
     public string L4Dip
     {
-        get { return savedDip[3]; }
+        get { return l4Dip[Random.Range(0, l4Dip.Length)]; }
     }
     public string L5Dip
     {
-        get { return savedDip[4]; }
+        get { return l5Dip[Random.Range(0, l5Dip.Length)]; }
     }
     public string L6Dip
     {
-        get { return savedDip[5]; }
+        get { return l6Dip[Random.Range(0, l6Dip.Length)]; }
     }
 
     public string L1Elec
     {
-        get { return savedElec[0]; }
+        get { return l1Elec[Random.Range(0, l1Elec.Length)]; }
     }
     public string L2Elec
     {
-        get { return savedElec[1]; }
+        get { return l2Elec[Random.Range(0, l2Elec.Length)]; }
     }
     public string L3Elec
     {
-        get { return savedElec[2]; }
+        get { return l3Elec[Random.Range(0, l3Elec.Length)]; }
     }
     public string L4Elec
     {
-        get { return savedElec[3]; }
+        get { return l4Elec[Random.Range(0, l4Elec.Length)]; }
     }
     public string L5Elec
     {
-        get { return savedElec[4]; }
+        get { return l5Elec[Random.Range(0, l5Elec.Length)]; }
     }
     public string L6Elec
     {
-        get { return savedElec[5]; }
+        get { return l6Elec[Random.Range(0, l6Elec.Length)]; }
     }
 }

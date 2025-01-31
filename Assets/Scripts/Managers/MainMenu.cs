@@ -1597,7 +1597,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         Transform soldierBanner = soldierOptionsUI.transform.Find("SoldierBanner");
         soldierBanner.Find("HP").GetComponent<TextMeshProUGUI>().text = $"HP: {activeSoldier.GetFullHP()}";
         soldierBanner.Find("AP").GetComponent<TextMeshProUGUI>().text = $"AP: {activeSoldier.ap}";
-        soldierBanner.Find("MP").GetComponent<TextMeshProUGUI>().text = $"MA: {activeSoldier.mp}";
+        soldierBanner.Find("MA").GetComponent<TextMeshProUGUI>().text = $"MA: {activeSoldier.mp}";
         soldierBanner.Find("Speed").GetComponent<TextMeshProUGUI>().text = $"Move: {activeSoldier.InstantSpeed}";
         soldierBanner.Find("XP").GetComponent<TextMeshProUGUI>().text = $"XP: {activeSoldier.xp}";
         soldierBanner.Find("Status").GetComponent<TextMeshProUGUI>().text = activeSoldier.GetStatus();

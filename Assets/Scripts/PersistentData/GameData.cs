@@ -22,8 +22,6 @@ public class GameData
     public Vector3 sunPosition;
     public int maxTurnTime;
     public int maxX, maxY, maxZ;
-    public List<string> savedDip;
-    public List<string> savedElec;
     public List<string> savedWeather;
     public List<string> allSoldiersIds;
     public Dictionary<string, Dictionary<string, object>> allSoldiersDetails;
@@ -54,8 +52,6 @@ public class GameData
         maxX = 0;
         maxY = 0;
         maxZ = 0;
-        savedDip = new List<string>();
-        savedElec = new List<string>();
         savedWeather = new List<string>();
 
         allSoldiersIds = new List<string>();

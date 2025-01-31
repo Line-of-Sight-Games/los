@@ -968,9 +968,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
   game: {fileID: 0}
+  normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 0
   max: 0
-  normalColour: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &2687862115611920848
 GameObject:
   m_ObjectHideFlags: 0
@@ -3189,6 +3189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menu: {fileID: 0}
   game: {fileID: 0}
+  soldierManager: {fileID: 0}
   soundManager: {fileID: 0}
   linkedSoldier: {fileID: 0}
   xSize: {fileID: 9108020749738744378}
@@ -3499,7 +3500,7 @@ GameObject:
   - component: {fileID: 5713749638366112780}
   - component: {fileID: 5713749638366112781}
   m_Layer: 5
-  m_Name: MP
+  m_Name: MA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4844,9 +4845,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
   game: {fileID: 0}
+  normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 0
   max: 0
-  normalColour: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &7772743642484609598
 GameObject:
   m_ObjectHideFlags: 0
@@ -5353,9 +5354,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
   game: {fileID: 0}
+  normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 0
   max: 0
-  normalColour: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1001 &7744116318287066342
 PrefabInstance:
   m_ObjectHideFlags: 0
