@@ -520,7 +520,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
 
 
-    //draining soldier AP and MA (MP below) after use during turn
+    //draining soldier AP and MP after use during turn
     public void EndSoldierTurn()
     {
         activeSoldier.DrainAP();
@@ -3819,10 +3819,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             int rankDifference = killer.RankDifferenceTo(deadMan);
 
-            if (deadMan.IsHigherRankThan(killer))
+            if (killer.IsHigherRankThan(deadMan))
                 xp = 6 + Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
             else
-                xp = 6 - rankDifference;
+                xp = 6 + rankDifference;
 
             if (xp < 0)
                 xp = 0;
@@ -3836,10 +3836,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             int rankDifference = killer.RankDifferenceTo(deadMan);
 
-            if (deadMan.IsHigherRankThan(killer))
-                xp = Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
+            if (killer.IsHigherRankThan(deadMan))
+                xp = 10 + Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
             else
-                xp = 10 - rankDifference;
+                xp = 10 + rankDifference;
 
             if (xp < 0)
                 xp = 0;
@@ -3853,10 +3853,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             int rankDifference = killer.RankDifferenceTo(deadMan);
 
-            if (deadMan.IsHigherRankThan(killer))
+            if (killer.IsHigherRankThan(deadMan))
                 xp = 20 + Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
             else
-                xp = 20 - rankDifference;
+                xp = 20 + rankDifference;
 
             if (xp < 0)
                 xp = 0;

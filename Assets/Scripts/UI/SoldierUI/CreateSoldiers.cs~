@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System;
 using System.Collections;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 public class CreateSoldiers : MonoBehaviour, IDataPersistence
 {
@@ -163,8 +164,11 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		data.allSoldiersIds = allSoldierIds;
 		data.maxTeams = setTeamParameters.maxTeams;
 	}
-
-	public void OpenRandomAlertUI()
+    public void ReturnToMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+    public void OpenRandomAlertUI()
 	{
 		randomAlertUI.SetActive(true);
 	}
