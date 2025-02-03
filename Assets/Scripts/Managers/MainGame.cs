@@ -3251,7 +3251,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 FileUtility.WriteToReport($"{activeSoldier.soldierName} places claymore at ({x}, {y}, {z})."); //write to report
 
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                Instantiate(poiManager.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, activeSoldier.Id));
+                Instantiate(poiManager.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, false, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseClaymoreUI();

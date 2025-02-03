@@ -27,7 +27,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         if (Exploded)
             poiManager.DestroyPOI(this);
     }
-    public Claymore Init(Vector3 location, Tuple<int, int, int, string> otherDetails)
+    public Claymore Init(Vector3 location, Tuple<int, int, int, bool, string> otherDetails)
     {
         id = GenerateGuid();
         poiType = "claymore";
@@ -39,7 +39,8 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         c = otherDetails.Item1;
         facingX = otherDetails.Item2;
         facingY = otherDetails.Item3;
-        placedById = otherDetails.Item4;
+        triggered = otherDetails.Item4;
+        placedById = otherDetails.Item5;
         placedBy = menu.soldierManager.FindSoldierById(placedById);
 
         poiPortrait = LoadPortrait(poiType);

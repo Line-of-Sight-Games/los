@@ -131,7 +131,7 @@ public class ExplosionList : MonoBehaviour
                             hitItem.CheckExplosionGrenade(explodedBy, new(hitItem.X, hitItem.Y, hitItem.Z));
                         else if (hitItem.IsClaymore())
                         {
-                            Instantiate(menu.poiManager.claymorePrefab).Init(new(hitItem.X, hitItem.Y, hitItem.Z), Tuple.Create(0, hitItem.X, hitItem.Y, explodedBy.Id)).CheckExplosionClaymore(explodedBy, true);
+                            Instantiate(menu.poiManager.claymorePrefab).Init(new(hitItem.X, hitItem.Y, hitItem.Z), Tuple.Create(0, hitItem.X, hitItem.Y, true, explodedBy.Id)).CheckExplosionClaymore(explodedBy, true);
                             hitItem.DestroyItem(explodedBy);
                         }
                     }
