@@ -49,8 +49,8 @@ public class Beam : MonoBehaviour
     public Vector3 CalculateBoundaryPoint(Vector3 start, Vector3 direction)
     {
         float tX = direction.x != 0 ? ((direction.x > 0 ? game.maxX : 1) - start.x) / direction.x : float.MaxValue;
-        float tY = direction.y != 0 ? ((direction.y > 0 ? game.maxY : 1) - start.y) / direction.y : float.MaxValue;
-        float tZ = direction.z != 0 ? ((direction.z > 0 ? game.maxZ : 0) - start.z) / direction.z : float.MaxValue;
+        float tY = direction.y != 0 ? ((direction.y > 0 ? game.maxZ : 1) - start.y) / direction.y : float.MaxValue;
+        float tZ = direction.z != 0 ? ((direction.z > 0 ? game.maxY : 0) - start.z) / direction.z : float.MaxValue;
 
         // Find the smallest positive t (time to reach boundary)
         float t = Mathf.Min(tX, tY, tZ);
