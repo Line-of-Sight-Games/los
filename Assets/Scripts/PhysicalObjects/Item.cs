@@ -472,7 +472,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
                 //take exo armour health
                 linkedSoldier.stats.H.BaseVal -= 3;
-                linkedSoldier.TakeDamage(null, 3, true, new() { "Exo" });
+                linkedSoldier.TakeDamage(null, 3, true, new() { "Exo" }, Vector3.zero);
             }
             else if (itemName.Equals("Armour_Stimulant"))
             {
@@ -642,27 +642,19 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (linkedSoldier != null)
         {
-            if (damage > ablativeHealth)
-            {
-                damage -= ablativeHealth;
-                ablativeHealth = 0;
-            }
+            int absorbedDamage;
+            if (damage <= ablativeHealth)
+                absorbedDamage = damage;
             else
-            {
-                ablativeHealth -= damage;
-                damage = 0;
-            }
+                absorbedDamage = ablativeHealth;
 
-            //uncon check if wearer in LS 
-            if (damage == 0)
-                if (linkedSoldier.IsLastStand() && !linkedSoldier.ResilienceCheck())
-                    linkedSoldier.MakeUnconscious(damagedBy, damageSource);
+            ablativeHealth -= absorbedDamage;
 
-            //apply stun affect from tranquiliser (through armour)
-            if (damagedBy != null && damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !linkedSoldier.IsRevoker())
-                linkedSoldier.TakeStun(1);
+            //uncon check if wearer in LS (through armour) 
+            if (linkedSoldier.IsLastStand() && !linkedSoldier.ResilienceCheck())
+                linkedSoldier.MakeUnconscious(damagedBy, damageSource);
 
-            return damage;
+            return absorbedDamage;
         }
         return 0;
     }
@@ -958,7 +950,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         //play use grenade sfx
         game.soundManager.PlayUseGrenade(this);
 
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} | Detonated: {position.x},{position.y},{position.z}").gameObject;
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} | Detonated: {position.x},{position.y},{position.z}", position).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.Id;
 
         if (IsFrag())
@@ -1081,7 +1073,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public void DestroyItem(Soldier destroyedBy)
     {
         if (owner != null && owner is Soldier linkedSoldier)
-            menu.AddDamageAlert(linkedSoldier, $"{linkedSoldier.soldierName} had {this.itemName} ({this.X},{this.Y},{this.Z}) destroyed.", false, true);
+            menu.AddSoldierAlert(linkedSoldier, "ITEM DESTROYED", Color.red, $"{linkedSoldier.soldierName} had {this.itemName} ({this.X},{this.Y},{this.Z}) destroyed.", -1, -1);
 
         ConsumeItem();
     }

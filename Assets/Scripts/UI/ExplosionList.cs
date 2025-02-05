@@ -10,13 +10,16 @@ using UnityEngine.UI;
 public class ExplosionList : MonoBehaviour
 {
     public MainMenu menu;
+    public Vector3 explosionLocation;
+
     private void Awake()
     {
         menu = FindFirstObjectByType<MainMenu>();
     }
-    public ExplosionList Init(string explosionMessage)
+    public ExplosionList Init(string explosionMessage, Vector3 explosionLocation)
     {
         transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text = explosionMessage;
+        this.explosionLocation = explosionLocation;
 
         return this;
     }
@@ -70,7 +73,7 @@ public class ExplosionList : MonoBehaviour
                         {
                             //set terminal destroyer to 3 hp
                             if (explodedBy.hp > 3)
-                                explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" });
+                                explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" }, Vector3.zero);
                             menu.poiManager.DestroyPOI(terminal);
                         }
                     }
@@ -85,14 +88,14 @@ public class ExplosionList : MonoBehaviour
                         {
                             if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
                             {   
-                                hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" });
+                                int actualDamage = hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" }, explosionLocation);
                                 int actualStun = hitSoldier.TakeStun(stun);
 
                                 //do xp calculations, enemy - friendly damage
                                 if (hitSoldier.IsOppositeTeamAs(explodedBy))
-                                    posDamage += damage;
+                                    posDamage += actualDamage;
                                 else
-                                    negDamage += damage;
+                                    negDamage += actualDamage;
 
                                 //add xp for stunning Flashbang only
                                 if (explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
@@ -126,7 +129,6 @@ public class ExplosionList : MonoBehaviour
                     }
                     else if (hitByExplosion is Item hitItem && hitItem.IsTriggered())
                     {
-                        print($"{hitItem.id} is triggered.");
                         if (hitItem.IsGrenade())
                             hitItem.CheckExplosionGrenade(explodedBy, new(hitItem.X, hitItem.Y, hitItem.Z));
                         else if (hitItem.IsClaymore())
@@ -136,7 +138,8 @@ public class ExplosionList : MonoBehaviour
                         }
                     }
                 }
-                print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Resolved - {posDamage + posStun}, {negDamage + negStun}");
+
+                FileUtility.WriteToReport($"Explosion from ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) caused by {explosionCausedBy.soldierName}, did {posDamage} damage and {posStun} stun to enemies, and {negDamage} damage and {negStun} stun to allies"); //write to report
 
                 //actually apply the xp
                 if (posDamage + posStun > negDamage + negStun)

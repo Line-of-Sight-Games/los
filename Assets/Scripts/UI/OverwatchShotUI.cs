@@ -142,7 +142,7 @@ public class OverwatchShotUI : MonoBehaviour
                 {
                     FileUtility.WriteToReport($"The shot is critical!"); //write to report
 
-                    targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Overwatch", "Shot" });
+                    targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Overwatch", "Shot" }, Vector3.zero);
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                     //paying xp for hit
@@ -153,7 +153,7 @@ public class OverwatchShotUI : MonoBehaviour
                 }
                 else
                 {
-                    targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Overwatch", "Shot" });
+                    targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Overwatch", "Shot" }, Vector3.zero);
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                     //paying xp for hit
@@ -168,10 +168,8 @@ public class OverwatchShotUI : MonoBehaviour
                 {
                     if (!targetSoldier.ResilienceCheck())
                     {
-                        FileUtility.WriteToReport($"{targetSoldier.soldierName} resists overwatch daze."); //write to report
-
                         menu.AddXpAlert(targetSoldier, 2, $"Resisted overwatch daze.", false);
-                        menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} resisted overwatch daze.", true, true);
+                        menu.AddSoldierAlert(targetSoldier, "DAZE RESISTED", Color.green, $"Resists overwatch daze.", -1, -1);
 
                         //restore actual position of move
                         targetSoldier.X = intendedLocation.Item1;
@@ -181,9 +179,7 @@ public class OverwatchShotUI : MonoBehaviour
                     }
                     else if (targetSoldier.IsGuardsman())
                     {
-                        FileUtility.WriteToReport($"{targetSoldier.soldierName} resists overwatch daze (Guardsman)."); //write to report
-
-                        menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} resisted overwatch daze (<color=green>Guardsman</color>).", true, true);
+                        menu.AddSoldierAlert(targetSoldier, "DAZE RESISTED", Color.green, $"Resists overwatch daze with <color=green>Guardsman</color> ability.", -1, -1);
 
                         //restore actual position of move
                         targetSoldier.X = intendedLocation.Item1;
@@ -193,10 +189,8 @@ public class OverwatchShotUI : MonoBehaviour
                     }
                     else //apply overwatch daze
                     {
-                        FileUtility.WriteToReport($"{targetSoldier.soldierName} suffers overwatch daze."); //write to report
-
                         targetSoldier.ap = 0;
-                        menu.AddDamageAlert(targetSoldier, $"{targetSoldier.soldierName} suffered overwatch daze at X: {targetSoldier.X}, Y: {targetSoldier.Y}, Z: {targetSoldier.Z}, Ter: {targetSoldier.TerrainOn}.", false, true);
+                        menu.AddSoldierAlert(targetSoldier, "DAZED", Color.red, $"Suffers overwatch daze at X: {targetSoldier.X}, Y: {targetSoldier.Y}, Z: {targetSoldier.Z}, Ter: {targetSoldier.TerrainOn}.", -1, -1);
                     }
                 }
 
@@ -235,7 +229,7 @@ public class OverwatchShotUI : MonoBehaviour
                 targetSoldier.TerrainOn = intendedLocation.Item4;
 
                 //push a zero damage attack through for abilities trigger
-                targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });
+                targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" }, Vector3.zero);
             }
 
             //unset overwatch after any shot

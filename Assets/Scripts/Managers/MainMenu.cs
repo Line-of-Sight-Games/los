@@ -38,10 +38,14 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public GeneralAlertUI generalAlertUI;
     public BinocularsUI binocularsUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, damageAlertPrefab, traumaAlertPrefab, inspirerAlertPrefab, xpAlertPrefab, promotionAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, overwatchShotUIPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, setupMenuUI, gameMenuUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
+    
+    public SoldierAlert soldierAlertPrefab;
+    public XpAlert xpAlertPrefab;
+    public PromotionAlert promotionAlertPrefab;
+    public TraumaAlert traumaAlertPrefab;
 
     public InventorySourcePanel inventoryPanelGroundPrefab, inventoryPanelAllyPrefab, inventoryPanelGoodyBoxPrefab;
-
     public ItemIconGB gbItemIconPrefab;
     public LOSArrow LOSArrowPrefab;
     public OverwatchSectorSphere overwatchSectorSpherePrefab;
@@ -901,7 +905,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 else
                 {
                     if (newHp < activeSoldier.hp)
-                        activeSoldier.TakeDamage(null, activeSoldier.hp - newHp, true, new() { "Override" });
+                        activeSoldier.TakeDamage(null, activeSoldier.hp - newHp, true, new() { "Override" }, Vector3.zero);
                     else if (newHp > activeSoldier.hp)
                         activeSoldier.TakeHeal(null, newHp - activeSoldier.hp, 0, true, false);
                 }
@@ -2259,30 +2263,10 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
 
     //damage ui functions
-    public void AddDamageAlert(Soldier soldier, string description, bool resisted, bool nonDamage)
+    public void AddSoldierAlert(Soldier soldier, string title, Color titleColour, string description, int preDamage, int postDamage)
     {
-        GameObject damageAlert = Instantiate(damageAlertPrefab, damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+        Instantiate(soldierAlertPrefab, damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(soldier, title, titleColour, description, preDamage, postDamage);
 
-        if (resisted)
-        {
-            if (nonDamage)
-                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>EFFECT RESISTED</color>";
-            else
-                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>DAMAGE RESISTED</color>";
-        }
-        else
-        {
-            if (nonDamage)
-                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=red>EFFECT SUFFERED</color>";
-            else
-                damageAlert.transform.Find("DamageTitle").GetComponent<TextMeshProUGUI>().text = "<color=red>DAMAGE SUFFERED</color>";
-        }
-
-        damageAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
-        damageAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
-        damageAlert.transform.Find("DamageDescription").GetComponent<TextMeshProUGUI>().text = description;
-        damageAlert.transform.SetAsFirstSibling();
-        FileUtility.WriteToReport($"{soldier.soldierName} damage alert: {description}, resisted: {resisted}, nonDamage: {nonDamage}"); //write to report
         //try and open damagealert
         StartCoroutine(OpenDamageList());
     }
@@ -2403,35 +2387,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddTraumaAlert(Soldier friendly, int trauma, string reason, int rolls, int xpOnResist, string range)
     {
-        GameObject traumaAlert = Instantiate(traumaAlertPrefab, traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
-        traumaAlert.GetComponent<SoldierAlert>().SetSoldier(friendly);
-
-        traumaAlert.transform.Find("TraumaIndicator").GetComponent<TextMeshProUGUI>().text = $"{trauma}";
-        traumaAlert.transform.Find("TraumaDescription").GetComponent<TextMeshProUGUI>().text = reason;
-        traumaAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(friendly);
-        traumaAlert.transform.Find("Rolls").GetComponent<TextMeshProUGUI>().text = rolls.ToString();
-        traumaAlert.transform.Find("XpOnResist").GetComponent<TextMeshProUGUI>().text = xpOnResist.ToString();
-        traumaAlert.transform.Find("Distance").GetComponent<TextMeshProUGUI>().text = range;
-
-        //block invalid trauma alerts being created
-        if (reason.Contains("automatic") || reason.Contains("Tabun"))
-        {
-            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().isOn = true;
-            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
-        }
-        else if (friendly.IsDesensitised())
-        {
-            traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=blue>DESENSITISED</color>";
-            traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
-            traumaAlert.transform.Find("TraumaToggle").GetComponent<Toggle>().interactable = false;
-            traumaAlert.transform.Find("ConfirmButton").gameObject.SetActive(false);
-        }
-        else if (friendly.IsResilient())
-        {
-            traumaAlert.transform.Find("TraumaGainTitle").GetComponent<TextMeshProUGUI>().text = "<color=green>RESILIENT</color>";
-            traumaAlert.transform.Find("TraumaIndicator").gameObject.SetActive(false);
-            traumaAlert.transform.Find("ConfirmButton").Find("Text").GetComponent<TextMeshProUGUI>().text = "<color=green>Test</color>";
-        }
+        Instantiate(traumaAlertPrefab, traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(friendly, trauma, reason, rolls, xpOnResist, range);
     }
 
     public IEnumerator OpenTraumaAlertUI()
@@ -2497,18 +2453,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             //riot shield block
             if (hitByExplosion.HasActiveAndCorrectlyAngledRiotShield(explosionLocation))
-            {
-                damage /= 2;
-                stunRounds = 0;
                 explosionAlert.transform.Find("RiotShield").gameObject.SetActive(true);
-            }
 
             //JA block
             if (hitByExplosion.IsWearingJuggernautArmour(true))
-            {
-                damage /= 2;
                 explosionAlert.transform.Find("JA").gameObject.SetActive(true);
-            }
 
             //display item destroyed indicators
             if (damage > 0)
@@ -2522,7 +2471,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
             //delete if there's no damage and no stun
             if (damage <= 0 && stunRounds <= 0)
-                Destroy(explosionAlert);
+                Destroy(explosionAlert);  
         }
     }
     public void AddExplosionAlertPOI(GameObject explosionList, POI poiHit, Soldier explodedBy, int damage)
@@ -2552,6 +2501,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 if ((itemHit.IsBreakable() && damage >= 5) || (itemHit.IsFragile() && damage > 0))
                 {
                     GameObject explosionAlert = Instantiate(explosionAlertItemPrefab, explosionList.transform.Find("Scroll").Find("View").Find("Content"));
+
                     explosionAlert.GetComponent<ExplosiveAlert>().SetObjects(explodedBy, itemHit);
                     explosionAlert.transform.Find("ItemPortrait").GetComponent<ItemPortrait>().Init(itemHit);
                     explosionAlert.transform.Find("Damage").Find("ExplosiveDamageIndicator").GetComponent<TextMeshProUGUI>().text = $"{damage}";
@@ -3918,37 +3868,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //block duplicate xp alerts being created, made to obey the rule that xp for avoidance or detection can only be one per soldier per turn
             foreach (Transform child in xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
             {
+                XpAlert xpAlert = child.GetComponent<XpAlert>();
+
                 //destroy duplicate avoidances/detections against same detecting/avoiding soldier
-                if ((child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Avoided") && child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text == xpDescription && child.GetComponent<SoldierAlert>().soldier == soldier) || (child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Detected") && child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text == xpDescription && child.GetComponent<SoldierAlert>().soldier == soldier))
+                if ((xpAlert.description.text.Contains("Avoided") && xpAlert.description.text == xpDescription && xpAlert.soldier == soldier) || (xpAlert.description.text.Contains("Detected") && xpAlert.description.text == xpDescription && xpAlert.soldier == soldier))
                 {
                     print($"destroying {xpDescription}");
-                    Destroy(child.gameObject);
+                    Destroy(xpAlert.gameObject);
                 }
             }
 
             if (soldier.IsConscious())
             {
-                GameObject xpAlert = Instantiate(xpAlertPrefab, xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
-
-                xpAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
-                xpAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
-                xpAlert.transform.Find("XpIndicator").GetComponent<TextMeshProUGUI>().text = xp.ToString();
-                xpAlert.transform.Find("XpDescription").GetComponent<TextMeshProUGUI>().text = xpDescription;
-                xpAlert.transform.Find("LearnerEnabled").GetComponent<Toggle>().isOn = learnerEnabled;
-
-                //force xp event if made in override mode
-                if (xpDescription.Contains("Override"))
-                {
-                    xpAlert.transform.Find("XpToggle").GetComponent<Toggle>().isOn = true;
-                    xpAlert.transform.Find("XpToggle").GetComponent<Toggle>().interactable = false;
-                }
-
-                //learner ability
-                if (learnerEnabled && soldier.IsLearner())
-                {
-                    xpAlert.transform.Find("LearnerIndicator").gameObject.SetActive(true);
-                    xpAlert.transform.Find("LearnerIndicator").GetComponent<TextMeshProUGUI>().text = $"(+{Mathf.CeilToInt(0.5f * xp)})";
-                }
+                Instantiate(xpAlertPrefab, xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(soldier, xp, xpDescription, learnerEnabled);
             }
             else
                 print($"{soldier.soldierName} cannot receive xp unconscious.");
@@ -3982,19 +3914,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             List<Transform> xpAlertsList = new();
             foreach (Transform child in xpAlerts)
             {
-                bool learnerEnabled = child.Find("LearnerEnabled").GetComponent<Toggle>().isOn;
-                Soldier soldier = child.GetComponent<SoldierAlert>().soldier;
-
-                if (child.Find("XpToggle").GetComponent<Toggle>().isOn)
-                {
-                    int.TryParse(child.Find("XpIndicator").GetComponent<TextMeshProUGUI>().text, out int xp);
-                    //block override xp from double incrementing
-                    if (child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text.Contains("Override"))
-                        soldier.xp -= xp;
-                    soldier.IncrementXP(xp, learnerEnabled);
-                    FileUtility.WriteToReport($"{soldier.soldierName} got {xp} xp for: {child.Find("XpDescription").GetComponent<TextMeshProUGUI>().text}"); //write to report
-                }
                 xpAlertsList.Add(child);
+                child.GetComponent<XpAlert>().Resolve();
             }
 
             CheckPromotion(xpAlertsList);
@@ -4062,9 +3983,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddPromotionAlert(Soldier soldier)
     {
-        GameObject promotionAlert = Instantiate(promotionAlertPrefab, promotionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+        PromotionAlert promotionAlert = Instantiate(promotionAlertPrefab, promotionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
-        promotionAlert.GetComponent<SoldierAlert>().SetSoldier(soldier);
+        promotionAlert.SetSoldier(soldier);
         promotionAlert.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(soldier);
         promotionAlert.transform.Find("NextRankIndicator").GetComponent<Image>().sprite = soldier.LoadInsignia(soldier.NextRank());
         promotionAlert.transform.Find("PromotionRank").GetComponent<TextMeshProUGUI>().text = soldier.NextRank();
@@ -4082,7 +4003,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         List<Transform> promotionAlertsList = new();
         foreach (Transform child in promotionAlerts)
         {
-            if (!child.GetComponent<SoldierAlert>().promotionComplete)
+            if (!child.GetComponent<PromotionAlert>().promotionComplete)
                 confirm = false;
 
             promotionAlertsList.Add(child);

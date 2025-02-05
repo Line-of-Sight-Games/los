@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public static class FileUtility
@@ -7,6 +8,8 @@ public static class FileUtility
 
     public static void WriteToReport(string message)
     {
+        message = CleanMessage(message);
+
         string path = Path.Combine(Application.persistentDataPath, fileName);
 
         // Check if the file exists, and create it if not
@@ -21,5 +24,10 @@ public static class FileUtility
             using StreamWriter sw = File.AppendText(path);
             sw.WriteLine(message);
         }
+    }
+
+    public static string CleanMessage(string message)
+    {
+        return Regex.Replace(message, "<.*?>", string.Empty);
     }
 }

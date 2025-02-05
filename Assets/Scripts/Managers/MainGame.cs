@@ -815,7 +815,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //check for fall damage
         if (fallDistanceInt > 0)
-            movingSoldier.TakeDamage(movingSoldier, CalculateFallDamage(movingSoldier, fallDistanceInt), false, new() { "Fall" });
+            movingSoldier.TakeDamage(movingSoldier, CalculateFallDamage(movingSoldier, fallDistanceInt), false, new() { "Fall" }, Vector3.zero);
 
         //launch melee if melee toggle is on
         if (meleeToggle)
@@ -1796,7 +1796,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         FileUtility.WriteToReport($"The shot is critical!"); //write to report
 
-                        targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Shot" }, Vector3.zero);
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
@@ -1810,7 +1810,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                     else
                     {
-                        targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Shot" });
+                        targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Shot" }, Vector3.zero);
                         menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
@@ -1856,7 +1856,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         menu.AddXpAlert(targetSoldier, 1, $"Shot dodged from {shooter.soldierName}.", false);
 
                     //push a zero damage attack through for abilities trigger
-                    targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" });
+                    targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" }, Vector3.zero);
                 }
             }
         }
@@ -2561,7 +2561,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                     damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
                                 else
                                     damageMessage = "<color=green>Successful Attack\n(" + meleeDamage + " Damage)</color>";
-                                defender.TakeDamage(attacker, meleeDamage, false, damageType);
+                                defender.TakeDamage(attacker, meleeDamage, false, damageType, Vector3.zero);
                                 attacker.BrawlerMeleeHitReward();
                             }
                         }
@@ -2575,7 +2575,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             counterattack = true;
                             meleeDamage *= -1;
                             damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
-                            attacker.TakeDamage(defender, meleeDamage, false, damageType);
+                            attacker.TakeDamage(defender, meleeDamage, false, damageType, Vector3.zero);
                         }
                         else
                         {
@@ -2592,7 +2592,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     attacker.UnsetBloodRage();
 
                     //push a zero damage attack to the defender for abilities trigger
-                    defender.TakeDamage(attacker, 0, true, damageType);
+                    defender.TakeDamage(attacker, 0, true, damageType, Vector3.zero);
                 }
 
                 //add xp for successful melee attack
@@ -3327,7 +3327,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //play explosion sfx
         soundManager.PlayExplosion();
 
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}").gameObject;
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}", position).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         //create explosion objects
@@ -3504,7 +3504,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                 terminal.terminalEnabled = false;
                 if (activeSoldier.hp > 3)
-                    activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new() { "Dipelec" });
+                    activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new() { "Dipelec" }, Vector3.zero);
             }
             //play dipelec result sfx
             soundManager.PlayDipelecResolution(resultString);
@@ -3702,7 +3702,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         }
         else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Other") && int.TryParse(damageEventUI.otherInput.text, out int otherDamage))
         {
-            activeSoldier.TakeDamage(null, otherDamage, false, new() { damageEventUI.damageSource.text });
+            activeSoldier.TakeDamage(null, otherDamage, false, new() { damageEventUI.damageSource.text }, Vector3.zero);
             menu.CloseDamageEventUI();
         }
         else
@@ -3711,7 +3711,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation))
             {
                 if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Fall"))
-                    activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(damageEventUI.fallInput.text)), false, new() { "Fall" });
+                    activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(damageEventUI.fallInput.text)), false, new() { "Fall" }, Vector3.zero);
                 else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Collapse"))
                 {
                     int structureHeight = int.Parse(damageEventUI.structureHeight.text);
@@ -3719,14 +3719,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (activeSoldier.StructuralCollapseCheck(structureHeight))
                     {
                         menu.AddXpAlert(activeSoldier, activeSoldier.stats.R.Val, $"Survived a {structureHeight}cm structural collapse.", true);
-                        menu.AddDamageAlert(activeSoldier, $"{activeSoldier.soldierName} survived a {structureHeight}cm structural collapse.", true, false);
+                        menu.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse.", -1, -1);
                     }
                     else
                     {
                         if (activeSoldier.IsWearingJuggernautArmour(false))
                         {
                             activeSoldier.MakeUnconscious(null, new() { "Structural Collapse" });
-                            menu.AddDamageAlert(activeSoldier, $"{activeSoldier.soldierName} survived a {structureHeight}cm structural collapse with Juggernaut Armour.", true, false);
+                            menu.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse with Juggernaut Armour.", -1, -1);
                         }
                         else
                         {

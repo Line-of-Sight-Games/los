@@ -113,7 +113,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         //play explosion sfx
         game.soundManager.PlayExplosion();
 
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {this.X},{this.Y},{this.Z}").gameObject;
+        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {X},{Y},{Z}", new(X, Y, Z)).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         float arc;
