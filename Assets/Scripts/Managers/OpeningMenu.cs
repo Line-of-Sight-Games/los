@@ -42,7 +42,8 @@ public class OpeningMenu : MonoBehaviour
     }
     public void ContinueClicked()
     {
-        SceneManager.LoadScene("Battlefield");
+        SceneManager.LoadScene("LoadingScreen");
+        LoadingScreen.Instance.LoadSceneWithData("Battlefield");
     }
     public void NewClicked()
     {

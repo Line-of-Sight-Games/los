@@ -62,16 +62,6 @@ public class PromotionAlert : SoldierAlert
         soundManager = FindFirstObjectByType<SoundManager>();
     }
 
-    public void PlayButtonPress()
-    {
-        soundManager.PlayButtonPress();
-    }
-
-    public void SetSoldier(Soldier initSoldier)
-    {
-        soldier = initSoldier;
-    }
-
     public void PromoteSoldier()
     {
         string choiceStat = statDropdown.captionText.text;

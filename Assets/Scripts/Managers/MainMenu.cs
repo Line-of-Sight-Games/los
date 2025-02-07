@@ -160,6 +160,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     void Start()
     {
+        GameManager.Instance.LoadGameData();
         UnfreezeTimer();
         //check the game has started and weather exists
         if (game.currentRound > 0 && weather.savedWeather.Count > 0)
