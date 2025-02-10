@@ -22,7 +22,7 @@ public class DragUI : MonoBehaviour
     {
         if (pressCount.Equals(1))
         {
-            if (menu.ValidateIntInput(xPos, out int x) && menu.ValidateIntInput(yPos, out int y) && menu.ValidateIntInput(zPos, out int z) && terrainDropdown.value != 0)
+            if (HelperFunctions.ValidateIntInput(xPos, out int x) && HelperFunctions.ValidateIntInput(yPos, out int y) && HelperFunctions.ValidateIntInput(zPos, out int z) && terrainDropdown.value != 0)
             {
                 moveLocation = new(x, y, z);
                 if (menu.activeSoldier.PointWithinRadius(moveLocation, menu.activeSoldier.GetMaxDragRange()))
@@ -46,7 +46,7 @@ public class DragUI : MonoBehaviour
         else if (pressCount.Equals(2))
         {
             apCost.text = "0";
-            if (menu.ValidateIntInput(xPosD, out int x) && menu.ValidateIntInput(yPosD, out int y) && menu.ValidateIntInput(zPosD, out int z) && terrainDropdownD.value != 0)
+            if (HelperFunctions.ValidateIntInput(xPosD, out int x) && HelperFunctions.ValidateIntInput(yPosD, out int y) && HelperFunctions.ValidateIntInput(zPosD, out int z) && terrainDropdownD.value != 0)
             {
                 dropLocation = new(x, y, z);
                 if (IsWithinDropBounds())

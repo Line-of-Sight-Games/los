@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 public class CreateSoldiers : MonoBehaviour, IDataPersistence
 {
 	public Soldier baseSoldier;
-	public SetTeamParameters setTeamParameters;
+	public SetGameParameters setGameParameters;
 	public TMP_Dropdown terrainDropdown;
 	public GameObject alpineDropdownObj, desertDropdownObj, jungleDropdownObj, urbanDropdownObj, commanderAlpineDropdownObj, commanderDesertDropdownObj, commanderJungleDropdownObj, commanderUrbanDropdownObj;
 	public TMP_Dropdown alpineDropdown, desertDropdown, jungleDropdown, urbanDropdown, commanderAlpineDropdown, commanderDesertDropdown, commanderJungleDropdown, commanderUrbanDropdown;
@@ -164,7 +164,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			allSoldierIds.Add(soldier.id);
 
 		data.allSoldiersIds = allSoldierIds;
-		data.maxTeams = setTeamParameters.maxTeams;
 	}
     public void ReturnToMenu()
     {
@@ -288,7 +287,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 	public void SetupConfirmed()
     {
-		maxSoldiersPerTeam = setTeamParameters.maxSoldiers;
+		maxSoldiersPerTeam = setGameParameters.maxSoldiers;
 		primaries = teamBreakdown[maxSoldiersPerTeam - 3, 0];
 		weapons = teamBreakdown[maxSoldiersPerTeam - 3, 1];
 		supports = teamBreakdown[maxSoldiersPerTeam - 3, 2];
@@ -323,7 +322,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			}
 			else
 			{
-				if (currentTeam < setTeamParameters.maxTeams)
+				if (currentTeam < setGameParameters.maxTeams)
 				{
                     currentTeam++;
 					soldierIndex = 1;

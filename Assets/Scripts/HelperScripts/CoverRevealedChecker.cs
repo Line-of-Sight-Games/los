@@ -29,7 +29,7 @@ public class CoverRevealedChecker : MonoBehaviour
     public bool GetCoverLocation(out Vector3 coverLocation)
     {
         coverLocation = default;
-        if (menu.ValidateIntInput(XPos, out int x) && menu.ValidateIntInput(YPos, out int y) && menu.ValidateIntInput(ZPos, out int z))
+        if (HelperFunctions.ValidateIntInput(XPos, out int x) && HelperFunctions.ValidateIntInput(YPos, out int y) && HelperFunctions.ValidateIntInput(ZPos, out int z))
         {
             coverLocation = new Vector3(x, y, z);
             return true;

@@ -559,7 +559,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 {
                     if (!linkedSoldier.plannerGunsBlessed.Contains(this.Id))
                     {
-                        ammo += game.DiceRoll();
+                        ammo += HelperFunctions.DiceRoll();
                         if (ammo > maxClip)
                             ammo = maxClip;
 
@@ -765,7 +765,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
             int avgDipElec = (dip + elec + 1) / 2;
 
-            if (game.DiceRoll() <= avgDipElec)
+            if (HelperFunctions.DiceRoll() <= avgDipElec)
             {
                 FileUtility.WriteToReport($"{linkedSoldier.soldierName} successfully uses ulf to {effect}."); //write to report
 
@@ -997,7 +997,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 int damage = 0, stun = 0;
                 if (obj.IsWithinSphere(explosion1.BodyCollider))
                 {
-                    damage = game.DiceRoll();
+                    damage = HelperFunctions.DiceRoll();
                     stun = 4;
                 }
                 else if (obj.IsWithinSphere(explosion2.BodyCollider))

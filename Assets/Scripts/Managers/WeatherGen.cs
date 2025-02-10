@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Collections.ObjectModel;
 
 public class WeatherGen : MonoBehaviour, IDataPersistence
 {
     public MainGame game;
 
-    Dictionary<int, string> visibility = new()
+    readonly Dictionary<int, string> visibility = new()
     {
         {0, "Zero"},
         {1, "Poor"},
@@ -16,14 +17,14 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         {3, "Good"},
         {4, "Full"}
     };
-    Dictionary<int, string> windSpeed = new()
+    readonly Dictionary<int, string> windSpeed = new()
     {
         {0, "Zero"},
         {1, "Light"},
         {2, "Moderate"},
         {3, "Strong"}
     };
-    Dictionary<int, string> windDirection = new()
+    readonly Dictionary<int, string> windDirection = new()
     {
         {0, "Northern"},
         {1, "North-Eastern"},
@@ -34,7 +35,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         {6, "Western"},
         {7, "North-Western"}
     };
-    Dictionary<int, string> rain = new()
+    readonly Dictionary<int, string> rain = new()
     {
         {0, "Zero"},
         {1, "Light"},
@@ -42,7 +43,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         {3, "Heavy"},
         {4, "Torrential"}
     };
-    public Dictionary<string, Vector2> windDirectionVectors = new()
+    readonly Dictionary<string, Vector2> windDirectionVectors = new()
     {
         {"Northern", new(0, 1)},
         {"North-Eastern", new(1, 1)},
@@ -67,7 +68,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         data.savedWeather = savedWeather;
     }
 
-    public void GenerateWeather()
+    public void GenerateWeather(int maxRounds)
     {
         int k = 0;
         vis = HelperFunctions.RandomNumber(0, 4);
@@ -75,7 +76,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
         dir = HelperFunctions.RandomNumber(0, 7);
         rn = HelperFunctions.RandomNumber(0, 4);
 
-        for (int i = 1; i <= game.maxRounds; i++)
+        for (int i = 1; i <= maxRounds; i++)
         {
             for (int j = 1; j <= 2; j++)
             {
@@ -101,19 +102,19 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     {
         if (vis == 0)
         {
-            if (game.CoinFlip())
+            if (HelperFunctions.CoinFlip())
                 vis++;
         }
         else if (vis == 4)
         {
-            if (game.CoinFlip())
+            if (HelperFunctions.CoinFlip())
                 vis--;
         }
         else
         {
             if (HelperFunctions.RandomNumber(1, 5) >= 4)
             {
-                if (game.CoinFlip())
+                if (HelperFunctions.CoinFlip())
                     vis--;
                 else
                     vis++;
@@ -126,19 +127,19 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     {
         if (sp == 0)
         {
-            if (game.CoinFlip())
+            if (HelperFunctions.CoinFlip())
                 sp++;
         }
         else if (sp == 3)
         {
-            if (game.CoinFlip())
+            if (HelperFunctions.CoinFlip())
                 sp--;
         }
         else
         {
             if (HelperFunctions.RandomNumber(1, 5) >= 4)
             {
-                if (game.CoinFlip())
+                if (HelperFunctions.CoinFlip())
                     sp--;
                 else
                     sp++;
@@ -151,7 +152,7 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     {
         if (HelperFunctions.RandomNumber(1, 3) == 3)
         {
-            if (game.CoinFlip())
+            if (HelperFunctions.CoinFlip())
             {
                 dir--;
                 if (dir < 0)
@@ -171,19 +172,19 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     {
         if (rn == 0)
         {
-            if (game.CoinFlip())
+            if (HelperFunctions.CoinFlip())
                 rn++;
         }
         else if (rn == 4)
         {
-            if (game.CoinFlip())
+            if (HelperFunctions.CoinFlip())
                 rn--;
         }
         else
         {
             if (HelperFunctions.RandomNumber(1, 5) >= 4)
             {
-                if (game.CoinFlip())
+                if (HelperFunctions.CoinFlip())
                     rn--;
                 else
                     rn++;

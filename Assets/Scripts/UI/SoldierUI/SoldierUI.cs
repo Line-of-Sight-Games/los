@@ -115,7 +115,7 @@ public class SoldierUI : MonoBehaviour
     {
         if (menu.OverrideView && menu.DeathKey())
         {
-            if (game.DiceRoll() == 1)
+            if (HelperFunctions.DiceRoll() == 1)
             {
                 print("Died from Deathroll");
                 linkedSoldier.InstantKill(null, new() { "Deathroll" });

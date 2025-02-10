@@ -12,7 +12,7 @@ public class IntInputController : MonoBehaviour
     {
         textInput = GetComponent<TMP_InputField>();
         game = FindFirstObjectByType<MainGame>();
-        normalColour = game.menu.normalTextColour;
+        normalColour = new(0.196f, 0.196f, 0.196f);
     }
 
     private void Update()

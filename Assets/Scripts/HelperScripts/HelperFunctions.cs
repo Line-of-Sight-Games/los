@@ -1,10 +1,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using TMPro;
 
 
 public static class HelperFunctions
 {
+    public static bool ValidateIntInput(TMP_InputField inputField, out int outputInt)
+    {
+        Color normalTextColour = new(0.196f, 0.196f, 0.196f);
+        outputInt = 0;
+        if (inputField.textComponent.color == normalTextColour)
+        {
+            if (int.TryParse(inputField.text, out int innerOutputInt))
+            {
+                outputInt = innerOutputInt;
+                return true;
+            }
+        }
+        return false;
+    }
+    public static int DiceRoll()
+    {
+        return RandomNumber(1, 6);
+    }
+    public static bool CoinFlip()
+    {
+        if (RandomNumber(0, 1) == 1)
+            return true;
+
+        return false;
+    }
     public static Vector3 ConvertPhysicalPosToMathPos(Vector3 physicalPos)
     {
         return new(Mathf.CeilToInt(physicalPos.x + 0.5f), Mathf.CeilToInt(physicalPos.z), Mathf.CeilToInt(physicalPos.y + 0.5f));

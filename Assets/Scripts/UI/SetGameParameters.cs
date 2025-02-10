@@ -1,0 +1,78 @@
+using UnityEngine;
+using TMPro;
+
+public class SetGameParameters : MonoBehaviour, IDataPersistence
+{
+    public Vector3 camPosition, sunPosition, mapPosition, mapDimensions, bottomPlanePosition, bottomPlaneDimensions, outlineAreaPosition, outlineAreaDimensions;
+    public float camOrthoSize;
+
+    public WeatherGen weather;
+
+    public GameObject setupMenuUI, createSoldierMenuUI;
+    public TMP_InputField xSize, ySize, zSize, maxRoundsInput, turnTimeInput;
+    public TMP_Dropdown maxSoldierDropdown;
+    public int x, y, z, maxRounds, maxTurnTime, maxTeams, maxSoldiers;
+
+    public void LoadData(GameData data)
+    {
+
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        data.mapPosition = mapPosition;
+        data.mapDimensions = mapDimensions;
+        data.bottomPlanePosition = bottomPlanePosition;
+        data.bottomPlaneDimensions = bottomPlaneDimensions;
+        data.outlineAreaPosition = outlineAreaPosition;
+        data.outlineAreaDimensions = outlineAreaDimensions;
+        data.camPosition = camPosition;
+        data.camOrthoSize = camOrthoSize;
+        data.sunPosition = sunPosition;
+
+        data.currentRound = 1;
+        data.currentTeam = 1;
+        data.maxRounds = maxRounds;
+        data.maxTurnTime = maxTurnTime * 60;
+        data.maxX = x;
+        data.maxY = y;
+        data.maxZ = z;
+        data.maxTeams = maxTeams;
+    }
+    public void SetField()
+    {
+        bottomPlaneDimensions = new Vector3(x, y, z);
+        bottomPlanePosition = new Vector3(x / 2, 0, z / 2);
+
+        outlineAreaDimensions = new Vector3(x, 0.1f, z);
+        outlineAreaPosition = new Vector3(x / 2, 0, z / 2);
+
+        mapDimensions = new Vector3(x, y, z);
+        mapPosition = new Vector3(x / 2, y / 2, z / 2);
+    }
+
+    public void SetCam()
+    {
+        camOrthoSize = Mathf.Max(x, z) / 2;
+        camPosition = new Vector3(x / 2, y * 2, z / 2);
+        sunPosition = new Vector3(0, y + 1, 0);
+    }
+
+    public void Confirm()
+    {
+        if (HelperFunctions.ValidateIntInput(xSize, out x) && HelperFunctions.ValidateIntInput(ySize, out y) && HelperFunctions.ValidateIntInput(zSize, out z) && HelperFunctions.ValidateIntInput(maxRoundsInput, out maxRounds) && HelperFunctions.ValidateIntInput(turnTimeInput, out maxTurnTime) && int.TryParse(maxSoldierDropdown.captionText.text, out maxSoldiers))
+        {
+            maxTeams = 2;
+            maxTurnTime *= 60;
+            SetField();
+            SetCam();
+
+            weather.GenerateWeather(maxRounds);
+            DataPersistenceManager.Instance.SaveGame();
+
+
+            setupMenuUI.SetActive(false);
+            createSoldierMenuUI.SetActive(true);
+        }
+    }
+}

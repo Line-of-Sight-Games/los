@@ -386,7 +386,7 @@ public class SoundManager : MonoBehaviour
     {
         if (audioClipArray.Any())
         {
-            if (game.CoinFlip()) //50% chance of silence
+            if (HelperFunctions.CoinFlip()) //50% chance of silence
             {
                 PlayVoice(s, audioClipArray[HelperFunctions.RandomNumber(0, audioClipArray.Length - 1)]);
             }

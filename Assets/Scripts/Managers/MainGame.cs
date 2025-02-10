@@ -116,17 +116,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         return AllBattlefieldObjects().OfType<DrugCabinet>().ToList();
     }
-    public int DiceRoll()
-    {
-        return HelperFunctions.RandomNumber(1, 6);
-    }
-    public bool CoinFlip()
-    {
-        if (HelperFunctions.RandomNumber(0, 1) == 1)
-            return true;
-
-        return false;
-    }
     public int Factorial(int number)
     {
         if (number == 0)
@@ -172,14 +161,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public string RandomShotScatterHorizontal()
     {
-        if (CoinFlip())
+        if (HelperFunctions.CoinFlip())
             return "left";
         else
             return "right";
     }
     public string RandomShotScatterVertical()
     {
-        if (CoinFlip())
+        if (HelperFunctions.CoinFlip())
             return "up";
         else
             return "down";
@@ -556,7 +545,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //overwatch functions
     public void ConfirmOverwatch()
     {
-        if (menu.ValidateIntInput(overwatchUI.xPos, out int x) && menu.ValidateIntInput(overwatchUI.yPos, out int y) && menu.ValidateIntInput(overwatchUI.radius, out int r) && menu.ValidateIntInput(overwatchUI.arc, out int a))
+        if (HelperFunctions.ValidateIntInput(overwatchUI.xPos, out int x) && HelperFunctions.ValidateIntInput(overwatchUI.yPos, out int y) && HelperFunctions.ValidateIntInput(overwatchUI.radius, out int r) && HelperFunctions.ValidateIntInput(overwatchUI.arc, out int a))
         {
             if (activeSoldier.CheckAP(2))
             {
@@ -629,7 +618,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetMoveLocation(out Tuple<Vector3, string> moveLocation)
     {
         moveLocation = default;
-        if (menu.ValidateIntInput(moveUI.xPos, out int x) && menu.ValidateIntInput(moveUI.yPos, out int y) && menu.ValidateIntInput(moveUI.zPos, out int z) && moveUI.terrainDropdown.value != 0)
+        if (HelperFunctions.ValidateIntInput(moveUI.xPos, out int x) && HelperFunctions.ValidateIntInput(moveUI.yPos, out int y) && HelperFunctions.ValidateIntInput(moveUI.zPos, out int z) && moveUI.terrainDropdown.value != 0)
         {
             moveLocation = Tuple.Create(new Vector3(x, y, z), moveUI.terrainDropdown.captionText.text);
             return true;
@@ -2919,14 +2908,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (!useUHFUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
 
-            if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y))
+            if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y))
             {
                 int highestRoll = 0, newX, newY;
                 float scatterDistance;
                 int scatterDegree = HelperFunctions.RandomNumber(0, 360);
                 for (int i = 0; i < rolls; i++)
                 {
-                    int roll = DiceRoll();
+                    int roll = HelperFunctions.DiceRoll();
                     if (roll > highestRoll)
                         highestRoll = roll;
                 }
@@ -2982,7 +2971,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else
             {
-                if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z))
+                if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y) && HelperFunctions.ValidateIntInput(targetZ, out int z))
                 {
                     menu.CloseUHFUI();
                     useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
@@ -3017,7 +3006,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField targetX = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField targetY = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("YPos").GetComponent<TMP_InputField>();
 
-        if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y))
+        if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y))
         {
             //set riot shield facing
             activeSoldier.riotXPoint = x;
@@ -3037,7 +3026,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (!throwTarget.pressedOnce.activeInHierarchy) //first press
         {
-            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
+            if (HelperFunctions.ValidateIntInput(throwTarget.XPos, out int x) && HelperFunctions.ValidateIntInput(throwTarget.YPos, out int y) && HelperFunctions.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
             {
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
@@ -3045,7 +3034,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 int scatterDegree = HelperFunctions.RandomNumber(0, 360);
                 int scatterDistance = activeSoldier.StrengthCheck() switch
                 {
-                    false => Mathf.CeilToInt(DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
+                    false => Mathf.CeilToInt(HelperFunctions.DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
                     _ => -1,
                 };
 
@@ -3072,7 +3061,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else
             {
-                if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z))
+                if (HelperFunctions.ValidateIntInput(throwTarget.XPos, out int x) && HelperFunctions.ValidateIntInput(throwTarget.YPos, out int y) && HelperFunctions.ValidateIntInput(throwTarget.ZPos, out int z))
                 {
                     useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
                     useGrenade.itemUsed.CheckExplosionGrenade(activeSoldier, new Vector3(x, y, z));
@@ -3092,7 +3081,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         if (!throwItemUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
         {
-            if (menu.ValidateIntInput(throwTarget.XPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
+            if (HelperFunctions.ValidateIntInput(throwTarget.XPos, out int x) && HelperFunctions.ValidateIntInput(throwTarget.YPos, out int y) && HelperFunctions.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
             {
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
@@ -3100,7 +3089,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 int scatterDegree = HelperFunctions.RandomNumber(0, 360);
                 int scatterDistance = activeSoldier.StrengthCheck() switch
                 {
-                    false => Mathf.CeilToInt(DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
+                    false => Mathf.CeilToInt(HelperFunctions.DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
                     _ => -1,
                 };
 
@@ -3133,7 +3122,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
             else
             {
-                if (menu.ValidateIntInput(throwTarget.YPos, out int x) && menu.ValidateIntInput(throwTarget.YPos, out int y) && menu.ValidateIntInput(throwTarget.ZPos, out int z))
+                if (HelperFunctions.ValidateIntInput(throwTarget.YPos, out int x) && HelperFunctions.ValidateIntInput(throwTarget.YPos, out int y) && HelperFunctions.ValidateIntInput(throwTarget.ZPos, out int z))
                 {
                     if (itemWillBreak.activeInHierarchy)
                     {
@@ -3181,7 +3170,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         GameObject itemWillBreak = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ItemWillBreak").gameObject;
         GameObject catcher = dropItemUI.transform.Find("OptionPanel").Find("Catcher").gameObject;
 
-        if (menu.ValidateIntInput(targetX, out int x) && menu.ValidateIntInput(targetY, out int y) && menu.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
+        if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y) && HelperFunctions.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
         {
             FileUtility.WriteToReport($"{activeSoldier.soldierName} drops {dropItemUI.itemUsed.itemName}."); //write to report
 
@@ -3225,7 +3214,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmBinoculars()
     {
-        if (menu.ValidateIntInput(menu.binocularsUI.xPos, out int x) && menu.ValidateIntInput(menu.binocularsUI.yPos, out int y))
+        if (HelperFunctions.ValidateIntInput(menu.binocularsUI.xPos, out int x) && HelperFunctions.ValidateIntInput(menu.binocularsUI.yPos, out int y))
         {
             FileUtility.WriteToReport($"{activeSoldier.soldierName} uses binoculars ({x}, {y})."); //write to report
 
@@ -3244,7 +3233,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField facingY = useClaymore.transform.Find("OptionPanel").Find("ClaymoreFacing").Find("YPos").GetComponent<TMP_InputField>();
 
 
-        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy))
+        if (HelperFunctions.ValidateIntInput(placedX, out int x) && HelperFunctions.ValidateIntInput(placedY, out int y) && HelperFunctions.ValidateIntInput(placedZ, out int z) && HelperFunctions.ValidateIntInput(facingX, out int fx) && HelperFunctions.ValidateIntInput(facingY, out int fy))
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
@@ -3266,7 +3255,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField placedY = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("YPos").GetComponent<TMP_InputField>();
         TMP_InputField placedZ = useDeploymentBeacon.transform.Find("OptionPanel").Find("BeaconPlacing").Find("ZPos").GetComponent<TMP_InputField>();
 
-        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z))
+        if (HelperFunctions.ValidateIntInput(placedX, out int x) && HelperFunctions.ValidateIntInput(placedY, out int y) && HelperFunctions.ValidateIntInput(placedZ, out int z))
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
@@ -3293,7 +3282,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         TMP_InputField facingX = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("XPos").GetComponent<TMP_InputField>();
         TMP_InputField facingY = useThermalCam.transform.Find("OptionPanel").Find("CamFacing").Find("YPos").GetComponent<TMP_InputField>();
 
-        if (menu.ValidateIntInput(placedX, out int x) && menu.ValidateIntInput(placedY, out int y) && menu.ValidateIntInput(placedZ, out int z) && menu.ValidateIntInput(facingX, out int fx) && menu.ValidateIntInput(facingY, out int fy))
+        if (HelperFunctions.ValidateIntInput(placedX, out int x) && HelperFunctions.ValidateIntInput(placedY, out int y) && HelperFunctions.ValidateIntInput(placedZ, out int z) && HelperFunctions.ValidateIntInput(facingX, out int fx) && HelperFunctions.ValidateIntInput(facingY, out int fy))
         {
             if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
             {
@@ -3749,7 +3738,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation)
     {
         fallCollapseLocation = default;
-        if (menu.ValidateIntInput(damageEventUI.xPos, out int x) && menu.ValidateIntInput(damageEventUI.yPos, out int y) && menu.ValidateIntInput(damageEventUI.zPos, out int z) && damageEventUI.terrainDropdown.value != 0)
+        if (HelperFunctions.ValidateIntInput(damageEventUI.xPos, out int x) && HelperFunctions.ValidateIntInput(damageEventUI.yPos, out int y) && HelperFunctions.ValidateIntInput(damageEventUI.zPos, out int z) && damageEventUI.terrainDropdown.value != 0)
         {
             fallCollapseLocation = Tuple.Create(new Vector3(x, y, z), damageEventUI.terrainDropdown.captionText.text);
 
@@ -3950,7 +3939,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public bool GetInsertLocation(out Tuple<Vector3, string> insertLocation)
     {
         insertLocation = default;
-        if (menu.ValidateIntInput(insertObjectsUI.xPos, out int x) && menu.ValidateIntInput(insertObjectsUI.yPos, out int y) && menu.ValidateIntInput(insertObjectsUI.zPos, out int z))
+        if (HelperFunctions.ValidateIntInput(insertObjectsUI.xPos, out int x) && HelperFunctions.ValidateIntInput(insertObjectsUI.yPos, out int y) && HelperFunctions.ValidateIntInput(insertObjectsUI.zPos, out int z))
         {
             insertLocation = Tuple.Create(new Vector3(x, y, z), string.Empty);
 

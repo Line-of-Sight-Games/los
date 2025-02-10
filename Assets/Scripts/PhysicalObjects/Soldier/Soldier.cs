@@ -1252,7 +1252,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 damage = 0;
                 menu.AddSoldierAlert(this, "DAMAGE BLOCKED", Color.green, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Riot Shield.", preDamage, damage);
             }
-            if (IsWearingExoArmour() && game.CoinFlip())
+            if (IsWearingExoArmour() && HelperFunctions.CoinFlip())
             {
                 int preDamage = damage;
                 damage = 0;
@@ -3264,19 +3264,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     //status checks
     public bool ResilienceCheck()
     {
-        if (game.DiceRoll() <= stats.R.Val)
+        if (HelperFunctions.DiceRoll() <= stats.R.Val)
             return true;
         return false;
     }
     public bool StrengthCheck()
     {
-        if (game.DiceRoll() <= stats.Str.Val)
+        if (HelperFunctions.DiceRoll() <= stats.Str.Val)
             return true;
         return false;
     }
     public bool HealCheck()
     {
-        if (game.DiceRoll() <= stats.Heal.Val)
+        if (HelperFunctions.DiceRoll() <= stats.Heal.Val)
             return true;
         return false;
     }

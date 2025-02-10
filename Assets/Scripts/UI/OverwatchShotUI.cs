@@ -264,7 +264,7 @@ public class OverwatchShotUI : MonoBehaviour
     }
     public void OpenShotOverwatchConfirmUI()
     {
-        if (menu.ValidateIntInput(xPos, out int xOver) && menu.ValidateIntInput(yPos, out int yOver) && menu.ValidateIntInput(zPos, out int zOver) && terrainDropdown.value != 0)
+        if (HelperFunctions.ValidateIntInput(xPos, out int xOver) && HelperFunctions.ValidateIntInput(yPos, out int yOver) && HelperFunctions.ValidateIntInput(zPos, out int zOver) && terrainDropdown.value != 0)
         {
             //find shooter
             Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
