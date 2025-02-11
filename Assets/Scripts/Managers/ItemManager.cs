@@ -73,15 +73,17 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         IEnumerable<Item> allItems = FindObjectsByType<Item>(default);
         foreach (Item item in allItems)
             if (item != null)
-            Destroy(item.gameObject);
+                Destroy(item.gameObject);
 
         allItemIds = data.allItemIds;
         foreach (string id in allItemIds)
         {
-            var newItem = Instantiate(itemPrefab);
+            Item newItem = Instantiate(itemPrefab);
             newItem.id = id;
             newItem.LoadData(data);
         }
+
+        isDataLoaded = true;
     }
 
     public void SaveData(ref GameData data)
@@ -99,24 +101,17 @@ public class ItemManager : MonoBehaviour, IDataPersistence
 
     public void AssignItemsToOwners()
     {
+        Debug.Log("Assigning items to owners...");
         IEnumerable<Item> allItems = FindObjectsByType<Item>(default);
-        IEnumerable<MonoBehaviour> allObjects = FindObjectsByType<MonoBehaviour>(default);
+        IEnumerable<PhysicalObject> allPhysicalObjects = FindObjectsByType<PhysicalObject>(default);
 
         // Filter objects that implement IHaveInventory interface
-        foreach (MonoBehaviour obj in allObjects)
+        foreach (Item item in allItems)
         {
-            if (obj is IHaveInventory inventoryObject)
+            foreach (PhysicalObject obj in allPhysicalObjects)
             {
-                foreach (string itemId in inventoryObject.InventoryList)
-                {
-                    foreach (Item item in allItems)
-                    {
-                        if (item.Id == itemId)
-                        {
-                            inventoryObject.Inventory.AddItemToSlotFromSave(item, item.whereEquipped);
-                        }
-                    }
-                }
+                if (item.ownerId == obj.Id)
+                    (obj as IHaveInventory).Inventory.AddItemToSlotFromSave(item, item.whereEquipped);
             }
         }
     }
@@ -135,12 +130,12 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         for (int i = strikeTable.Length - 1; i >= 0; i--)
             if (strikeTable[i].Item1 <= score)
                 strikeOptions.Add($"{strikeTable[i].Item2}");
-        
+
         return strikeOptions;
     }
     public Item SpawnItem(string itemName)
     {
-        var item = Instantiate(itemPrefab).Init(itemName);
+        Item item = Instantiate(itemPrefab).Init(itemName);
 
         //spawn small medikit inside brace
         if (item.IsBrace())
@@ -178,4 +173,8 @@ public class ItemManager : MonoBehaviour, IDataPersistence
 
         return null;
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

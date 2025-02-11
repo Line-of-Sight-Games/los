@@ -5,6 +5,9 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System.Threading.Tasks;
+using System;
+using TMPro;
+using UnityEngine.UI;
 
 public class DataPersistenceManager : MonoBehaviour
 {
@@ -12,9 +15,10 @@ public class DataPersistenceManager : MonoBehaviour
     public GameData gameData;
     public List<IDataPersistence> dataPersistanceObjects;
     public FileDataHandler coreDataHandler;
-    public MainGame game;
-    public ItemManager itemManager;
     public bool dataLoaded = false;
+    public GameObject loadingScreen;
+    public Slider progressBar;
+    public TextMeshProUGUI progressText;
 
     private void Awake()
     {
@@ -22,63 +26,153 @@ public class DataPersistenceManager : MonoBehaviour
         {
             Instance = this;
             coreDataHandler = new(Application.persistentDataPath, "LOSCore.json");
-            // Load the Loading Screen scene additively
-            if (SceneManager.GetSceneByName("LoadingScreen").isLoaded == false)
-                SceneManager.LoadSceneAsync("LoadingScreen", LoadSceneMode.Additive);
-
-            if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
-            {
-                game = FindFirstObjectByType<MainGame>();
-                itemManager = FindFirstObjectByType<ItemManager>();
-            }
+            DontDestroyOnLoad(gameObject);
         }
         else
             Destroy(gameObject);
     }
-    public async Task LoadGameData()
+    public void LoadSceneWithData(string sceneName)
     {
-        if (dataLoaded) return; // Prevent reloading on scene changes
+        loadingScreen.SetActive(true);
+        progressBar.value = 0;
+        progressText.text = "Loading...";
+
+        StartCoroutine(LoadSceneAsync(sceneName));
+    }
+    private IEnumerator LoadSceneAsync(string sceneName)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = false;
+
+        float displayedProgress = 0f;
+
+        while (!operation.isDone)
+        {
+            // Unity’s progress is from 0 to 0.9 before scene is ready
+            float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
+
+            // Smoothly interpolate bar progress to 80%
+            while (displayedProgress < targetProgress * 0.8f)
+            {
+                displayedProgress = Mathf.MoveTowards(displayedProgress, targetProgress * 0.8f, Time.deltaTime * 0.5f);
+                progressBar.value = displayedProgress;
+                progressText.text = $"Loading... {displayedProgress * 100:F0}%";
+                yield return null;
+            }
+
+            if (targetProgress >= 1f)
+            {
+                yield return new WaitForSeconds(0.5f); // Smooth transition delay
+                operation.allowSceneActivation = true;
+            }
+
+            yield return null;
+        }
+
+        // After scene loads, start loading game data
+        StartCoroutine(LoadGameData());
+    }
+    public IEnumerator LoadGameData()
+    {
+        if (dataLoaded)
+        {
+            yield break;
+        }
 
         string path = Path.Combine(Application.persistentDataPath, "LOSCore.json");
 
         if (!File.Exists(path))
         {
             Debug.LogError("JSON file not found!");
-            return;
+            progressBar.value = 1f;
+            progressText.text = "Load Failed!";
+            yield break;
         }
 
-        string jsonText = await File.ReadAllTextAsync(path);
+        progressBar.value = 0.8f; // Scene loaded, start data loading
+
+        string jsonText = File.ReadAllText(path);
         gameData = JsonUtility.FromJson<GameData>(jsonText);
-        LoadGame();
+        progressBar.value = 0.85f;
+        progressText.text = "Loading Data...";
+
+        yield return StartCoroutine(LoadGame());
 
         dataLoaded = true;
+        loadingScreen.SetActive(false);
+    }
+    public IEnumerator LoadGame()
+    {
+        dataPersistanceObjects = FindAllDataPersistenceObjects();
+        gameData = coreDataHandler.Load();
+
+        if (gameData == null)
+        {
+            print("No data was found. Starting new game.");
+            NewGame();
+        }
+
+        float step = 0.15f / dataPersistanceObjects.Count; // 15% for game data
+        float currentProgress = 0.85f;
+
+        foreach (IDataPersistence dataPersistenceObj in dataPersistanceObjects)
+        {
+            dataPersistenceObj.LoadData(gameData);
+            currentProgress += step;
+            progressBar.value = currentProgress;
+            progressText.text = $"Loading Data... {currentProgress * 100:F0}%";
+            yield return null;
+        }
+
+        ItemManager itemManager = FindFirstObjectByType<ItemManager>();
+        if (itemManager != null)
+        {
+            itemManager.AssignItemsToOwners();
+            progressBar.value = 0.98f;
+        }
+
+        MainGame mainGame = FindFirstObjectByType<MainGame>();
+        if (mainGame != null)
+        {
+            mainGame.Init();
+            progressBar.value = 1f;
+        }
     }
     public void NewGame()
     {
         gameData = new GameData();
     }
 
-    public void LoadGame()
+    public async Task WaitForDynamicObjects(IProgress<float> progress = null)
     {
-        dataPersistanceObjects = FindAllDataPersistenceObjects();
-        gameData = coreDataHandler.Load();
-        //Load any saved data from data handler
-        if (gameData == null)
+        float startProgress = 0.9f;
+        float endProgress = 1.0f;
+        float currentProgress = startProgress;
+
+        while (!AllObjectsLoaded())
         {
-            print("No data was found. Starting new game.");
-            NewGame();
+            currentProgress = Mathf.Lerp(currentProgress, endProgress, Time.deltaTime * 2);
+            progress?.Report(currentProgress);
+            await Task.Yield();
         }
-        //Push loaded data to all other scripts that need it
-        foreach (IDataPersistence dataPersistenceObj in dataPersistanceObjects)
-            dataPersistenceObj.LoadData(gameData);
 
-        if (itemManager != null)
-            itemManager.AssignItemsToOwners();
-
-        if (game != null)
-            game.Init();
+        // Ensure it reaches 100%
+        await Task.Delay(500);
+        progress?.Report(1f);
     }
 
+    private bool AllObjectsLoaded()
+    {
+        dataPersistanceObjects = FindAllDataPersistenceObjects(); // Refresh list
+        foreach (var obj in dataPersistanceObjects)
+        {
+            if (!obj.IsDataLoaded) // Implement this property in IDataPersistence
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     public void SaveGame()
     {
         //print("Saving game");

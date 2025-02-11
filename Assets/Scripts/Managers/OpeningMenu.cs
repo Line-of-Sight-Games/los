@@ -42,8 +42,7 @@ public class OpeningMenu : MonoBehaviour
     }
     public void ContinueClicked()
     {
-        SceneManager.LoadScene("LoadingScreen");
-        LoadingScreen.Instance.LoadSceneWithData("Battlefield");
+        DataPersistenceManager.Instance.LoadSceneWithData("Battlefield");
     }
     public void NewClicked()
     {

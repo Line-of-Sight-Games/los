@@ -141,10 +141,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     };
 
     public List<string> terrainList = new() { "Urban", "Desert", "Jungle", "Alpine" };
+
     public void LoadData(GameData data)
     {
         playTimeTotal = data.playTimeTotal;
         turnTime = data.turnTime;
+
+        isDataLoaded = true;
     }
 
     public void SaveData(ref GameData data)
@@ -157,15 +160,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         SceneManager.LoadScene("Menu");
     }
-    void Start()
-    {
-        _ = DataPersistenceManager.Instance.LoadGameData();
-    }
 
     void Update()
     {
-        //check the game has started and weather exists
-        if (game.currentRound > 0 && weather.savedWeather.Count > 0)
+        //check the game is running
+        if (game.GameRunning)
         {
             //check if game has not run out of turns
             if (game.currentRound <= game.maxRounds)
@@ -1713,9 +1712,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 game.EndFrozenTurn();
             activeSoldier.UnsetActiveSoldier();
             soldierOptionsUI.SetActive(false);
-            soldierManager.enemyDisplayColumn.gameObject.SetActive(true);
-            soldierManager.friendlyDisplayColumn.gameObject.SetActive(true);
-            //turnTitle.text = "L I N E    O F    S I G H T";
+            soldierManager.enemyDisplayColumn.SetActive(true);
+            soldierManager.friendlyDisplayColumn.SetActive(true);
+            
+            //save game
+            DataPersistenceManager.Instance.SaveGame();
         }
     }
     public void CloseSoldierMenuUndo()
@@ -4678,4 +4679,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             return allStats;
         }
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

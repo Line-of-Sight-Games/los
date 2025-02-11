@@ -36,7 +36,7 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
         return this;
     }
 
-    public override void LoadData(GameData data)
+    public void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
@@ -50,9 +50,11 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
 
             placedById = (string)details["placedById"];
         }
+
+        isDataLoaded = true;
     }
 
-    public override void SaveData(ref GameData data)
+    public void SaveData(ref GameData data)
     {
         details = new()
         {
@@ -71,5 +73,9 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
         data.allPOIDetails.Add(id, details);
     }
     public Sprite DisarmImage { get { return poiPortrait; } }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }
 

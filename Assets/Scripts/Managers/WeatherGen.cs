@@ -61,6 +61,8 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         savedWeather = data.savedWeather;
+
+        isDataLoaded = true;
     }
 
     public void SaveData(ref GameData data)
@@ -566,4 +568,8 @@ public class WeatherGen : MonoBehaviour, IDataPersistence
                 return "Zero";
         }
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

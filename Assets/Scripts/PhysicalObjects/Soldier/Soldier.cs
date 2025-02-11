@@ -302,6 +302,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         //link to maingame object
         game = FindFirstObjectByType<MainGame>();
+
+        isDataLoaded = true;
     }
     public Soldier LinkWithUI(Transform displayPanel)
     {
@@ -4773,4 +4775,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public List<string> InventoryList { get { return inventoryList; } }
     public Dictionary<string, string> InventorySlots { get { return inventorySlots; } }
     public int ActiveC { get { return stats.C.Val; } }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

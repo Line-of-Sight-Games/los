@@ -4001,6 +4001,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         maxX = data.maxX;
         maxY = data.maxY;
         maxZ = data.maxZ;
+
+        isDataLoaded = true;
     }
     public void SaveData(ref GameData data)
     {
@@ -4020,4 +4022,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         data.maxY = maxY;
         data.maxZ = maxZ;
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

@@ -15,7 +15,7 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
 
     public void LoadData(GameData data)
     {
-
+        isDataLoaded = true;
     }
 
     public void SaveData(ref GameData data)
@@ -75,4 +75,8 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
             createSoldierMenuUI.SetActive(true);
         }
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

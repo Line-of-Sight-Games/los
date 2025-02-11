@@ -49,7 +49,7 @@ public class BinocularBeam : POI, IDataPersistence
 
         return this;
     }
-    public override void LoadData(GameData data)
+    public void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
@@ -68,8 +68,10 @@ public class BinocularBeam : POI, IDataPersistence
 
             beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, Z)), beamHeight, beamWidth);
         }
+
+        isDataLoaded = true;
     }
-    public override void SaveData(ref GameData data)
+    public void SaveData(ref GameData data)
     {
         details = new()
         {
@@ -108,4 +110,8 @@ public class BinocularBeam : POI, IDataPersistence
 
         return 4f;
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

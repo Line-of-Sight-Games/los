@@ -65,6 +65,8 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
                 newSoldier.LinkWithUI(enemyDisplayColumn.transform);
         }
         RefreshSoldierList();
+
+        isDataLoaded = true;
     }
 
     public void SaveData(ref GameData data)
@@ -99,4 +101,8 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
         }
         return null;
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

@@ -47,7 +47,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
 
         return this;
     }
-    public override void LoadData(GameData data)
+    public void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
@@ -66,9 +66,11 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
             revealed = (bool)details["revealed"];
             placedById = (string)details["placedById"];
         }
+
+        isDataLoaded = true;
     }
 
-    public override void SaveData(ref GameData data)
+    public void SaveData(ref GameData data)
     {
         details = new()
         {
@@ -162,4 +164,8 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     public bool Exploded
     { get { return exploded; } set { exploded = value; } }
     public Sprite DisarmImage { get { return poiPortrait; } }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

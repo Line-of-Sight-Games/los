@@ -361,6 +361,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 inventorySlots = JsonConvert.DeserializeObject<Dictionary<string, string>>(details["inventorySlots"].ToString());
             }
         }
+
+        isDataLoaded = true;
     }
 
     public void SaveData(ref GameData data)
@@ -1472,4 +1474,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public GameObject GameObject { get { return gameObject; } }
     public List<string> InventoryList { get { return inventoryList; } }
     public Dictionary<string, string> InventorySlots { get { return inventorySlots; } }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

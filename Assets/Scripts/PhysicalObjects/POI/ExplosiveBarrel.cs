@@ -29,7 +29,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         return this;
     }
 
-    public override void LoadData(GameData data)
+    public void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
@@ -41,9 +41,11 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
             terrainOn = (string)details["terrainOn"];
             MapPhysicalPosition(x, y, z);
         }
+
+        isDataLoaded = true;
     }
 
-    public override void SaveData(ref GameData data)
+    public void SaveData(ref GameData data)
     {
         details = new()
         {
@@ -104,4 +106,8 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     { get { return triggered; } set { triggered = value; } }
     public bool Exploded
     { get { return exploded; } set { exploded = value; } }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

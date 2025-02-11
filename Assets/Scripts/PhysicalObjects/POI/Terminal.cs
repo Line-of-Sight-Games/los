@@ -33,7 +33,7 @@ public class Terminal : POI, IDataPersistence
         return this;
     }
 
-    public override void LoadData(GameData data)
+    public void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
@@ -60,9 +60,11 @@ public class Terminal : POI, IDataPersistence
             foreach (string soldierId in soldiersAlreadyHackedJArray)
                 soldiersAlreadyHacked.Add(soldierId);
         }
+
+        isDataLoaded = true;
     }
 
-    public override void SaveData(ref GameData data)
+    public void SaveData(ref GameData data)
     {
         details = new()
         {
@@ -96,5 +98,9 @@ public class Terminal : POI, IDataPersistence
         get { return soldiersAlreadyHacked; }
         set { soldiersAlreadyHacked = value; }
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }
 

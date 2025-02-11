@@ -154,7 +154,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 	public void LoadData(GameData data)
 	{
-
+		isDataLoaded = true;
 	}
 
 	public void SaveData(ref GameData data)
@@ -554,4 +554,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
         }
 	}
 
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

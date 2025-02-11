@@ -46,7 +46,7 @@ public class SmokeCloud : POI, IDataPersistence
     {
         placedBy = menu.soldierManager.FindSoldierById(placedById);
     }
-    public override void LoadData(GameData data)
+    public void LoadData(GameData data)
     {
         if (data.allPOIDetails.TryGetValue(id, out details))
         {
@@ -63,9 +63,11 @@ public class SmokeCloud : POI, IDataPersistence
             enemiesAffected = (details["enemiesAffected"] as JArray).Select(token => token.ToString()).ToList();
             placedById = (string)details["placedById"];
         }
+
+        isDataLoaded = true;
     }
 
-    public override void SaveData(ref GameData data)
+    public void SaveData(ref GameData data)
     {
         details = new()
         {
@@ -113,4 +115,8 @@ public class SmokeCloud : POI, IDataPersistence
                 DissipateCloud();
         }
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }

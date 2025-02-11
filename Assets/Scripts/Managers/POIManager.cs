@@ -32,36 +32,75 @@ public class POIManager : MonoBehaviour, IDataPersistence
         allPOIIds = data.allPOIIds;
         foreach (string id in allPOIIds)
         {
-            POI newPOI = Instantiate(poiPrefab);
-            newPOI.id = id;
-            newPOI.LoadData(data);
-            string spawnType = newPOI.poiType;
-            Destroy(newPOI.gameObject);
+            string spawnType;
+            if (data.allPOIDetails.TryGetValue(id, out var details))
+            {
+                spawnType = (string)details["poiType"];
 
-            if (spawnType == "terminal")
-                newPOI = Instantiate(terminalPrefab);
-            else if (spawnType == "gb")
-                newPOI = Instantiate(gbPrefab);
-            else if (spawnType == "barrel")
-                newPOI = Instantiate(barrelPrefab);
-            else if (spawnType == "claymore")
-                newPOI = Instantiate(claymorePrefab);
-            else if (spawnType == "smoke")
-                newPOI = Instantiate(smokeCloudPrefab);
-            else if (spawnType == "tabun")
-                newPOI = Instantiate(tabunCloudPrefab);
-            else if (spawnType == "depbeacon")
-                newPOI = Instantiate(deploymentBeaconPrefab);
-            else if (spawnType == "thermalcam")
-                newPOI = Instantiate(thermalCamPrefab);
-            else if (spawnType == "drugcab")
-                newPOI = Instantiate(drugCabinetPrefab);
-            else if (spawnType == "binocularBeam")
-                newPOI = Instantiate(binocularStripPrefab);
-
-            newPOI.id = id;
-            newPOI.LoadData(data);
+                if (spawnType == "terminal")
+                {
+                    Terminal terminal = Instantiate(terminalPrefab);
+                    terminal.id = id;
+                    terminal.LoadData(data);
+                }
+                else if (spawnType == "gb")
+                {
+                    GoodyBox gb = Instantiate(gbPrefab);
+                    gb.id = id;
+                    gb.LoadData(data);
+                }
+                else if (spawnType == "barrel")
+                {
+                    ExplosiveBarrel barrel = Instantiate(barrelPrefab);
+                    barrel.id = id;
+                    barrel.LoadData(data);
+                }
+                else if (spawnType == "claymore")
+                {
+                    Claymore claymore = Instantiate(claymorePrefab);
+                    claymore.id = id;
+                    claymore.LoadData(data);
+                }
+                else if (spawnType == "smoke")
+                {
+                    SmokeCloud smoke = Instantiate(smokeCloudPrefab);
+                    smoke.id = id;
+                    smoke.LoadData(data);
+                }
+                else if (spawnType == "tabun")
+                {
+                    TabunCloud tabun = Instantiate(tabunCloudPrefab);
+                    tabun.id = id;
+                    tabun.LoadData(data);
+                }
+                else if (spawnType == "depbeacon")
+                {
+                    DeploymentBeacon depbeacon = Instantiate(deploymentBeaconPrefab);
+                    depbeacon.id = id;
+                    depbeacon.LoadData(data);
+                }
+                else if (spawnType == "thermalcam")
+                {
+                    ThermalCamera thermalcam = Instantiate(thermalCamPrefab);
+                    thermalcam.id = id;
+                    thermalcam.LoadData(data);
+                }
+                else if (spawnType == "drugcab")
+                {
+                    DrugCabinet drugcab = Instantiate(drugCabinetPrefab);
+                    drugcab.id = id;
+                    drugcab.LoadData(data);
+                }
+                else if (spawnType == "binocularBeam")
+                {
+                    BinocularBeam binocular = Instantiate(binocularStripPrefab);
+                    binocular.id = id;
+                    binocular.LoadData(data);
+                }
+            }
         }
+
+        isDataLoaded = true;
     }
     public void SaveData(ref GameData data)
     {
@@ -93,4 +132,8 @@ public class POIManager : MonoBehaviour, IDataPersistence
         }
         return null;
     }
+
+    [SerializeField]
+    private bool isDataLoaded;
+    public bool IsDataLoaded { get { return isDataLoaded; } }
 }
