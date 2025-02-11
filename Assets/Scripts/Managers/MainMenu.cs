@@ -159,7 +159,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     void Start()
     {
-        _ = GameManager.Instance.LoadGameData();
+        _ = DataPersistenceManager.Instance.LoadGameData();
     }
 
     void Update()

@@ -167,6 +167,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	}
     public void ReturnToMenu()
     {
+		DataPersistenceManager.Instance.SaveGame();
         SceneManager.LoadScene("Menu");
     }
     public void OpenRandomAlertUI()

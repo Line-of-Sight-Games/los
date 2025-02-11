@@ -30,7 +30,7 @@ public class LoadingScreen : MonoBehaviour
         progressBar.value = 0;
         progressText.text = "Loading...";
 
-        await GameManager.Instance.LoadGameData(); // Load JSON before scene transition
+        await DataPersistenceManager.Instance.LoadGameData();
         await LoadSceneAsync(sceneName);
 
         loadingPanel.SetActive(false); // Hide loading UI when done
