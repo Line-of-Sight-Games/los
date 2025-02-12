@@ -13,6 +13,7 @@ public class SoldierPortrait : MonoBehaviour
     public Image hpDisplayImage;
     public TextMeshProUGUI hpDisplay;
     public Image soldierPosition;
+    public Image equipmentOnHead;
     public TextMeshProUGUI soldierName, soldierLocation;
 
     public void Init(Soldier s)
@@ -63,6 +64,12 @@ public class SoldierPortrait : MonoBehaviour
                 soldierPosition.sprite = linkedSoldier.LoadPosition("Last Stand");
             else
                 soldierPosition.sprite = linkedSoldier.LoadPosition("Active");
+
+            //load equipment on head
+            if (linkedSoldier.InventorySlots["Head"] != "")
+                equipmentOnHead.sprite = linkedSoldier.LoadHeadEquipment(linkedSoldier.menu.itemManager.FindItemById(linkedSoldier.InventorySlots["Head"]).itemName);
+            else
+                equipmentOnHead.sprite = linkedSoldier.LoadHeadEquipment("Nothing");
 
             //load name
             soldierName.text = linkedSoldier.soldierName;

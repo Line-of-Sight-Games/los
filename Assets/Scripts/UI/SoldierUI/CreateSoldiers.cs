@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System;
 using System.Collections;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public class CreateSoldiers : MonoBehaviour, IDataPersistence
@@ -13,8 +12,8 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	public Soldier baseSoldier;
 	public SetGameParameters setGameParameters;
 	public TMP_Dropdown terrainDropdown;
-	public GameObject alpineDropdownObj, desertDropdownObj, jungleDropdownObj, urbanDropdownObj, commanderAlpineDropdownObj, commanderDesertDropdownObj, commanderJungleDropdownObj, commanderUrbanDropdownObj;
-	public TMP_Dropdown alpineDropdown, desertDropdown, jungleDropdown, urbanDropdown, commanderAlpineDropdown, commanderDesertDropdown, commanderJungleDropdown, commanderUrbanDropdown;
+	public GameObject alpineDropdownObj, desertDropdownObj, jungleDropdownObj, urbanDropdownObj;
+	public TMP_Dropdown alpineDropdown, desertDropdown, jungleDropdown, urbanDropdown;
 	public TMP_Dropdown activePortraitDropdown;
 	public GameObject commanderSpecialityDropdownObj, primarySpecialityDropdownObj, weaponSpecialityDropdownObj, supportSpecialityDropdownObj;
 	public TMP_Dropdown commanderSpecialityDropdown, primarySpecialityDropdown, weaponSpecialityDropdown, supportSpecialityDropdown;
@@ -119,7 +118,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		"Anansi","Yali","Lupin","Saci","Nue","Leutogi","Isonade","Roc","Oozlum","Dill","Wattle","Alkanet","Nepata","Kava"
     };
 	public List<string> selectedPortraits;
-	public List<string> selectedCommanderTerrains;
 	public List<string> selectedSkills;
 	public List<string> selectedAbilities;
 	private readonly string[] randomNames = 
@@ -226,19 +224,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	}
 	public void RandomTerrain()
     {
-		if (soldierIdentifier.text.Contains("Commander"))
-		{
-			bool checkingValid = true;
-
-			while (checkingValid)
-			{
-				terrainDropdown.value = UnityEngine.Random.Range(1, terrainDropdown.options.Count);
-				if (!selectedCommanderTerrains.Contains(terrainDropdown.captionText.text))
-					checkingValid = false;
-			}
-		}
-		else
-			terrainDropdown.value = UnityEngine.Random.Range(1, terrainDropdown.options.Count);
+		terrainDropdown.value = UnityEngine.Random.Range(1, terrainDropdown.options.Count);
     }
 	public void RandomPortrait()
 	{
@@ -336,10 +322,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			//refresh input fields and exclude previously chosen options
 			bannedNames.Add(soldierName.text); 
 			soldierName.text = "";
-            //exclude commander terrains that have been selected
-            if (GetSpeciality(activeSpecialityDropdown.captionText.text).Equals("Leadership"))
-				selectedCommanderTerrains.Add(terrainDropdown.captionText.text);
-
             terrainDropdown.value = 0;
 			selectedSkills.Add(activeSpecialityDropdown.captionText.text);
 			activeSpecialityDropdown.value = 0;
@@ -387,9 +369,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			urbanDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
 			urbanDropdown.GetComponent<DropdownController>().optionsToGrey.AddRange(selectedPortraits);
 			terrainDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
-			//if commander grey out commander chosen terrains
-			if (soldierIndex == 1)
-				terrainDropdown.GetComponent<DropdownController>().optionsToGrey.AddRange(selectedCommanderTerrains);
         }
 		else
 			print("Details invalid.");
@@ -524,85 +503,40 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	{
 		if (terrainDropdown.value > 0)
         {
-			if (soldierIdentifier.text.Contains("Commander"))
+			if (terrainDropdown.captionText.text.Contains("Alpine"))
 			{
-				if (terrainDropdown.captionText.text.Contains("Alpine"))
-				{
-					commanderAlpineDropdownObj.SetActive(true);
-					activePortraitDropdown = commanderAlpineDropdown;
-				}
-				else
-					commanderAlpineDropdownObj.SetActive(false);
-
-				if (terrainDropdown.captionText.text.Contains("Desert"))
-				{
-					commanderDesertDropdownObj.SetActive(true);
-					activePortraitDropdown = commanderDesertDropdown;
-				}
-				else
-					commanderDesertDropdownObj.SetActive(false);
-
-				if (terrainDropdown.captionText.text.Contains("Jungle"))
-				{
-					commanderJungleDropdownObj.SetActive(true);
-					activePortraitDropdown = commanderJungleDropdown;
-				}
-				else
-					commanderJungleDropdownObj.SetActive(false);
-
-				if (terrainDropdown.captionText.text.Contains("Urban"))
-				{
-					commanderUrbanDropdownObj.SetActive(true);
-					activePortraitDropdown = commanderUrbanDropdown;
-				}
-				else
-					commanderUrbanDropdownObj.SetActive(false);
+				alpineDropdownObj.SetActive(true);
+				activePortraitDropdown = alpineDropdown;
 			}
 			else
+				alpineDropdownObj.SetActive(false);
+
+			if (terrainDropdown.captionText.text.Contains("Desert"))
 			{
-				commanderAlpineDropdownObj.SetActive(false);
-				commanderDesertDropdownObj.SetActive(false);
-				commanderJungleDropdownObj.SetActive(false);
-				commanderUrbanDropdownObj.SetActive(false);
-				if (terrainDropdown.captionText.text.Contains("Alpine"))
-				{
-					alpineDropdownObj.SetActive(true);
-					activePortraitDropdown = alpineDropdown;
-				}
-				else
-					alpineDropdownObj.SetActive(false);
-
-				if (terrainDropdown.captionText.text.Contains("Desert"))
-				{
-					desertDropdownObj.SetActive(true);
-					activePortraitDropdown = desertDropdown;
-				}
-				else
-					desertDropdownObj.SetActive(false);
-
-				if (terrainDropdown.captionText.text.Contains("Jungle"))
-				{
-					jungleDropdownObj.SetActive(true);
-					activePortraitDropdown = jungleDropdown;
-				}
-				else
-					jungleDropdownObj.SetActive(false);
-
-				if (terrainDropdown.captionText.text.Contains("Urban"))
-				{
-					urbanDropdownObj.SetActive(true);
-					activePortraitDropdown = urbanDropdown;
-				}
-				else
-					urbanDropdownObj.SetActive(false);
+				desertDropdownObj.SetActive(true);
+				activePortraitDropdown = desertDropdown;
 			}
+			else
+				desertDropdownObj.SetActive(false);
+
+			if (terrainDropdown.captionText.text.Contains("Jungle"))
+			{
+				jungleDropdownObj.SetActive(true);
+				activePortraitDropdown = jungleDropdown;
+			}
+			else
+				jungleDropdownObj.SetActive(false);
+
+			if (terrainDropdown.captionText.text.Contains("Urban"))
+			{
+				urbanDropdownObj.SetActive(true);
+				activePortraitDropdown = urbanDropdown;
+			}
+			else
+				urbanDropdownObj.SetActive(false);
 		}
 		else
         {
-			commanderAlpineDropdownObj.SetActive(false);
-			commanderDesertDropdownObj.SetActive(false);
-			commanderJungleDropdownObj.SetActive(false);
-			commanderUrbanDropdownObj.SetActive(false);
 			alpineDropdownObj.SetActive(false);
 			desertDropdownObj.SetActive(false);
 			jungleDropdownObj.SetActive(false);

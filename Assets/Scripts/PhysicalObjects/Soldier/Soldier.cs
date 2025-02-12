@@ -2186,6 +2186,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Active" or _ => allPositions.options[0].image,
         };
     }
+    public Sprite LoadHeadEquipment(string headEquipmentType)
+    {
+        TMP_Dropdown allHeadEquipment = FindFirstObjectByType<AllHeadEquipment>().allHeadEquipmentDropdown;
+        return headEquipmentType switch
+        {
+            "Thermal_Goggles" => allHeadEquipment.options[1].image,
+            "Armour_Stimulant" => allHeadEquipment.options[2].image,
+            "Armour_Juggernaut" => allHeadEquipment.options[3].image,
+            "Armour_Ghillie" => allHeadEquipment.options[4].image,
+            "Armour_Exo" => allHeadEquipment.options[5].image,
+            _ => allHeadEquipment.options[0].image,
+        };
+    }
     public string IncrementRandom(string choiceStat)
     {
         string[] stats =
