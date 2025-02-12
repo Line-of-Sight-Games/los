@@ -20,6 +20,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	public TMP_Dropdown commanderSpecialityDropdown, primarySpecialityDropdown, weaponSpecialityDropdown, supportSpecialityDropdown;
 	public TMP_Dropdown activeSpecialityDropdown;
 	public TMP_Dropdown abilityDropdown;
+	public TMP_Dropdown random1Dropdown, random2Dropdown;
 	public List<Soldier> soldiers = new();
 	public TextMeshProUGUI soldierIdentifier, playerIdentifier;
 	public TMP_InputField soldierName;
@@ -203,6 +204,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		RandomPortrait();
 		RandomSpeciality();
 		RandomAbility();
+		RandomPoints();
 	}
 	public void RandomName()
     {
@@ -285,8 +287,38 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 				checkingValid = false;
 		}
 	}
-
-	public void SetupConfirmed()
+	public void RandomPoints()
+	{
+		bool checkingValid = true;
+		while (checkingValid)
+		{
+			random1Dropdown.value = UnityEngine.Random.Range(1, random1Dropdown.options.Count);
+			random2Dropdown.value = UnityEngine.Random.Range(1, random2Dropdown.options.Count);
+			if (RandomPointsUnique())
+				checkingValid = false;
+		}
+	}
+    public void RandomPoint1()
+    {
+        bool checkingValid = true;
+        while (checkingValid)
+        {
+            random1Dropdown.value = UnityEngine.Random.Range(1, random1Dropdown.options.Count);
+            if (RandomPointsUnique())
+                checkingValid = false;
+        }
+    }
+    public void RandomPoint2()
+    {
+        bool checkingValid = true;
+        while (checkingValid)
+        {
+            random2Dropdown.value = UnityEngine.Random.Range(1, random2Dropdown.options.Count);
+            if (RandomPointsUnique())
+                checkingValid = false;
+        }
+    }
+    public void SetupConfirmed()
     {
 		maxSoldiersPerTeam = setGameParameters.maxSoldiers;
 		primaries = teamBreakdown[maxSoldiersPerTeam - 3, 0];
@@ -299,13 +331,13 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	{
 		if (CheckValidDetails())
 		{
-			Instantiate(baseSoldier).Init(soldierName.text, currentTeam, terrainDropdown.captionText.text, activePortraitDropdown.captionImage.sprite, activePortraitDropdown.captionText.text, GetSpeciality(), abilityDropdown.captionText.text);
+            Instantiate(baseSoldier).Init(soldierName.text, currentTeam, terrainDropdown.captionText.text, activePortraitDropdown.captionImage.sprite, activePortraitDropdown.captionText.text, GetSpeciality(activeSpecialityDropdown.captionText.text), abilityDropdown.captionText.text, random1Dropdown.captionText.text, random2Dropdown.captionText.text);
 
 			//refresh input fields and exclude previously chosen options
 			bannedNames.Add(soldierName.text); 
 			soldierName.text = "";
             //exclude commander terrains that have been selected
-            if (GetSpeciality().Equals("Leadership"))
+            if (GetSpeciality(activeSpecialityDropdown.captionText.text).Equals("Leadership"))
 				selectedCommanderTerrains.Add(terrainDropdown.captionText.text);
 
             terrainDropdown.value = 0;
@@ -314,7 +346,8 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			selectedAbilities.Add(abilityDropdown.captionText.text);
 			abilityDropdown.value = 0;
 			selectedPortraits.Add(activePortraitDropdown.captionText.text);
-            
+            random1Dropdown.value = 0;
+            random2Dropdown.value = 0;
 
             //increment soldier and player as necessary
             if (soldierIndex < maxSoldiersPerTeam)
@@ -362,9 +395,9 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			print("Details invalid.");
 	}
 
-	public string GetSpeciality()
+	public string GetSpeciality(string specialityString)
     {
-        return activeSpecialityDropdown.captionText.text switch
+        return specialityString switch
         {
             "Commander (L)" => "Leadership",
             "Spartan (H)" => "Health",
@@ -386,18 +419,42 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
             "Diplomat (Dip)" => "Diplomacy",
             "Technician (Elec)" => "Electronics",
             "Medic (Heal)" => "Healing",
+            "L" => "Leadership",
+            "H" => "Health",
+            "R" => "Resilience",
+            "S" => "Speed",
+            "E" => "Evasion",
+            "F" => "Fight",
+            "P" => "Perceptiveness",
+            "C" => "Camouflage",
+            "SR" => "Sight Radius",
+            "Ri" => "Rifle",
+            "AR" => "Assault Rifle",
+            "LMG" => "Light Machine Gun",
+            "Sn" => "Sniper Rifle",
+            "SMG" => "Sub-Machine Gun",
+            "Sh" => "Shotgun",
+            "M" => "Melee",
+            "Str" => "Strength",
+            "Dip" => "Diplomacy",
+            "Elec" => "Electronics",
+            "Heal" => "Healing",
             _ => "",
         };
     }
 
 	public bool CheckValidDetails()
     {
-		if (soldierName.text.Length > 0 && soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color == new Color(0.196f, 0.196f, 0.196f) && terrainDropdown.value != 0 && activeSpecialityDropdown.value != 0 && abilityDropdown.value != 0)
+		if (soldierName.text.Length > 0 && soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color == new Color(0.196f, 0.196f, 0.196f) && terrainDropdown.value != 0 && activeSpecialityDropdown.value != 0 && abilityDropdown.value != 0 && random1Dropdown.value != 0 && random2Dropdown.value != 0 && RandomPointsUnique())
 			return true;
-		else
-            return false;
+        return false;
     }
-
+	public bool RandomPointsUnique()
+	{
+		if (random1Dropdown.value != random2Dropdown.value && GetSpeciality(random1Dropdown.captionText.text) != GetSpeciality(activeSpecialityDropdown.captionText.text) && GetSpeciality(random2Dropdown.captionText.text) != GetSpeciality(activeSpecialityDropdown.captionText.text))
+            return true;
+		return false;
+    }
     public void Update()
 	{
 		CheckSoldierIndex();

@@ -58,7 +58,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         itemManager = FindFirstObjectByType<ItemManager>();
     }
 
-    public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability)
+    public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
     {
         id = GenerateGuid();
         soldierName = name;
@@ -72,7 +72,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         stats = new Statline(this);
         inventory = new Inventory(this);
         IncrementSpeciality();
-        IncrementDoubleRandom();
+        IncrementStat(random1);
+        IncrementStat(random2);
         hp = stats.H.BaseVal;
         GenerateAP();
         xp = 1;
@@ -2197,44 +2198,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         stats = stats.Where(e => e != soldierSpeciality && e != choiceStat).ToArray();
         return IncrementStat(stats[UnityEngine.Random.Range(0, stats.Length)]);
     }
-    public void IncrementDoubleRandom()
-    {
-        int num1 = -1, num2 = -1, num3 = -1;
-        string[] stats =
-        {
-            "Leadership", "Health", "Resilience", "Speed", "Evasion", "Fight", "Perceptiveness", "Camouflage", "Sight Radius",
-            "Rifle", "Assault Rifle", "Light Machine Gun", "Sniper Rifle", "Sub-Machine Gun", "Shotgun", "Melee",
-            "Strength", "Diplomacy", "Electronics", "Healing"
-        };
-
-        stats = stats.Where(e => e != soldierSpeciality).ToArray();
-
-        num1 = UnityEngine.Random.Range(0, stats.Length);
-        num2 = UnityEngine.Random.Range(0, stats.Length);
-
-        if (num1 == num2)
-        {
-            num3 = UnityEngine.Random.Range(0, stats.Length);
-            while (num1 == num2 || num1 == num3 || num2 == num3)
-            {
-                num1 = UnityEngine.Random.Range(0, stats.Length);
-                num2 = UnityEngine.Random.Range(0, stats.Length);
-                num3 = UnityEngine.Random.Range(0, stats.Length);
-            }
-        }
-
-        IncrementStat(stats[num1]);
-        IncrementStat(stats[num2]);
-        if (num3 > -1)
-            IncrementStat(stats[num3]);
-    }
     public string IncrementSpeciality()
     {
         return IncrementStat(soldierSpeciality);
     }
-    public string IncrementStat(string statName)
+    public string IncrementStat(string statNameOrCode)
     {
-        string incrementDisplay = statName switch
+        string incrementDisplay = statNameOrCode switch
         {
             "Leadership" => "L: +" + stats.L.Increment(),
             "Health" => "H: +" + stats.H.Increment(),
@@ -2256,6 +2226,26 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Diplomacy" => "Dip: +" + stats.Dip.Increment(),
             "Electronics" => "Elec: +" + stats.Elec.Increment(),
             "Healing" => "Heal: +" + stats.Heal.Increment(),
+            "L" => "L: +" + stats.L.Increment(),
+            "H" => "H: +" + stats.H.Increment(),
+            "R" => "R: +" + stats.R.Increment(),
+            "S" => "S: +" + stats.S.Increment(),
+            "E" => "E: +" + stats.E.Increment(),
+            "F" => "F: +" + stats.F.Increment(),
+            "P" => "P: +" + stats.P.Increment(),
+            "C" => "C: +" + stats.C.Increment(),
+            "SR" => "SR: +" + stats.SR.Increment(),
+            "Ri" => "Ri: +" + stats.Ri.Increment(),
+            "AR" => "AR: +" + stats.AR.Increment(),
+            "LMG" => "LMG: +" + stats.LMG.Increment(),
+            "Sn" => "Sn: +" + stats.Sn.Increment(),
+            "SMG" => "SMG: +" + stats.SMG.Increment(),
+            "Sh" => "Sh: +" + stats.Sh.Increment(),
+            "M" => "M: +" + stats.M.Increment(),
+            "Str" => "Str: +" + stats.Str.Increment(),
+            "Dip" => "Dip: +" + stats.Dip.Increment(),
+            "Elec" => "Elec: +" + stats.Elec.Increment(),
+            "Heal" => "Heal: +" + stats.Heal.Increment(),
             _ => "Error",
         };
 
