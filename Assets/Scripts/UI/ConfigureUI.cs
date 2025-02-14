@@ -10,4 +10,5 @@ public class ConfigureUI : MonoBehaviour
 
     public GameObject externalItemSourcesPanel;
     public GameObject inventorySourceIconPanel;
+    public InventorySourcePanel allItemsPanel;
 }

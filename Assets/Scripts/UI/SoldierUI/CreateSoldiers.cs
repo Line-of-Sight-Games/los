@@ -20,11 +20,10 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 	public TMP_Dropdown activeSpecialityDropdown;
 	public TMP_Dropdown abilityDropdown;
 	public TMP_Dropdown random1Dropdown, random2Dropdown;
-	public List<Soldier> soldiers = new();
 	public TextMeshProUGUI soldierIdentifier, playerIdentifier;
 	public TMP_InputField soldierName;
 	public GameObject createCompletedUI, randomAlertUI;
-	private readonly List<string> allSoldierIds = new();
+	private readonly List<string> allSoldierIds = new(), allItemIds = new();
 	public int currentTeam = 1, maxSoldiersPerTeam, primaries, weapons, supports, soldierIndex = 1;
 	public readonly List<string> bannedNames = new()
 	{
@@ -158,12 +157,13 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 	public void SaveData(ref GameData data)
 	{
+		//save soldiers
 		IEnumerable<Soldier> allSoldiers = FindObjectsByType<Soldier>(default);
 		foreach (Soldier soldier in allSoldiers)
 			allSoldierIds.Add(soldier.id);
 
 		data.allSoldiersIds = allSoldierIds;
-	}
+    }
     public void ReturnToMenu()
     {
 		DataPersistenceManager.Instance.SaveGame();

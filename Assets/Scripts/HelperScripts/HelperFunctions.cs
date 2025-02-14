@@ -1,11 +1,18 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public static class HelperFunctions
 {
+    public static bool CheckInScene(string sceneName)
+    {
+        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName(sceneName))
+            return true;
+        return false;
+    }
     public static bool ValidateIntInput(TMP_InputField inputField, out int outputInt)
     {
         Color normalTextColour = new(0.196f, 0.196f, 0.196f);

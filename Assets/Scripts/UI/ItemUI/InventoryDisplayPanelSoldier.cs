@@ -138,7 +138,7 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
         {
             if (slot.item == null)
             {
-                ItemIcon newItemIcon = Instantiate(itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item);
+                ItemIcon newItemIcon = Instantiate(itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item, slot);
                 slot.AssignItemIcon(newItemIcon);
             }
         }

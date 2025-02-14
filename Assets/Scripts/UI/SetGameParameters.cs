@@ -70,7 +70,6 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
             weather.GenerateWeather(maxRounds);
             DataPersistenceManager.Instance.SaveGame();
 
-
             setupMenuUI.SetActive(false);
             createSoldierMenuUI.SetActive(true);
         }

@@ -3296,7 +3296,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (i.transform.parent == null)
             {
                 ItemSlot itemSlot = Instantiate(itemSlotPrefab, groundInventoryPanel.transform.Find("Viewport").Find("Contents")).GetComponent<ItemSlot>();
-                itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i));
+                itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).GetComponent<ItemIcon>().Init(i, itemSlot));
             }
         }
 
@@ -3396,15 +3396,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void AddGlobalInventorySourceButton()
     {
-        Instantiate(globalInventoryIconPrefab, inventorySourceIconsUI.transform).GetComponent<InventorySourceIcon>().Init(configUI.transform.Find("AllItemsPanel").GetComponent<InventorySourcePanel>());
+        Instantiate(globalInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(configUI.allItemsPanel), inventorySourceIconsUI.transform);
     }
     public void OpenConfigureUI()
     {
         //populate active soldier inventory
         configUI.activeSoldierInventory.Init(activeSoldier);
 
-        //add global button
-        //AddGlobalInventorySourceButton();
+        if (OverrideView)
+        {
+            //add global button
+            AddGlobalInventorySourceButton();
+        }
 
         //populate ground item icons
         AddGroundInventorySourceButton();
@@ -3429,7 +3432,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //destroy all item source panels
         foreach (Transform child in configUI.externalItemSourcesPanel.transform)
             if (child.GetComponent<InventorySourcePanel>() != null)
-                Destroy(child.gameObject);
+            {
+                if (child.name.Equals("AllItemsPanel"))
+                    child.gameObject.SetActive(false);
+                else
+                    Destroy(child.gameObject);
+            }
     }
     public void OpenInventoryPanel(InventorySourcePanel inventoryPanel)
     {

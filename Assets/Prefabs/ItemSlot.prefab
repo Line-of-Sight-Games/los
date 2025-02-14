@@ -92,6 +92,8 @@ MonoBehaviour:
   item: {fileID: 0}
   unavailable: 0
   parentIcon: {fileID: 0}
+  isEmpty: 1
+  blocked: {fileID: 9030056937131459483}
 --- !u!1 &7350929381329123230
 GameObject:
   m_ObjectHideFlags: 0

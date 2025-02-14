@@ -715,7 +715,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     private void Update()
     {
-        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
+        if (HelperFunctions.CheckInScene("Battlefield"))
         {
             if (game.currentRound > 0 && game.weather.savedWeather.Count > 0)
             {
@@ -734,7 +734,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void CalculateActiveStats()
     {
-        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Battlefield"))
+        if (HelperFunctions.CheckInScene("Battlefield"))
         {
             if (game.currentRound > 0 && game.weather.savedWeather.Count > 0)
             {

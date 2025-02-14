@@ -34,7 +34,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         binocInHandPopup = FindFirstObjectByType<BinocInHandPopup>(FindObjectsInactive.Include);
     }
 
-    public ItemIcon Init(Item item)
+    public ItemIcon Init(Item item, ItemSlot originalSlot)
     {
         print($"trying to initialise prefab of {item.itemName}({item.Id})");
         this.item = item;
@@ -42,7 +42,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         menu = FindFirstObjectByType<MainMenu>();
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
-        originalSlot = transform.parent.GetComponent<ItemSlot>();
+        this.originalSlot = originalSlot;
         currentSlot = originalSlot;
         item.markedForAction = string.Empty;
         transform.Find("ItemImage").GetComponent<Image>().sprite = FindFirstObjectByType<ItemAssets>().GetSprite(item.itemName);
@@ -123,7 +123,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             if (slot.item == null)
             {
                 print("targetslot is empty");
-                ItemIcon newItemIcon = Instantiate(menu.itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item);
+                ItemIcon newItemIcon = Instantiate(menu.itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item, slot);
                 print($"{newItemIcon.name} @ {newItemIcon.transform}");
                 slot.AssignItemIcon(newItemIcon);
             }

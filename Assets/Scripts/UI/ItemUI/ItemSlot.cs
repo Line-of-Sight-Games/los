@@ -6,6 +6,7 @@ public class ItemSlot : MonoBehaviour
     public Item item; // The item currently in the slot
     public bool unavailable;
     public ItemIcon parentIcon;
+    public Transform blocked;
 
     public ItemSlot Init(IHaveInventory linkedInventoryObject)
     {
@@ -36,6 +37,6 @@ public class ItemSlot : MonoBehaviour
     }
     private void Update()
     {
-        transform.Find("Blocked").gameObject.SetActive(unavailable);
+        blocked.gameObject.SetActive(unavailable);
     }
 }
