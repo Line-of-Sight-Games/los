@@ -2726,7 +2726,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     item.MoveItem(FindHasInventoryById(instructions[0]), instructions[1], FindHasInventoryById(instructions[2]), instructions[3]);
                 }
             }
-            activeSoldier.PerformLoudAction(5);
+
+            if (menu.configureButton.GetComponentInChildren<TextMeshProUGUI>().text.Equals("Spawn Config")) { } //if spawn config, make it silent
+            else
+                activeSoldier.PerformLoudAction(5);
+
             menu.CloseConfigureUI();
         }
     }

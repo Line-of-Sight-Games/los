@@ -1518,9 +1518,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         //change config button text if first ap use
         if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
-            configureButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Spawn Config";
+            configureButton.GetComponentInChildren<TextMeshProUGUI>().text = "Spawn Config";
         else
-            configureButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Config";
+            configureButton.GetComponentInChildren<TextMeshProUGUI>().text = "Config";
 
         /*if (activeSoldier.usedAP)
             undoButton.SetActive(true);
@@ -3403,20 +3403,28 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         //populate active soldier inventory
         configUI.activeSoldierInventory.Init(activeSoldier);
 
-        if (OverrideView)
+        if (configureButton.GetComponentInChildren<TextMeshProUGUI>().text.Equals("Spawn Config"))
         {
             //add global button
             AddGlobalInventorySourceButton();
         }
+        else
+        {
+            if (OverrideView)
+            {
+                //add global button
+                AddGlobalInventorySourceButton();
+            }
 
-        //populate ground item icons
-        AddGroundInventorySourceButton();
-        
-        //populate ally icons
-        AddAllyInventorySourceButtons();
-        
-        //populate gb and dc icons
-        AddPOIInventorySourceButtons();
+            //populate ground item icons
+            AddGroundInventorySourceButton();
+
+            //populate ally icons
+            AddAllyInventorySourceButtons();
+
+            //populate gb and dc icons
+            AddPOIInventorySourceButtons();
+        }
 
         configUI.gameObject.SetActive(true);
     }
