@@ -157,10 +157,13 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void ChangeAmmo()
     {
-        if (int.TryParse(overrideAmmoIndicator.text, out int newAmmo))
-            if (newAmmo >= 0)
-                item.ammo = newAmmo;
+        if (int.TryParse(overrideAmmoIndicator.text, out int newAmmo) && newAmmo >= 0)
+        {
+            FileUtility.WriteToReport($"(Override) {item.itemName} ammo changed from {item.ammo} to {newAmmo}"); //write to report
 
+            item.ammo = newAmmo;
+        }
+                
         overrideAmmoIndicator.text = "";
     }
     public void OnBeginDrag(PointerEventData eventData)

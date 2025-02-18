@@ -1910,6 +1910,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         ap = apMp[0];
         mp = apMp[1];
 
+        FileUtility.WriteToReport($"{soldierName} generated {ap} AP and {mp} MP ({stats.L.Val}L)"); //write to report
+
         //post check to set gluco to finished state either side or neutral
         switch (glucoState)
         {

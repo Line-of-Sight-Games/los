@@ -155,6 +155,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             return 0;
     }
+    public string RandomShotMissString()
+    {
+        return $"{RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}";
+    }
     public string RandomShotScatterDistance()
     {
         return decimal.Round((decimal)UnityEngine.Random.Range(0.5f, 5.0f), 1).ToString();
@@ -521,6 +525,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (activeSoldier.CheckAP(1))
         {
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} takes cover"); //write to report
+
             activeSoldier.DeductAP(1);
             activeSoldier.SetCover();
         }
@@ -538,6 +544,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmPlaydead()
     {
+        FileUtility.WriteToReport($"{activeSoldier.soldierName} plays dead"); //write to report
+
         activeSoldier.SetPlaydead();
         menu.ClosePlaydeadAlertUI();
     }
@@ -1641,9 +1649,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (shotUI.shotTypeDropdown.value == 0) //standard shot
         {
             if (target is Soldier)
-                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {(target as Soldier).soldierName}"); //write to report
+                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {(target as Soldier).soldierName}. Weather: {weather.CurrentWeather} Target Cover: {shotUI.coverLevelDropdown.captionText.text}"); //write to report
             else
-                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {target.GetType()}"); //write to report
+                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {target.GetType()}. Weather: {weather.CurrentWeather}"); //write to report
 
             //play shot sfx
             soundManager.PlayShotResolution(gun);
@@ -1711,13 +1719,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
-                    FileUtility.WriteToReport($"{shooter.soldierName} misses cover at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
+                    string missString = RandomShotMissString();
+
+                    FileUtility.WriteToReport($"{shooter.soldierName} misses cover at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%), shot goes {missString}"); //write to report
 
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter);
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is ExplosiveBarrel targetBarrel)
@@ -1741,13 +1751,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
-                    FileUtility.WriteToReport($"{shooter.soldierName} misses explosive barrel at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
+                    string missString = RandomShotMissString();
+
+                    FileUtility.WriteToReport($"{shooter.soldierName} misses explosive barrel at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%), shot goes {missString}"); //write to report
 
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter);
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is Soldier targetSoldier) //check if target is soldier
@@ -1814,7 +1826,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
-                    FileUtility.WriteToReport($"{shooter.soldierName} misses {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
+                    string missString = RandomShotMissString();
+
+                    FileUtility.WriteToReport($"{shooter.soldierName} misses {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%), shot goes {missString}"); //write to report
 
                     //play shot miss dialogue
                     soundManager.PlaySoldierShotMiss(shooter);
@@ -1830,7 +1844,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     soundManager.SetSoldierSelectionSoundFlagAfterEnemyMissesShot(targetSoldier);
 
                     menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {RandomShotScatterDistance()}cm {RandomShotScatterHorizontal()}, {RandomShotScatterDistance()}cm {RandomShotScatterVertical()}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                     //show los check button if shot misses
                     menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
@@ -3528,6 +3542,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (activeSoldier.CheckAP(1))
         {
+            FileUtility.WriteToReport($"{activeSoldier.soldierName} lastandicides"); //write to report
+
             activeSoldier.DeductAP(1);
             activeSoldier.InstantKill(activeSoldier, new List<string> { "Lastandicide" });
         }

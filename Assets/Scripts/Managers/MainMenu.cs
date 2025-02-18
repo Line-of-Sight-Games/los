@@ -723,6 +723,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void SetOverrideHealthState()
     {
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideHealthState").Find("HealthStateDropdown").GetComponent<TMP_Dropdown>();
+        FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} health state changed"); //write to report
 
         if (dropdown.value == 3)
         {
@@ -761,15 +762,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void SetOverrideTerrainOn()
     {
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideTerrainOn").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
-
-        if (dropdown.value == 0)
-            activeSoldier.TerrainOn = "Alpine";
-        else if (dropdown.value == 1)
-            activeSoldier.TerrainOn = "Desert";
-        else if (dropdown.value == 2)
-            activeSoldier.TerrainOn = "Jungle";
-        else if (dropdown.value == 3)
-            activeSoldier.TerrainOn = "Urban";
+        string terrainOnString = dropdown.value switch
+        {
+            0 => "Alpine",
+            1 => "Desert",
+            2 => "Jungle",
+            3 => "Urban",
+            _ => "Unknown",
+        };
+        FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} terrain on changed from {activeSoldier.TerrainOn} to {terrainOnString}"); //write to report
+        
+        activeSoldier.TerrainOn = terrainOnString;
     }
     public void HideOverrideWeather()
     {
@@ -850,8 +853,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void SetOverrideVisibility()
     {
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
-        string oldVis = weather.CurrentVis;
+        FileUtility.WriteToReport($"(Override) Weather changed: Visibility changed from {weather.CurrentVis} to {dropdown.captionText.text}"); //write to report
 
+        string oldVis = weather.CurrentVis;
         weather.CurrentVis = dropdown.captionText.text;
         
         if (!weather.CurrentVis.Equals(oldVis))
@@ -860,24 +864,29 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void SetOverrideWindSpeed()
     {
         TMP_Dropdown dropdown = overrideWindSpeedDropdown.GetComponent<TMP_Dropdown>();
+        FileUtility.WriteToReport($"(Override) Weather changed: Wind speed changed from {weather.CurrentWindSpeed} to {dropdown.captionText.text}"); //write to report
         weather.CurrentWindSpeed = dropdown.captionText.text;
     }
     public void SetOverrideWindDirection()
     {
         TMP_Dropdown dropdown = overrideWindDirectionDropdown.GetComponent<TMP_Dropdown>();
+        FileUtility.WriteToReport($"(Override) Weather changed: Wind direction changed from {weather.CurrentWindDirection} to {dropdown.captionText.text}"); //write to report
         weather.CurrentWindDirection = dropdown.captionText.text;
     }
     public void SetOverrideRain()
     {
         TMP_Dropdown dropdown = overrideRainDropdown.GetComponent<TMP_Dropdown>();
+        FileUtility.WriteToReport($"(Override) Weather changed: Rain intensity changed from {weather.CurrentRain} to {dropdown.captionText.text}"); //write to report
         weather.CurrentRain = dropdown.captionText.text;
     }
     public void ChangeHP()
     {
         TMP_InputField hpInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("OverrideHP").GetComponent<TMP_InputField>();
         
-        if (int.TryParse(hpInput.text, out int newHp))
+        if (int.TryParse(hpInput.text, out int newHp) && newHp >= 0)
         {
+            FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} hp changed from {activeSoldier.hp} to {newHp}"); //write to report
+
             if (newHp > 0)
             {
                 if (activeSoldier.hp == 0)
@@ -901,13 +910,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_InputField apInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("OverrideAP").GetComponent<TMP_InputField>();
         
-        if (int.TryParse(apInput.text, out int newAp))
+        if (int.TryParse(apInput.text, out int newAp) && newAp >= 0)
         {
-            if (newAp >= 0)
-            {
-                activeSoldier.usedAP = false;
-                activeSoldier.ap = newAp; 
-            }
+            FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} ap changed from {activeSoldier.ap} to {newAp}"); //write to report
+
+            activeSoldier.usedAP = false;
+            activeSoldier.ap = newAp; 
         }
 
         apInput.text = "";
@@ -916,13 +924,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_InputField mpInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("OverrideMP").GetComponent<TMP_InputField>();
         
-        if (int.TryParse(mpInput.text, out int newMp))
-            if (newMp >= 0)
-            {
-                activeSoldier.usedMP = false;
-                activeSoldier.mp = newMp;
-            }
+        if (int.TryParse(mpInput.text, out int newMp) && newMp >= 0)
+        {
+            FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} mp changed from {activeSoldier.mp} to {newMp}"); //write to report
 
+            activeSoldier.usedMP = false;
+            activeSoldier.mp = newMp;
+        }
 
         mpInput.text = "";
     }
@@ -934,11 +942,12 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (newXp >= 0)
             {
+                FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} xp changed from {activeSoldier.xp} to {newXp}"); //write to report
+
                 if (newXp > activeSoldier.xp)
                     AddXpAlert(activeSoldier, newXp - activeSoldier.xp, "(Override) Extra xp added.", false);
 
                 activeSoldier.xp = newXp;
-                
             }
         }
 
@@ -948,6 +957,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         if (int.TryParse((GetType().GetField(code + "Input").GetValue(this) as TMP_InputField).text, out int newBaseVal) && newBaseVal >= 0)
         {
+            FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} base {code} changed from {activeSoldier.stats.GetStat(code).BaseVal} to {newBaseVal}"); //write to report
+
             activeSoldier.stats.SetStat(code, newBaseVal);
 
             //recalculate stats
@@ -973,6 +984,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
 
         if (abilityList.Count > 0)
         {
+            FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} abilities changed from {HelperFunctions.PrintList(activeSoldier.soldierAbilities)} to {HelperFunctions.PrintList(abilityList)}"); //write to report
+
             foreach (string str in abilityList)
                 foreach (string[] abilityTuple in abilitiesUpgradedAbilities)
                     if (abilityTuple[0] == str || abilityTuple[1] == str)
@@ -996,33 +1009,35 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 activeSoldier.SetLosCheck("losChange|move(override)"); //losCheck
 
                 if (xyz.Equals("X"))
+                {
+                    FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} location changed from {activeSoldier.X}, {activeSoldier.Y}, {activeSoldier.Z} to {newlocationInput}, {activeSoldier.Y}, {activeSoldier.Z}"); //write to report
                     activeSoldier.X = newlocationInput;
+                }
                 else if (xyz.Equals("Y"))
+                {
+                    FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} location changed from {activeSoldier.X}, {activeSoldier.Y}, {activeSoldier.Z} to {activeSoldier.X}, {newlocationInput}, {activeSoldier.Z}"); //write to report
                     activeSoldier.Y = newlocationInput;
+                }
                 else
+                {
+                    FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} location changed from {activeSoldier.X}, {activeSoldier.Y}, {activeSoldier.Z} to {activeSoldier.X}, {activeSoldier.Z}, {newlocationInput}"); //write to report
                     activeSoldier.Z = newlocationInput;
+                }
             }
         }
 
         locationInput.text = string.Empty;
     }
-    public void ChangeTerrainOn()
-    {
-        TMP_InputField terrainOnInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideTerrainOn").GetComponent<TMP_InputField>();
-        string terrainOnString = terrainOnInput.text;
-
-        if (terrainList.Contains(terrainOnString) && terrainOnString != "")
-            activeSoldier.TerrainOn = terrainOnString;
-
-        terrainOnInput.text = "";
-    }
     public void ChangeRoundsWithoutFood()
     {
         TMP_InputField roundsWithoutFoodInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideRoundsWithoutFood").GetComponent<TMP_InputField>();
         
-        if (int.TryParse(roundsWithoutFoodInput.text, out int newRoundsWithoutFood))
-            if (newRoundsWithoutFood >= 0)
-                activeSoldier.RoundsWithoutFood = newRoundsWithoutFood;
+        if (int.TryParse(roundsWithoutFoodInput.text, out int newRoundsWithoutFood) && newRoundsWithoutFood >= 0)
+        {
+            FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} rounds without food changed from {activeSoldier.RoundsWithoutFood} to {newRoundsWithoutFood}"); //write to report
+
+            activeSoldier.RoundsWithoutFood = newRoundsWithoutFood;
+        }
 
         roundsWithoutFoodInput.text = "";
     }
@@ -1030,12 +1045,13 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         TMP_InputField traumaInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideTraumaPoints").GetComponent<TMP_InputField>();
         
-        if (int.TryParse(traumaInput.text, out int newTrauma))
-            if (newTrauma >= 0)
-            {
-                activeSoldier.tp = 0;
-                activeSoldier.TakeTrauma(newTrauma);
-            }
+        if (int.TryParse(traumaInput.text, out int newTrauma) && newTrauma >= 0)
+        {
+            FileUtility.WriteToReport($"(Override) {activeSoldier.soldierName} trauma points changed from {activeSoldier.tp} to {newTrauma}"); //write to report
+
+            activeSoldier.tp = 0;
+            activeSoldier.TakeTrauma(newTrauma);
+        }
 
         traumaInput.text = "";
     }
@@ -2631,12 +2647,15 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void CloseShotResultUI()
     {
-        if (shotResultUI.transform.Find("RunSecondShot").gameObject.activeInHierarchy)
-            game.ConfirmShot(false);
-        else
+        if (OverrideKey())
         {
-            SetShotResolvedFlagTo(true);
-            shotResultUI.SetActive(false);
+            if (shotResultUI.transform.Find("RunSecondShot").gameObject.activeInHierarchy)
+                game.ConfirmShot(false);
+            else
+            {
+                SetShotResolvedFlagTo(true);
+                shotResultUI.SetActive(false);
+            }
         }
     }
     public void ClearShotUI()
@@ -2785,6 +2804,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public void ExitShotConfirmUI()
     {
+        FileUtility.WriteToReport($"{activeSoldier.soldierName} bails out of aimed shot ({shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("HitChance").GetComponent<TextMeshProUGUI>().text}|{shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("CritHitChance").GetComponent<TextMeshProUGUI>().text})"); //write to report
+
         int.TryParse(shotUI.apCost.text, out int ap);
         //deduct ap for aiming if leaving shot
         activeSoldier.DeductAP(ap - 1);
