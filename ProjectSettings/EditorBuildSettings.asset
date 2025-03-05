@@ -11,9 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Create.unity
     guid: 9b14fc81d84b7d8498595ff1bc0a1b88
-  - enabled: 0
-    path: Assets/Scenes/LoadingScreen.unity
-    guid: f185f0d4f567cbe4a8dc4f05d566bd6f
   - enabled: 1
     path: Assets/Scenes/Battlefield.unity
     guid: 489f817189d513149847fdf2772b726b

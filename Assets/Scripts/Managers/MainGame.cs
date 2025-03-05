@@ -484,22 +484,33 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         foreach (Soldier s in AllFieldedSoldiers())
         {
-            if (s.IsOnturnAndAlive())
+            if (s.IsOnturnAndAlive()) //run things that trigger at the start of actvive team turn
             {
                 //patriot ability
                 s.SetPatriotic();
 
-                //run things that trigger at the start of players turn
+                //inspirer ability
                 if (s.IsInspirer())
                     CheckInspirer(s);
+
+                //dissuader ability
+                if (s.IsDissuader()) //set initial dissuasions
+                {
+                    foreach (string revealedSoldierId in s.LOSToTheseSoldiersAndRevealing)
+                    {
+                        Soldier revealedSoldier = soldierManager.FindSoldierById(revealedSoldierId);
+                        if (!revealedSoldier.IsRevoker())
+                            revealedSoldier.SetDissuaded();
+                    }
+                }
 
                 yield return new WaitUntil(() => menu.inspirerResolvedFlag);
 
                 s.GenerateAP();
             }
-            else
+            else //run things that trigger at the start of opposition team turn
             {
-                //run things that trigger at the start of another team's turn
+                
             }
         }
         menu.CheckXP();

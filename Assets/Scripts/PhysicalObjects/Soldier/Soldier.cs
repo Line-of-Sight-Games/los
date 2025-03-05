@@ -1993,7 +1993,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             SoldiersRevealingThisSoldier.Add(id);
 
         //dissuader ability
-        if (soldierManager.FindSoldierById(id).IsDissuader())
+        Soldier revealingSoldier = soldierManager.FindSoldierById(id);
+        if (revealingSoldier.IsOnturnAndAlive() && revealingSoldier.IsDissuader())
         {
             if (!IsRevoker())
                 SetDissuaded();
