@@ -597,12 +597,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         foreach (Item item in itemList)
             item.DestroyItem(destroyedBy);
     }
-    public void BrokenDropAllItemsExceptArmour()
+    public void BrokenDropAllItems()
     {
         List<Item> itemList = new();
         Dictionary<string, string> itemSlots = new();
         foreach (Item item in Inventory.AllItems)
-            if (!item.itemName.Contains("Armour"))
+            if (!item.IsOnlyRemovableFromCorpse())
                 itemList.Add(item);
         foreach (KeyValuePair<string, string> kvp in InventorySlots)
             itemSlots.Add(kvp.Key, kvp.Value);
@@ -1488,7 +1488,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             //drop all items for broken
             if (IsBroken())
             {
-                BrokenDropAllItemsExceptArmour();
+                BrokenDropAllItems();
                 foreach (Soldier s in game.AllSoldiers())
                     game.BreakMeleeEngagement(this, s);
             }

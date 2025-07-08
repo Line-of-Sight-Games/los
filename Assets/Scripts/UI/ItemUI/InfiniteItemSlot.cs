@@ -25,5 +25,6 @@ public class InfiniteItemSlot : MonoBehaviour
     private void OnDisable()
     {
         linkedItem.DestroyItem(null);
+        linkedSlot.ClearItemIcon();
     }
 }
