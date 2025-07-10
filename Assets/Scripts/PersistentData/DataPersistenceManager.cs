@@ -15,7 +15,6 @@ public class DataPersistenceManager : MonoBehaviour
     public GameData gameData;
     public List<IDataPersistence> dataPersistanceObjects;
     public FileDataHandler coreDataHandler;
-    public bool dataLoaded = false;
     public GameObject loadingScreen;
     public Slider progressBar;
     public TextMeshProUGUI progressText;
@@ -41,44 +40,54 @@ public class DataPersistenceManager : MonoBehaviour
     }
     private IEnumerator LoadSceneAsync(string sceneName)
     {
+        Debug.Log($"Loading scene: {sceneName}");
+
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        if (operation == null)
+        {
+            Debug.LogError($"Scene '{sceneName}' failed to load. Check build settings.");
+            yield break;
+        }
+
         operation.allowSceneActivation = false;
 
         float displayedProgress = 0f;
+        float timer = 0f;
+        float timeout = 30f; // seconds
 
         while (!operation.isDone)
         {
-            // Unity’s progress is from 0 to 0.9 before scene is ready
+            timer += Time.deltaTime;
+
             float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
 
-            // Smoothly interpolate bar progress to 80%
-            while (displayedProgress < targetProgress * 0.8f)
+            // Timeout safety
+            if (timer >= timeout)
             {
-                displayedProgress = Mathf.MoveTowards(displayedProgress, targetProgress * 0.8f, Time.deltaTime * 0.5f);
-                progressBar.value = displayedProgress;
-                progressText.text = $"Loading... {displayedProgress * 100:F0}%";
-                yield return null;
+                Debug.LogError($"Scene load stalled at {operation.progress:P0}. Timeout hit.");
+                yield break;
             }
+
+            // Visual progress bar
+            displayedProgress = Mathf.MoveTowards(displayedProgress, targetProgress * 0.8f, Time.deltaTime * 0.5f);
+            progressBar.value = displayedProgress;
+            progressText.text = $"Loading... {displayedProgress * 100:F0}%";
 
             if (targetProgress >= 1f)
             {
-                yield return new WaitForSeconds(0.5f); // Smooth transition delay
+                yield return new WaitForSeconds(0.5f);
                 operation.allowSceneActivation = true;
             }
 
             yield return null;
         }
 
-        // After scene loads, start loading game data
+        Debug.Log("Scene load complete. Proceeding to data load.");
         StartCoroutine(LoadGameData());
     }
+
     public IEnumerator LoadGameData()
     {
-        if (dataLoaded)
-        {
-            yield break;
-        }
-
         string path = Path.Combine(Application.persistentDataPath, "LOSCore.json");
 
         if (!File.Exists(path))
@@ -98,7 +107,6 @@ public class DataPersistenceManager : MonoBehaviour
 
         yield return StartCoroutine(LoadGame());
 
-        dataLoaded = true;
         loadingScreen.SetActive(false);
     }
     public IEnumerator LoadGame()
