@@ -3857,7 +3857,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             int rankDifference = killer.RankDifferenceTo(deadMan);
 
             if (deadMan.IsHigherRankThan(killer))
-                xp = 10 + Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
+                xp = Mathf.CeilToInt(Mathf.Pow(rankDifference, 2) / 2);
             else
                 xp = 10 - rankDifference;
 
