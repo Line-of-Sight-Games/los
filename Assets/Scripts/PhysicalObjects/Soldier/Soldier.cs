@@ -890,10 +890,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void ApplySustenanceMods()
     {
         if (roundsWithoutFood < 20 && healthRemovedFromStarve > 0)
-        {
-            TakeHeal(null, healthRemovedFromStarve, 0, false, false);
-            healthRemovedFromStarve = 0;
-        }
+            healthRemovedFromStarve = 0; // reset health removed from starvation but doesn't heal
 
         if (roundsWithoutFood >= 20 && healthRemovedFromStarve == 0)
         {
