@@ -5,7 +5,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
-using System.Diagnostics;
 
 public class MainGame : MonoBehaviour, IDataPersistence
 {
@@ -115,6 +114,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public List<DrugCabinet> AllDrugCabinets()
     {
         return AllBattlefieldObjects().OfType<DrugCabinet>().ToList();
+    }
+    public List<Terminal> AllTerminals()
+    {
+        return AllBattlefieldObjects().OfType<Terminal>().ToList();
     }
     public int Factorial(int number)
     {
@@ -3413,10 +3416,26 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (!menu.clearDipelecFlag)
             UpdateDipElecRewardAndChance();
-
     }
     public void UpdateDipElecRewardAndChance()
     {
+        //read terminal
+        Terminal terminal = poiManager.FindPOIById(dipelecUI.SelectedTerminalId) as Terminal;
+
+        //set dipelec type
+        dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+
+        if (terminal.terminalType == "Dip Only" || terminal.SoldiersAlreadyHacked.Contains(activeSoldier.Id))
+            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
+        if (terminal.terminalType == "Elec Only" || terminal.SoldiersAlreadyNegotiated.Contains(activeSoldier.Id))
+            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
+
+        if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Hack") && dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
+            dipelecUI.dipElecTypeDropdown.value = 2;
+        else if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
+            dipelecUI.dipElecTypeDropdown.value = 1;
+
+        //set level dropdown and success chance
         dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
 
         if (dipelecUI.dipElecTypeDropdown.value == 0)
@@ -3456,7 +3475,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             int passCount = 0;
             string resultString = "";
 
-            Terminal terminal = poiManager.FindPOIById(dipelecUI.terminalID.text) as Terminal;
+            Terminal terminal = poiManager.FindPOIById(dipelecUI.SelectedTerminalId) as Terminal;
 
             FileUtility.WriteToReport($"{activeSoldier.soldierName} attempts to interact with terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
 

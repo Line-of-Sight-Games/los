@@ -3023,13 +3023,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (!isActive)
         {
-            foreach (Terminal t in FindObjectsByType<Terminal>(default))
+            foreach (Terminal t in game.AllTerminals())
                 if (PhysicalObjectWithinMeleeRadius(t))
                     return true;
         }
         else
         {
-            foreach (Terminal t in FindObjectsByType<Terminal>(default))
+            foreach (Terminal t in game.AllTerminals())
                 if (PhysicalObjectWithinMeleeRadius(t) && t.terminalEnabled)
                     return true;
         }

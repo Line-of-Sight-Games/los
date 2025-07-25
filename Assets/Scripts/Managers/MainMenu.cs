@@ -3502,24 +3502,19 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     //dipelec functions
     public void OpenDipElecUI()
     {
-        Terminal terminal = activeSoldier.ClosestTerminal();
-        dipelecUI.terminalID.text = terminal.id;
-
-        dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
-        if (terminal.terminalType == "Dip Only")
-            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
-        else if (terminal.terminalType == "Elec Only")
-            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
-
-        if (terminal.SoldiersAlreadyHacked.Contains(activeSoldier.id))
-            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
-        if (terminal.SoldiersAlreadyNegotiated.Contains(activeSoldier.id))
-            dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
-
-        if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Hack") && dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
-            dipelecUI.dipElecTypeDropdown.value = 2;
-        else if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
-            dipelecUI.dipElecTypeDropdown.value = 1;
+        //generate terminal list
+        List<TMP_Dropdown.OptionData> terminalDetailsList = new();
+        foreach (Terminal t in game.AllTerminals())
+        {
+            TMP_Dropdown.OptionData terminalDetails = null;
+            if (t.terminalEnabled && activeSoldier.PhysicalObjectWithinMeleeRadius(t))
+            {
+                dipelecUI.allTerminalIds.Add(t.id);
+                terminalDetails = new($"X:{t.X} Y:{t.Y} Z:{t.Z}", t.poiPortrait, Color.white);
+                terminalDetailsList.Add(terminalDetails);
+            }
+        }
+        dipelecUI.dipElecTerminalDropdown.AddOptions(terminalDetailsList);
 
         game.UpdateDipElecUI();
         dipelecUI.gameObject.SetActive(true);
@@ -3532,9 +3527,16 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void ClearDipElecUI()
     {
         clearDipelecFlag = true;
-        dipelecUI.transform.Find("DipElecType").Find("DipElecTypeDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        dipelecUI.transform.Find("Level").Find("LevelDropdown").GetComponent<TMP_Dropdown>().value = 0;
-        dipelecUI.transform.Find("SuccessChance").Find("SuccessChanceDisplay").GetComponent<TextMeshProUGUI>().text = "";
+        dipelecUI.allTerminalIds.Clear();
+
+        dipelecUI.dipElecTerminalDropdown.value = 0;
+        dipelecUI.dipElecTerminalDropdown.ClearOptions();
+
+        dipelecUI.dipElecTypeDropdown.value = 0;
+        dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+
+        dipelecUI.dipElecLevelDropdown.value = 0;
+        dipelecUI.successChanceDisplay.text = "";
         clearDipelecFlag = false;
     }
     public void OpenDipelecResultUI()
