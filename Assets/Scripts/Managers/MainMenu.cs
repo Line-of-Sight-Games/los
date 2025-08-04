@@ -19,7 +19,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public ItemManager itemManager;
     public MainGame game;
     public WeatherGen weather;
-    public DipelecGen dipelec;
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;

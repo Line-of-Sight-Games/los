@@ -16,7 +16,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public SoldierManager soldierManager;
     public POIManager poiManager;
     public WeatherGen weather;
-    public DipelecGen dipelec;
     public SoundManager soundManager;
 
     public MoveUI moveUI;
@@ -3513,7 +3512,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=green>{resultString} successful</color>";
                         GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
-                        dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = (resultString == "Hack") ? dipelec.GetLevelElec(i) : dipelec.GetLevelDip(i);
+                        dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = (resultString == "Hack") ? DipelecManager.Instance.GetLevelElec(i) : DipelecManager.Instance.GetLevelDip(i);
                     }
 
                     //add xp for successful dipelec

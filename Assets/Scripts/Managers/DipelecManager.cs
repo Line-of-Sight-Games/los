@@ -1,8 +1,26 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class DipelecGen : MonoBehaviour
+public class DipelecManager : MonoBehaviour
 {
+    public static DipelecManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     private readonly string[] l1Dip =
     {
         "L1\nReceive a single piece of medium-level advice if it is asked in the form of a yes/no Question",
