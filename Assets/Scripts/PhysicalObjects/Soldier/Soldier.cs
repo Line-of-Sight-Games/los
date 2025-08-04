@@ -717,7 +717,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (HelperFunctions.CheckInScene("Battlefield"))
         {
-            if (game.currentRound > 0 && game.weather.savedWeather.Count > 0)
+            if (game.currentRound > 0 && WeatherManager.Instance.savedWeather.Count > 0)
             {
                 CalculateActiveStats();
                 DisplayStats();
@@ -736,7 +736,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (HelperFunctions.CheckInScene("Battlefield"))
         {
-            if (game.currentRound > 0 && game.weather.savedWeather.Count > 0)
+            if (game.currentRound > 0 && WeatherManager.Instance.savedWeather.Count > 0)
             {
                 stats.L.Val = stats.L.BaseVal;
                 stats.H.Val = stats.H.BaseVal;
@@ -801,13 +801,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (!IsWearingThermalGoggles())
         {
-            if (game.weather.IsZeroVis())
+            if (WeatherManager.Instance.IsZeroVis())
                 stats.SR.Val -= 100;
-            else if (game.weather.IsPoorVis())
+            else if (WeatherManager.Instance.IsPoorVis())
                 stats.SR.Val -= 90;
-            else if (game.weather.IsModerateVis())
+            else if (WeatherManager.Instance.IsModerateVis())
                 stats.SR.Val -= 70;
-            else if (game.weather.IsGoodVis())
+            else if (WeatherManager.Instance.IsGoodVis())
                 stats.SR.Val -= 40;
         }
     }
@@ -1629,7 +1629,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             visModMove = 0.0f;
         else
         {
-            visModMove = game.weather.CurrentVis switch
+            visModMove = WeatherManager.Instance.CurrentVis switch
             {
                 "Zero" => 0.5f,
                 "Poor" => 0.1f,
@@ -1643,7 +1643,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public float ApplyRainModsMove()
     {
-        var rainModMove = game.weather.CurrentRain switch
+        var rainModMove = WeatherManager.Instance.CurrentRain switch
         {
             "Torrential" => 0.2f,
             "Heavy" => 0.1f,

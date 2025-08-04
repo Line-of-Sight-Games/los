@@ -6,8 +6,6 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
     public Vector3 camPosition, sunPosition, mapPosition, mapDimensions, bottomPlanePosition, bottomPlaneDimensions, outlineAreaPosition, outlineAreaDimensions;
     public float camOrthoSize;
 
-    public WeatherGen weather;
-
     public GameObject setupMenuUI, createSoldierMenuUI;
     public TMP_InputField xSize, ySize, zSize, maxRoundsInput, turnTimeInput;
     public TMP_Dropdown maxSoldierDropdown;
@@ -67,7 +65,7 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
             SetField();
             SetCam();
 
-            weather.GenerateWeather(maxRounds);
+            WeatherManager.Instance.GenerateWeather(maxRounds);
             DataPersistenceManager.Instance.SaveGame();
 
             setupMenuUI.SetActive(false);

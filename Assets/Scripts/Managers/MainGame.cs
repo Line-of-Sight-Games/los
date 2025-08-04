@@ -15,7 +15,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public ItemManager itemManager;
     public SoldierManager soldierManager;
     public POIManager poiManager;
-    public WeatherGen weather;
     public SoundManager soundManager;
 
     public MoveUI moveUI;
@@ -303,7 +302,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 yield return new WaitUntil(() => menu.teamTurnOverFlag == true);
 
                 //set los flags only if weather changes
-                if (weather.CheckVisChange(out string increaseOrDecrease))
+                if (WeatherManager.Instance.CheckVisChange(out string increaseOrDecrease))
                     SetLosCheckAll($"statChange(SR)|weatherChange({increaseOrDecrease})"); //loscheckall
 
                 currentTurn++;
@@ -1319,7 +1318,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             visMod = 0.0f;
         else
         {
-            visMod = weather.CurrentVis switch
+            visMod = WeatherManager.Instance.CurrentVis switch
             {
                 "Full" => 0.0f,
                 "Good" => 0.02f,
@@ -1336,12 +1335,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public float RainMod(Soldier shooter, IAmShootable target)
     {
-        string rainfall = weather.CurrentRain;
+        string rainfall = WeatherManager.Instance.CurrentRain;
 
         if (shooter.IsCalculator() && target is Soldier targetSoldier1 && !targetSoldier1.IsRevoker())
-            rainfall = weather.DecreasedRain(rainfall);
+            rainfall = WeatherManager.Instance.DecreasedRain(rainfall);
         if (target is Soldier targetSoldier2 && targetSoldier2.IsCalculator() && !shooter.IsRevoker())
-            rainfall = weather.IncreasedRain(rainfall);
+            rainfall = WeatherManager.Instance.IncreasedRain(rainfall);
 
         float rainMod = rainfall switch
         {
@@ -1358,10 +1357,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public float RainMod(Soldier shooter)
     {
-        string rainfall = weather.CurrentRain;
+        string rainfall = WeatherManager.Instance.CurrentRain;
 
         if (shooter.IsCalculator())
-            rainfall = weather.DecreasedRain(rainfall);
+            rainfall = WeatherManager.Instance.DecreasedRain(rainfall);
 
         var rainMod = rainfall switch
         {
@@ -1380,18 +1379,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         Vector2 shotLine = new(target.X - shooter.X, target.Y - shooter.Y);
         shotLine.Normalize();
-        Vector2 windLine = weather.CurrentWindDirectionVector;
+        Vector2 windLine = WeatherManager.Instance.CurrentWindDirectionVector;
         float shotAngleRelativeToWind = Vector2.Angle(shotLine, windLine);
         //print("WIND: " + windLine + " SHOT: " + shotLine + "ANGLE: " + shotAngleRelativeToWind);
 
         float windMod;
 
-        string windSpeed = weather.CurrentWindSpeed;
+        string windSpeed = WeatherManager.Instance.CurrentWindSpeed;
         if (shooter.IsCalculator())
-            windSpeed = weather.DecreasedWindspeed(windSpeed);
+            windSpeed = WeatherManager.Instance.DecreasedWindspeed(windSpeed);
         if (target is Soldier targetSoldier)
             if (targetSoldier.IsCalculator())
-                windSpeed = weather.IncreasedWindspeed(windSpeed);
+                windSpeed = WeatherManager.Instance.IncreasedWindspeed(windSpeed);
 
         if (shotAngleRelativeToWind <= 22.5 || shotAngleRelativeToWind >= 157.5)
             windMod = 0f;
@@ -1662,9 +1661,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (shotUI.shotTypeDropdown.value == 0) //standard shot
         {
             if (target is Soldier)
-                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {(target as Soldier).soldierName}. Weather: {weather.CurrentWeather} Target Cover: {shotUI.coverLevelDropdown.captionText.text}"); //write to report
+                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {(target as Soldier).soldierName}. Weather: {WeatherManager.Instance.CurrentWeather} Target Cover: {shotUI.coverLevelDropdown.captionText.text}"); //write to report
             else
-                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {target.GetType()}. Weather: {weather.CurrentWeather}"); //write to report
+                FileUtility.WriteToReport($"{shooter.soldierName} shoots at {target.GetType()}. Weather: {WeatherManager.Instance.CurrentWeather}"); //write to report
 
             //play shot sfx
             soundManager.PlayShotResolution(gun);

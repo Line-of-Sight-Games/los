@@ -1,12 +1,28 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Collections.ObjectModel;
 
-public class WeatherGen : MonoBehaviour, IDataPersistence
+public class WeatherManager : MonoBehaviour, IDataPersistence
 {
+    public static WeatherManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     public MainGame game;
 
     readonly Dictionary<int, string> visibility = new()

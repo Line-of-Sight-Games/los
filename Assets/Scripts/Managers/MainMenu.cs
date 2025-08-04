@@ -18,7 +18,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public SoldierManager soldierManager;
     public ItemManager itemManager;
     public MainGame game;
-    public WeatherGen weather;
     public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
@@ -795,8 +794,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void GetOverrideVisibility()
     {
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
-        dropdown.captionText.text = weather.CurrentVis;
-        dropdown.value = weather.CurrentVis switch
+        dropdown.captionText.text = WeatherManager.Instance.CurrentVis;
+        dropdown.value = WeatherManager.Instance.CurrentVis switch
         {
             "Full" => 0,
             "Good" => 1,
@@ -809,8 +808,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void GetOverrideWindSpeed()
     {
         TMP_Dropdown dropdown = overrideWindSpeedDropdown.GetComponent<TMP_Dropdown>();
-        dropdown.captionText.text = weather.CurrentWindSpeed;
-        dropdown.value = weather.CurrentWindSpeed switch
+        dropdown.captionText.text = WeatherManager.Instance.CurrentWindSpeed;
+        dropdown.value = WeatherManager.Instance.CurrentWindSpeed switch
         {
             "Strong" => 0,
             "Moderate" => 1,
@@ -822,8 +821,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void GetOverrideWindDirection()
     {
         TMP_Dropdown dropdown = overrideWindDirectionDropdown.GetComponent<TMP_Dropdown>();
-        dropdown.captionText.text = weather.CurrentWindDirection;
-        dropdown.value = weather.CurrentWindDirection switch
+        dropdown.captionText.text = WeatherManager.Instance.CurrentWindDirection;
+        dropdown.value = WeatherManager.Instance.CurrentWindDirection switch
         {
             "North-Eastern" => 0,
             "South-Eastern" => 1,
@@ -839,8 +838,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void GetOverrideRain()
     {
         TMP_Dropdown dropdown = overrideRainDropdown.GetComponent<TMP_Dropdown>();
-        dropdown.captionText.text = weather.CurrentRain;
-        dropdown.value = weather.CurrentRain switch
+        dropdown.captionText.text = WeatherManager.Instance.CurrentRain;
+        dropdown.value = WeatherManager.Instance.CurrentRain switch
         {
             "Torrential" => 0,
             "Heavy" => 1,
@@ -852,31 +851,31 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void SetOverrideVisibility()
     {
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Visibility changed from {weather.CurrentVis} to {dropdown.captionText.text}"); //write to report
+        FileUtility.WriteToReport($"(Override) Weather changed: Visibility changed from {WeatherManager.Instance.CurrentVis} to {dropdown.captionText.text}"); //write to report
 
-        string oldVis = weather.CurrentVis;
-        weather.CurrentVis = dropdown.captionText.text;
+        string oldVis = WeatherManager.Instance.CurrentVis;
+        WeatherManager.Instance.CurrentVis = dropdown.captionText.text;
         
-        if (!weather.CurrentVis.Equals(oldVis))
+        if (!WeatherManager.Instance.CurrentVis.Equals(oldVis))
             game.SetLosCheckAll("statChange(SR)|weatherChange(override)"); //loscheckall
     }
     public void SetOverrideWindSpeed()
     {
         TMP_Dropdown dropdown = overrideWindSpeedDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Wind speed changed from {weather.CurrentWindSpeed} to {dropdown.captionText.text}"); //write to report
-        weather.CurrentWindSpeed = dropdown.captionText.text;
+        FileUtility.WriteToReport($"(Override) Weather changed: Wind speed changed from {WeatherManager.Instance.CurrentWindSpeed} to {dropdown.captionText.text}"); //write to report
+        WeatherManager.Instance.CurrentWindSpeed = dropdown.captionText.text;
     }
     public void SetOverrideWindDirection()
     {
         TMP_Dropdown dropdown = overrideWindDirectionDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Wind direction changed from {weather.CurrentWindDirection} to {dropdown.captionText.text}"); //write to report
-        weather.CurrentWindDirection = dropdown.captionText.text;
+        FileUtility.WriteToReport($"(Override) Weather changed: Wind direction changed from {WeatherManager.Instance.CurrentWindDirection} to {dropdown.captionText.text}"); //write to report
+        WeatherManager.Instance.CurrentWindDirection = dropdown.captionText.text;
     }
     public void SetOverrideRain()
     {
         TMP_Dropdown dropdown = overrideRainDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Rain intensity changed from {weather.CurrentRain} to {dropdown.captionText.text}"); //write to report
-        weather.CurrentRain = dropdown.captionText.text;
+        FileUtility.WriteToReport($"(Override) Weather changed: Rain intensity changed from {WeatherManager.Instance.CurrentRain} to {dropdown.captionText.text}"); //write to report
+        WeatherManager.Instance.CurrentRain = dropdown.captionText.text;
     }
     public void ChangeHP()
     {
@@ -1072,7 +1071,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         Transform weatherIcons = weatherUI.transform.Find("WeatherIcons");
         Transform experimentalistWeatherIcons = weatherUI.transform.Find("ExperimentalistWeatherIcons");
 
-        weatherIcons.Find("Vis").GetComponent<Image>().sprite = weather.CurrentVis switch
+        weatherIcons.Find("Vis").GetComponent<Image>().sprite = WeatherManager.Instance.CurrentVis switch
         {
             "Zero" => allVis.options[0].image,
             "Poor" => allVis.options[1].image,
@@ -1082,18 +1081,18 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         };
 
         weatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(true);
-        weatherIcons.Find("Wind").GetComponent<Image>().sprite = weather.CurrentWindSpeed switch
+        weatherIcons.Find("Wind").GetComponent<Image>().sprite = WeatherManager.Instance.CurrentWindSpeed switch
         {
             "Strong" => allWind.options[0].image,
             "Moderate" => allWind.options[1].image,
             "Light" => allWind.options[2].image,
             "Zero" or _ => allWind.options[3].image,
         };
-        if (weather.CurrentWindSpeed.Equals("Zero"))
+        if (WeatherManager.Instance.CurrentWindSpeed.Equals("Zero"))
             weatherIcons.Find("Wind").Find("Direction").gameObject.SetActive(false);
         else
         {
-            weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = weather.CurrentWindDirection switch
+            weatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = WeatherManager.Instance.CurrentWindDirection switch
             {
                 "North-Eastern" => allWindDirection.options[0].image,
                 "South-Eastern" => allWindDirection.options[1].image,
@@ -1107,7 +1106,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             };
         }
 
-        weatherIcons.Find("Rain").GetComponent<Image>().sprite = weather.CurrentRain switch
+        weatherIcons.Find("Rain").GetComponent<Image>().sprite = WeatherManager.Instance.CurrentRain switch
         {
             "Torrential" => allRain.options[0].image,
             "Heavy" => allRain.options[1].image,
@@ -1121,7 +1120,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (s.IsOnturnAndAlive() && s.IsExperimentalist())
             {
-                experimentalistWeatherIcons.Find("Vis").GetComponent<Image>().sprite = weather.NextTurnVis switch
+                experimentalistWeatherIcons.Find("Vis").GetComponent<Image>().sprite = WeatherManager.Instance.NextTurnVis switch
                 {
                     "Zero" => allVis.options[0].image,
                     "Poor" => allVis.options[1].image,
@@ -1130,7 +1129,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     "Full" or _ => allVis.options[4].image,
                 };
 
-                experimentalistWeatherIcons.Find("Wind").GetComponent<Image>().sprite = weather.NextTurnWindSpeed switch
+                experimentalistWeatherIcons.Find("Wind").GetComponent<Image>().sprite = WeatherManager.Instance.NextTurnWindSpeed switch
                 {
                     "Strong" => allWind.options[0].image,
                     "Moderate" => allWind.options[1].image,
@@ -1138,7 +1137,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     "Zero" or _ => allWind.options[3].image,
                 };
 
-                experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = weather.NextTurnWindDirection switch
+                experimentalistWeatherIcons.Find("Wind").Find("Direction").GetComponent<Image>().sprite = WeatherManager.Instance.NextTurnWindDirection switch
                 {
                     "North-Eastern" => allWindDirection.options[0].image,
                     "South-Eastern" => allWindDirection.options[1].image,
@@ -1151,7 +1150,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     "Zero" or _ => allWindDirection.options[8].image,
                 };
 
-                experimentalistWeatherIcons.Find("Rain").GetComponent<Image>().sprite = weather.NextTurnRain switch
+                experimentalistWeatherIcons.Find("Rain").GetComponent<Image>().sprite = WeatherManager.Instance.NextTurnRain switch
                 {
                     "Torrential" => allRain.options[0].image,
                     "Heavy" => allRain.options[1].image,
