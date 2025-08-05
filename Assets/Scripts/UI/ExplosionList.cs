@@ -29,7 +29,7 @@ public class ExplosionList : MonoBehaviour
         {
             int posDamage = 0, negDamage = 0, posStun = 0, negStun = 0;
             ScrollRect explosionScroller = explosionList.transform.Find("Scroll").GetComponent<ScrollRect>();
-            Soldier explosionCausedBy = menu.soldierManager.FindSoldierById(transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text);
+            Soldier explosionCausedBy = SoldierManager.Instance.FindSoldierById(transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text);
             print($"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) ({explosionCausedBy.soldierName} {explosionCausedBy.soldierTeam}) Start - {posDamage + posStun}, {negDamage + negStun}");
             if (explosionScroller.verticalNormalizedPosition <= 0.05f)
             {

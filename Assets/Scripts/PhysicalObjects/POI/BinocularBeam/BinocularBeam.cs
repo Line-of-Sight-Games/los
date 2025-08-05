@@ -21,7 +21,7 @@ public class BinocularBeam : POI, IDataPersistence
     }
     private void Update()
     {
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
     }
     public BinocularBeam Init(Vector3 location, Tuple<int, int, int, string> otherDetails, string mode)
     {
@@ -36,7 +36,7 @@ public class BinocularBeam : POI, IDataPersistence
         facingY = otherDetails.Item2;
         turnsActive = otherDetails.Item3;
         placedById = otherDetails.Item4;
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
 
         beamHeight = game.maxZ;
         beamWidth = GetBeamSize();

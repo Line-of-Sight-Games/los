@@ -7,7 +7,7 @@ public class InformerAlert : SoldierAlert
     public void OpenSoldierSnapshot(TextMeshProUGUI snappedSoldierID)
     {
         MainMenu menu = FindFirstObjectByType<MainMenu>();
-        Soldier snapshotSoldier = menu.soldierManager.FindSoldierById(snappedSoldierID.text);
+        Soldier snapshotSoldier = SoldierManager.Instance.FindSoldierById(snappedSoldierID.text);
         if (snapshotSoldier != null)
         {
             GameObject soldierSnapshot = Instantiate(menu.soldierSnapshotPrefab, menu.damageUI.transform);

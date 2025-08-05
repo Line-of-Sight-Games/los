@@ -20,7 +20,7 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
 
     private void Update()
     {
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
     }
 
     public ThermalCamera Init(Vector3 location, Tuple<int, int, string> otherDetails)
@@ -35,7 +35,7 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
         facingX = otherDetails.Item1;
         facingY = otherDetails.Item2;
         placedById = otherDetails.Item3;
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
         
         beamHeight = GetBeamSize();
         beamWidth = GetBeamSize();

@@ -90,7 +90,7 @@ public class DragUI : MonoBehaviour
         if (pressCount.Equals(0)) //first press
         {
             drager = menu.activeSoldier;
-            dragee = menu.soldierManager.FindSoldierById(targetDropdown.captionText.text);
+            dragee = SoldierManager.Instance.FindSoldierById(targetDropdown.captionText.text);
             targetDropdown.interactable = false;
             maxDragRange.text = drager.GetMaxDragRange().ToString();
             moveObjects.SetActive(true);

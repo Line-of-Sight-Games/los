@@ -15,7 +15,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public KeyCode secondOverrideKey = KeyCode.Space;
     public KeyCode deathKey = KeyCode.D;
 
-    public SoldierManager soldierManager;
     public MainGame game;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 
@@ -306,7 +305,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             foreach (string id in s.LOSToTheseSoldiersAndRevealing)
             {
-                LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s, soldierManager.FindSoldierById(id));
+                LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s, SoldierManager.Instance.FindSoldierById(id));
                 arrow.transform.SetAsLastSibling();
             }
         }
@@ -376,7 +375,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     }
     public string IdToName(string id)
     {
-        Soldier s = soldierManager.FindSoldierById(id);
+        Soldier s = SoldierManager.Instance.FindSoldierById(id);
         if (s != null)
             return s.soldierName;
         else
@@ -1723,8 +1722,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                 game.EndFrozenTurn();
             activeSoldier.UnsetActiveSoldier();
             soldierOptionsUI.SetActive(false);
-            soldierManager.enemyDisplayColumn.SetActive(true);
-            soldierManager.friendlyDisplayColumn.SetActive(true);
+            SoldierManager.Instance.enemyDisplayColumn.SetActive(true);
+            SoldierManager.Instance.friendlyDisplayColumn.SetActive(true);
             
             //save game
             DataPersistenceManager.Instance.SaveGame();
@@ -2122,7 +2121,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             {
                 //print(keyValuePair.Key + " " + game.FindSoldierById(keyValuePair.Key).soldierName);
                 List<string> arrayOfRevealingList = allSoldiersRevealing[keyValuePair.Key];
-                List<string> arrayOfOldRevealingList = soldierManager.FindSoldierById(keyValuePair.Key).LOSToTheseSoldiersAndRevealing;
+                List<string> arrayOfOldRevealingList = SoldierManager.Instance.FindSoldierById(keyValuePair.Key).LOSToTheseSoldiersAndRevealing;
                 List<string> arrayOfNotRevealingList = new();
                 arrayOfNotRevealingList.AddRange(allSoldiersNotRevealingOutOfSR[keyValuePair.Key]);
                 arrayOfNotRevealingList.AddRange(allSoldiersNotRevealingNoLos[keyValuePair.Key]);
@@ -2694,7 +2693,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             if (activeSoldier.CheckAP(ap))
             {
-                Soldier shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
+                Soldier shooter = SoldierManager.Instance.FindSoldierById(shotUI.shooterID.text);
                 IAmShootable target = game.FindShootableById(shotUI.targetDropdown.captionText.text);
                 Item gun1 = null, gun2 = null;
                 Tuple<int, int, int> chances1 = null, chances2 = null;
@@ -2910,7 +2909,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         {
             meleeUI.targetDropdown.AddOptions(defenderDetails);
 
-            Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
+            Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
             if (defender.controlledBySoldiersList.Contains(activeSoldier.id))
                 meleeUI.meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=green>Disengage</color>") });
@@ -2987,8 +2986,8 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             if (activeSoldier.CheckAP(ap))
             {
                 //find attacker and defender
-                Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-                Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
+                Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
+                Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
                 int meleeDamage = game.CalculateMeleeResult(attacker, defender);
 

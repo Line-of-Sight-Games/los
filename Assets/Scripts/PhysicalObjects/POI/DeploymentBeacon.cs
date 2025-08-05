@@ -1,6 +1,4 @@
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
@@ -16,7 +14,7 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
 
     private void Update()
     {
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
     }
 
     public DeploymentBeacon Init(Vector3 location, string placedBySoldierId)
@@ -28,7 +26,7 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
         Z = (int)location.z;
         MapPhysicalPosition(x, y, z);
         placedById = placedBySoldierId;
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
 
         poiPortrait = LoadPortrait(poiType);
 

@@ -12,7 +12,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     private bool gameRunning;
 
     public MainMenu menu;
-    public SoldierManager soldierManager;
 
     public MoveUI moveUI;
     public ShotUI shotUI;
@@ -58,7 +57,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public List<Soldier> AllSoldiers()
     {
-        return soldierManager.allSoldiers;
+        return SoldierManager.Instance.allSoldiers;
     }
     public List<Soldier> AllFieldedSoldiers()
     {
@@ -496,7 +495,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     foreach (string revealedSoldierId in s.LOSToTheseSoldiersAndRevealing)
                     {
-                        Soldier revealedSoldier = soldierManager.FindSoldierById(revealedSoldierId);
+                        Soldier revealedSoldier = SoldierManager.Instance.FindSoldierById(revealedSoldierId);
                         if (!revealedSoldier.IsRevoker())
                             revealedSoldier.SetDissuaded();
                     }
@@ -659,7 +658,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 activeSoldier.DeductAP(ap);
                 activeSoldier.DrainMP();
                 foreach (Transform child in moveUI.closestAllyUI.transform.Find("ClosestAllyPanel"))
-                    soldierManager.FindSoldierByName(child.Find("SoldierName").GetComponent<TextMeshProUGUI>().text).plannerDonatedMove += activeSoldier.HalfMove;
+                    SoldierManager.Instance.FindSoldierByName(child.Find("SoldierName").GetComponent<TextMeshProUGUI>().text).plannerDonatedMove += activeSoldier.HalfMove;
             }
             menu.CloseMoveUI();
         }
@@ -868,7 +867,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         //if function is called not from a script, shooter has to be determined from interface
         if (shooter.id == "0")
-            shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
+            shooter = SoldierManager.Instance.FindSoldierById(shotUI.shooterID.text);
 
         if (!menu.clearShotFlag)
         {
@@ -883,7 +882,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         //if function is called not from a script, shooter has to be determined from interface
         if (shooter.id == "0")
-            shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
+            shooter = SoldierManager.Instance.FindSoldierById(shotUI.shooterID.text);
 
         List<TMP_Dropdown.OptionData> targetOptionDataList = new();
 
@@ -1620,7 +1619,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmShot(bool retry)
     {
-        Soldier shooter = soldierManager.FindSoldierById(shotUI.shooterID.text);
+        Soldier shooter = SoldierManager.Instance.FindSoldierById(shotUI.shooterID.text);
         IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
         Item gun = null;
         bool runSecondShot = false;
@@ -1927,8 +1926,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //melee functions
     public void UpdateMeleeUI()
     {
-        Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
+        Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
+        Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
         if (!menu.clearMeleeFlag)
         {
@@ -2007,8 +2006,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateMeleeTypeOptions()
     {
-        Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
+        Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
+        Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
         List<TMP_Dropdown.OptionData> meleeTypeDetails = new()
         {
@@ -2477,7 +2476,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             engagedSoldiersList.Add(soldierId);
 
         foreach (string soldierId in engagedSoldiersList)
-            BreakMeleeEngagement(s1, soldierManager.FindSoldierById(soldierId));
+            BreakMeleeEngagement(s1, SoldierManager.Instance.FindSoldierById(soldierId));
     }
     public void BreakMeleeEngagement(Soldier s1, Soldier s2)
     {
@@ -2488,8 +2487,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void ConfirmMelee()
     {
-        Soldier attacker = soldierManager.FindSoldierById(meleeUI.attackerID.text);
-        Soldier defender = soldierManager.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
+        Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
+        Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
         if (int.TryParse(meleeUI.apCost.text, out int ap))
         {
@@ -2912,7 +2911,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateSoldierUsedOn(UseItemUI useItemUI)
     {
-        useItemUI.soldierUsedOn = soldierManager.FindSoldierById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+        useItemUI.soldierUsedOn = SoldierManager.Instance.FindSoldierById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
     }
     public void UpdateItemUsedOn(UseItemUI useItemUI)
     {
@@ -3159,7 +3158,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         if (throwItemUI.itemUsed.IsCatchable())
                         {
-                            Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
+                            Soldier catchingSoldier = SoldierManager.Instance.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
 
                             //if soldier has left hand free catch it there, otherwise catch in right hand
                             if (catchingSoldier.LeftHandItem == null)
@@ -3210,7 +3209,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 if (dropItemUI.itemUsed.IsCatchable())
                 {
-                    Soldier catchingSoldier = soldierManager.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
+                    Soldier catchingSoldier = SoldierManager.Instance.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
 
                     FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} is caught by {catchingSoldier.soldierName}."); //write to report
 

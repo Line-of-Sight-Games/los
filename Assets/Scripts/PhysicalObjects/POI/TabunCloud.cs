@@ -31,7 +31,7 @@ public class TabunCloud : POI, IDataPersistence
 
         turnsUntilDissipation = 3;
         placedById = thrownBy;
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
 
         SpawnCloud();
 
@@ -39,7 +39,7 @@ public class TabunCloud : POI, IDataPersistence
     }
     private void Update()
     {
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
     }
     public void LoadData(GameData data)
     {

@@ -22,7 +22,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     }
     private void Update()
     {
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
         if (Exploded)
             POIManager.Instance.DestroyPOI(this);
     }
@@ -40,7 +40,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         facingY = otherDetails.Item3;
         triggered = otherDetails.Item4;
         placedById = otherDetails.Item5;
-        placedBy = menu.soldierManager.FindSoldierById(placedById);
+        placedBy = SoldierManager.Instance.FindSoldierById(placedById);
 
         poiPortrait = LoadPortrait(poiType);
 

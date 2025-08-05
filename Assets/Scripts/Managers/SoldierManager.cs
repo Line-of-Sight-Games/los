@@ -4,6 +4,25 @@ using UnityEngine;
 
 public class SoldierManager : MonoBehaviour, IDataPersistence
 {
+    public static SoldierManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     public MainGame game;
 
     public List<string> allSoldierIds = new();

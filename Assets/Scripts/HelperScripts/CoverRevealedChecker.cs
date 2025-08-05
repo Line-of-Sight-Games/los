@@ -18,7 +18,7 @@ public class CoverRevealedChecker : MonoBehaviour
         if (GetCoverLocation(out Vector3 coverLocation))
         {
             coverman.SetCovermanLocation(coverLocation);
-            if (menu.soldierManager.FindSoldierById(shooterId.text).PhysicalObjectIsRevealed(coverman))
+            if (SoldierManager.Instance.FindSoldierById(shooterId.text).PhysicalObjectIsRevealed(coverman))
                 coverNotRevealed.SetActive(false);
             else
                 coverNotRevealed.SetActive(true);

@@ -70,8 +70,8 @@ public class OverwatchShotUI : MonoBehaviour
     }
     public void ConfirmShotOverwatch(bool retry)
     {
-        Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-        IAmShootable target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+        Soldier shooter = SoldierManager.Instance.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
+        IAmShootable target = SoldierManager.Instance.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
         Item gun = shooter.EquippedGuns.First();
         int actingHitChance;
 
@@ -269,8 +269,8 @@ public class OverwatchShotUI : MonoBehaviour
         if (HelperFunctions.ValidateIntInput(xPos, out int xOver) && HelperFunctions.ValidateIntInput(yPos, out int yOver) && HelperFunctions.ValidateIntInput(zPos, out int zOver) && terrainDropdown.value != 0)
         {
             //find shooter
-            Soldier shooter = game.soldierManager.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-            Soldier target = game.soldierManager.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            Soldier shooter = SoldierManager.Instance.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
+            Soldier target = SoldierManager.Instance.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item gun = shooter.EquippedGuns.First();
 
             //save target intended location

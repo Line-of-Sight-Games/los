@@ -47,13 +47,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public GameObject soldierSnapshotAlertPrefab;
     public SoldierUI soldierUI, soldierUIPrefab;
 
-    public SoldierManager soldierManager;
-
     private void Awake()
     {
         game = FindFirstObjectByType<MainGame>();
         menu = FindFirstObjectByType<MainMenu>();
-        soldierManager = FindFirstObjectByType<SoldierManager>();
     }
 
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
@@ -909,8 +906,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             stats.SR.Val = 0;
             stats.E.Val = 0;
-            if (soldierManager.FindSoldierById(beingDraggedBy) != null)
-                stats.C.Val = soldierManager.FindSoldierById(beingDraggedBy).ActiveC;
+            if (SoldierManager.Instance.FindSoldierById(beingDraggedBy) != null)
+                stats.C.Val = SoldierManager.Instance.FindSoldierById(beingDraggedBy).ActiveC;
             else
                 stats.C.Val = 0;
             stats.M.Val = 0;
@@ -1199,13 +1196,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public IEnumerator TakePoisonDamage()
     {
         yield return new WaitUntil(() => menu.xpResolvedFlag == true);
-        TakeDamage(soldierManager.FindSoldierById(poisonedBy), 2, false, new() { "Poison" }, Vector3.zero);
+        TakeDamage(SoldierManager.Instance.FindSoldierById(poisonedBy), 2, false, new() { "Poison" }, Vector3.zero);
     }
     public IEnumerator BleedoutKill()
     {
         yield return new WaitUntil(() => menu.xpResolvedFlag == true);
         madeUnconBydamageList.Add("Bleedout");
-        InstantKill(soldierManager.FindSoldierById(madeUnconBy), madeUnconBydamageList);
+        InstantKill(SoldierManager.Instance.FindSoldierById(madeUnconBy), madeUnconBydamageList);
     }
 
     public int ApplyDamageMods(Soldier damagedBy, int damage, List<string> damageSource, Vector3 explosionLocation)
@@ -1948,7 +1945,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
 
         //add reference of this soldier revealing others
-        soldierManager.FindSoldierById(id).AddSoldierRevealingThisSoldier(this.Id);
+        SoldierManager.Instance.FindSoldierById(id).AddSoldierRevealingThisSoldier(this.Id);
 
         //remove from the other lists
         RemoveLOSToThisSoldierButHidden(id);
@@ -1988,7 +1985,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             SoldiersRevealingThisSoldier.Add(id);
 
         //dissuader ability
-        Soldier revealingSoldier = soldierManager.FindSoldierById(id);
+        Soldier revealingSoldier = SoldierManager.Instance.FindSoldierById(id);
         if (revealingSoldier.IsOnturnAndAlive() && revealingSoldier.IsDissuader())
         {
             if (!IsRevoker())
@@ -2007,7 +2004,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         LOSToTheseSoldiersAndRevealing.Remove(id);
 
         //remove this soldier revealing other soldiers
-        soldierManager.FindSoldierById(id).RemoveSoldierRevealingThisSoldier(this.Id);
+        SoldierManager.Instance.FindSoldierById(id).RemoveSoldierRevealingThisSoldier(this.Id);
     }
     public void RemoveLOSToThisSoldierButHidden(string id)
     {
@@ -2377,9 +2374,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         //get all engaged soldiers' suppression values
         foreach (string id in controlledBySoldiersList)
-            suppressionValues.Add(1 - (soldierManager.FindSoldierById(id).suppressionValue/100f));
+            suppressionValues.Add(1 - (SoldierManager.Instance.FindSoldierById(id).suppressionValue/100f));
         foreach (string id in controllingSoldiersList)
-            suppressionValues.Add(1 - (soldierManager.FindSoldierById(id).suppressionValue/100f));
+            suppressionValues.Add(1 - (SoldierManager.Instance.FindSoldierById(id).suppressionValue/100f));
 
         //multiply all inverses
         foreach (float val in suppressionValues)
@@ -4164,7 +4161,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsSpotting())
         {
-            game.soldierManager.FindSoldierById(isSpotting).RemoveSpottedBy(Id);
+            SoldierManager.Instance.FindSoldierById(isSpotting).RemoveSpottedBy(Id);
             isSpotting = string.Empty;
         }
     }
@@ -4403,9 +4400,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             for (int i = 0; i < controllingSoldiersList.Count; i++)
             {
                 if (i > 0)
-                    controlString += ", " + soldierManager.FindSoldierById(controllingSoldiersList[i]).soldierName;
+                    controlString += ", " + SoldierManager.Instance.FindSoldierById(controllingSoldiersList[i]).soldierName;
                 else
-                    controlString += soldierManager.FindSoldierById(controllingSoldiersList[i]).soldierName;
+                    controlString += SoldierManager.Instance.FindSoldierById(controllingSoldiersList[i]).soldierName;
             }
             controlString += ")</color>";
         }
@@ -4417,9 +4414,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             for (int i = 0; i < controlledBySoldiersList.Count; i++)
             {
                 if (i > 0)
-                    controlString += ", " + soldierManager.FindSoldierById(controlledBySoldiersList[i]).soldierName;
+                    controlString += ", " + SoldierManager.Instance.FindSoldierById(controlledBySoldiersList[i]).soldierName;
                 else
-                    controlString += soldierManager.FindSoldierById(controlledBySoldiersList[i]).soldierName;
+                    controlString += SoldierManager.Instance.FindSoldierById(controlledBySoldiersList[i]).soldierName;
             }
             controlString += ")</color>";
         }
@@ -4583,7 +4580,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string GetSpottingState()
     {
         if (IsSpotting())
-            return $", <color=green>Spotting ({soldierManager.FindSoldierById(isSpotting).soldierName})</color>";
+            return $", <color=green>Spotting ({SoldierManager.Instance.FindSoldierById(isSpotting).soldierName})</color>";
         return "";
     }
     public string GetWitnessState()
@@ -4690,9 +4687,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             List<Soldier> engagedSoldiers = new();
             foreach(string id in controlledBySoldiersList)
-                engagedSoldiers.Add(soldierManager.FindSoldierById(id));
+                engagedSoldiers.Add(SoldierManager.Instance.FindSoldierById(id));
             foreach (string id in controllingSoldiersList)
-                engagedSoldiers.Add(soldierManager.FindSoldierById(id));
+                engagedSoldiers.Add(SoldierManager.Instance.FindSoldierById(id));
             return engagedSoldiers;
         }
     }
