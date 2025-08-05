@@ -6,7 +6,6 @@ using TMPro;
 
 public class DropthrowPopup : MonoBehaviour
 {
-    public MainMenu menu;
     public GameObject dropThrowUI, noThrowIndicator;
     public TextMeshProUGUI noThrowIndicatorText;
     public Button throwButton, dropButton;
@@ -22,19 +21,19 @@ public class DropthrowPopup : MonoBehaviour
     }
     public void ShowDropThrowPopup()
     {
-        if (menu.activeSoldier.stats.Str.Val == 0)
+        if (MenuManager.Instance.activeSoldier.stats.Str.Val == 0)
         {
             throwButton.interactable = false;
             noThrowIndicatorText.text = "Too Weak";
             noThrowIndicator.SetActive(true);
         }
-        if (menu.activeSoldier.IsBlind())
+        if (MenuManager.Instance.activeSoldier.IsBlind())
         {
             throwButton.interactable = false;
             noThrowIndicatorText.text = "Blind";
             noThrowIndicator.SetActive(true);
         }
-        else if (!menu.activeSoldier.HandsFreeToThrowItem(itemToDropThrow))
+        else if (!MenuManager.Instance.activeSoldier.HandsFreeToThrowItem(itemToDropThrow))
         {
             throwButton.interactable = false;
             noThrowIndicatorText.text = "Hands Full";
@@ -51,13 +50,13 @@ public class DropthrowPopup : MonoBehaviour
 
     public void ThrowButtonClick()
     {
-        menu.OpenDropThrowItemUI("throw", itemToDropThrow, itemToDropThrow.whereEquipped, itemIconToDropThrow);
+        MenuManager.Instance.OpenDropThrowItemUI("throw", itemToDropThrow, itemToDropThrow.whereEquipped, itemIconToDropThrow);
         HideDropThrowPopup();
     }
 
     public void DropButtonClick()
     {
-        menu.OpenDropThrowItemUI("drop", itemToDropThrow, itemToDropThrow.whereEquipped, itemIconToDropThrow);
+        MenuManager.Instance.OpenDropThrowItemUI("drop", itemToDropThrow, itemToDropThrow.whereEquipped, itemIconToDropThrow);
         HideDropThrowPopup();
     }
 }

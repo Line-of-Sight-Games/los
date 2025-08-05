@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class CoverRevealedChecker : MonoBehaviour
 {
-    public MainMenu menu;
     public TMP_InputField XPos, YPos, ZPos;
     public Coverman coverman;
     public GameObject coverNotRevealed;

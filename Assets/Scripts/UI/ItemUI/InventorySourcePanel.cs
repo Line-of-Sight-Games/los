@@ -2,14 +2,12 @@ using UnityEngine;
 
 public class InventorySourcePanel : MonoBehaviour
 {
-    public MainMenu menu;
     public IHaveInventory linkedInventorySource;
     public ItemSlot itemSlotPrefab;
     public ItemIcon itemIconPrefab;
 
     public InventorySourcePanel Init(IHaveInventory inventorySource)
     {
-        menu = FindFirstObjectByType<MainMenu>();
         linkedInventorySource = inventorySource;
 
         if (linkedInventorySource is Soldier linkedSoldier)
@@ -32,8 +30,8 @@ public class InventorySourcePanel : MonoBehaviour
 
     public void CloseInventorySourcePanel()
     {
-        menu.inventorySourceViewOnly = false; //locater ability
-        menu.CloseInventoryPanel(gameObject);
+        MenuManager.Instance.inventorySourceViewOnly = false; //locater ability
+        MenuManager.Instance.CloseInventoryPanel(gameObject);
     }
 
     public void ButtonSoundTrigger()

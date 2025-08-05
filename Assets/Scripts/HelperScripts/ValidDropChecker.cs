@@ -5,7 +5,6 @@ using System.Linq;
 
 public class ValidDropChecker : MonoBehaviour
 {
-    public MainMenu menu;
     public TMP_InputField XPos, YPos, ZPos;
     public GameObject invalidThrow, catcher, itemWillBreak;
     public TMP_Dropdown catcherDropdown;
@@ -21,7 +20,7 @@ public class ValidDropChecker : MonoBehaviour
     {
         invalidThrow.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && (Vector2.Distance(new(throwLocation.x, throwLocation.y), new(menu.activeSoldier.X, menu.activeSoldier.Y)) > 3 || throwLocation.z > menu.activeSoldier.Z + 3))
+        if (GetThrowLocation(out Vector3 throwLocation) && (Vector2.Distance(new(throwLocation.x, throwLocation.y), new(MenuManager.Instance.activeSoldier.X, MenuManager.Instance.activeSoldier.Y)) > 3 || throwLocation.z > MenuManager.Instance.activeSoldier.Z + 3))
             invalidThrow.SetActive(true);
     }
     public bool GetThrowLocation(out Vector3 throwLocation)
@@ -41,9 +40,9 @@ public class ValidDropChecker : MonoBehaviour
 
         if (GetThrowLocation(out Vector3 throwLocation))
         {
-            foreach (Soldier s in menu.game.AllFieldedSoldiers())
+            foreach (Soldier s in MenuManager.Instance.game.AllFieldedSoldiers())
             {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(menu.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
+                if (s.IsAbleToSee() && s.IsSameTeamAs(MenuManager.Instance.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
                 {
                     if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
                         catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });
@@ -58,7 +57,7 @@ public class ValidDropChecker : MonoBehaviour
     {
         itemWillBreak.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && menu.activeSoldier.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !invalidThrow.activeInHierarchy)
+        if (GetThrowLocation(out Vector3 throwLocation) && MenuManager.Instance.activeSoldier.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !invalidThrow.activeInHierarchy)
             itemWillBreak.SetActive(true);
     }
 }

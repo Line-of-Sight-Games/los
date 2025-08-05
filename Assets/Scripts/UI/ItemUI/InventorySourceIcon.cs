@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class InventorySourceIcon : MonoBehaviour
 {
-    public MainMenu menu;
     public InventorySourcePanel linkedInventoryPanel;
     public Button linkedIconButton;
     public GameObject disabledReason;
@@ -12,7 +11,6 @@ public class InventorySourceIcon : MonoBehaviour
 
     public InventorySourceIcon Init(InventorySourcePanel linkedPanel)
     {
-        menu = FindFirstObjectByType<MainMenu>();
         linkedInventoryPanel = linkedPanel;
 
         return this;
@@ -20,7 +18,7 @@ public class InventorySourceIcon : MonoBehaviour
 
     public void OpenItemPanel()
     {
-        menu.OpenInventoryPanel(linkedInventoryPanel);
+        MenuManager.Instance.OpenInventoryPanel(linkedInventoryPanel);
     }
     public void Grey(string reason)
     {

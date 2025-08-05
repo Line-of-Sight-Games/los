@@ -50,7 +50,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     private void Awake()
     {
         game = FindFirstObjectByType<MainGame>();
-        menu = FindFirstObjectByType<MainMenu>();
     }
 
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
@@ -311,13 +310,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void SetActiveSoldier()
     {
-        menu.activeSoldier = this;
+        MenuManager.Instance.activeSoldier = this;
         game.activeSoldier = this;
         selected = true;
     }
     public void UnsetActiveSoldier()
     {
-        menu.activeSoldier = null;
+        MenuManager.Instance.activeSoldier = null;
         game.activeSoldier = null;
         selected = false;
     }
@@ -422,22 +421,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsUnconscious())
         {
-            menu.generalAlertUI.Activate($"{soldierName} cannot use items (<color=blue>Uncon</color>)");
+            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (<color=blue>Uncon</color>)");
             return false;
         }
         else if (IsStunned())
         {
-            menu.generalAlertUI.Activate($"{soldierName} cannot use items (<color=red>Stunner</color>)");
+            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (<color=red>Stunner</color>)");
             return false;
         }
         else if (IsPlayingDead())
         {
-            menu.generalAlertUI.Activate($"{soldierName} cannot use items (<color=yellow>Playdead</color>)");
+            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (<color=yellow>Playdead</color>)");
             return false;
         }
         else if (IsUsingBinocularsInReconMode())
         {
-            menu.generalAlertUI.Activate($"{soldierName} cannot use items (Using binoculars)");
+            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (Using binoculars)");
             return false;
         }
         
@@ -634,7 +633,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string PrintSoldierSpeciality()
     {
-        return HelperFunctions.FindStringInColXReturnStringInColYInMatrix(menu.specialtiesStats, soldierSpeciality, 1, 0);
+        return HelperFunctions.FindStringInColXReturnStringInColYInMatrix(MenuManager.Instance.specialtiesStats, soldierSpeciality, 1, 0);
     }
     public void IncrementXP(int xp, bool learnerEnabled)
     {
@@ -1079,7 +1078,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void TakeDrug(string drugName, Soldier administeredBy)
     {
         if (IsWearingStimulantArmour())
-            menu.AddSoldierAlert(this, "DRUG BLOCKED", Color.grey, $"{soldierName} is wearing Stim Armour, {drugName} had no effect.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "DRUG BLOCKED", Color.grey, $"{soldierName} is wearing Stim Armour, {drugName} had no effect.", -1, -1);
         else
         {
             if (this.IsSameTeamAsIncludingSelf(administeredBy) && administeredBy.IsMedic())
@@ -1087,7 +1086,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (!IsOnDrug(drugName))
                 {
                     TakeSpecificDrug(administeredBy, drugName, true, false);
-                    menu.AddSoldierAlert(this, "DRUG ADMINISTERED", Color.green, $"{soldierName} took {drugName}. It worked with no side-effect.", -1, -1);
+                    MenuManager.Instance.AddSoldierAlert(this, "DRUG ADMINISTERED", Color.green, $"{soldierName} took {drugName}. It worked with no side-effect.", -1, -1);
                 }
             }
             else
@@ -1102,22 +1101,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     if (num == 10)
                     {
                         TakeSpecificDrug(administeredBy, drugName, false, !IsExperimentalist());
-                        menu.AddSoldierAlert(this, "DRUG BOTCHED", Color.red, $"{soldierName} took {drugName}. It didn't work but conferred a side-effect.", -1, -1);
+                        MenuManager.Instance.AddSoldierAlert(this, "DRUG BOTCHED", Color.red, $"{soldierName} took {drugName}. It didn't work but conferred a side-effect.", -1, -1);
                         if (IsExperimentalist())
-                            menu.AddSoldierAlert(this, "SIDE-EFFECT RESISTED", Color.green, $"{soldierName} resisted side-effect with <color=green>Experimentalist</color> ability.", -1, -1); 
+                            MenuManager.Instance.AddSoldierAlert(this, "SIDE-EFFECT RESISTED", Color.green, $"{soldierName} resisted side-effect with <color=green>Experimentalist</color> ability.", -1, -1); 
                         else
-                            menu.AddSoldierAlert(this, "SIDE-EFFECT SUFFERED", Color.red, $"{soldierName} suffered a side-effect.", -1, -1);
+                            MenuManager.Instance.AddSoldierAlert(this, "SIDE-EFFECT SUFFERED", Color.red, $"{soldierName} suffered a side-effect.", -1, -1);
                     }
                     else if (num == 1)
-                        menu.AddSoldierAlert(this, "DRUG FAILED", Color.grey, $"{soldierName} took {drugName}. It didn't work at all.", -1, -1);
+                        MenuManager.Instance.AddSoldierAlert(this, "DRUG FAILED", Color.grey, $"{soldierName} took {drugName}. It didn't work at all.", -1, -1);
                     else
                     {
                         TakeSpecificDrug(administeredBy, drugName, true, !IsExperimentalist());
-                        menu.AddSoldierAlert(this, "DRUG ADMINISTERED", Color.yellow, $"{soldierName} took {drugName}. It worked but conferred a side-effect.", -1, -1);
+                        MenuManager.Instance.AddSoldierAlert(this, "DRUG ADMINISTERED", Color.yellow, $"{soldierName} took {drugName}. It worked but conferred a side-effect.", -1, -1);
                         if (IsExperimentalist())
-                            menu.AddSoldierAlert(this, "SIDE-EFFECT RESISTED", Color.green, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", -1, -1);
+                            MenuManager.Instance.AddSoldierAlert(this, "SIDE-EFFECT RESISTED", Color.green, $"{soldierName} is an <color=green>Experimentalist</color> and immune to the side-effect.", -1, -1);
                         else
-                            menu.AddSoldierAlert(this, "SIDE-EFFECT SUFFERED", Color.red, $"{soldierName} suffered a side-effect.", -1, -1);
+                            MenuManager.Instance.AddSoldierAlert(this, "SIDE-EFFECT SUFFERED", Color.red, $"{soldierName} suffered a side-effect.", -1, -1);
                     }
                 }
             }
@@ -1195,12 +1194,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public IEnumerator TakePoisonDamage()
     {
-        yield return new WaitUntil(() => menu.xpResolvedFlag == true);
+        yield return new WaitUntil(() => MenuManager.Instance.xpResolvedFlag == true);
         TakeDamage(SoldierManager.Instance.FindSoldierById(poisonedBy), 2, false, new() { "Poison" }, Vector3.zero);
     }
     public IEnumerator BleedoutKill()
     {
-        yield return new WaitUntil(() => menu.xpResolvedFlag == true);
+        yield return new WaitUntil(() => MenuManager.Instance.xpResolvedFlag == true);
         madeUnconBydamageList.Add("Bleedout");
         InstantKill(SoldierManager.Instance.FindSoldierById(madeUnconBy), madeUnconBydamageList);
     }
@@ -1211,7 +1210,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (damage > 0 && roundsFielded == 0 && !usedAP)
         {
             damage = 0;
-            menu.AddSoldierAlert(this, "DAMAGE INVALID", Color.cyan, $"{soldierName} can't be damaged before using AP. {damage} {HelperFunctions.PrintList(damageSource)} damage resisted.", hp, hp);
+            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE INVALID", Color.cyan, $"{soldierName} can't be damaged before using AP. {damage} {HelperFunctions.PrintList(damageSource)} damage resisted.", hp, hp);
         }
 
         //apply insulator damage halving
@@ -1219,7 +1218,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             int preDamage = damage;
             damage /= 2;
-            menu.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} halved incoming {HelperFunctions.PrintList(damageSource)} damage with <color=green>Insulator</color> ability.", preDamage, damage);
+            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} halved incoming {HelperFunctions.PrintList(damageSource)} damage with <color=green>Insulator</color> ability.", preDamage, damage);
         }
 
         //apply stim armour damage reduction
@@ -1227,7 +1226,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             int preDamage = damage;
             damage -= 2;
-            menu.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} resisted 2 {HelperFunctions.PrintList(damageSource)} damage with Stim Armour.", preDamage, damage);
+            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} resisted 2 {HelperFunctions.PrintList(damageSource)} damage with Stim Armour.", preDamage, damage);
         }
 
         //apply andro damage reduction
@@ -1235,7 +1234,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             int preDamage = damage;
             damage -= 1;
-            menu.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} resisted 1 {HelperFunctions.PrintList(damageSource)} damage with Androstenedione.", preDamage, damage);
+            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} resisted 1 {HelperFunctions.PrintList(damageSource)} damage with Androstenedione.", preDamage, damage);
         }
         
         //apply mods that apply to shot damage
@@ -1245,13 +1244,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 int preDamage = damage;
                 damage = 0;
-                menu.AddSoldierAlert(this, "DAMAGE BLOCKED", Color.green, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Riot Shield.", preDamage, damage);
+                MenuManager.Instance.AddSoldierAlert(this, "DAMAGE BLOCKED", Color.green, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Riot Shield.", preDamage, damage);
             }
             if (IsWearingExoArmour() && HelperFunctions.CoinFlip())
             {
                 int preDamage = damage;
                 damage = 0;
-                menu.AddSoldierAlert(this, "DAMAGE BLOCKED", Color.green, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Exo Armour.", preDamage, damage);
+                MenuManager.Instance.AddSoldierAlert(this, "DAMAGE BLOCKED", Color.green, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Exo Armour.", preDamage, damage);
             }
         }
 
@@ -1262,7 +1261,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 int preDamage = damage;
                 damage = 0;
-                menu.AddSoldierAlert(this, "DAMAGE BLOCKED", Color.green, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", preDamage, damage);
+                MenuManager.Instance.AddSoldierAlert(this, "DAMAGE BLOCKED", Color.green, $"{soldierName} resisted {damage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", preDamage, damage);
             }
         }
 
@@ -1274,7 +1273,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 int preDamage = damage;
                 damage /= 2;
-                menu.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} halved incoming {HelperFunctions.PrintList(damageSource)} damage with riot shield.", preDamage, damage);
+                MenuManager.Instance.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} halved incoming {HelperFunctions.PrintList(damageSource)} damage with riot shield.", preDamage, damage);
             }
                 
             //JA halving
@@ -1282,7 +1281,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 int preDamage = damage;
                 damage /= 2;
-                menu.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} halved incoming {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", preDamage, damage);
+                MenuManager.Instance.AddSoldierAlert(this, "DAMAGE MITIGATED", Color.green, $"{soldierName} halved incoming {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", preDamage, damage);
             }
         }
 
@@ -1297,14 +1296,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 int preDamage = damage;
                 absorbedDamage = Inventory.GetItem("Armour_Juggernaut").TakeAblativeDamage(damagedBy, damage, damageSource);
                 damage -= absorbedDamage;
-                menu.AddSoldierAlert(this, "DAMAGE ABSORBED", Color.green, $"{soldierName} absorbed {absorbedDamage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", preDamage, damage);
+                MenuManager.Instance.AddSoldierAlert(this, "DAMAGE ABSORBED", Color.green, $"{soldierName} absorbed {absorbedDamage} {HelperFunctions.PrintList(damageSource)} damage with Juggernaut Armour.", preDamage, damage);
             }
             else if (IsWearingBodyArmour(true))
             {
                 int preDamage = damage;
                 absorbedDamage = Inventory.GetItem("Armour_Body").TakeAblativeDamage(damagedBy, damage, damageSource);
                 damage -= absorbedDamage;
-                menu.AddSoldierAlert(this, "DAMAGE ABSORBED", Color.green, $"{soldierName} absorbed {absorbedDamage} {HelperFunctions.PrintList(damageSource)} damage with Body Armour.", preDamage, damage);
+                MenuManager.Instance.AddSoldierAlert(this, "DAMAGE ABSORBED", Color.green, $"{soldierName} absorbed {absorbedDamage} {HelperFunctions.PrintList(damageSource)} damage with Body Armour.", preDamage, damage);
             }
         }
 
@@ -1322,7 +1321,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (IsAlive())
         {
             //add damage alert
-            menu.AddSoldierAlert(this, "DAMAGE INCOMING", Color.red, $"{soldierName} has {damage} ({HelperFunctions.PrintList(damageSource)}) damage incoming.", damage, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE INCOMING", Color.red, $"{soldierName} has {damage} ({HelperFunctions.PrintList(damageSource)}) damage incoming.", damage, -1);
 
             //apply damage mods
             if (!skipDamageMods)
@@ -1374,14 +1373,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         {
                             int preHp = hp;
                             hp -= damage;
-                            menu.AddSoldierAlert(this, "DAMAGE SUFFERED", Color.red, $"{soldierName} suffers {damage} damage.", preHp, hp);
+                            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE SUFFERED", Color.red, $"{soldierName} suffers {damage} damage.", preHp, hp);
 
                             if (IsLastStand())
                             {
                                 if (ResilienceCheck())
                                 {
-                                    menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
-                                    menu.AddSoldierAlert(this, "UNCON RESISTED", Color.green, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", -1, -1);
+                                    MenuManager.Instance.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
+                                    MenuManager.Instance.AddSoldierAlert(this, "UNCON RESISTED", Color.green, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", -1, -1);
                                 }
                                 else
                                     MakeUnconscious(damagedBy, damageSource);
@@ -1393,8 +1392,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                                     if (ResilienceCheck())
                                     {
                                         MakeLastStand();
-                                        menu.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
-                                        menu.AddSoldierAlert(this, "UNCON RESISTED", Color.green, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", -1, -1);
+                                        MenuManager.Instance.AddXpAlert(this, 2, "Resisted Unconsciousness.", false);
+                                        MenuManager.Instance.AddSoldierAlert(this, "UNCON RESISTED", Color.green, $"{soldierName} resisted falling <color=blue>Unconscious</color>.", -1, -1);
                                     }
                                     else
                                         MakeUnconscious(damagedBy, damageSource);
@@ -1403,8 +1402,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                                 {
                                     if (ResilienceCheck())
                                     {
-                                        menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
-                                        menu.AddSoldierAlert(this, "LAST STAND RESISTED", Color.green, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", -1, -1);
+                                        MenuManager.Instance.AddXpAlert(this, 1, "Resisted Last Stand.", false);
+                                        MenuManager.Instance.AddSoldierAlert(this, "LAST STAND RESISTED", Color.green, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", -1, -1);
                                     }
                                     else
                                         MakeLastStand();
@@ -1421,8 +1420,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                                     if (pass)
                                     {
-                                        menu.AddXpAlert(this, 1, "Resisted Last Stand.", false);
-                                        menu.AddSoldierAlert(this, "LAST STAND RESISTED", Color.green, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", -1, -1);
+                                        MenuManager.Instance.AddXpAlert(this, 1, "Resisted Last Stand.", false);
+                                        MenuManager.Instance.AddSoldierAlert(this, "LAST STAND RESISTED", Color.green, $"{soldierName} resisted falling into <color=red>Last Stand</color>.", -1, -1);
                                     }
                                     else
                                         MakeLastStand();
@@ -1448,7 +1447,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void AddSoldierSnapshot(Soldier attackedBy)
     {
-        GameObject snapshot = Instantiate(soldierSnapshotAlertPrefab, menu.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+        GameObject snapshot = Instantiate(soldierSnapshotAlertPrefab, MenuManager.Instance.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
 
         snapshot.GetComponent<SoldierAlert>().SetSoldier(this);
         snapshot.transform.Find("SoldierID").GetComponent<TextMeshProUGUI>().text = attackedBy.Id;
@@ -1456,13 +1455,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         snapshot.transform.Find("SnapshotDetails").GetComponent<TextMeshProUGUI>().text = $"{soldierName} has informed on an attacker ({attackedBy.soldierName}). Click to see details.";
 
         //try and open damagealert
-        StartCoroutine(menu.OpenDamageList());
+        StartCoroutine(MenuManager.Instance.OpenDamageList());
     }
 
     public void TabunTraumaCheck()
     {
-        menu.AddTraumaAlert(this, 1, "Tabun exposure.", stats.R.Val + stats.Heal.Val, 1, "");
-        StartCoroutine(menu.OpenTraumaAlertUI());
+        MenuManager.Instance.AddTraumaAlert(this, 1, "Tabun exposure.", stats.R.Val + stats.Heal.Val, 1, "");
+        StartCoroutine(MenuManager.Instance.OpenTraumaAlertUI());
     }
     public void TakeTrauma(int trauma)
     {
@@ -1502,8 +1501,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 if (healedBy != null)
                 {
-                    menu.AddXpAlert(healedBy, 2, $"Revived {soldierName}.", true);
-                    menu.AddSoldierAlert(this, "REVIVED", Color.green, $"{soldierName} was revived by {healedBy.soldierName} (Uncon -> LS).", hp, hp);
+                    MenuManager.Instance.AddXpAlert(healedBy, 2, $"Revived {soldierName}.", true);
+                    MenuManager.Instance.AddSoldierAlert(this, "REVIVED", Color.green, $"{soldierName} was revived by {healedBy.soldierName} (Uncon -> LS).", hp, hp);
                 }
                 MakeLastStand();
             }
@@ -1519,20 +1518,20 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     //add xp for successful heal
                     if (healedBy == this)
                     {
-                        menu.AddXpAlert(healedBy, Mathf.CeilToInt((actualHeal + actualTraumaHeal) / 2.0f), $"Healed self by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
-                        menu.AddSoldierAlert(this, "HEALED", Color.green, $"{soldierName} healed self. Gained {actualHeal} hp and removed {actualTraumaHeal} trauma point(s).", preHealHp, hp);
+                        MenuManager.Instance.AddXpAlert(healedBy, Mathf.CeilToInt((actualHeal + actualTraumaHeal) / 2.0f), $"Healed self by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
+                        MenuManager.Instance.AddSoldierAlert(this, "HEALED", Color.green, $"{soldierName} healed self. Gained {actualHeal} hp and removed {actualTraumaHeal} trauma point(s).", preHealHp, hp);
                     }
                     else
                     {
-                        menu.AddXpAlert(healedBy, actualHeal + actualTraumaHeal, $"Healed {soldierName} by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
-                        menu.AddSoldierAlert(this, "HEALED", Color.green, $"{soldierName} was healed by {healedBy.soldierName}. Gained {actualHeal} hp and removed {actualTraumaHeal} trauma point(s).", preHealHp, hp);
+                        MenuManager.Instance.AddXpAlert(healedBy, actualHeal + actualTraumaHeal, $"Healed {soldierName} by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
+                        MenuManager.Instance.AddSoldierAlert(this, "HEALED", Color.green, $"{soldierName} was healed by {healedBy.soldierName}. Gained {actualHeal} hp and removed {actualTraumaHeal} trauma point(s).", preHealHp, hp);
                     }
 
                     //stabilise if in last stand
                     if (IsLastStand())
                     {
                         MakeActive();
-                        menu.AddSoldierAlert(this, "STABILISED", Color.green, $"{soldierName} was stabilised from <color=red>Last Stand</color> to Active.", -1, -1);
+                        MenuManager.Instance.AddSoldierAlert(this, "STABILISED", Color.green, $"{soldierName} was stabilised from <color=red>Last Stand</color> to Active.", -1, -1);
                     }
                 }
             }
@@ -2025,8 +2024,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //show the losLostList popup if no more soldier's revealing
         if (actualRemove && !SoldiersRevealingThisSoldier.Any() && IsAlive() && !IsPlayingDead())
         {
-            menu.AddLostLosAlert(this);
-            StartCoroutine(menu.OpenLostLOSList());
+            MenuManager.Instance.AddLostLosAlert(this);
+            StartCoroutine(MenuManager.Instance.OpenLostLOSList());
         }
     }
 
@@ -2403,13 +2402,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (resistable && ResilienceCheck())
         {
-            menu.AddXpAlert(this, stats.R.Val, "Resisted poisoning.", true);
-            menu.AddSoldierAlert(this, "RESISTED POISON", Color.green, $"{soldierName} resisted poisoning.", -1, -1);
+            MenuManager.Instance.AddXpAlert(this, stats.R.Val, "Resisted poisoning.", true);
+            MenuManager.Instance.AddSoldierAlert(this, "RESISTED POISON", Color.green, $"{soldierName} resisted poisoning.", -1, -1);
         }
         else
         {
             this.poisonedBy = poisonedBy;
-            menu.AddSoldierAlert(this, "SUFFERED POISON", Color.red, $"{soldierName} was poisoned!", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "SUFFERED POISON", Color.red, $"{soldierName} was poisoned!", -1, -1);
             SetPoisoned();
         }
     }
@@ -2502,7 +2501,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         UnsetState("SmokeBlinded");
         SetState("SmokeCovered");
-        menu.AddSoldierAlert(this, "SMOKE COVERED", Color.green, $"{soldierName} is in a smoke cloud (<color=green>Defence Zone</color>).", -1, -1);
+        MenuManager.Instance.AddSoldierAlert(this, "SMOKE COVERED", Color.green, $"{soldierName} is in a smoke cloud (<color=green>Defence Zone</color>).", -1, -1);
 
         SetLosCheck("statChange(P)(SR)|smokeActive(defencezone)"); //losCheck
     }
@@ -2510,7 +2509,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         UnsetState("SmokeCovered");
         SetState("SmokeBlinded");
-        menu.AddSoldierAlert(this, "SMOKE BLINDED", Color.yellow, $"{soldierName} is in a smoke cloud (<color=red>Blind Zone</color>).", -1, -1);
+        MenuManager.Instance.AddSoldierAlert(this, "SMOKE BLINDED", Color.yellow, $"{soldierName} is in a smoke cloud (<color=red>Blind Zone</color>).", -1, -1);
 
         SetLosCheck("statChange(P)(SR)|smokeActive(blindzone)"); //losCheck
     }
@@ -2556,18 +2555,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (rCheck && healCheck)
         {
-            menu.AddXpAlert(this, 2, $"{soldierName} resisted tabun gas.", false);
-            menu.AddSoldierAlert(this, "TABUN RESISTED", Color.green, $"Fully resists tabun gas.", -1, -1);
+            MenuManager.Instance.AddXpAlert(this, 2, $"{soldierName} resisted tabun gas.", false);
+            MenuManager.Instance.AddSoldierAlert(this, "TABUN RESISTED", Color.green, $"Fully resists tabun gas.", -1, -1);
         }
         else if (rCheck ^ healCheck)
         {
             SetTabunEffectLevel(25);
-            menu.AddSoldierAlert(this, "TABUN SUFFERED", Color.yellow, $"Suffers <color=yellow>Light</color> effects from tabun gas.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "TABUN SUFFERED", Color.yellow, $"Suffers <color=yellow>Light</color> effects from tabun gas.", -1, -1);
         }
         else
         {
             SetTabunEffectLevel(50);
-            menu.AddSoldierAlert(this, "TABUN SUFFERED", new(1f, 0.6470588f, 0f, 1f), $"Suffers <color=orange>Moderate</color> effects from tabun gas.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "TABUN SUFFERED", new(1f, 0.6470588f, 0f, 1f), $"Suffers <color=orange>Moderate</color> effects from tabun gas.", -1, -1);
         }
     }
     public void SetTabunInnerAffected()
@@ -2580,21 +2579,21 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (rCheck && healCheck)
         {
-            menu.AddXpAlert(this, 2, $"Fully resisted tabun gas.", false);
-            menu.AddSoldierAlert(this, "TABUN RESISTED", Color.green, $"Fully resisted tabun gas.", -1, -1);
+            MenuManager.Instance.AddXpAlert(this, 2, $"Fully resisted tabun gas.", false);
+            MenuManager.Instance.AddSoldierAlert(this, "TABUN RESISTED", Color.green, $"Fully resisted tabun gas.", -1, -1);
         }
         else if (rCheck ^ healCheck)
         {
-            menu.AddXpAlert(this, 1, $"Partially resisted tabun gas.", false);
+            MenuManager.Instance.AddXpAlert(this, 1, $"Partially resisted tabun gas.", false);
             SetTabunEffectLevel(50);
-            menu.AddSoldierAlert(this, "TABUN SUFFERED", new(1f, 0.6470588f, 0f, 1f), $"Suffered <color=orange>Moderate</color> effects from tabun gas.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "TABUN SUFFERED", new(1f, 0.6470588f, 0f, 1f), $"Suffered <color=orange>Moderate</color> effects from tabun gas.", -1, -1);
 
             SetLosCheck("statChange(P)(C)(SR)|tabunActive(half)"); //losCheck
         }
         else
         {
             SetTabunEffectLevel(100);
-            menu.AddSoldierAlert(this, "TABUN SUFFERED", Color.red, $"Suffered <color=red>Severe</color> effects from tabun gas.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "TABUN SUFFERED", Color.red, $"Suffered <color=red>Severe</color> effects from tabun gas.", -1, -1);
 
             SetLosCheck("statChange(P)(C)(SR)|tabunActive(full)"); //losCheck
         }
@@ -2742,12 +2741,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 if (resistedRounds > 0)
                 {
-                    menu.AddSoldierAlert(this, "STUN RESISTED", Color.green, $"Resists {resistedRounds} rounds of stun.", -1, -1);
-                    menu.AddXpAlert(this, resistedRounds, $"Resisting stun ({resistedRounds} rounds).", true);
+                    MenuManager.Instance.AddSoldierAlert(this, "STUN RESISTED", Color.green, $"Resists {resistedRounds} rounds of stun.", -1, -1);
+                    MenuManager.Instance.AddXpAlert(this, resistedRounds, $"Resisting stun ({resistedRounds} rounds).", true);
                 }
                 if (actualRoundsStun > 0)
                 {
-                    menu.AddSoldierAlert(this, "STUN SUFFERED", Color.red, $"Suffers {stunRounds - resistedRounds} rounds of stun.", -1, -1);
+                    MenuManager.Instance.AddSoldierAlert(this, "STUN SUFFERED", Color.red, $"Suffers {stunRounds - resistedRounds} rounds of stun.", -1, -1);
                     SetStunned(actualRoundsStun * 2);
                 }
 
@@ -2774,12 +2773,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void MakeLastStand()
     {
         if (IsWearingJuggernautArmour(false))
-            menu.AddSoldierAlert(this, "LAST STAND RESISTED", Color.green, $"Resists <color=red>Last Stand</color> with Juggernaut Armour.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "LAST STAND RESISTED", Color.green, $"Resists <color=red>Last Stand</color> with Juggernaut Armour.", -1, -1);
         else
         {
             ClearHealthState();
             SetState("Last Stand");
-            menu.AddSoldierAlert(this, "LAST STAND", Color.red, $"Falls into <color=red>Last Stand</color>.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(this, "LAST STAND", Color.red, $"Falls into <color=red>Last Stand</color>.", -1, -1);
 
             SetLosCheck("losChange|healthState(lastStand)"); //losCheck
         }
@@ -2790,7 +2789,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         ClearHealthState();
         SetState("Unconscious");
-        menu.AddSoldierAlert(this, "UNCONSCIOUS", Color.blue, $"Falls <color=blue>Unconscious ({bleedoutTurns})</color>.", -1, -1);
+        MenuManager.Instance.AddSoldierAlert(this, "UNCONSCIOUS", Color.blue, $"Falls <color=blue>Unconscious ({bleedoutTurns})</color>.", -1, -1);
         
         //set up payout for who made soldier uncon
         if (damagedBy != null)
@@ -2839,7 +2838,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (modaProtect)
             {
-                menu.AddSoldierAlert(this, "DEATH RESISTED", Color.green, $"Resists death with Modafinil. He gets an immediate turn.", -1, -1);
+                MenuManager.Instance.AddSoldierAlert(this, "DEATH RESISTED", Color.green, $"Resists death with Modafinil. He gets an immediate turn.", -1, -1);
                 game.StartModaTurn(this, killedBy, damageSource);
             }
             else 
@@ -2848,7 +2847,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (killedBy != null && killedBy.IsOnturn() && killedBy.IsConscious())
                     SoundManager.Instance.PlaySoldierKillEnemy(killedBy);
 
-                menu.AddSoldierAlert(this, "DEATH", Color.red, $"Dies from {HelperFunctions.PrintList(damageSource)}.", hp, 0);
+                MenuManager.Instance.AddSoldierAlert(this, "DEATH", Color.red, $"Dies from {HelperFunctions.PrintList(damageSource)}.", hp, 0);
 
                 //make him dead
                 ClearHealthState();
@@ -2883,18 +2882,18 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 {
                     //pay xp for relevant damage type kill
                     if (damageSource.Contains("Shot"))
-                        menu.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
+                        MenuManager.Instance.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
                     else if (damageSource.Contains("Melee"))
                     {
                         if (damageSource.Contains("Counter"))
-                            menu.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
+                            MenuManager.Instance.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
                         else
-                            menu.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
+                            MenuManager.Instance.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
                         killedBy.BrawlerMeleeKillReward(damageSource);
                     }
                     else if (damageSource.Contains("Poison"))
-                        menu.AddXpAlert(killedBy, 10 + this.stats.R.Val, $"Killed {soldierName} by poisoning.", false);
+                        MenuManager.Instance.AddXpAlert(killedBy, 10 + this.stats.R.Val, $"Killed {soldierName} by poisoning.", false);
 
                     //set haskilled flag for avenger
                     if (this.IsOppositeTeamAs(killedBy))
@@ -3234,7 +3233,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (message == "")
             return true;
         else
-            menu.OpenCannotUseItemUI(message);
+            MenuManager.Instance.OpenCannotUseItemUI(message);
 
         return false;
     }
@@ -3286,13 +3285,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (ResilienceCheck())
             {
-                menu.AddSoldierAlert(this, "SUPPRESSION RESISTED", Color.green, $"Resists {suppressionValue} suppression.", -1, -1);
-                menu.AddXpAlert(this, 1, "Resisted Suppression.", true);
+                MenuManager.Instance.AddSoldierAlert(this, "SUPPRESSION RESISTED", Color.green, $"Resists {suppressionValue} suppression.", -1, -1);
+                MenuManager.Instance.AddXpAlert(this, 1, "Resisted Suppression.", true);
                 return true;
             }
             else
             {
-                menu.AddSoldierAlert(this, "UNDER SUPPRESSION", Color.red, $"Suppressed for {suppressionValue}.", -1, -1);
+                MenuManager.Instance.AddSoldierAlert(this, "UNDER SUPPRESSION", Color.red, $"Suppressed for {suppressionValue}.", -1, -1);
                 return false;
             }
         }
@@ -3714,19 +3713,19 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         if (IsUsingBinocularsInFlashMode())
         {
-            menu.binocularsFlashResolvedFlag = false;
+            MenuManager.Instance.binocularsFlashResolvedFlag = false;
 
             yield return new WaitForSeconds(0.5f);
 
-            menu.binocularsFlashResolvedFlag = true;
+            MenuManager.Instance.binocularsFlashResolvedFlag = true;
 
-            if (menu.detectionUI.detectionAlertsPanel.childCount.Equals(0)) //no detections appeared
+            if (MenuManager.Instance.detectionUI.detectionAlertsPanel.childCount.Equals(0)) //no detections appeared
                 UnsetUsingBinoculars();
         }
     }
     public void UnsetUsingBinoculars()
     {
-        menu.binocularsFlashResolvedFlag = true;
+        MenuManager.Instance.binocularsFlashResolvedFlag = true;
         SetLosCheck("losChange|statChange(P)|binocularsDeactive"); //losCheck
 
         StartCoroutine((POIManager.Instance.FindPOIById(binocularBeamId.Split("|")[0]) as BinocularBeam).DestroyBeam());
@@ -4211,29 +4210,29 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool CheckAP(int ap)
     {
         //check if it's on the current players turn
-        if (menu.OverrideView)
+        if (MenuManager.Instance.OverrideView)
             return true;
         else
         {
             if (this.ap >= ap)
             {
-                if (!menu.meleeUI.isActiveAndEnabled && IsMeleeControlling() && ap > 1)
+                if (!MenuManager.Instance.meleeUI.isActiveAndEnabled && IsMeleeControlling() && ap > 1)
                 {
-                    menu.generalAlertUI.Activate("Cannot perform actions >1AP while controlling melee");
+                    MenuManager.Instance.generalAlertUI.Activate("Cannot perform actions >1AP while controlling melee");
                     return false;
                 }
                 return true;
             }
             else
             {
-                menu.generalAlertUI.Activate("Not enough AP to perform action");
+                MenuManager.Instance.generalAlertUI.Activate("Not enough AP to perform action");
                 return false;
             }
         }
     }
     public bool CheckMP(int mp)
     {
-        if (menu.OverrideView)
+        if (MenuManager.Instance.OverrideView)
             return true;
         else
         {
@@ -4241,14 +4240,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 return true;
             else
             {
-                menu.generalAlertUI.Activate("Not enough MA to perform move");
+                MenuManager.Instance.generalAlertUI.Activate("Not enough MA to perform move");
                 return false;
             }
         }
     }
     public void DeductAP(int ap)
     {
-        if (!menu.OverrideView && ap > 0)
+        if (!MenuManager.Instance.OverrideView && ap > 0)
         {
             this.ap -= ap;
             usedAP = true;
@@ -4262,7 +4261,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void DeductMP(int mp)
     {
-        if (!menu.OverrideView && mp > 0)
+        if (!MenuManager.Instance.OverrideView && mp > 0)
         {
             this.mp -= mp;
             usedMP = true;
@@ -4301,7 +4300,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         foreach (TextMeshProUGUI t in statLabels)
         {
-            foreach (string[] s in menu.AllStats)
+            foreach (string[] s in MenuManager.Instance.AllStats)
             {
                 Color displayColor = Color.white;
                 if (t.text == s[0] && s[1] == soldierSpeciality)

@@ -19,7 +19,6 @@ public class SmokeCloud : POI, IDataPersistence
 
     private void Start()
     {
-        menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
     }
 
@@ -96,10 +95,10 @@ public class SmokeCloud : POI, IDataPersistence
         //pay xp
         int xp = alliesAffected.Count - enemiesAffected.Count;
         if (xp > 0)
-            menu.AddXpAlert(placedBy, xp, $"Smoke grenade covered {alliesAffected.Count} allies and {enemiesAffected.Count} enemies.", true);
+            MenuManager.Instance.AddXpAlert(placedBy, xp, $"Smoke grenade covered {alliesAffected.Count} allies and {enemiesAffected.Count} enemies.", true);
 
         //show dissipation alert
-        menu.CreateCloudDissipationAlert(this);
+        MenuManager.Instance.CreateCloudDissipationAlert(this);
 
         //dissipate and recheck
         game.CheckAllSmokeClouds();

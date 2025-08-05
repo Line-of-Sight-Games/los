@@ -71,9 +71,9 @@ public class TraumaAlert : SoldierAlert
                 if (resisted)
                 {
                     if (description.text.Contains("Tabun"))
-                        soldier.menu.AddXpAlert(soldier, xpOnResist, $"Resisted tabun trauma.", true);
+                        MenuManager.Instance.AddXpAlert(soldier, xpOnResist, $"Resisted tabun trauma.", true);
                     else
-                        soldier.menu.AddXpAlert(soldier, xpOnResist, $"Resisted trauma from death witnessed at {range} range.", true);
+                        MenuManager.Instance.AddXpAlert(soldier, xpOnResist, $"Resisted trauma from death witnessed at {range} range.", true);
 
                     title.text = "<color=green>TRAUMA RESISTED</color>";
                     description.text = $"{soldier.soldierName} resisted the trauma.";

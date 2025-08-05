@@ -7,8 +7,6 @@ using UnityEngine.EventSystems;
 
 public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public MainMenu menu;
-
     public bool s1Entered, s1Exited, s2Entered, s2Exited; 
 
     public Soldier s1;
@@ -42,10 +40,6 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public GameObject causeOfLosCheckCounterObject;
     public TextMeshProUGUI causeOfLosCheckCounter;
 
-    private void Start()
-    {
-        menu = FindFirstObjectByType<MainMenu>();
-    }
     public SoldierAlertLOS Init(Soldier s1, Soldier s2)
     {
         SetSoldiers(s1, s2);
@@ -330,13 +324,13 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     //pointer hover functions
     public void OnPointerEnter(PointerEventData eventData)
     {
-        menu.CreateLOSArrowPair(s1, s2);
+        MenuManager.Instance.CreateLOSArrowPair(s1, s2);
         causeOfLosCheckDetectorObject.SetActive(true);
         causeOfLosCheckCounterObject.SetActive(true);
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        menu.DestroyLOSArrowPair(s1, s2);
+        MenuManager.Instance.DestroyLOSArrowPair(s1, s2);
         causeOfLosCheckDetectorObject.SetActive(false);
         causeOfLosCheckCounterObject.SetActive(false);
     }

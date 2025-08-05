@@ -38,7 +38,7 @@ public class SoldierPortrait : MonoBehaviour
             soldierRank.sprite = linkedSoldier.LoadInsignia(linkedSoldier.rank);
 
             //load hp
-            if (linkedSoldier.IsOnturn() || linkedSoldier.menu.OverrideView)
+            if (linkedSoldier.IsOnturn() || MenuManager.Instance.OverrideView)
             {
                 armourImage.gameObject.SetActive(false);
                 brokenArmourImage.gameObject.SetActive(false);

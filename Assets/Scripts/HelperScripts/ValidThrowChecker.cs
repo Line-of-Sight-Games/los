@@ -5,16 +5,10 @@ using System.Linq;
 
 public class ValidThrowChecker : MonoBehaviour
 {
-    public MainMenu menu;
     public TMP_InputField XPos, YPos, ZPos;
     public GameObject throwBeyondRadius, throwBeyondBlindRadius, pressedOnce, catcher, itemWillBreak, scatteredOffMap;
     public TMP_Dropdown catcherDropdown;
     public UseItemUI useItemUI;
-
-    private void Start()
-    {
-        menu = FindFirstObjectByType<MainMenu>();
-    }
 
     private void Update()
     {
@@ -30,7 +24,7 @@ public class ValidThrowChecker : MonoBehaviour
     {
         scatteredOffMap.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && (throwLocation.x <= 0 || throwLocation.x > menu.game.maxX || throwLocation.y <= 0 || throwLocation.y > menu.game.maxY)) //is scattering off map
+        if (GetThrowLocation(out Vector3 throwLocation) && (throwLocation.x <= 0 || throwLocation.x > MenuManager.Instance.game.maxX || throwLocation.y <= 0 || throwLocation.y > MenuManager.Instance.game.maxY)) //is scattering off map
             scatteredOffMap.SetActive(true);
     }
     public void CheckThrowingRange()
@@ -42,14 +36,14 @@ public class ValidThrowChecker : MonoBehaviour
         {
             if (GetThrowLocation(out Vector3 throwLocation))
             {
-                if (menu.activeSoldier.IsAbleToSee() && menu.activeSoldier.HasStrength())
+                if (MenuManager.Instance.activeSoldier.IsAbleToSee() && MenuManager.Instance.activeSoldier.HasStrength())
                 {
-                    if (!IsWithinBounds(menu.activeSoldier, throwLocation))
+                    if (!IsWithinBounds(MenuManager.Instance.activeSoldier, throwLocation))
                         throwBeyondRadius.SetActive(true);
                 }
                 else
                 {
-                    if (!IsWithinDropBounds(menu.activeSoldier, throwLocation)) //dropping allowed while blind within 3 or 0 strength
+                    if (!IsWithinDropBounds(MenuManager.Instance.activeSoldier, throwLocation)) //dropping allowed while blind within 3 or 0 strength
                         throwBeyondBlindRadius.SetActive(true);
                 }
             }
@@ -93,9 +87,9 @@ public class ValidThrowChecker : MonoBehaviour
 
         if (GetThrowLocation(out Vector3 throwLocation))
         {
-            foreach (Soldier s in menu.game.AllSoldiers())
+            foreach (Soldier s in MenuManager.Instance.game.AllSoldiers())
             {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(menu.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
+                if (s.IsAbleToSee() && s.IsSameTeamAs(MenuManager.Instance.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
                 {
                     if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
                         catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });
@@ -110,7 +104,7 @@ public class ValidThrowChecker : MonoBehaviour
     {
         itemWillBreak.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && menu.activeSoldier.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
+        if (GetThrowLocation(out Vector3 throwLocation) && MenuManager.Instance.activeSoldier.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
             itemWillBreak.SetActive(true);
     }
 }

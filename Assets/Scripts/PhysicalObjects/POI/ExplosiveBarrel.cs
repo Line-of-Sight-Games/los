@@ -11,7 +11,6 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     public bool exploded;
     private void Start()
     {
-        menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
     }
 
@@ -67,7 +66,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         //play explosion sfx
         SoundManager.Instance.PlayExplosion();
 
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel | Detonated: {X},{Y},{Z}", new(X, Y, Z)).gameObject;
+        GameObject explosionList = Instantiate(MenuManager.Instance.explosionListPrefab, MenuManager.Instance.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel | Detonated: {X},{Y},{Z}", new(X, Y, Z)).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         //create explosion objects
@@ -88,16 +87,16 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
             if (damage > 0)
             {
                 if (obj is Item hitItem)
-                    menu.AddExplosionAlertItem(explosionList, hitItem, new(X, Y), explodedBy, damage);
+                    MenuManager.Instance.AddExplosionAlertItem(explosionList, hitItem, new(X, Y), explodedBy, damage);
                 else if (obj is POI hitPoi && hitPoi != this)
-                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                    MenuManager.Instance.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y), explodedBy, damage, 1);
+                    MenuManager.Instance.AddExplosionAlert(explosionList, hitSoldier, new(X, Y), explodedBy, damage, 1);
             }
         }
 
         //show explosion ui
-        menu.OpenExplosionUI();
+        MenuManager.Instance.OpenExplosionUI();
         
         POIManager.Instance.DestroyPOI(this);
     }

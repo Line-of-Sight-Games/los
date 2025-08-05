@@ -67,7 +67,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     private void Awake()
     {
         game = FindFirstObjectByType<MainGame>();
-        menu = FindFirstObjectByType<MainMenu>();
         reader = FindFirstObjectByType<ItemReader>();
     }
     private void Update()
@@ -772,14 +771,14 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 if (effect.Equals("spy"))
                 {
                     SetSpying();
-                    menu.OpenULFResultUI("<color=green>Spying successful!</color>");
+                    MenuManager.Instance.OpenULFResultUI("<color=green>Spying successful!</color>");
                 }
                 else
                 {
                     SetJamming();
-                    menu.OpenULFResultUI("<color=green>Jamming successful!</color>");
+                    MenuManager.Instance.OpenULFResultUI("<color=green>Jamming successful!</color>");
                 }
-                menu.AddXpAlert(linkedSoldier, 2, $"{linkedSoldier.soldierName} successfully used a ULF radio to {effect}.", true);
+                MenuManager.Instance.AddXpAlert(linkedSoldier, 2, $"{linkedSoldier.soldierName} successfully used a ULF radio to {effect}.", true);
 
                 //perform loud action
                 linkedSoldier.PerformLoudAction(24);
@@ -797,7 +796,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             {
                 FileUtility.WriteToReport($"{linkedSoldier.soldierName} fails to use ulf to {effect}."); //write to report
 
-                menu.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
+                MenuManager.Instance.OpenULFResultUI("<color=red>Unsuccessful</color> ULF use.");
             }
                 
         }
@@ -825,7 +824,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     //play use etool
                     SoundManager.Instance.PlayUseETool();
 
-                    menu.OpenEtoolResultUI();
+                    MenuManager.Instance.OpenEtoolResultUI();
                     break;
                 case "Food_Pack":
                     if (poisonedBy == null || poisonedBy == "")
@@ -950,7 +949,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         //play use grenade sfx
         SoundManager.Instance.PlayUseGrenade(this);
 
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} | Detonated: {position.x},{position.y},{position.z}", position).gameObject;
+        GameObject explosionList = Instantiate(MenuManager.Instance.explosionListPrefab, MenuManager.Instance.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} | Detonated: {position.x},{position.y},{position.z}", position).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.Id;
 
         if (IsFrag())
@@ -976,11 +975,11 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 if (damage > 0)
                 {
                     if (obj is Item hitItem)
-                        menu.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, damage);
+                        MenuManager.Instance.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, damage);
                     else if (obj is POI hitPoi)
-                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                        MenuManager.Instance.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
                     else if (obj is Soldier hitSoldier)
-                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage, 1);
+                        MenuManager.Instance.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage, 1);
                 }
             }
         }
@@ -1016,12 +1015,12 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                         if (damage < 0)
                             damage = 0;
 
-                        menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage, stun);
+                        MenuManager.Instance.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, damage, stun);
                     }
                     else if (obj is POI hitPoi && damage > 0)
-                        menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
+                        MenuManager.Instance.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, damage);
                     else if (obj is Item hitItem && damage > 0)
-                        menu.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, damage);
+                        MenuManager.Instance.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, damage);
                 }
             }
         }
@@ -1049,7 +1048,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
 
         //show explosion ui
-        menu.OpenExplosionUI();
+        MenuManager.Instance.OpenExplosionUI();
 
         DestroyItem(explodedBy);
     }
@@ -1073,7 +1072,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public void DestroyItem(Soldier destroyedBy)
     {
         if (owner != null && owner is Soldier linkedSoldier)
-            menu.AddSoldierAlert(linkedSoldier, "ITEM DESTROYED", Color.red, $"{linkedSoldier.soldierName} had {this.itemName} ({this.X},{this.Y},{this.Z}) destroyed.", -1, -1);
+            MenuManager.Instance.AddSoldierAlert(linkedSoldier, "ITEM DESTROYED", Color.red, $"{linkedSoldier.soldierName} had {this.itemName} ({this.X},{this.Y},{this.Z}) destroyed.", -1, -1);
 
         ConsumeItem();
     }

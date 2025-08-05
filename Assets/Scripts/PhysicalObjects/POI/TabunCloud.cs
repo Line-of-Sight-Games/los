@@ -15,7 +15,6 @@ public class TabunCloud : POI, IDataPersistence
 
     private void Start()
     {
-        menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
     }
 
@@ -91,10 +90,10 @@ public class TabunCloud : POI, IDataPersistence
         //pay xp
         int xp = enemiesAffected.Count - alliesAffected.Count;
         if (xp > 0)
-            menu.AddXpAlert(placedBy, xp, $"Tabun grenade affected {enemiesAffected.Count} enemies and {alliesAffected.Count} allies.", false);
+            MenuManager.Instance.AddXpAlert(placedBy, xp, $"Tabun grenade affected {enemiesAffected.Count} enemies and {alliesAffected.Count} allies.", false);
 
         //show dissipation alert
-        menu.CreateCloudDissipationAlert(this);
+        MenuManager.Instance.CreateCloudDissipationAlert(this);
 
         //dissipate and recheck
         game.CheckAllTabunClouds();

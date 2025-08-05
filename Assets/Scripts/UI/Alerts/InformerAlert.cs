@@ -6,11 +6,10 @@ public class InformerAlert : SoldierAlert
 {
     public void OpenSoldierSnapshot(TextMeshProUGUI snappedSoldierID)
     {
-        MainMenu menu = FindFirstObjectByType<MainMenu>();
         Soldier snapshotSoldier = SoldierManager.Instance.FindSoldierById(snappedSoldierID.text);
         if (snapshotSoldier != null)
         {
-            GameObject soldierSnapshot = Instantiate(menu.soldierSnapshotPrefab, menu.damageUI.transform);
+            GameObject soldierSnapshot = Instantiate(MenuManager.Instance.soldierSnapshotPrefab, MenuManager.Instance.damageUI.transform);
             soldierSnapshot.transform.SetAsLastSibling();
             Transform soldierBanner = soldierSnapshot.transform.Find("SoldierBanner");
 
@@ -26,7 +25,7 @@ public class InformerAlert : SoldierAlert
 
             soldier.PaintSpeciality(soldierStatsUI);
 
-            foreach (string[] s in menu.AllStats)
+            foreach (string[] s in MenuManager.Instance.AllStats)
             {
                 Color displayColor = Color.white;
                 if (snapshotSoldier.stats.GetStat(s[0]).Val < snapshotSoldier.stats.GetStat(s[0]).BaseVal)

@@ -8,7 +8,6 @@ using System.Collections;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public MainMenu menu;
     public Item item; // The item associated with this icon
     public RectTransform rectTransform;
     private CanvasGroup canvasGroup;
@@ -39,7 +38,6 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         print($"trying to initialise prefab of {item.itemName}({item.Id})");
         this.item = item;
         gameObject.name = item.itemName;
-        menu = FindFirstObjectByType<MainMenu>();
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         this.originalSlot = originalSlot;
@@ -101,7 +99,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             ammoIndicator.gameObject.SetActive(false);
 
         //show override ammo field
-        if (menu.OverrideView)
+        if (MenuManager.Instance.OverrideView)
         {
             if (item.IsGun() || item.IsAmmo())
             {
@@ -123,7 +121,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             if (slot.item == null)
             {
                 print("targetslot is empty");
-                ItemIcon newItemIcon = Instantiate(menu.itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item, slot);
+                ItemIcon newItemIcon = Instantiate(MenuManager.Instance.itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item, slot);
                 print($"{newItemIcon.name} @ {newItemIcon.transform}");
                 slot.AssignItemIcon(newItemIcon);
             }
@@ -185,7 +183,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         canvasGroup.blocksRaycasts = true;
         GameObject targetDrop = eventData.pointerEnter;
         string originalInventoryId = "none", targetInventoryId = "none", originalSlotName = item.whereEquipped, targetSlotName = "none";
-        if (!menu.onItemUseScreen && !menu.inventorySourceViewOnly)
+        if (!MenuManager.Instance.onItemUseScreen && !MenuManager.Instance.inventorySourceViewOnly)
         {
             if (targetDrop != null)
             {
@@ -274,14 +272,14 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             else
                 ReturnToOldSlot();
 
-            menu.game.UpdateConfigureAP();
+            MenuManager.Instance.game.UpdateConfigureAP();
         }
         else
             ReturnToOldSlot();
     }
     public void UseItem()
     {
-        if (menu.onItemUseScreen && !menu.OverrideView)
+        if (MenuManager.Instance.onItemUseScreen && !MenuManager.Instance.OverrideView)
         {
             if (item.IsUsable())
             {
@@ -335,28 +333,28 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     {
                         int ap = item.usageAP;
                         //adept ability
-                        if (menu.activeSoldier.IsAdept() && item.usageAP > 1)
+                        if (MenuManager.Instance.activeSoldier.IsAdept() && item.usageAP > 1)
                             ap--;
                         //gunner ability
-                        if (menu.activeSoldier.IsGunner() && item.IsAmmo())
+                        if (MenuManager.Instance.activeSoldier.IsGunner() && item.IsAmmo())
                             ap = 1;
 
-                        if (menu.activeSoldier.CheckAP(ap))
+                        if (MenuManager.Instance.activeSoldier.CheckAP(ap))
                         {
-                            if (menu.activeSoldier.HandsFreeToUseItem(item))
-                                menu.OpenUseItemUI(item, transform.parent.name, this, ap);
+                            if (MenuManager.Instance.activeSoldier.HandsFreeToUseItem(item))
+                                MenuManager.Instance.OpenUseItemUI(item, transform.parent.name, this, ap);
                         }
                     }
                 }
                 
             }
             else
-                menu.generalAlertUI.Activate("This item is not usable in this way.");
+                MenuManager.Instance.generalAlertUI.Activate("This item is not usable in this way.");
         }
     }
     public void DropThrowItem()
     {
-        if (menu.onItemUseScreen && !menu.OverrideView)
+        if (MenuManager.Instance.onItemUseScreen && !MenuManager.Instance.OverrideView)
         {
             if (item.IsThrowable())
             {
@@ -375,7 +373,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             }
             else
             {
-                menu.OpenDropThrowItemUI("drop", item, transform.parent.name, this);
+                MenuManager.Instance.OpenDropThrowItemUI("drop", item, transform.parent.name, this);
             }
         }
     }

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class DetectionUI : MonoBehaviour
 {
-    public MainMenu menu;
     public Transform detectionAlertsPanel;
     public List<SoldierAlertLOS> allSoldierDetectionAlerts;
     public List<ClaymoreAlertLOS> allClaymoreDetectionAlerts;
@@ -42,7 +41,7 @@ public class DetectionUI : MonoBehaviour
         allSoldierDetectionAlerts.Add(detectionAlert);
 
         //try to open detectionUI
-        menu.StartCoroutine(menu.OpenDetectionAlertUI());
+        MenuManager.Instance.StartCoroutine(MenuManager.Instance.OpenDetectionAlertUI());
 
         return detectionAlert;
     }
@@ -108,7 +107,7 @@ public class DetectionUI : MonoBehaviour
         allClaymoreDetectionAlerts.Add(detectionAlert);
 
         //try to open detectionUI
-        menu.StartCoroutine(menu.OpenDetectionAlertUI());
+        MenuManager.Instance.StartCoroutine(MenuManager.Instance.OpenDetectionAlertUI());
 
         return detectionAlert;
     }
@@ -152,7 +151,7 @@ public class DetectionUI : MonoBehaviour
         allThermalCamDetectionAlerts.Add(detectionAlert);
 
         //try to open detectionUI
-        menu.StartCoroutine(menu.OpenDetectionAlertUI());
+        MenuManager.Instance.StartCoroutine(MenuManager.Instance.OpenDetectionAlertUI());
 
         return detectionAlert;
     }

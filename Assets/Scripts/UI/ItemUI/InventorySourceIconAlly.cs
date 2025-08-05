@@ -8,7 +8,6 @@ public class InventorySourceIconAlly : InventorySourceIcon
 
     public InventorySourceIcon Init(Soldier s, InventorySourcePanel inventorySourcePanel)
     {
-        menu = FindFirstObjectByType<MainMenu>();
         linkedSoldier = s;
         linkedInventoryPanel = inventorySourcePanel;
         transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(s);

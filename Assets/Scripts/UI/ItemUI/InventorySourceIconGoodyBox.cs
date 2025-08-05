@@ -10,7 +10,6 @@ public class InventorySourceIconGoodyBox : InventorySourceIcon
 
     public InventorySourceIcon Init(GoodyBox gb, InventorySourcePanel inventorySourcePanel)
     {
-        menu = FindFirstObjectByType<MainMenu>();
         linkedGB = gb;
         linkedInventoryPanel = inventorySourcePanel;
         transform.GetComponentInChildren<POIPortrait>().Init(gb);
@@ -29,9 +28,9 @@ public class InventorySourceIconGoodyBox : InventorySourceIcon
     {
         if (locaterDisplay.activeSelf) //locater ability
         {
-            if (menu.OverrideKey())
+            if (MenuManager.Instance.OverrideKey())
             {
-                menu.inventorySourceViewOnly = this.inventorySourceViewOnly;
+                MenuManager.Instance.inventorySourceViewOnly = this.inventorySourceViewOnly;
                 OpenItemPanel();
             }
         }

@@ -8,8 +8,27 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class MainMenu : MonoBehaviour, IDataPersistence
+public class MenuManager : MonoBehaviour, IDataPersistence
 {
+    public static MenuManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     //secret override key
     public KeyCode overrideKey = KeyCode.LeftShift;
     public KeyCode secondOverrideKey = KeyCode.Space;

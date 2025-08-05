@@ -7,8 +7,6 @@ using UnityEngine.UI;
 
 public class ThermalCamAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public MainMenu menu;
-
     public bool entered, exited;
 
     public ThermalCamera themalCam;
@@ -19,10 +17,6 @@ public class ThermalCamAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerE
     public TextMeshProUGUI startBoundary, endBoundary, label;
     public Toggle toggle;
 
-    private void Start()
-    {
-        menu = FindFirstObjectByType<MainMenu>();
-    }
     public ThermalCamAlertLOS Init(Soldier soldier, ThermalCamera themalCam)
     {
         SetSoldierAndCamera(soldier, themalCam);
@@ -72,10 +66,10 @@ public class ThermalCamAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerE
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        menu.CreateLOSArrowPair(soldier, themalCam);
+        MenuManager.Instance.CreateLOSArrowPair(soldier, themalCam);
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        menu.DestroyLOSArrowPair(soldier, themalCam);
+        MenuManager.Instance.DestroyLOSArrowPair(soldier, themalCam);
     }
 }

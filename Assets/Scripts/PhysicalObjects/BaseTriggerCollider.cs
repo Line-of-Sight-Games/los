@@ -2,12 +2,7 @@ using UnityEngine;
 
 public class BaseTriggerCollider : MonoBehaviour
 {
-    public MainMenu menu;
     public PhysicalObject linkedObject;
-    private void Awake()
-    {
-        menu = FindFirstObjectByType<MainMenu>();
-    }
 
     public Vector3 CollisionPoint(Collider collider)
     {

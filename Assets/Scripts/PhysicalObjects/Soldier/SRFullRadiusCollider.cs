@@ -51,7 +51,7 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
 
                             if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                             {
-                                menu.detectionUI.LOSAlertSoldierSoldierStart(detector, detectee, DetermineDetecteeLabel(detector, detectee));
+                                MenuManager.Instance.detectionUI.LOSAlertSoldierSoldierStart(detector, detectee, DetermineDetecteeLabel(detector, detectee));
                                 //print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
                             }
                         }
@@ -66,7 +66,7 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
                             {
                                 if (detector.stats.P.Val > claymore.ActiveC)
                                 {
-                                    menu.detectionUI.LOSAlertSoldierClaymore(detector, claymore);
+                                    MenuManager.Instance.detectionUI.LOSAlertSoldierClaymore(detector, claymore);
                                     //print($"{claymoreThatEntered.LinkedClaymore} ({claymoreThatEntered.LinkedClaymore.X},{claymoreThatEntered.LinkedClaymore.Y},{claymoreThatEntered.LinkedClaymore.Z}) entered the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatEntered)}");
                                 }
                             }
@@ -97,7 +97,7 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
 
                             if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                             {
-                                menu.detectionUI.LOSAlertSoldierSoldierStay(detector, detectee, DetermineDetecteeLabel(detector, detectee));
+                                MenuManager.Instance.detectionUI.LOSAlertSoldierSoldierStay(detector, detectee, DetermineDetecteeLabel(detector, detectee));
                                 //print($"{soldierThatStayed.LinkedSoldier.soldierName} stayed in the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatStayed)}");
                             }
                         }
@@ -112,7 +112,7 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
                             {
                                 if (detector.stats.P.Val > claymore.ActiveC)
                                 {
-                                    menu.detectionUI.LOSAlertSoldierClaymore(detector, claymore);
+                                    MenuManager.Instance.detectionUI.LOSAlertSoldierClaymore(detector, claymore);
                                     //print($"{claymoreThatStayed.LinkedClaymore} ({claymoreThatStayed.LinkedClaymore.X},{claymoreThatStayed.LinkedClaymore.Y},{claymoreThatStayed.LinkedClaymore.Z}) stayed in the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatStayed)}");
                                 }
                             }
@@ -143,7 +143,7 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
 
                                 if (detector.losCheck || detectee.losCheck) //only trigger if a change has happened
                                 {
-                                    menu.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, DetermineDetecteeLabel(detector, detectee));
+                                    MenuManager.Instance.detectionUI.LOSAlertSoldierSoldierEnd(detector, detectee, DetermineDetecteeLabel(detector, detectee));
                                     //print($"{soldierThatExited.LinkedSoldier.soldierName} exited the SRFullRadiusCollider of {LinkedSoldier.soldierName} at {CollisionPoint(colliderThatExited)}");
                                 }
                             }

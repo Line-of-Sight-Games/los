@@ -6,20 +6,12 @@ using UnityEngine.EventSystems;
 
 public class ClaymoreAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public MainMenu menu;
-
     public Soldier soldier;
     public SoldierPortrait soldierPortrait;
 
     public Claymore claymore;
     public POIPortrait claymorePortrait;
     
-
-
-    private void Start()
-    {
-        menu = FindFirstObjectByType<MainMenu>();
-    }
     public ClaymoreAlertLOS Init(Soldier soldier, Claymore claymore)
     {
         SetSoldierAndClaymore(soldier, claymore);
@@ -35,10 +27,10 @@ public class ClaymoreAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExi
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        menu.CreateLOSArrowPair(soldier, claymore);
+        MenuManager.Instance.CreateLOSArrowPair(soldier, claymore);
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        menu.DestroyLOSArrowPair(soldier, claymore);
+        MenuManager.Instance.DestroyLOSArrowPair(soldier, claymore);
     }
 }

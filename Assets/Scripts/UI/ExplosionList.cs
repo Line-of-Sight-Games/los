@@ -9,13 +9,8 @@ using UnityEngine.UI;
 
 public class ExplosionList : MonoBehaviour
 {
-    public MainMenu menu;
     public Vector3 explosionLocation;
 
-    private void Awake()
-    {
-        menu = FindFirstObjectByType<MainMenu>();
-    }
     public ExplosionList Init(string explosionMessage, Vector3 explosionLocation)
     {
         transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text = explosionMessage;
@@ -25,7 +20,7 @@ public class ExplosionList : MonoBehaviour
     }
     public void ConfirmExplosion(GameObject explosionList)
     {
-        if (menu.OverrideKey())
+        if (MenuManager.Instance.OverrideKey())
         {
             int posDamage = 0, negDamage = 0, posStun = 0, negStun = 0;
             ScrollRect explosionScroller = explosionList.transform.Find("Scroll").GetComponent<ScrollRect>();
@@ -145,12 +140,12 @@ public class ExplosionList : MonoBehaviour
                 if (posDamage + posStun > negDamage + negStun)
                 {
                     if (explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Flashbang"))
-                        menu.AddXpAlert(explosionCausedBy, posDamage - negDamage + posStun - negStun, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage}/{posStun} damage/stun to enemies and {negDamage}/{negStun} damage/stun to allies.", false);
+                        MenuManager.Instance.AddXpAlert(explosionCausedBy, posDamage - negDamage + posStun - negStun, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage}/{posStun} damage/stun to enemies and {negDamage}/{negStun} damage/stun to allies.", false);
                     else
-                        menu.AddXpAlert(explosionCausedBy, posDamage - negDamage, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage} damage to enemies and {negDamage} damage to allies.", false);
+                        MenuManager.Instance.AddXpAlert(explosionCausedBy, posDamage - negDamage, $"Explosion ({explosionList.transform.Find("Title").Find("Text").GetComponent<TextMeshProUGUI>().text}) did {posDamage} damage to enemies and {negDamage} damage to allies.", false);
                 }
 
-                menu.CloseExplosionUI();
+                MenuManager.Instance.CloseExplosionUI();
                 Destroy(explosionList);
             }
             else

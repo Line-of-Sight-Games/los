@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class SoldierUI : MonoBehaviour
 {
-    public MainMenu menu;
     public MainGame game;
     public Soldier linkedSoldier;
     public TMP_InputField xSize, ySize, zSize;
@@ -17,7 +16,6 @@ public class SoldierUI : MonoBehaviour
 
     private void Start()
     {
-        menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
     }
     public void DisplayInFriendlyColumn()
@@ -92,24 +90,24 @@ public class SoldierUI : MonoBehaviour
     {
         linkedSoldier.SetActiveSoldier();
 
-        //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{menu.activeSoldier.soldierName}");
+        //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{MenuManager.Instance.activeSoldier.soldierName}");
         SoldierManager.Instance.enemyDisplayColumn.SetActive(false);
         SoldierManager.Instance.friendlyDisplayColumn.SetActive(false);
-        menu.menuUI.transform.Find("GameMenu").Find("SoldierOptions").gameObject.SetActive(true);
+        MenuManager.Instance.menuUI.transform.Find("GameMenu").Find("SoldierOptions").gameObject.SetActive(true);
         /*if (type == "frozen")
-            menu.turnTitle.text = "<color=orange>F R O Z E N    T U R N</color>";
+            MenuManager.Instance.turnTitle.text = "<color=orange>F R O Z E N    T U R N</color>";
         else if (type == "moda")
-            menu.turnTitle.text = "<color=purple>M O D A F I N I L    T U R N</color>";
+            MenuManager.Instance.turnTitle.text = "<color=purple>M O D A F I N I L    T U R N</color>";
         else
-            menu.turnTitle.text = "N O R M A L    T U R N";*/
+            MenuManager.Instance.turnTitle.text = "N O R M A L    T U R N";*/
 
         //populate soldier loadout
-        Transform soldierBanner = menu.soldierOptionsUI.transform.Find("SoldierBanner");
+        Transform soldierBanner = MenuManager.Instance.soldierOptionsUI.transform.Find("SoldierBanner");
         soldierBanner.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
     }
     public void DeathRoll()
     {
-        if (menu.OverrideView && menu.DeathKey())
+        if (MenuManager.Instance.OverrideView && MenuManager.Instance.DeathKey())
         {
             if (HelperFunctions.DiceRoll() == 1)
             {

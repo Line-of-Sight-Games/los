@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class DragUI : MonoBehaviour
 {
-    public MainMenu menu;
     public int pressCount = 0;
     public bool legitMove, legitDrop;
     public Vector3 moveLocation, dropLocation;
@@ -25,7 +24,7 @@ public class DragUI : MonoBehaviour
             if (HelperFunctions.ValidateIntInput(xPos, out int x) && HelperFunctions.ValidateIntInput(yPos, out int y) && HelperFunctions.ValidateIntInput(zPos, out int z) && terrainDropdown.value != 0)
             {
                 moveLocation = new(x, y, z);
-                if (menu.activeSoldier.PointWithinRadius(moveLocation, menu.activeSoldier.GetMaxDragRange()))
+                if (MenuManager.Instance.activeSoldier.PointWithinRadius(moveLocation, MenuManager.Instance.activeSoldier.GetMaxDragRange()))
                 {
                     legitMove = true;
                     apCost.text = GetDragAPCost().ToString();
@@ -73,7 +72,7 @@ public class DragUI : MonoBehaviour
     }
     public int GetDragAPCost()
     {
-        return Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(new(menu.activeSoldier.X, menu.activeSoldier.Y, menu.activeSoldier.Z), new(moveLocation.x, moveLocation.y, moveLocation.z))) / menu.activeSoldier.stats.Str.Val);
+        return Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(new(MenuManager.Instance.activeSoldier.X, MenuManager.Instance.activeSoldier.Y, MenuManager.Instance.activeSoldier.Z), new(moveLocation.x, moveLocation.y, moveLocation.z))) / MenuManager.Instance.activeSoldier.stats.Str.Val);
     }
     public int GetDropDistance()
     {
@@ -89,7 +88,7 @@ public class DragUI : MonoBehaviour
     {
         if (pressCount.Equals(0)) //first press
         {
-            drager = menu.activeSoldier;
+            drager = MenuManager.Instance.activeSoldier;
             dragee = SoldierManager.Instance.FindSoldierById(targetDropdown.captionText.text);
             targetDropdown.interactable = false;
             maxDragRange.text = drager.GetMaxDragRange().ToString();
@@ -101,12 +100,12 @@ public class DragUI : MonoBehaviour
             if (legitMove)
             {
                 dragee.beingDraggedBy = drager.Id;
-                menu.game.BreakAllControllingMeleeEngagments(drager); //break melee engagement when commencing drag
+                MenuManager.Instance.game.BreakAllControllingMeleeEngagments(drager); //break melee engagement when commencing drag
                 if (drager.CheckAP(GetDragAPCost()))
                 {
                     drager.DeductAP(GetDragAPCost());
-                    menu.game.PerformMove(drager, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true); 
-                    menu.game.PerformMove(dragee, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true);
+                    MenuManager.Instance.game.PerformMove(drager, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true); 
+                    MenuManager.Instance.game.PerformMove(dragee, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true);
                     moveObjects.SetActive(false);
                     backButton.SetActive(false);
                     dropObjects.SetActive(true);
@@ -119,8 +118,8 @@ public class DragUI : MonoBehaviour
             if (IsWithinDropBounds())
             {
                 dragee.beingDraggedBy = string.Empty;
-                menu.game.PerformMove(dragee, 0, Tuple.Create(dropLocation, terrainDropdownD.captionText.text), false, false, GetDropDistance().ToString(), true);
-                menu.CloseDragUI();
+                MenuManager.Instance.game.PerformMove(dragee, 0, Tuple.Create(dropLocation, terrainDropdownD.captionText.text), false, false, GetDropDistance().ToString(), true);
+                MenuManager.Instance.CloseDragUI();
             }
         }
     }

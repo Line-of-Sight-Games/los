@@ -7,7 +7,6 @@ using System.Collections.Generic;
 
 public class InventoryPopup : MonoBehaviour
 {
-    public MainMenu menu;
     public GameObject inventoryArea;
     public ItemSlot itemSlotPrefab;
     public ItemIcon itemIconPrefab;

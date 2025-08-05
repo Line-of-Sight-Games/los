@@ -11,8 +11,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     [SerializeField]
     private bool gameRunning;
 
-    public MainMenu menu;
-
     public MoveUI moveUI;
     public ShotUI shotUI;
     public MeleeUI meleeUI;
@@ -219,13 +217,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
         gameOver = true;
         print("GameOver");
 
-        if (menu.OverrideView)
-            menu.UnsetOverrideView();
+        if (MenuManager.Instance.OverrideView)
+            MenuManager.Instance.UnsetOverrideView();
 
-        menu.FreezeTimer();
-        menu.DisplaySoldiersGameOver();
-        menu.roundIndicator.text = "Game Over";
-        menu.teamTurnIndicator.text = result;
+        MenuManager.Instance.FreezeTimer();
+        MenuManager.Instance.DisplaySoldiersGameOver();
+        MenuManager.Instance.roundIndicator.text = "Game Over";
+        MenuManager.Instance.teamTurnIndicator.text = result;
 
         //play game over music
         SoundManager.Instance.PlayGameOverMusic();
@@ -237,7 +235,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartModaTurn(Soldier modaSoldier, Soldier killedBy, List<string> damageSource)
     {
-        menu.FreezeTimer();
+        MenuManager.Instance.FreezeTimer();
 
         //set temp parameters
         tempSoldier = killedBy;
@@ -252,7 +250,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void EndModaTurn()
     {
-        menu.UnfreezeTimer();
+        MenuManager.Instance.UnfreezeTimer();
 
         //update temp parameters
         tempDamageSource.Add("Modafinil");
@@ -264,7 +262,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void StartFrozenTurn(Soldier frozenSoldier)
     {
-        menu.SetOverrideView();
+        MenuManager.Instance.SetOverrideView();
 
         //change game parameters
         frozenTurn = true;
@@ -272,11 +270,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         //activate the surviving soldier
         frozenSoldier.soldierUI.GetComponent<SoldierUI>().OpenSoldierMenu("frozen");
-        menu.OpenShotUI();
+        MenuManager.Instance.OpenShotUI();
     }
     public void EndFrozenTurn()
     {
-        menu.UnsetOverrideView();
+        MenuManager.Instance.UnsetOverrideView();
 
         frozenTurn = false;
         SwitchTeam(tempTeam);
@@ -291,11 +289,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (currentRound <= maxRounds)
             {
-                menu.SetTeamTurnOverFlagTo(false);
+                MenuManager.Instance.SetTeamTurnOverFlagTo(false);
 
                 EndTeamTurn();
 
-                yield return new WaitUntil(() => menu.teamTurnOverFlag == true);
+                yield return new WaitUntil(() => MenuManager.Instance.teamTurnOverFlag == true);
 
                 //set los flags only if weather changes
                 if (WeatherManager.Instance.CheckVisChange(out string increaseOrDecrease))
@@ -317,14 +315,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
 
                 //run los lost for intra-turn changes
-                if (menu.lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
-                    StartCoroutine(menu.OpenLostLOSList());
+                if (MenuManager.Instance.lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
+                    StartCoroutine(MenuManager.Instance.OpenLostLOSList());
 
-                menu.SetTeamTurnStartFlagTo(false);
+                MenuManager.Instance.SetTeamTurnStartFlagTo(false);
 
-                yield return new WaitUntil(() => menu.teamTurnStartFlag == true);
+                yield return new WaitUntil(() => MenuManager.Instance.teamTurnStartFlag == true);
 
-                menu.turnTime = 0;
+                MenuManager.Instance.turnTime = 0;
                 SoundManager.Instance.banzaiPlayed = false;
                 StartTurn();
             }
@@ -363,7 +361,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //only give xp for every 4 rounds conscious on the field
                     s.roundsFieldedConscious++;
                     if (s.roundsFieldedConscious % 4 == 0)
-                        menu.AddXpAlert(s, 1, $"Survived {s.roundsFieldedConscious} rounds.", true);
+                        MenuManager.Instance.AddXpAlert(s, 1, $"Survived {s.roundsFieldedConscious} rounds.", true);
                 }
 
                 //increase rounds without food
@@ -420,7 +418,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 
         }
 
-        menu.CheckXP();
+        MenuManager.Instance.CheckXP();
 
         //post xp stuff
         foreach (Soldier s in AllFieldedSoldiers())
@@ -476,8 +474,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public IEnumerator StartTeamTurn()
     {
-        if (menu.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
-            StartCoroutine(menu.OpenDamageList());
+        if (MenuManager.Instance.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
+            StartCoroutine(MenuManager.Instance.OpenDamageList());
 
         foreach (Soldier s in AllFieldedSoldiers())
         {
@@ -501,7 +499,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     }
                 }
 
-                yield return new WaitUntil(() => menu.inspirerResolvedFlag);
+                yield return new WaitUntil(() => MenuManager.Instance.inspirerResolvedFlag);
 
                 s.GenerateAP();
             }
@@ -510,7 +508,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 
             }
         }
-        menu.CheckXP();
+        MenuManager.Instance.CheckXP();
     }
     public void StartRound()
     {
@@ -539,7 +537,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             activeSoldier.SetCover();
         }
 
-        menu.CloseTakeCoverUI();
+        MenuManager.Instance.CloseTakeCoverUI();
     }
 
     //playdead functions
@@ -548,14 +546,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (activeSoldier.IsPlayingDead())
             activeSoldier.UnsetPlaydead();
         else
-            menu.OpenPlaydeadAlertUI();
+            MenuManager.Instance.OpenPlaydeadAlertUI();
     }
     public void ConfirmPlaydead()
     {
         FileUtility.WriteToReport($"{activeSoldier.soldierName} plays dead"); //write to report
 
         activeSoldier.SetPlaydead();
-        menu.ClosePlaydeadAlertUI();
+        MenuManager.Instance.ClosePlaydeadAlertUI();
     }
 
     //overwatch functions
@@ -571,7 +569,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 activeSoldier.DrainAP();
                 activeSoldier.SetOverwatch(x, y, r, a);
             }
-            menu.CloseOverwatchUI();
+            MenuManager.Instance.CloseOverwatchUI();
         }
 
     }
@@ -625,7 +623,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateMoveUI()
     {
-        if (!menu.clearMoveFlag)
+        if (!MenuManager.Instance.clearMoveFlag)
         {
             UpdateMoveAP();
             UpdateMoveDonated();
@@ -660,7 +658,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 foreach (Transform child in moveUI.closestAllyUI.transform.Find("ClosestAllyPanel"))
                     SoldierManager.Instance.FindSoldierByName(child.Find("SoldierName").GetComponent<TextMeshProUGUI>().text).plannerDonatedMove += activeSoldier.HalfMove;
             }
-            menu.CloseMoveUI();
+            MenuManager.Instance.CloseMoveUI();
         }
         else if (moveUI.moveTypeDropdown.captionText.text.Contains("Exo"))
         {
@@ -683,13 +681,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                             //trigger loud action
                             activeSoldier.PerformLoudAction(10);
                         }
-                        menu.CloseMoveUI();
+                        MenuManager.Instance.CloseMoveUI();
                     }
                     else
-                        menu.OpenOvermoveUI("Warning: Landing is further than 3cm away from jump point.");
+                        MenuManager.Instance.OpenOvermoveUI("Warning: Landing is further than 3cm away from jump point.");
                 }
                 else
-                    menu.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
+                    MenuManager.Instance.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
             }
         }
         else
@@ -726,16 +724,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                                 PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
                             }
-                            menu.CloseMoveUI();
+                            MenuManager.Instance.CloseMoveUI();
                         }
                         else
-                            menu.OpenOvermoveUI($"Warning: Proposed move is {distance - maxMove} cm over max ({distance}/{maxMove})");
+                            MenuManager.Instance.OpenOvermoveUI($"Warning: Proposed move is {distance - maxMove} cm over max ({distance}/{maxMove})");
                     }
                     else
-                        menu.OpenSuppressionMoveUI();
+                        MenuManager.Instance.OpenSuppressionMoveUI();
                 }
                 else
-                    menu.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
+                    MenuManager.Instance.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
             }
             else
                 print("Invalid Input");
@@ -831,7 +829,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 launchMelee = "Half Charge Attack";
             else if (moveUI.moveTypeDropdown.value == 2)
                 launchMelee = "3cm Charge Attack";
-            StartCoroutine(menu.OpenMeleeUI(launchMelee));
+            StartCoroutine(MenuManager.Instance.OpenMeleeUI(launchMelee));
         }
 
         //check broken soldier leaving field
@@ -843,13 +841,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (movingSoldier.IsBroken())
             if (movingSoldier.X == movingSoldier.startX && movingSoldier.Y == movingSoldier.startY && movingSoldier.Z == movingSoldier.startZ)
-                menu.OpenBrokenFledUI();
+                MenuManager.Instance.OpenBrokenFledUI();
     }
     public void CheckDeploymentBeacons(Soldier fieldedSoldier)
     {
         foreach (DeploymentBeacon beacon in FindObjectsByType<DeploymentBeacon>(default))
             if (beacon.placedBy.IsSameTeamAs(fieldedSoldier) && fieldedSoldier.X == beacon.X && fieldedSoldier.Y == beacon.Y && fieldedSoldier.Z == beacon.Z)
-                menu.AddXpAlert(beacon.placedBy, 1, $"Ally ({fieldedSoldier.soldierName}) deployed through beacon at ({beacon.X}, {beacon.Y}, {beacon.Z})", true);
+                MenuManager.Instance.AddXpAlert(beacon.placedBy, 1, $"Ally ({fieldedSoldier.soldierName}) deployed through beacon at ({beacon.X}, {beacon.Y}, {beacon.Z})", true);
     }
 
 
@@ -869,7 +867,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (shooter.id == "0")
             shooter = SoldierManager.Instance.FindSoldierById(shotUI.shooterID.text);
 
-        if (!menu.clearShotFlag)
+        if (!MenuManager.Instance.clearShotFlag)
         {
             UpdateShotAP(shooter);
             if (shotUI.shotTypeDropdown.value == 0)
@@ -929,14 +927,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (shooter.PhysicalObjectIsRevealed(b))
-                    targetOptionData = new(b.Id, menu.explosiveBarrelSprite, Color.white);
+                    targetOptionData = new(b.Id, MenuManager.Instance.explosiveBarrelSprite, Color.white);
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
             }
 
             //add coverman
-            targetOptionDataList.Add(new("coverman", menu.covermanSprite, Color.white));
+            targetOptionDataList.Add(new("coverman", MenuManager.Instance.covermanSprite, Color.white));
         }
         else if (shotUI.shotTypeDropdown.value == 1)
             shotUI.suppressionValueUI.SetActive(true);
@@ -994,14 +992,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
             print("targeting coverman");
             shotUI.coverLocationUI.SetActive(true);
             shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
-            menu.ClearFlankersUI(menu.flankersShotUI);
+            MenuManager.Instance.ClearFlankersUI(MenuManager.Instance.flankersShotUI);
         }
         else if (target is ExplosiveBarrel targetBarrel)
         {
             shotUI.barrelLocation.text = $"X:{targetBarrel.X} Y:{targetBarrel.Y} Z:{targetBarrel.Z}";
             shotUI.barrelLocationUI.SetActive(true);
             shotUI.shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
-            menu.ClearFlankersUI(menu.flankersShotUI);
+            MenuManager.Instance.ClearFlankersUI(MenuManager.Instance.flankersShotUI);
         }
         else if (target is Soldier targetSoldier)
         {
@@ -1045,7 +1043,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateTargetFlanking(Soldier shooter, Soldier target)
     {
         //clear the flanker ui
-        menu.ClearFlankersUI(menu.flankersShotUI);
+        MenuManager.Instance.ClearFlankersUI(MenuManager.Instance.flankersShotUI);
         int flankersCount = 0;
         int flankingAngle = 80;
         List<Tuple<float, Soldier>> allFlankingAngles = new();
@@ -1091,14 +1089,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         flankersCount++;
 
                         //add flanker to ui to visualise
-                        GameObject flankerPortrait = Instantiate(menu.soldierPortraitPrefab, menu.flankersShotUI.transform.Find("FlankersPanel"));
+                        GameObject flankerPortrait = Instantiate(MenuManager.Instance.soldierPortraitPrefab, MenuManager.Instance.flankersShotUI.transform.Find("FlankersPanel"));
                         flankerPortrait.GetComponentInChildren<SoldierPortrait>().Init(confirmedFlankAngle.Item2);
                     }
                 }
 
                 //display flankers if there are any
                 if (flankersCount > 0)
-                    menu.OpenFlankersUI(menu.flankersShotUI);
+                    MenuManager.Instance.OpenFlankersUI(MenuManager.Instance.flankersShotUI);
             }
         }
     }
@@ -1534,7 +1532,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (!targetSoldier.IsTactician())
             {
-                flankingMod = menu.flankersShotUI.transform.Find("FlankersPanel").childCount switch
+                flankingMod = MenuManager.Instance.flankersShotUI.transform.Find("FlankersPanel").childCount switch
                 {
                     1 => -0.2f,
                     2 => -0.5f,
@@ -1623,13 +1621,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
         IAmShootable target = FindShootableById(shotUI.targetDropdown.captionText.text);
         Item gun = null;
         bool runSecondShot = false;
-        string gunNames = menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text;
+        string gunNames = MenuManager.Instance.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text;
         print(gunNames);
         if (gunNames.Contains("|"))
         {
-            string[] guns = menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Split('|');
+            string[] guns = MenuManager.Instance.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Split('|');
             gun = shooter.GetEquippedGun(guns[0]);
-            menu.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text = guns[1];
+            MenuManager.Instance.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text = guns[1];
             runSecondShot = true;
         }
         else
@@ -1638,10 +1636,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
         int.TryParse(shotUI.apCost.text, out int ap);
         int actingHitChance;
         bool resistSuppression;
-        menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
-        menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
-        menu.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(false);
-        menu.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
+        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
+        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(false);
+        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
 
         tempShooterTarget = Tuple.Create(shooter, target);
         if (runSecondShot || retry) 
@@ -1652,7 +1650,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             activeSoldier.DeductAP(ap);
 
-        menu.SetShotResolvedFlagTo(false);
+        MenuManager.Instance.SetShotResolvedFlagTo(false);
 
         if (shotUI.shotTypeDropdown.value == 0) //standard shot
         {
@@ -1675,20 +1673,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //display shooter suppression indicator
             if (shooter.IsSuppressed())
             {
-                menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
 
                 if (resistSuppression)
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} resists suppression."); //write to report
 
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
                     actingHitChance = chances.Item1;
                 }
                 else
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} suffers suppression."); //write to report
 
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
                     actingHitChance = chances.Item3;
                 }
             }
@@ -1707,7 +1705,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 };
 
                 //show los check button
-                menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                 //standard shot hits cover
                 if (randNum1 <= actingHitChance)
@@ -1717,13 +1715,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //play cover destruction
                     SoundManager.Instance.PlayCoverDestruction();
 
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                     //critical shot hits cover
                     if (randNum2 <= chances.Item2)
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
                     else
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
                 }
                 else
                 {
@@ -1734,27 +1732,27 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //play shot miss dialogue
                     SoundManager.Instance.PlaySoldierShotMiss(shooter);
 
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is ExplosiveBarrel targetBarrel)
             {
                 //show los check button
-                menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                 //standard shot hits barrel
                 if (randNum1 <= actingHitChance)
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} hits explosive barrel at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
 
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                     //critical shot hits barrel
                     if (randNum2 <= chances.Item2)
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
                     else
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
                     targetBarrel.CheckExplosionBarrel(shooter);
                 }
                 else
@@ -1766,8 +1764,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //play shot miss dialogue
                     SoundManager.Instance.PlaySoldierShotMiss(shooter);
 
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is Soldier targetSoldier) //check if target is soldier
@@ -1785,10 +1783,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         if (randNum3 > 0)
                         {
                             targetSoldier = originalTarget.EngagedSoldiers[randNum3 - 1];
-                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee aiming for {originalTarget.soldierName}, hit {targetSoldier.soldierName}.";
+                            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee aiming for {originalTarget.soldierName}, hit {targetSoldier.soldierName}.";
                         }
                         else
-                            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee and hit intended target.";
+                            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee and hit intended target.";
 
                         FileUtility.WriteToReport($"{shooter.soldierName} shoots into melee aiming for {originalTarget.soldierName}, hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
                     }
@@ -1796,7 +1794,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     {
                         FileUtility.WriteToReport($"{shooter.soldierName} hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
 
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
                     }
                         
 
@@ -1806,29 +1804,29 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         FileUtility.WriteToReport($"The shot is critical!"); //write to report
 
                         targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Shot" }, Vector3.zero);
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
                         {
                             //paying xp for hit
                             if (actingHitChance < 10)
-                                menu.AddXpAlert(shooter, 10, $"Critical shot <10% hit on {targetSoldier.soldierName}!", false);
+                                MenuManager.Instance.AddXpAlert(shooter, 10, $"Critical shot <10% hit on {targetSoldier.soldierName}!", false);
                             else
-                                menu.AddXpAlert(shooter, 8, $"Critical shot hit on {targetSoldier.soldierName}!", false);
+                                MenuManager.Instance.AddXpAlert(shooter, 8, $"Critical shot hit on {targetSoldier.soldierName}!", false);
                         }
                     }
                     else
                     {
                         targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Shot" }, Vector3.zero);
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
                         {
                             //paying xp for hit
                             if (actingHitChance < 10)
-                                menu.AddXpAlert(shooter, 10, $"Shot <10% hit on {targetSoldier.soldierName}!", false);
+                                MenuManager.Instance.AddXpAlert(shooter, 10, $"Shot <10% hit on {targetSoldier.soldierName}!", false);
                             else
-                                menu.AddXpAlert(shooter, 2, $"Shot hit on {targetSoldier.soldierName}.", false);
+                                MenuManager.Instance.AddXpAlert(shooter, 2, $"Shot hit on {targetSoldier.soldierName}.", false);
                         }
                     }
                 }
@@ -1851,20 +1849,20 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //set sound flags after enemy misses shot
                     SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyMissesShot(targetSoldier);
 
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                     //show los check button if shot misses
-                    menu.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                     //show avenger retry if opponent has killed
                     if (shooter.IsAvenger() && targetSoldier.hasKilled && gun.CheckAnyAmmo() && !retry && !targetSoldier.IsRevoker())
-                        menu.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
+                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
 
                     //paying xp for dodge
                     if (actingHitChance > 90)
-                        menu.AddXpAlert(targetSoldier, 10, $"Shot >90% dodged from {shooter.soldierName}!", false);
+                        MenuManager.Instance.AddXpAlert(targetSoldier, 10, $"Shot >90% dodged from {shooter.soldierName}!", false);
                     else
-                        menu.AddXpAlert(targetSoldier, 1, $"Shot dodged from {shooter.soldierName}.", false);
+                        MenuManager.Instance.AddXpAlert(targetSoldier, 1, $"Shot dodged from {shooter.soldierName}.", false);
 
                     //push a zero damage attack through for abilities trigger
                     targetSoldier.TakeDamage(shooter, 0, true, new() { "Shot" }, Vector3.zero);
@@ -1892,8 +1890,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 _ => 0,
             };
             (target as Soldier).SetSuppression(suppressionValue);
-            menu.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"<color=green> Supressing ({suppressionValue})</color>";
-            menu.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Suppressing {(target as Soldier).soldierName} until next round.";
+            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"<color=green> Supressing ({suppressionValue})</color>";
+            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Suppressing {(target as Soldier).soldierName} until next round.";
         }
 
         //trigger loud action
@@ -1902,8 +1900,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         else
             shooter.PerformLoudAction();
 
-        StartCoroutine(menu.OpenShotResultUI(runSecondShot));
-        menu.CloseShotUI();
+        StartCoroutine(MenuManager.Instance.OpenShotResultUI(runSecondShot));
+        MenuManager.Instance.CloseShotUI();
     }
 
 
@@ -1929,7 +1927,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
         Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
-        if (!menu.clearMeleeFlag)
+        if (!MenuManager.Instance.clearMeleeFlag)
         {
             UpdateMeleeAP(attacker);
             if (meleeUI.meleeTypeDropdown.value == 0) //If it's an actual attack
@@ -1958,12 +1956,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
         if (defender.BestMeleeWeapon != null)
             meleeUI.defenderWeaponImage.sprite = defender.BestMeleeWeapon.itemImage;
         else
-            meleeUI.defenderWeaponImage.sprite = menu.fist;
+            meleeUI.defenderWeaponImage.sprite = MenuManager.Instance.fist;
     }
     public void UpdateMeleeFlankingAgainstAttacker(Soldier attacker, Soldier defender)
     {
         //clear the flanker ui
-        menu.ClearFlankersUI(meleeUI.flankersMeleeAttackerUI);
+        MenuManager.Instance.ClearFlankersUI(meleeUI.flankersMeleeAttackerUI);
         int flankersCount = 0;
         foreach (Soldier s in AllSoldiers())
         {
@@ -1971,19 +1969,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 //add flanker to ui to visualise
                 flankersCount++;
-                GameObject flankerPortrait = Instantiate(menu.possibleFlankerPrefab, meleeUI.flankersMeleeAttackerUI.transform.Find("FlankersPanel"));
+                GameObject flankerPortrait = Instantiate(MenuManager.Instance.possibleFlankerPrefab, meleeUI.flankersMeleeAttackerUI.transform.Find("FlankersPanel"));
                 flankerPortrait.GetComponentInChildren<SoldierPortrait>().Init(s);
             }
         }
 
         //display flankers if there are any
         if (flankersCount > 0)
-            menu.OpenFlankersUI(meleeUI.flankersMeleeAttackerUI);
+            MenuManager.Instance.OpenFlankersUI(meleeUI.flankersMeleeAttackerUI);
     }
     public void UpdateMeleeFlankingAgainstDefender(Soldier attacker, Soldier defender)
     {
         //clear the flanker ui
-        menu.ClearFlankersUI(meleeUI.flankersMeleeDefenderUI);
+        MenuManager.Instance.ClearFlankersUI(meleeUI.flankersMeleeDefenderUI);
         int flankersCount = 0;
         if (!defender.IsTactician() || attacker.IsRevoker())
         {
@@ -1994,14 +1992,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     flankersCount++;
 
                     //add flanker to ui to visualise
-                    GameObject flankerPortrait = Instantiate(menu.possibleFlankerPrefab, meleeUI.flankersMeleeDefenderUI.transform.Find("FlankersPanel"));
+                    GameObject flankerPortrait = Instantiate(MenuManager.Instance.possibleFlankerPrefab, meleeUI.flankersMeleeDefenderUI.transform.Find("FlankersPanel"));
                     flankerPortrait.GetComponentInChildren<SoldierPortrait>().Init(s);
                 }
             }
 
             //display flankers if there are any
             if (flankersCount > 0)
-                menu.OpenFlankersUI(meleeUI.flankersMeleeDefenderUI);
+                MenuManager.Instance.OpenFlankersUI(meleeUI.flankersMeleeDefenderUI);
         }
     }
     public void UpdateMeleeTypeOptions()
@@ -2011,7 +2009,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
         List<TMP_Dropdown.OptionData> meleeTypeDetails = new()
         {
-            new TMP_Dropdown.OptionData(menu.meleeChargeIndicator),
+            new TMP_Dropdown.OptionData(MenuManager.Instance.meleeChargeIndicator),
             new TMP_Dropdown.OptionData("Engagement Only"),
         };
 
@@ -2352,13 +2350,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
         s2.controlledBySoldiersList.Add(controller.id);
         s2.controllingSoldiersList.Remove(controller.id);
 
-        StartCoroutine(menu.OpenMeleeResultUI());
+        StartCoroutine(MenuManager.Instance.OpenMeleeResultUI());
     }
     public void EstablishNoController(Soldier s1, Soldier s2)
     {
         BreakMeleeEngagement(s1, s2);
 
-        StartCoroutine(menu.OpenMeleeResultUI());
+        StartCoroutine(MenuManager.Instance.OpenMeleeResultUI());
     }
     public string DetermineMeleeController(Soldier attacker, Soldier defender, bool counterattack, bool disengage)
     {
@@ -2501,7 +2499,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 if (ap == 0)
                     damageType.Add("Charge");
 
-                menu.SetMeleeResolvedFlagTo(false);
+                MenuManager.Instance.SetMeleeResolvedFlagTo(false);
                 activeSoldier.DeductAP(ap);
 
                 int meleeDamage = CalculateMeleeResult(attacker, defender);
@@ -2612,14 +2610,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     if (!damageMessage.Contains("No Damage"))
                     {
                         if (counterattack)
-                            menu.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
+                            MenuManager.Instance.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
                         else
-                            menu.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
+                            MenuManager.Instance.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
                     }
                     else
                     {
                         if (meleeDamage == 0)
-                            menu.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
+                            MenuManager.Instance.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
                     }
                 }
 
@@ -2636,14 +2634,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 defender.UnsetOverwatch();
 
                 //add melee alert
-                menu.AddMeleeAlert(attacker, defender, damageMessage, DetermineMeleeController(attacker, defender, counterattack, disengage));
+                MenuManager.Instance.AddMeleeAlert(attacker, defender, damageMessage, DetermineMeleeController(attacker, defender, counterattack, disengage));
 
                 //trigger loud action
                 if (loudAction)
                     attacker.PerformLoudAction();
 
-                StartCoroutine(menu.OpenMeleeResultUI());
-                menu.CloseMeleeUI();
+                StartCoroutine(MenuManager.Instance.OpenMeleeResultUI());
+                MenuManager.Instance.CloseMeleeUI();
             }
         }
     }
@@ -2651,10 +2649,10 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (s1.EngagedSoldiers.Count > 0)
         {
-            menu.SetMeleeResolvedFlagTo(false);
-            yield return new WaitUntil(() => menu.MovementResolvedFlag() && menu.detectionResolvedFlag);
+            MenuManager.Instance.SetMeleeResolvedFlagTo(false);
+            yield return new WaitUntil(() => MenuManager.Instance.MovementResolvedFlag() && MenuManager.Instance.detectionResolvedFlag);
             foreach (Soldier s in s1.EngagedSoldiers)
-                menu.AddMeleeAlert(s1, s, "No Damage\n(Engagement Change)", DetermineMeleeController(s1, s, false, false));
+                MenuManager.Instance.AddMeleeAlert(s1, s, "No Damage\n(Engagement Change)", DetermineMeleeController(s1, s, false, false));
         }
     }
 
@@ -2676,7 +2674,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         int totalDrop = 0, totalPickup = 0, totalSwap = 0, ap = 0;
 
-        foreach (ItemIcon itemIcon in menu.configUI.GetComponentsInChildren<ItemIcon>(true))
+        foreach (ItemIcon itemIcon in MenuManager.Instance.configUI.GetComponentsInChildren<ItemIcon>(true))
         {
             Item item = itemIcon.item;
             if (item.markedForAction != string.Empty)
@@ -2749,11 +2747,11 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
 
-            if (menu.configureButton.GetComponentInChildren<TextMeshProUGUI>().text.Equals("Spawn Config")) { } //if spawn config, make it silent
+            if (MenuManager.Instance.configureButton.GetComponentInChildren<TextMeshProUGUI>().text.Equals("Spawn Config")) { } //if spawn config, make it silent
             else
                 activeSoldier.PerformLoudAction(5);
 
-            menu.CloseConfigureUI();
+            MenuManager.Instance.CloseConfigureUI();
         }
     }
 
@@ -2776,7 +2774,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             activeSoldier.DeductAP(1);
 
-            POI poiToDisarm = POIManager.Instance.FindPOIById(menu.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            POI poiToDisarm = POIManager.Instance.FindPOIById(MenuManager.Instance.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item disarmedItem = null;
             Soldier placedBy = null;
 
@@ -2799,7 +2797,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             //xp for disarming enemy objects
             if (placedBy != null && activeSoldier.IsOppositeTeamAs(placedBy))
-                menu.AddXpAlert(activeSoldier, 2, "Disarmed enemy device.", true);
+                MenuManager.Instance.AddXpAlert(activeSoldier, 2, "Disarmed enemy device.", true);
 
             //set item to same position as poi and destroy poi
             disarmedItem.X = poiToDisarm.X;
@@ -2808,7 +2806,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             POIManager.Instance.DestroyPOI(poiToDisarm);
             
             activeSoldier.PerformLoudAction(6);
-            menu.CloseDisarmUI();
+            MenuManager.Instance.CloseDisarmUI();
         }
     }
 
@@ -2871,51 +2869,51 @@ public class MainGame : MonoBehaviour, IDataPersistence
             case "Grenade_Frag":
             case "Grenade_Smoke":
             case "Grenade_Tabun":
-                menu.OpenGrenadeUI(useItemUI);
+                MenuManager.Instance.OpenGrenadeUI(useItemUI);
                 break;
             case "Binoculars":
-                menu.OpenBinocularsUI(itemUsed, linkedIcon, "Flash");
+                MenuManager.Instance.OpenBinocularsUI(itemUsed, linkedIcon, "Flash");
                 break;
             case "Claymore":
-                menu.OpenClaymoreUI(useItemUI);
+                MenuManager.Instance.OpenClaymoreUI(useItemUI);
                 break;
             case "Deployment_Beacon":
-                menu.OpenDeploymentBeaconUI(useItemUI);
+                MenuManager.Instance.OpenDeploymentBeaconUI(useItemUI);
                 break;
             case "Riot_Shield":
-                menu.OpenRiotShieldUI(useItemUI);
+                MenuManager.Instance.OpenRiotShieldUI(useItemUI);
                 break;
             case "Thermal_Camera":
-                menu.OpenThermalCamUI(useItemUI);
+                MenuManager.Instance.OpenThermalCamUI(useItemUI);
                 break;
             case "UHF_Radio":
-                menu.OpenUHFUI(useItemUI);
+                MenuManager.Instance.OpenUHFUI(useItemUI);
                 break;
             default:
                 break;
 
         }
         activeSoldier.DeductAP(ap);
-        menu.CloseUseItemUI();
+        MenuManager.Instance.CloseUseItemUI();
     }
     public void ConfirmDropThrowItem(UseItemUI useItemUI)
     {
         int.TryParse(useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
         if (useItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Throw"))
-            menu.OpenThrowUI(useItemUI);
+            MenuManager.Instance.OpenThrowUI(useItemUI);
         else
-            menu.OpenDropUI(useItemUI);
+            MenuManager.Instance.OpenDropUI(useItemUI);
 
         activeSoldier.DeductAP(ap);
-        menu.CloseDropThrowItemUI();
+        MenuManager.Instance.CloseDropThrowItemUI();
     }
     public void UpdateSoldierUsedOn(UseItemUI useItemUI)
     {
-        useItemUI.soldierUsedOn = SoldierManager.Instance.FindSoldierById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+        useItemUI.soldierUsedOn = SoldierManager.Instance.FindSoldierById(MenuManager.Instance.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
     }
     public void UpdateItemUsedOn(UseItemUI useItemUI)
     {
-        useItemUI.itemUsedOn = ItemManager.Instance.FindItemById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+        useItemUI.itemUsedOn = ItemManager.Instance.FindItemById(MenuManager.Instance.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
     }
     public void ConfirmUHF(UseItemUI useUHFUI)
     {
@@ -2992,14 +2990,14 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (totalMiss.activeInHierarchy)
             {
-                menu.CloseUHFUI();
+                MenuManager.Instance.CloseUHFUI();
                 useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
             }
             else
             {
                 if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y) && HelperFunctions.ValidateIntInput(targetZ, out int z))
                 {
-                    menu.CloseUHFUI();
+                    MenuManager.Instance.CloseUHFUI();
                     useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
                     CheckExplosionUHF(activeSoldier, new Vector3(x, y, z), radius, damage);
                 }
@@ -3024,7 +3022,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             activeSoldier.DeductAP(3);
             useULFUI.itemUsed.UseULF(useULFUI.itemUsedFromSlotName);
-            menu.CloseUseULFUI();
+            MenuManager.Instance.CloseUseULFUI();
         }
     }
     public void ConfirmRiotShield(UseItemUI useRiotShield)
@@ -3038,7 +3036,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             activeSoldier.riotXPoint = x;
             activeSoldier.riotYPoint = y;
 
-            menu.CloseRiotShieldUI();
+            MenuManager.Instance.CloseRiotShieldUI();
             useRiotShield.itemUsed.UseItem(useRiotShield.itemUsedIcon, useRiotShield.itemUsedOn, useRiotShield.soldierUsedOn);
         }
     }
@@ -3083,7 +3081,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (scatteredOffMap.activeInHierarchy)
             {
                 activeSoldier.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
-                menu.CloseGrenadeUI();
+                MenuManager.Instance.CloseGrenadeUI();
             }
             else
             {
@@ -3091,7 +3089,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
                     useGrenade.itemUsed.CheckExplosionGrenade(activeSoldier, new Vector3(x, y, z));
-                    menu.CloseGrenadeUI();
+                    MenuManager.Instance.CloseGrenadeUI();
                 }
             }
         }
@@ -3144,7 +3142,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (scatteredOffMap.activeInHierarchy)
             {
                 activeSoldier.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
-                menu.CloseThrowUI();
+                MenuManager.Instance.CloseThrowUI();
             }
             else
             {
@@ -3182,7 +3180,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                         throwItemUI.itemUsed.Z = z;
                     }
                     activeSoldier.PerformLoudAction(5);
-                    menu.CloseThrowUI();
+                    MenuManager.Instance.CloseThrowUI();
                 }
             }
         }
@@ -3235,19 +3233,19 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 dropItemUI.itemUsed.Z = z;
             }
             activeSoldier.PerformLoudAction(5);
-            menu.CloseDropUI();
+            MenuManager.Instance.CloseDropUI();
         }
     }
     public void ConfirmBinoculars()
     {
-        if (HelperFunctions.ValidateIntInput(menu.binocularsUI.xPos, out int x) && HelperFunctions.ValidateIntInput(menu.binocularsUI.yPos, out int y))
+        if (HelperFunctions.ValidateIntInput(MenuManager.Instance.binocularsUI.xPos, out int x) && HelperFunctions.ValidateIntInput(MenuManager.Instance.binocularsUI.yPos, out int y))
         {
             FileUtility.WriteToReport($"{activeSoldier.soldierName} uses binoculars ({x}, {y})."); //write to report
 
-            menu.binocularsUI.binocularsUsed.UseItem(menu.binocularsUI.binocularsUsedIcon, null, null);
-            StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), menu.binocularsUI.binocularMode));
+            MenuManager.Instance.binocularsUI.binocularsUsed.UseItem(MenuManager.Instance.binocularsUI.binocularsUsedIcon, null, null);
+            StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), MenuManager.Instance.binocularsUI.binocularMode));
 
-            menu.CloseBinocularsUI();
+            MenuManager.Instance.CloseBinocularsUI();
         }
     }
     public void ConfirmClaymore(UseItemUI useClaymore)
@@ -3269,7 +3267,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 Instantiate(POIManager.Instance.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, false, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
-                menu.CloseClaymoreUI();
+                MenuManager.Instance.CloseClaymoreUI();
             }
             else
                 useClaymore.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
@@ -3294,7 +3292,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 Instantiate(POIManager.Instance.deploymentBeaconPrefab).Init(new(x, y, z), activeSoldier.Id);
 
                 activeSoldier.PerformLoudAction(10);
-                menu.CloseDeploymentBeaconUI();
+                MenuManager.Instance.CloseDeploymentBeaconUI();
             }
             else
                 useDeploymentBeacon.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
@@ -3320,7 +3318,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 Instantiate(POIManager.Instance.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
-                menu.CloseThermalCamUI();
+                MenuManager.Instance.CloseThermalCamUI();
             }
             else
                 useThermalCam.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
@@ -3342,7 +3340,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         //play explosion sfx
         SoundManager.Instance.PlayExplosion();
 
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}", position).gameObject;
+        GameObject explosionList = Instantiate(MenuManager.Instance.explosionListPrefab, MenuManager.Instance.explosionUI.transform).GetComponent<ExplosionList>().Init($"UHF | Detonated: {position.x},{position.y},{position.z} | Radius: {radius}cm | Damage: {damage}", position).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         //create explosion objects
@@ -3360,16 +3358,16 @@ public class MainGame : MonoBehaviour, IDataPersistence
             if (damagef > 0)
             {
                 if (obj is Item hitItem)
-                    menu.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, Mathf.RoundToInt(damagef));
+                    MenuManager.Instance.AddExplosionAlertItem(explosionList, hitItem, position, explodedBy, Mathf.RoundToInt(damagef));
                 else if (obj is POI hitPoi)
-                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, Mathf.RoundToInt(damagef));
+                    MenuManager.Instance.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, Mathf.RoundToInt(damagef));
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, hitSoldier.RoundByResilience(damagef) - hitSoldier.stats.R.Val, 1);
+                    MenuManager.Instance.AddExplosionAlert(explosionList, hitSoldier, position, explodedBy, hitSoldier.RoundByResilience(damagef) - hitSoldier.stats.R.Val, 1);
             }
         }
 
         //show explosion ui
-        menu.OpenExplosionUI();
+        MenuManager.Instance.OpenExplosionUI();
     }
     public void CheckAllSmokeClouds()
     {
@@ -3408,7 +3406,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //dipelec functions
     public void UpdateDipElecUI()
     {
-        if (!menu.clearDipelecFlag)
+        if (!MenuManager.Instance.clearDipelecFlag)
             UpdateDipElecRewardAndChance();
     }
     public void UpdateDipElecRewardAndChance()
@@ -3463,7 +3461,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     {
         if (activeSoldier.CheckAP(3))
         {
-            menu.FreezeTimer();
+            MenuManager.Instance.FreezeTimer();
             activeSoldier.DeductAP(3);
             bool terminalDisabled = false;
             int passCount = 0;
@@ -3505,13 +3503,13 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
                     for (int i = targetLevel; i >= 1; i--)
                     {
-                        menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=green>{resultString} successful</color>";
-                        GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
+                        MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=green>{resultString} successful</color>";
+                        GameObject dipelecReward = Instantiate(MenuManager.Instance.dipelecRewardPrefab, MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                         dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = (resultString == "Hack") ? DipelecManager.Instance.GetLevelElec(i) : DipelecManager.Instance.GetLevelDip(i);
                     }
 
                     //add xp for successful dipelec
-                    menu.AddXpAlert(activeSoldier, (int)Mathf.Pow(2, targetLevel-1), $"Successful level {targetLevel} {resultString}", true);
+                    MenuManager.Instance.AddXpAlert(activeSoldier, (int)Mathf.Pow(2, targetLevel-1), $"Successful level {targetLevel} {resultString}", true);
 
                     resultString += $"SuccessL{targetLevel}";
                 }
@@ -3519,8 +3517,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 {
                     FileUtility.WriteToReport($"{activeSoldier.soldierName} fails to {resultString}."); //write to report
 
-                    menu.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>{resultString} failed</color>";
-                    GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
+                    MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>{resultString} failed</color>";
+                    GameObject dipelecReward = Instantiate(MenuManager.Instance.dipelecRewardPrefab, MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                     dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"No reward";
 
                     resultString += $"Fail";
@@ -3530,7 +3528,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             {
                 FileUtility.WriteToReport($"{activeSoldier.soldierName} disables terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
 
-                GameObject dipelecReward = Instantiate(menu.dipelecRewardPrefab, menu.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
+                GameObject dipelecReward = Instantiate(MenuManager.Instance.dipelecRewardPrefab, MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                 dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>Terminal disabled</color>";
 
                 terminal.terminalEnabled = false;
@@ -3540,8 +3538,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //play dipelec result sfx
             SoundManager.Instance.PlayDipelecResolution(resultString);
 
-            menu.OpenDipelecResultUI();
-            menu.CloseDipElecUI();
+            MenuManager.Instance.OpenDipelecResultUI();
+            MenuManager.Instance.CloseDipElecUI();
         }
     }
 
@@ -3589,18 +3587,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //print(friendly.soldierName + " trauma check actually running");
                     //desensitised
                     if (friendly.IsDesensitised())
-                        menu.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
+                        MenuManager.Instance.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
                     else
                     {
                         //guaranteed trauma from commander death and/or lastandicide
                         if (commander)
                         {
-                            menu.AddTraumaAlert(friendly, 1, "Commander died, an automatic trauma point has been accrued.", 0, 0, "");
+                            MenuManager.Instance.AddTraumaAlert(friendly, 1, "Commander died, an automatic trauma point has been accrued.", 0, 0, "");
                             showTraumaUI = true;
                         }
                         if (lastandicide)
                         {
-                            menu.AddTraumaAlert(friendly, 1, deadSoldier.soldierName + " committed Lastandicide, an automatic trauma point has been accrued.", 0, 0, "");
+                            MenuManager.Instance.AddTraumaAlert(friendly, 1, deadSoldier.soldierName + " committed Lastandicide, an automatic trauma point has been accrued.", 0, 0, "");
                             showTraumaUI = true;
                         }
 
@@ -3647,9 +3645,9 @@ public class MainGame : MonoBehaviour, IDataPersistence
                                     rolls += 2;
 
                                 if (friendly.IsResilient())
-                                    menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is Resilient. Within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
+                                    MenuManager.Instance.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is Resilient. Within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
                                 else
-                                    menu.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
+                                    MenuManager.Instance.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
 
                                 showTraumaUI = true;
                             }
@@ -3659,17 +3657,17 @@ public class MainGame : MonoBehaviour, IDataPersistence
             }
 
             if (showTraumaUI)
-                StartCoroutine(menu.OpenTraumaAlertUI());
+                StartCoroutine(MenuManager.Instance.OpenTraumaAlertUI());
         }
     }
     public void ConfirmTrauma()
     {
-        ScrollRect traumaScroller = menu.traumaUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
+        ScrollRect traumaScroller = MenuManager.Instance.traumaUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
         bool unresolved = false;
 
         if (traumaScroller.verticalNormalizedPosition <= 0.05f)
         {
-            Transform traumaAlerts = menu.traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
+            Transform traumaAlerts = MenuManager.Instance.traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
 
             foreach (Transform child in traumaAlerts)
             {
@@ -3701,7 +3699,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 foreach (KeyValuePair<Soldier, int> kvp in soldiersToTraumatise)
                     kvp.Key.TakeTrauma(kvp.Value);
 
-                menu.CloseTraumaUI();
+                MenuManager.Instance.CloseTraumaUI();
             }
             else
                 print("Haven't traumatised everyone.");
@@ -3731,12 +3729,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
             FileUtility.WriteToReport($"{activeSoldier.soldierName} bloodlets."); //write to report
 
             activeSoldier.TakeBloodlettingDamage();
-            menu.CloseDamageEventUI();
+            MenuManager.Instance.CloseDamageEventUI();
         }
         else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Other") && int.TryParse(damageEventUI.otherInput.text, out int otherDamage))
         {
             activeSoldier.TakeDamage(null, otherDamage, false, new() { damageEventUI.damageSource.text }, Vector3.zero);
-            menu.CloseDamageEventUI();
+            MenuManager.Instance.CloseDamageEventUI();
         }
         else
         {
@@ -3751,15 +3749,15 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     //add xp if survives, otherwise kill
                     if (activeSoldier.StructuralCollapseCheck(structureHeight))
                     {
-                        menu.AddXpAlert(activeSoldier, activeSoldier.stats.R.Val, $"Survived a {structureHeight}cm structural collapse.", true);
-                        menu.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse.", -1, -1);
+                        MenuManager.Instance.AddXpAlert(activeSoldier, activeSoldier.stats.R.Val, $"Survived a {structureHeight}cm structural collapse.", true);
+                        MenuManager.Instance.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse.", -1, -1);
                     }
                     else
                     {
                         if (activeSoldier.IsWearingJuggernautArmour(false))
                         {
                             activeSoldier.MakeUnconscious(null, new() { "Structural Collapse" });
-                            menu.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse with Juggernaut Armour.", -1, -1);
+                            MenuManager.Instance.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse with Juggernaut Armour.", -1, -1);
                         }
                         else
                         {
@@ -3772,7 +3770,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 //move actually proceeds
                 PerformMove(activeSoldier, 0, fallCollapseLocation, false, false, string.Empty, true);
 
-                menu.CloseDamageEventUI();
+                MenuManager.Instance.CloseDamageEventUI();
 
             }
             else
@@ -3800,30 +3798,30 @@ public class MainGame : MonoBehaviour, IDataPersistence
     //inspirer functions
     public void CheckInspirer(Soldier inspirer)
     {
-        menu.SetInspirerResolvedFlagTo(false);
+        MenuManager.Instance.SetInspirerResolvedFlagTo(false);
         bool openInspirerUI = false;
 
         foreach (Soldier friendly in AllSoldiers())
         {
             if (friendly.IsAbleToSee() && inspirer.IsSameTeamAs(friendly) && friendly.PhysicalObjectWithinMaxRadius(inspirer) && !friendly.IsRevoker())
             {
-                menu.AddInspirerAlert(friendly, "An Inspirer (" + inspirer.soldierName + ") is within SR range of " + friendly.soldierName + ". Is LOS present?");
+                MenuManager.Instance.AddInspirerAlert(friendly, "An Inspirer (" + inspirer.soldierName + ") is within SR range of " + friendly.soldierName + ". Is LOS present?");
                 openInspirerUI = true;
             }
         }
 
         if (openInspirerUI)
-            menu.OpenInspirerUI();
+            MenuManager.Instance.OpenInspirerUI();
         else
-            menu.SetInspirerResolvedFlagTo(true);
+            MenuManager.Instance.SetInspirerResolvedFlagTo(true);
     }
     public void ConfirmInspirer()
     {
-        ScrollRect inspireScroller = menu.inspirerUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
+        ScrollRect inspireScroller = MenuManager.Instance.inspirerUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
 
         if (inspireScroller.verticalNormalizedPosition <= 0.05f)
         {
-            Transform inspirerAlerts = menu.inspirerUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
+            Transform inspirerAlerts = MenuManager.Instance.inspirerUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
 
             foreach (Transform child in inspirerAlerts)
             {
@@ -3835,7 +3833,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             foreach (Transform child in inspirerAlerts)
                 Destroy(child.gameObject);
 
-            menu.CloseInspirerUI();
+            MenuManager.Instance.CloseInspirerUI();
         }
         else
             print("Haven't scrolled all the way to the bottom");
@@ -3975,7 +3973,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
 
-            menu.CloseOverrideInsertObjectsUI();
+            MenuManager.Instance.CloseOverrideInsertObjectsUI();
         }
         else
             print("Invalid Input");

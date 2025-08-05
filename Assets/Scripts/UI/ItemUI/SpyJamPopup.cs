@@ -6,7 +6,6 @@ using TMPro;
 
 public class SpyJamPopup : MonoBehaviour
 {
-    public MainMenu menu;
     public GameObject useItemUI, jammedIndicator, inUseIndicator;
     public Button spyButton, jamButton;
     public Item ulfUsed;
@@ -45,13 +44,13 @@ public class SpyJamPopup : MonoBehaviour
 
     public void SpyButtonClick()
     {
-        menu.OpenUseULFUI("spy", ulfUsed);
+        MenuManager.Instance.OpenUseULFUI("spy", ulfUsed);
         HideSpyJamPopup();
     }
 
     public void JamButtonClick()
     {
-        menu.OpenUseULFUI("jam", ulfUsed);
+        MenuManager.Instance.OpenUseULFUI("jam", ulfUsed);
         HideSpyJamPopup();
     }
 }

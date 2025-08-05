@@ -16,7 +16,6 @@ public class BinocularBeam : POI, IDataPersistence
 
     private void Start()
     {
-        menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
     }
     private void Update()

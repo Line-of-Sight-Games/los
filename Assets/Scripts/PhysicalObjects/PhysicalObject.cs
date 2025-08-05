@@ -9,12 +9,10 @@ public class PhysicalObject : MonoBehaviour
     public int x, y, z;
     public Collider bodyCollider;
     public MainGame game;
-    public MainMenu menu;
 
     private void Awake()
     {
         game = FindFirstObjectByType<MainGame>();
-        menu = FindFirstObjectByType<MainMenu>();
     }
     public string GenerateGuid()
     {

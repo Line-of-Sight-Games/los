@@ -6,7 +6,6 @@ using TMPro;
 
 public class BinocInHandPopup : MonoBehaviour
 {
-    public MainMenu menu;
     public Button reconButton, flashButton;
     public Item binocsUsed;
     public ItemIcon binocsItemIcon;
@@ -21,13 +20,13 @@ public class BinocInHandPopup : MonoBehaviour
     }
     public void ShowBinocInHandPopup()
     {
-        if (menu.activeSoldier.ap >= 2)
+        if (MenuManager.Instance.activeSoldier.ap >= 2)
         {
             reconButton.interactable = true;
             flashButton.interactable = true;
             notEnoughApIndicator.SetActive(false);
 
-            if (binocsUsed.whereEquipped.Contains("Hand") && !menu.activeSoldier.HasAHandFree(true))
+            if (binocsUsed.whereEquipped.Contains("Hand") && !MenuManager.Instance.activeSoldier.HasAHandFree(true))
             {
                 reconButton.interactable = false;
                 handsFullIndicator.SetActive(true);
@@ -53,15 +52,15 @@ public class BinocInHandPopup : MonoBehaviour
 
     public void ReconButtonClick()
     {
-        menu.activeSoldier.DrainAP();
-        menu.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Recon");
+        MenuManager.Instance.activeSoldier.DrainAP();
+        MenuManager.Instance.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Recon");
         HideBinocInHandPopup();
     }
 
     public void FlashButtonClick()
     {
-        menu.activeSoldier.DeductAP(2);
-        menu.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Flash");
+        MenuManager.Instance.activeSoldier.DeductAP(2);
+        MenuManager.Instance.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Flash");
         HideBinocInHandPopup();
     }
 }

@@ -17,7 +17,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
 
     private void Start()
     {
-        menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
     }
     private void Update()
@@ -114,7 +113,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         //play explosion sfx
         SoundManager.Instance.PlayExplosion();
 
-        GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {X},{Y},{Z}", new(X, Y, Z)).gameObject;
+        GameObject explosionList = Instantiate(MenuManager.Instance.explosionListPrefab, MenuManager.Instance.explosionUI.transform).GetComponent<ExplosionList>().Init($"Claymore : {X},{Y},{Z}", new(X, Y, Z)).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         float arc;
@@ -128,16 +127,16 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
             if (PhysicalObjectWithinClaymoreCone(obj, arc))
             {
                 if (obj is Item hitItem)
-                    menu.AddExplosionAlertItem(explosionList, hitItem, new(X, Y, Z), explodedBy, 8);
+                    MenuManager.Instance.AddExplosionAlertItem(explosionList, hitItem, new(X, Y, Z), explodedBy, 8);
                 else if (obj is POI hitPoi && hitPoi != this)
-                    menu.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, 8);
+                    MenuManager.Instance.AddExplosionAlertPOI(explosionList, hitPoi, explodedBy, 8);
                 else if (obj is Soldier hitSoldier)
-                    menu.AddExplosionAlert(explosionList, hitSoldier, new(X, Y, Z), explodedBy, 8, 0);
+                    MenuManager.Instance.AddExplosionAlert(explosionList, hitSoldier, new(X, Y, Z), explodedBy, 8, 0);
             }
         }
 
         //show explosion ui
-        menu.OpenExplosionUI();
+        MenuManager.Instance.OpenExplosionUI();
 
         Exploded = true;
     }

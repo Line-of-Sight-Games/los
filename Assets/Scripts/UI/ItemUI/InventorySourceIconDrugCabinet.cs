@@ -10,7 +10,6 @@ public class InventorySourceIconDrugCabinet : InventorySourceIcon
 
     public InventorySourceIcon Init(DrugCabinet dc, InventorySourcePanel inventorySourcePanel)
     {
-        menu = FindFirstObjectByType<MainMenu>();
         linkedDC = dc;
         linkedInventoryPanel = inventorySourcePanel;
         transform.GetComponentInChildren<POIPortrait>().Init(dc);
@@ -28,9 +27,9 @@ public class InventorySourceIconDrugCabinet : InventorySourceIcon
     {
         if (locaterDisplay.activeSelf) //locater ability
         {
-            if (menu.OverrideKey())
+            if (MenuManager.Instance.OverrideKey())
             {
-                menu.inventorySourceViewOnly = this.inventorySourceViewOnly;
+                MenuManager.Instance.inventorySourceViewOnly = this.inventorySourceViewOnly;
                 OpenItemPanel();
             }
         }

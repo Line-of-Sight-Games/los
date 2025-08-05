@@ -6,7 +6,6 @@ using TMPro;
 
 public class BinocReconPopup : MonoBehaviour
 {
-    public MainMenu menu;
     public Button relocateButton, stopButton;
     public Item binocsUsed;
     public ItemIcon binocsItemIcon;
@@ -21,7 +20,7 @@ public class BinocReconPopup : MonoBehaviour
     }
     public void ShowBinocReconPopup()
     {
-        if (menu.activeSoldier.ap >= 2)
+        if (MenuManager.Instance.activeSoldier.ap >= 2)
         {
             relocateButton.interactable = true;
             notEnoughApIndicator.SetActive(false);
@@ -46,8 +45,8 @@ public class BinocReconPopup : MonoBehaviour
 
     public void RelocateButtonClick()
     {
-        menu.activeSoldier.DrainAP();
-        menu.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Recon");
+        MenuManager.Instance.activeSoldier.DrainAP();
+        MenuManager.Instance.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Recon");
         HideBinocReconPopup();
     }
 }
