@@ -2046,7 +2046,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  game: {fileID: 0}
   normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 1
   max: 20
@@ -2881,8 +2880,8 @@ MonoBehaviour:
   m_fontSize: 12
   m_fontSizeBase: 12
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -13345,8 +13344,8 @@ MonoBehaviour:
   m_fontSize: 12
   m_fontSizeBase: 12
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -17798,7 +17797,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  game: {fileID: 0}
   normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 10
   max: 1000
@@ -19008,7 +19006,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  game: {fileID: 0}
   normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 10
   max: 1000
@@ -20393,7 +20390,6 @@ MonoBehaviour:
   outlineAreaPosition: {x: 0, y: 0, z: 0}
   outlineAreaDimensions: {x: 0, y: 0, z: 0}
   camOrthoSize: 0
-  weather: {fileID: 1652365975}
   setupMenuUI: {fileID: 354582449}
   createSoldierMenuUI: {fileID: 31577289}
   xSize: {fileID: 1344512486}
@@ -21579,7 +21575,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  game: {fileID: 0}
   normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 10
   max: 1000
@@ -22427,7 +22422,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8e9bb68a4413b47ae49a1fc17ea0b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  game: {fileID: 0}
   savedWeather: []
   isDataLoaded: 0
 --- !u!4 &1652365976
@@ -27552,7 +27546,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textInput: {fileID: 0}
-  game: {fileID: 0}
   normalColour: {r: 0, g: 0, b: 0, a: 0}
   min: 10
   max: 1000
