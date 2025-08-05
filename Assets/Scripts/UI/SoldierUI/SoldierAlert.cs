@@ -1,7 +1,4 @@
-using System.Linq;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class SoldierAlert : MonoBehaviour
@@ -43,5 +40,3 @@ public class SoldierAlert : MonoBehaviour
         soldierPortrait.Init(initSoldier);
     }
 }
-
-

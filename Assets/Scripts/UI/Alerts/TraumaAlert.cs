@@ -91,6 +91,7 @@ public class TraumaAlert : SoldierAlert
             description.text = "No trauma points accrued.";
         }
 
+        traumaIndicator.gameObject.SetActive(false);
         testButton.SetActive(false);
         traumaToggle.gameObject.SetActive(false);
     }

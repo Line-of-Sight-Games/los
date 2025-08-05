@@ -31,7 +31,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3989538252078272942}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -109,15 +108,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -167,7 +168,6 @@ RectTransform:
   m_Children:
   - {fileID: 6810365017266238404}
   m_Father: {fileID: 9047198959824982720}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -243,7 +243,6 @@ RectTransform:
   m_Children:
   - {fileID: 2736557057760140958}
   m_Father: {fileID: 3989538252078272942}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -341,7 +340,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2736557057760140958}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -422,7 +420,6 @@ RectTransform:
   - {fileID: 2589107836838524535}
   - {fileID: 9047198959824982720}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -479,14 +476,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ebd57be1922a364f9f03ae9632ffbb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noisePlayerSoldierAlert: {fileID: 0}
-  buttonPress: {fileID: 8300000, guid: 0158fe86bbf405b4eaa1fee284811850, type: 3}
   soldier: {fileID: 0}
-  promotionComplete: 0
-  statDropdown: {fileID: 0}
-  abilityDropdown: {fileID: 0}
-  traumaButton: {fileID: 0}
-  captaincyToggle: {fileID: 0}
+  soldierPortrait: {fileID: 3376104034259671620}
+  title: {fileID: 921480684911140206}
+  damageIndicator: {fileID: 0}
+  description: {fileID: 638308051853955374}
 --- !u!1 &7898794676086090122
 GameObject:
   m_ObjectHideFlags: 0
@@ -518,7 +512,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3989538252078272942}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -596,15 +589,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -627,6 +622,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 3989538252078272942}
     m_Modifications:
     - target: {fileID: 6555607041518850898, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
@@ -730,9 +726,23 @@ PrefabInstance:
       value: SoldierPortrait
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
 --- !u!224 &3029008711950028187 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6555607041518850898, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
   m_PrefabInstance: {fileID: 8138851971179192009}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3376104034259671620 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6785048890322191501, guid: bfa1b181a49d8c54a8236639fb9a2b14, type: 3}
+  m_PrefabInstance: {fileID: 8138851971179192009}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed9d0c91ec61ccf41859b886019f959e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

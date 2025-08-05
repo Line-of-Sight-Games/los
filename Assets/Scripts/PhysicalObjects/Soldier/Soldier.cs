@@ -337,15 +337,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsConscious()
     {
-        if (IsAlive())
-        {
-            if (CheckState("Unconscious"))
-                return false;
-            else
-                return true;
-        }
-        else
-            return false;
+        return IsAlive() && !CheckState("Unconscious");
     }
     public bool IsInjured()
     {
