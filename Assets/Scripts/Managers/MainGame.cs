@@ -12,7 +12,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     private bool gameRunning;
 
     public MainMenu menu;
-    public ItemManager itemManager;
     public SoldierManager soldierManager;
 
     public MoveUI moveUI;
@@ -2784,18 +2783,18 @@ public class MainGame : MonoBehaviour, IDataPersistence
 
             if (poiToDisarm is Claymore claymoreToDisarm)
             {
-                disarmedItem = itemManager.SpawnItem("Claymore");
+                disarmedItem = ItemManager.Instance.SpawnItem("Claymore");
                 placedBy = claymoreToDisarm.placedBy;
             }
             else if (poiToDisarm is DeploymentBeacon depbeaconToDisarm)
             {
-                disarmedItem = itemManager.SpawnItem("Deployment_Beacon");
+                disarmedItem = ItemManager.Instance.SpawnItem("Deployment_Beacon");
                 placedBy = depbeaconToDisarm.placedBy;
             }
             else if (poiToDisarm is ThermalCamera thermalcamToDisarm)
             {
                 SetLosCheckAllEnemies("losChange|thermalCamDeactive"); //loscheckallenemies
-                disarmedItem = itemManager.SpawnItem("Thermal_Camera");
+                disarmedItem = ItemManager.Instance.SpawnItem("Thermal_Camera");
                 placedBy = thermalcamToDisarm.placedBy;
             }
 
@@ -2917,7 +2916,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void UpdateItemUsedOn(UseItemUI useItemUI)
     {
-        useItemUI.itemUsedOn = itemManager.FindItemById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+        useItemUI.itemUsedOn = ItemManager.Instance.FindItemById(menu.useItemUI.transform.Find("OptionPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
     }
     public void ConfirmUHF(UseItemUI useUHFUI)
     {
@@ -2927,8 +2926,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         GameObject totalMiss = useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
         TMP_Dropdown strikeOption = useUHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>();
 
-        int dipelecScore = itemManager.scoreTable[activeSoldier.stats.Dip.Val, activeSoldier.stats.Elec.Val];
-        Tuple<int, string, int, int, int> strike = itemManager.GetStrike(strikeOption.captionText.text);
+        int dipelecScore = ItemManager.Instance.scoreTable[activeSoldier.stats.Dip.Val, activeSoldier.stats.Elec.Val];
+        Tuple<int, string, int, int, int> strike = ItemManager.Instance.GetStrike(strikeOption.captionText.text);
         int rolls = strike.Item4;
         int radius = strike.Item3;
         int damage = strike.Item5;
@@ -3394,7 +3393,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     }
     public void DecreaseTurnsSpyingJammingAllULFs()
     {
-        foreach (Item item in itemManager.allItems)
+        foreach (Item item in ItemManager.Instance.allItems)
         {
             if (item.IsJamming())
                 item.jammingForTurns--;
@@ -3957,7 +3956,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
                     if (itemIcon != null && itemIcon.pickupNumber > 0)
                         for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
-                            gb.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+                            gb.Inventory.AddItem(ItemManager.Instance.SpawnItem(child.gameObject.name));
                 }
             }
             else if (insertObjectsUI.objectTypeDropdown.value == 2)
@@ -3973,7 +3972,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                     ItemIconGB itemIcon = child.GetComponent<ItemIconGB>();
                     if (itemIcon != null && itemIcon.pickupNumber > 0)
                         for (int i = 0; i < child.GetComponent<ItemIconGB>().pickupNumber; i++)
-                            dc.Inventory.AddItem(itemManager.SpawnItem(child.gameObject.name));
+                            dc.Inventory.AddItem(ItemManager.Instance.SpawnItem(child.gameObject.name));
                 }
             }
 

@@ -79,7 +79,7 @@ public class Inventory
         if (item != null)
         {
             RemoveItemFromSlot(item, slotName);
-            item.itemManager.DestroyItem(item);
+            ItemManager.Instance.DestroyItem(item);
         }
     }
     public void AddItem(Item item)

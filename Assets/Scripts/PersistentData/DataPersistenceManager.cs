@@ -132,10 +132,9 @@ public class DataPersistenceManager : MonoBehaviour
             yield return null;
         }
 
-        ItemManager itemManager = FindFirstObjectByType<ItemManager>();
-        if (itemManager != null)
+        if (ItemManager.Instance != null)
         {
-            itemManager.AssignItemsToOwners();
+            ItemManager.Instance.AssignItemsToOwners();
             progressBar.value = 0.98f;
         }
 

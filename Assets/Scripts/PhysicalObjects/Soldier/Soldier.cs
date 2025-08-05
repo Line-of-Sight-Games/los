@@ -48,14 +48,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public SoldierUI soldierUI, soldierUIPrefab;
 
     public SoldierManager soldierManager;
-    public ItemManager itemManager;
 
     private void Awake()
     {
         game = FindFirstObjectByType<MainGame>();
         menu = FindFirstObjectByType<MainMenu>();
         soldierManager = FindFirstObjectByType<SoldierManager>();
-        itemManager = FindFirstObjectByType<ItemManager>();
     }
 
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
@@ -3511,7 +3509,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasGunsInInventory()
     {
-        foreach (Item item in itemManager.allItems)
+        foreach (Item item in ItemManager.Instance.allItems)
         {
             if (item.IsGun() && item.IsNestedOnSoldier() && item.SoldierNestedOn() == this)
                 return true;
@@ -3520,7 +3518,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Item RandomGunFromInventory()
     {
-        foreach (Item item in itemManager.allItems)
+        foreach (Item item in ItemManager.Instance.allItems)
         {
             if (item.IsGun() && item.IsNestedOnSoldier() && item.SoldierNestedOn() == this)
                 return item;
@@ -4728,7 +4726,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         get 
         {
             InventorySlots.TryGetValue("LeftHand", out string leftHand);
-            return itemManager.FindItemById(leftHand);
+            return ItemManager.Instance.FindItemById(leftHand);
         }
     }
     public Item RightHandItem
@@ -4736,7 +4734,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         get
         {
             InventorySlots.TryGetValue("RightHand", out string rightHand);
-            return itemManager.FindItemById(rightHand);
+            return ItemManager.Instance.FindItemById(rightHand);
         }
     }
     public Item BestMeleeWeapon

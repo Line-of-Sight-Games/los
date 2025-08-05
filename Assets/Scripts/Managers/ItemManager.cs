@@ -5,6 +5,25 @@ using UnityEngine;
 
 public class ItemManager : MonoBehaviour, IDataPersistence
 {
+    public static ItemManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     public List<string> allItemIds = new();
     public List<Item> allItems = new();
     public Item itemPrefab;

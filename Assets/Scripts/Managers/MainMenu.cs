@@ -16,7 +16,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public KeyCode deathKey = KeyCode.D;
 
     public SoldierManager soldierManager;
-    public ItemManager itemManager;
     public MainGame game;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 

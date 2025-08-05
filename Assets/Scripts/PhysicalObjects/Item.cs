@@ -12,7 +12,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 {
     public Dictionary<string, object> details;
     public ItemReader reader;
-    public ItemManager itemManager;
     public IHaveInventory owner;
     public string ownerId;
     public string markedForAction;
@@ -70,7 +69,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         game = FindFirstObjectByType<MainGame>();
         menu = FindFirstObjectByType<MainMenu>();
         reader = FindFirstObjectByType<ItemReader>();
-        itemManager = FindFirstObjectByType<ItemManager>();
     }
     private void Update()
     {
@@ -141,7 +139,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             inventorySlots = reader.allItems.items[itemIndex].InventorySlots;
         }
 
-        itemManager.RefreshItemList();
+        ItemManager.Instance.RefreshItemList();
         return this;
     }
 
@@ -485,8 +483,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 linkedSoldier.ResetRoundsWithoutFood();
 
                 //kill drugs
-                for (int i = 0; i < itemManager.drugTable.Length; i++)
-                    linkedSoldier.UnsetOnDrug(itemManager.drugTable[i]);
+                for (int i = 0; i < ItemManager.Instance.drugTable.Length; i++)
+                    linkedSoldier.UnsetOnDrug(ItemManager.Instance.drugTable[i]);
 
                 //kil tabun
                 if (linkedSoldier.IsInTabun())
@@ -531,7 +529,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             {
                 //label unlabelled syringes
                 if (linkedSoldier.IsMedic())
-                    itemName = $"Syringe_{itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)]}";
+                    itemName = $"Syringe_{ItemManager.Instance.drugTable[HelperFunctions.RandomNumber(0, ItemManager.Instance.drugTable.Length - 1)]}";
             }
 
             //perform ability effects
@@ -751,8 +749,8 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             if (elec > 9)
                 elec = 9;
 
-            int dipelecScore = itemManager.scoreTable[dip, elec];
-            List<string> strike = itemManager.GetStrikeAndLowerNames(dipelecScore);
+            int dipelecScore = ItemManager.Instance.scoreTable[dip, elec];
+            List<string> strike = ItemManager.Instance.GetStrikeAndLowerNames(dipelecScore);
             return strike;
         }
         return null;
@@ -902,7 +900,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                         //play use syringe
                         SoundManager.Instance.PlayUseSyringe();
 
-                        soldierUsedOn.TakeDrug(itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)], linkedSoldier);
+                        soldierUsedOn.TakeDrug(ItemManager.Instance.drugTable[HelperFunctions.RandomNumber(0, ItemManager.Instance.drugTable.Length - 1)], linkedSoldier);
                     }
                     else
                     {
@@ -1058,7 +1056,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public void ConsumeItem()
     {
         owner?.Inventory.RemoveItemFromSlot(this, whereEquipped);
-        itemManager.DestroyItem(this);
+        ItemManager.Instance.DestroyItem(this);
     }
     public void TakeDamage(Soldier damagedBy, int damage, List<string> damageSource)
     {
@@ -1386,7 +1384,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     {
         if (this.owner is Soldier owningSoldier)
         {
-            foreach (Item i in itemManager.allItems)
+            foreach (Item i in ItemManager.Instance.allItems)
                 if (i.IsJamming() && i.owner is Soldier linkedSoldier && linkedSoldier.IsOppositeTeamAs(owningSoldier))
                     return true;
         }

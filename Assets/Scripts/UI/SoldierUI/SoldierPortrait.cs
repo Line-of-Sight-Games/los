@@ -67,7 +67,7 @@ public class SoldierPortrait : MonoBehaviour
 
             //load equipment on head
             if (linkedSoldier.InventorySlots["Head"] != "")
-                equipmentOnHead.sprite = linkedSoldier.LoadHeadEquipment(linkedSoldier.menu.itemManager.FindItemById(linkedSoldier.InventorySlots["Head"]).itemName);
+                equipmentOnHead.sprite = linkedSoldier.LoadHeadEquipment(ItemManager.Instance.FindItemById(linkedSoldier.InventorySlots["Head"]).itemName);
             else
                 equipmentOnHead.sprite = linkedSoldier.LoadHeadEquipment("Nothing");
 

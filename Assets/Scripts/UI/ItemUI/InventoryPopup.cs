@@ -11,7 +11,6 @@ public class InventoryPopup : MonoBehaviour
     public GameObject inventoryArea;
     public ItemSlot itemSlotPrefab;
     public ItemIcon itemIconPrefab;
-    public ItemManager itemManager;
     public Item linkedItem;
 
     void Update()
@@ -26,7 +25,7 @@ public class InventoryPopup : MonoBehaviour
         foreach (KeyValuePair<string, string> inventorySlotKVP in linkedItem.inventorySlots)
         {
             ItemSlot itemSlot = Instantiate(itemSlotPrefab, inventoryArea.transform).Init(linkedItem);
-            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).Init(itemManager.FindItemById(inventorySlotKVP.Value), itemSlot));
+            itemSlot.AssignItemIcon(Instantiate(itemIconPrefab, itemSlot.transform).Init(ItemManager.Instance.FindItemById(inventorySlotKVP.Value), itemSlot));
         }
         gameObject.SetActive(true);
     }
