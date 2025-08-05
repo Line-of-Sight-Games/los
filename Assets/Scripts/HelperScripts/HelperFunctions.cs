@@ -124,4 +124,43 @@ public static class HelperFunctions
         //str += "]";
         return str;
     }
+    public static int Factorial(int number)
+    {
+        if (number == 0)
+            return 1;
+        else
+        {
+            int result = 1;
+
+            while (number != 1)
+            {
+                result *= number;
+                number--;
+            }
+            return result;
+        }
+    }
+    public static float BinomialProbability(int n, int x, float p, float q)
+    {
+        if (n >= x)
+            return Factorial(n) / (Factorial(n - x) * Factorial(x)) * Mathf.Pow(p, x) * Mathf.Pow(q, n - x);
+        else
+            return 0;
+    }
+    public static float CumulativeBinomialProbability(int n, int x, float p, float q)
+    {
+        if (n >= x)
+        {
+            float result = 0;
+
+            while (x <= n)
+            {
+                result += BinomialProbability(n, x, p, q);
+                x++;
+            }
+            return result;
+        }
+        else
+            return 0;
+    }
 }

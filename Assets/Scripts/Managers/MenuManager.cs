@@ -50,7 +50,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public GeneralAlertUI generalAlertUI;
     public BinocularsUI binocularsUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, dipelecResultUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierSnapshotPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
     
     public SoldierAlert soldierAlertPrefab;
     public XpAlert xpAlertPrefab;
@@ -66,7 +66,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     private float playTimeTotal;
     public float turnTime;
     public string meleeChargeIndicator;
-    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearDipelecFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
+    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite fist, explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
 
@@ -3510,70 +3510,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
 
 
-    //dipelec functions
-    public void OpenDipElecUI()
-    {
-        //generate terminal list
-        List<TMP_Dropdown.OptionData> terminalDetailsList = new();
-        foreach (Terminal t in GameManager.Instance.AllTerminals())
-        {
-            TMP_Dropdown.OptionData terminalDetails = null;
-            if (t.terminalEnabled && ActiveSoldier.Instance.S.PhysicalObjectWithinMeleeRadius(t))
-            {
-                dipelecUI.allTerminalIds.Add(t.id);
-                terminalDetails = new($"X:{t.X} Y:{t.Y} Z:{t.Z}", t.poiPortrait, Color.white);
-                terminalDetailsList.Add(terminalDetails);
-            }
-        }
-        dipelecUI.dipElecTerminalDropdown.AddOptions(terminalDetailsList);
-
-        GameManager.Instance.UpdateDipElecUI();
-        dipelecUI.gameObject.SetActive(true);
-    }
-    public void CloseDipElecUI()
-    {
-        ClearDipElecUI();
-        dipelecUI.gameObject.SetActive(false);
-    }
-    public void ClearDipElecUI()
-    {
-        clearDipelecFlag = true;
-        dipelecUI.allTerminalIds.Clear();
-
-        dipelecUI.dipElecTerminalDropdown.value = 0;
-        dipelecUI.dipElecTerminalDropdown.ClearOptions();
-
-        dipelecUI.dipElecTypeDropdown.value = 0;
-        dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
-
-        dipelecUI.dipElecLevelDropdown.value = 0;
-        dipelecUI.successChanceDisplay.text = "";
-        clearDipelecFlag = false;
-    }
-    public void OpenDipelecResultUI()
-    {
-        dipelecResultUI.SetActive(true);
-    }
-    public void ClearDipelecResultUI()
-    {
-        foreach (Transform child in dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"))
-            Destroy(child.gameObject);
-    }
-    public void CloseDipelecResultUI()
-    {
-        if (OverrideKey())
-        {
-            if (dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").childCount > 1)
-                Destroy(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").GetChild(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").childCount - 1).gameObject);
-            else
-            {
-                UnfreezeTimer();
-                ClearDipelecResultUI();
-                dipelecResultUI.SetActive(false);
-                ActiveSoldier.Instance.S.PerformLoudAction(30);
-            }
-        }
-    }
+    
     
     
     
