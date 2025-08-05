@@ -17,11 +17,6 @@ public class SmokeCloud : POI, IDataPersistence
     public SphereCollider innerCloud;
     public SphereCollider outerCloud;
 
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
-
     public SmokeCloud Init(Tuple<Vector3, string> location, string thrownBy)
     {
         Id = GenerateGuid();
@@ -88,7 +83,7 @@ public class SmokeCloud : POI, IDataPersistence
     }
     public void SpawnCloud()
     {
-        game.CheckAllSmokeClouds();
+        GameManager.Instance.CheckAllSmokeClouds();
     }
     public void DissipateCloud()
     {
@@ -101,7 +96,7 @@ public class SmokeCloud : POI, IDataPersistence
         MenuManager.Instance.CreateCloudDissipationAlert(this);
 
         //dissipate and recheck
-        game.CheckAllSmokeClouds();
+        GameManager.Instance.CheckAllSmokeClouds();
     }
     public int TurnsUntilDissipation
     {

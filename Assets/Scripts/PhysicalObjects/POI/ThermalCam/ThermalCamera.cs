@@ -12,11 +12,6 @@ public class ThermalCamera : POI, IDataPersistence, IAmDisarmable
     public float beamHeight, beamWidth;
     public Beam beam;
 
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
-
     private void Update()
     {
         placedBy = SoldierManager.Instance.FindSoldierById(placedById);

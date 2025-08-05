@@ -23,8 +23,6 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
             Instance = null;
     }
 
-    public MainGame game;
-
     public List<string> allSoldierIds = new();
     public List<Soldier> allSoldiers = new();
     public Soldier soldierPrefab;

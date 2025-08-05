@@ -12,13 +12,11 @@ public class ItemIconGB : MonoBehaviour
     public Item linkedItem;
     public int pickupNumber = 0;
     public List<Sprite> arrows = new();
-    public MainGame game;
     public Transform destination;
 
     public void Start()
     {
         itemAssets = FindFirstObjectByType<ItemAssets>();
-        game = FindFirstObjectByType<MainGame>();
         transform.Find("ItemImage").GetComponent<Image>().sprite = itemAssets.GetSprite(this.gameObject.name);
         transform.Find("Arrow").GetComponent<Image>().sprite = arrows[0];
         destination = null;
@@ -27,7 +25,6 @@ public class ItemIconGB : MonoBehaviour
     public ItemIconGB Init(string name, int amount, Item item)
     {
         itemAssets = FindFirstObjectByType<ItemAssets>();
-        game = FindFirstObjectByType<MainGame>();
         gameObject.name = name;
         pickupNumber = amount;
         linkedItem = item;

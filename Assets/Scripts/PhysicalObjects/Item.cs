@@ -66,7 +66,6 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
     private void Awake()
     {
-        game = FindFirstObjectByType<MainGame>();
         reader = FindFirstObjectByType<ItemReader>();
     }
     private void Update()
@@ -578,7 +577,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public void RunDropEffect(Soldier linkedSoldier)
     {
         //play drop general sfx (clashes with item use sound for consumables)
-        //game.SoundManager.Instance.PlayConfigGeneral(); 
+        //GameManager.Instance.SoundManager.Instance.PlayConfigGeneral(); 
 
         //minus ap for logistics belt
         if (itemName.Equals("Logistics_Belt"))
@@ -784,7 +783,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 linkedSoldier.PerformLoudAction(24);
 
                 //set sound flags after use ULF
-                foreach (Soldier s in game.AllSoldiers())
+                foreach (Soldier s in GameManager.Instance.AllSoldiers())
                 {
                     if (s.IsSameTeamAs(linkedSoldier))
                         SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyUseULF(s);
@@ -962,7 +961,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             Explosion explosion2 = Instantiate(POIManager.Instance.explosionPrefab).Init(8, position);
             Explosion explosion3 = Instantiate(POIManager.Instance.explosionPrefab).Init(15, position);
             
-            foreach (PhysicalObject obj in game.AllBattlefieldObjects())
+            foreach (PhysicalObject obj in GameManager.Instance.AllBattlefieldObjects())
             {
                 int damage = 0;
                 if (obj.IsWithinSphere(explosion1.BodyCollider))
@@ -1029,7 +1028,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             Instantiate(POIManager.Instance.smokeCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
 
             //set sound flags after enemy use smoke
-            foreach (Soldier s in game.AllSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
                 if (s.IsOppositeTeamAs(explodedBy))
                     SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyUseSmoke(s);
@@ -1040,7 +1039,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             Instantiate(POIManager.Instance.tabunCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
             
             //set sound flags after enemy use tabun
-            foreach (Soldier s in game.AllSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
                 if (s.IsOppositeTeamAs(explodedBy))
                     SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyUseTabun(s);

@@ -10,17 +10,17 @@ public class LocationInputController : MinMaxInputController
         if (textInput.transform.name.Contains("X"))
         {
             min = 1;
-            max = game.maxX;
+            max = GameManager.Instance.maxX;
         }
         else if (textInput.transform.name.Contains("Y"))
         {
             min = 1;
-            max = game.maxY;
+            max = GameManager.Instance.maxY;
         }
         else if (textInput.transform.name.Contains("Z"))
         {
             min = 0;
-            max = game.maxZ;
+            max = GameManager.Instance.maxZ;
         }
     }
 

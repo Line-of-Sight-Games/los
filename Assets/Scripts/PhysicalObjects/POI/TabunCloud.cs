@@ -13,11 +13,6 @@ public class TabunCloud : POI, IDataPersistence
     public SphereCollider innerCloud;
     public SphereCollider outerCloud;
 
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
-
     public TabunCloud Init(Tuple<Vector3, string> location, string thrownBy)
     {
         Id = GenerateGuid();
@@ -83,7 +78,7 @@ public class TabunCloud : POI, IDataPersistence
     }
     public void SpawnCloud()
     {
-        game.CheckAllTabunClouds();
+        GameManager.Instance.CheckAllTabunClouds();
     }
     public void DissipateCloud()
     {
@@ -96,7 +91,7 @@ public class TabunCloud : POI, IDataPersistence
         MenuManager.Instance.CreateCloudDissipationAlert(this);
 
         //dissipate and recheck
-        game.CheckAllTabunClouds();
+        GameManager.Instance.CheckAllTabunClouds();
     }
     public int TurnsUntilDissipation
     {

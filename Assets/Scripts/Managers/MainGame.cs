@@ -6,8 +6,27 @@ using TMPro;
 using UnityEngine.UI;
 using System.Linq;
 
-public class MainGame : MonoBehaviour, IDataPersistence
+public class GameManager : MonoBehaviour, IDataPersistence
 {
+    public static GameManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     [SerializeField]
     private bool gameRunning;
 
@@ -35,7 +54,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI;
     public Soldier activeSoldier;
 
-    public MainGame Init()
+    public GameManager Init()
     {
         gameRunning = true;
         return this;

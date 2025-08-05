@@ -56,14 +56,14 @@ public class Stat
     public int Increment()
     {
         BaseVal += ReadIncrement;
-        if (statlineBelongsTo.soldierBelongsTo != null && statlineBelongsTo.soldierBelongsTo.game != null && statlineBelongsTo.soldierBelongsTo.game.GameRunning) 
+        if (statlineBelongsTo.soldierBelongsTo != null && GameManager.Instance != null && GameManager.Instance.GameRunning) 
         {
             statlineBelongsTo.soldierBelongsTo.CalculateActiveStats();
 
             if (Name == "H")
                 statlineBelongsTo.soldierBelongsTo.TakeHeal(null, 1, 0, false, false);
             else if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str" || Name == "F"))
-                statlineBelongsTo.soldierBelongsTo.game.StartCoroutine(statlineBelongsTo.soldierBelongsTo.game.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
+                GameManager.Instance.StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
             else if (Name == "SR" || Name == "C" || Name == "P")
                 statlineBelongsTo.soldierBelongsTo.SetLosCheck($"statChange({Name})|baseStatChange"); //losCheck
         }

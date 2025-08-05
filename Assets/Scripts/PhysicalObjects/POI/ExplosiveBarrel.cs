@@ -9,10 +9,6 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
 {
     public bool triggered;
     public bool exploded;
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
 
     public ExplosiveBarrel Init(Tuple<Vector3, string> location)
     {

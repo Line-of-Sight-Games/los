@@ -8,12 +8,7 @@ public class PhysicalObject : MonoBehaviour
     public string id, terrainOn;
     public int x, y, z;
     public Collider bodyCollider;
-    public MainGame game;
 
-    private void Awake()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
     public string GenerateGuid()
     {
         return System.Guid.NewGuid().ToString();
@@ -56,13 +51,13 @@ public class PhysicalObject : MonoBehaviour
     }
     public bool OnBattlefield()
     {
-        if (X > 0 && X <= game.maxX && Y > 0 && Y <= game.maxY && Z <= game.maxZ)
+        if (X > 0 && X <= GameManager.Instance.maxX && Y > 0 && Y <= GameManager.Instance.maxY && Z <= GameManager.Instance.maxZ)
             return true;
         return false;
     }
     public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
     {
-        if (OnBattlefield() && obj.OnBattlefield() && game.CalculateRange(this, obj) <= radius)
+        if (OnBattlefield() && obj.OnBattlefield() && GameManager.Instance.CalculateRange(this, obj) <= radius)
             return true;
 
         return false;
@@ -87,7 +82,7 @@ public class PhysicalObject : MonoBehaviour
     }
     public bool PointWithinRadius(Vector3 point, float radius)
     {
-        if (OnBattlefield() && (point.x > 0 && X <= game.maxX && point.y > 0 && point.y <= game.maxY && point.z <= game.maxZ) && game.CalculateRange(this, point) <= radius)
+        if (OnBattlefield() && (point.x > 0 && X <= GameManager.Instance.maxX && point.y > 0 && point.y <= GameManager.Instance.maxY && point.z <= GameManager.Instance.maxZ) && GameManager.Instance.CalculateRange(this, point) <= radius)
             return true;
 
         return false;

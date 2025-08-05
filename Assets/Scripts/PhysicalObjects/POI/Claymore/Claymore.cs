@@ -15,10 +15,6 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     public Soldier placedBy;
     public Renderer renderer;
 
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
     private void Update()
     {
         placedBy = SoldierManager.Instance.FindSoldierById(placedById);

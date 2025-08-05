@@ -6,11 +6,6 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
     public string placedById;
     public Soldier placedBy;
 
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
-
     private void Update()
     {
         placedBy = SoldierManager.Instance.FindSoldierById(placedById);

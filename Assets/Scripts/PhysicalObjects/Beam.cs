@@ -2,18 +2,11 @@ using UnityEngine;
 
 public class Beam : MonoBehaviour
 {
-    public MainGame game;
     public Vector3 startingPosition, targetPosition;
     public float beamHeight, beamWidth;
 
     public Renderer renderer;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
 
-    // Update is called once per frame
     void Update()
     {
         if (targetPosition != null)
@@ -48,9 +41,9 @@ public class Beam : MonoBehaviour
 
     public Vector3 CalculateBoundaryPoint(Vector3 start, Vector3 direction)
     {
-        float tX = direction.x != 0 ? ((direction.x > 0 ? game.maxX : 1) - start.x) / direction.x : float.MaxValue;
-        float tY = direction.y != 0 ? ((direction.y > 0 ? game.maxZ : 1) - start.y) / direction.y : float.MaxValue;
-        float tZ = direction.z != 0 ? ((direction.z > 0 ? game.maxY : 0) - start.z) / direction.z : float.MaxValue;
+        float tX = direction.x != 0 ? ((direction.x > 0 ? GameManager.Instance.maxX : 1) - start.x) / direction.x : float.MaxValue;
+        float tY = direction.y != 0 ? ((direction.y > 0 ? GameManager.Instance.maxZ : 1) - start.y) / direction.y : float.MaxValue;
+        float tZ = direction.z != 0 ? ((direction.z > 0 ? GameManager.Instance.maxY : 0) - start.z) / direction.z : float.MaxValue;
 
         // Find the smallest positive t (time to reach boundary)
         float t = Mathf.Min(tX, tY, tZ);

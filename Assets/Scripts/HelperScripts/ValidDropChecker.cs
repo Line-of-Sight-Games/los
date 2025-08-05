@@ -40,7 +40,7 @@ public class ValidDropChecker : MonoBehaviour
 
         if (GetThrowLocation(out Vector3 throwLocation))
         {
-            foreach (Soldier s in MenuManager.Instance.game.AllFieldedSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllFieldedSoldiers())
             {
                 if (s.IsAbleToSee() && s.IsSameTeamAs(MenuManager.Instance.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
                 {

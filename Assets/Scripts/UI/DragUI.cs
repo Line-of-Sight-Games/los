@@ -100,12 +100,12 @@ public class DragUI : MonoBehaviour
             if (legitMove)
             {
                 dragee.beingDraggedBy = drager.Id;
-                MenuManager.Instance.game.BreakAllControllingMeleeEngagments(drager); //break melee engagement when commencing drag
+                GameManager.Instance.BreakAllControllingMeleeEngagments(drager); //break melee engagement when commencing drag
                 if (drager.CheckAP(GetDragAPCost()))
                 {
                     drager.DeductAP(GetDragAPCost());
-                    MenuManager.Instance.game.PerformMove(drager, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true); 
-                    MenuManager.Instance.game.PerformMove(dragee, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true);
+                    GameManager.Instance.PerformMove(drager, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true); 
+                    GameManager.Instance.PerformMove(dragee, 0, Tuple.Create(moveLocation, terrainDropdown.captionText.text), false, false, string.Empty, true);
                     moveObjects.SetActive(false);
                     backButton.SetActive(false);
                     dropObjects.SetActive(true);
@@ -118,7 +118,7 @@ public class DragUI : MonoBehaviour
             if (IsWithinDropBounds())
             {
                 dragee.beingDraggedBy = string.Empty;
-                MenuManager.Instance.game.PerformMove(dragee, 0, Tuple.Create(dropLocation, terrainDropdownD.captionText.text), false, false, GetDropDistance().ToString(), true);
+                GameManager.Instance.PerformMove(dragee, 0, Tuple.Create(dropLocation, terrainDropdownD.captionText.text), false, false, GetDropDistance().ToString(), true);
                 MenuManager.Instance.CloseDragUI();
             }
         }

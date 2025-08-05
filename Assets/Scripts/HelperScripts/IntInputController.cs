@@ -5,13 +5,11 @@ using UnityEngine;
 public class IntInputController : MonoBehaviour
 {
     public TMP_InputField textInput;
-    public MainGame game;
     public Color normalColour;
 
     private void Awake()
     {
         textInput = GetComponent<TMP_InputField>();
-        game = FindFirstObjectByType<MainGame>();
         normalColour = new(0.196f, 0.196f, 0.196f);
     }
 

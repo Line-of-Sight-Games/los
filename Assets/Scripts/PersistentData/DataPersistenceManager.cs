@@ -116,7 +116,7 @@ public class DataPersistenceManager : MonoBehaviour
 
         if (gameData == null)
         {
-            print("No data was found. Starting new game.");
+            print("No data was found. Starting new GameManager.Instance.");
             NewGame();
         }
 
@@ -138,10 +138,9 @@ public class DataPersistenceManager : MonoBehaviour
             progressBar.value = 0.98f;
         }
 
-        MainGame mainGame = FindFirstObjectByType<MainGame>();
-        if (mainGame != null)
+        if (GameManager.Instance != null)
         {
-            mainGame.Init();
+			GameManager.Instance.Init();
             progressBar.value = 1f;
         }
     }

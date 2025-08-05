@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class SoldierUI : MonoBehaviour
 {
-    public MainGame game;
     public Soldier linkedSoldier;
     public TMP_InputField xSize, ySize, zSize;
     public int x, y, z;
@@ -14,10 +13,6 @@ public class SoldierUI : MonoBehaviour
     public SoldierPortrait soldierPotrait;
     public TextMeshProUGUI ap, mp, location, revealMessageText; 
 
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
     public void DisplayInFriendlyColumn()
     {
         transform.SetParent(SoldierManager.Instance.friendlyDisplayColumn.transform);
@@ -70,13 +65,13 @@ public class SoldierUI : MonoBehaviour
     {
         if (int.TryParse(xSize.text, out x) && int.TryParse(ySize.text, out y) && int.TryParse(zSize.text, out z) && terrainDropdown.value != 0)
         {
-            if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
+            if (x >= 1 && x <= GameManager.Instance.maxX && y >= 1 && y <= GameManager.Instance.maxY && z >= 0 && z <= GameManager.Instance.maxZ)
             {
                 //play move confirm dialogue
                 SoundManager.Instance.PlaySoldierConfirmMove(linkedSoldier);
 
                 //deploy the soldier
-                game.PerformSpawn(linkedSoldier, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text));
+                GameManager.Instance.PerformSpawn(linkedSoldier, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text));
 
                 //confirm fielding
                 linkedSoldier.fielded = true;
@@ -90,7 +85,7 @@ public class SoldierUI : MonoBehaviour
     {
         linkedSoldier.SetActiveSoldier();
 
-        //print($"{Time.time}: Active Soldier: {game.activeSoldier.soldierName}|{MenuManager.Instance.activeSoldier.soldierName}");
+        //print($"{Time.time}: Active Soldier: {GameManager.Instance.activeSoldier.soldierName}|{MenuManager.Instance.activeSoldier.soldierName}");
         SoldierManager.Instance.enemyDisplayColumn.SetActive(false);
         SoldierManager.Instance.friendlyDisplayColumn.SetActive(false);
         MenuManager.Instance.menuUI.transform.Find("GameMenu").Find("SoldierOptions").gameObject.SetActive(true);

@@ -24,7 +24,7 @@ public class ValidThrowChecker : MonoBehaviour
     {
         scatteredOffMap.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && (throwLocation.x <= 0 || throwLocation.x > MenuManager.Instance.game.maxX || throwLocation.y <= 0 || throwLocation.y > MenuManager.Instance.game.maxY)) //is scattering off map
+        if (GetThrowLocation(out Vector3 throwLocation) && (throwLocation.x <= 0 || throwLocation.x > GameManager.Instance.maxX || throwLocation.y <= 0 || throwLocation.y > GameManager.Instance.maxY)) //is scattering off map
             scatteredOffMap.SetActive(true);
     }
     public void CheckThrowingRange()
@@ -87,7 +87,7 @@ public class ValidThrowChecker : MonoBehaviour
 
         if (GetThrowLocation(out Vector3 throwLocation))
         {
-            foreach (Soldier s in MenuManager.Instance.game.AllSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
                 if (s.IsAbleToSee() && s.IsSameTeamAs(MenuManager.Instance.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
                 {

@@ -23,8 +23,6 @@ public class WeatherManager : MonoBehaviour, IDataPersistence
             Instance = null;
     }
 
-    public MainGame game;
-
     readonly Dictionary<int, string> visibility = new()
     {
         {0, "Zero"},
@@ -316,21 +314,21 @@ public class WeatherManager : MonoBehaviour, IDataPersistence
     }
     public string CurrentWeather
     {
-        get { return savedWeather[game.currentTurn]; }
-        set { savedWeather[game.currentTurn] = value; }
+        get { return savedWeather[GameManager.Instance.currentTurn]; }
+        set { savedWeather[GameManager.Instance.currentTurn] = value; }
     }
     public string LastTurnWeather
     {
         get
         {
-            return savedWeather[game.currentTurn - 1];
+            return savedWeather[GameManager.Instance.currentTurn - 1];
         }
     }
     public string NextTurnWeather
     {
         get
         {
-            return savedWeather[game.currentTurn + 1];
+            return savedWeather[GameManager.Instance.currentTurn + 1];
         }
     }
     public string LastTurnVis

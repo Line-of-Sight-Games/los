@@ -272,7 +272,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             else
                 ReturnToOldSlot();
 
-            MenuManager.Instance.game.UpdateConfigureAP();
+            GameManager.Instance.UpdateConfigureAP();
         }
         else
             ReturnToOldSlot();

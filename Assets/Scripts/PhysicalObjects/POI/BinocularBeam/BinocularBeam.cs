@@ -14,10 +14,6 @@ public class BinocularBeam : POI, IDataPersistence
     public bool flashMode;
     public int turnsActive;
 
-    private void Start()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
     private void Update()
     {
         placedBy = SoldierManager.Instance.FindSoldierById(placedById);
@@ -37,7 +33,7 @@ public class BinocularBeam : POI, IDataPersistence
         placedById = otherDetails.Item4;
         placedBy = SoldierManager.Instance.FindSoldierById(placedById);
 
-        beamHeight = game.maxZ;
+        beamHeight = GameManager.Instance.maxZ;
         beamWidth = GetBeamSize();
         beam.Init(transform.position, HelperFunctions.ConvertMathPosToPhysicalPos(new(facingX, facingY, 0)), beamHeight, beamWidth);
 

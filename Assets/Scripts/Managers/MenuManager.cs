@@ -34,7 +34,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public KeyCode secondOverrideKey = KeyCode.Space;
     public KeyCode deathKey = KeyCode.D;
 
-    public MainGame game;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 
     public DetectionUI detectionUI;
@@ -177,10 +176,10 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     void Update()
     {
         //check the game is running
-        if (game.GameRunning)
+        if (GameManager.Instance.GameRunning)
         {
             //check if game has not run out of turns
-            if (game.currentRound <= game.maxRounds)
+            if (GameManager.Instance.currentRound <= GameManager.Instance.maxRounds)
             {
                 //always count play time
                 playTimeTotal += Time.unscaledDeltaTime;
@@ -191,7 +190,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                 DisplayWeather();
             }
-            if (!game.gameOver)
+            if (!GameManager.Instance.gameOver)
             {
                 DisplaySoldiers();
                 RenderSoldierVisuals();
@@ -216,7 +215,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             DisplayItems();
             gameTimer.text = FormatFloatTime(playTimeTotal);
-            turnTimer.text = FormatFloatTime(game.maxTurnTime - turnTime);
+            turnTimer.text = FormatFloatTime(GameManager.Instance.maxTurnTime - turnTime);
             TurnTimerColour();
             ChangeRoundIndicators();
 
@@ -320,7 +319,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void CreateLOSArrows()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             foreach (string id in s.LOSToTheseSoldiersAndRevealing)
             {
@@ -496,7 +495,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public bool MovementResolvedFlag()
     {
-        foreach (Soldier s in game.AllFieldedSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllFieldedSoldiers())
         {
             if (!s.moveResolvedFlag)
                 return false;
@@ -522,7 +521,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public string DisplayShotParameters()
     {
         List<string> colouredParameters = new();
-        foreach (Tuple<string,string> param in game.shotParameters)
+        foreach (Tuple<string,string> param in GameManager.Instance.shotParameters)
         {
 
             if (param.Item1 == "accuracy" || param.Item1 == "sharpshooter" || param.Item1 == "inspired" || param.Item1 == "WS" || param.Item1 == "stim" || param.Item1 == "juggernaut" || param.Item1 == "fight")
@@ -584,7 +583,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public string DisplayMeleeParameters()
     {
         List<string> colouredParameters = new();
-        foreach (Tuple<string, string> param in game.meleeParameters)
+        foreach (Tuple<string, string> param in GameManager.Instance.meleeParameters)
         {
 
             if (param.Item1 == "aM" || param.Item1 == "aJuggernaut" || param.Item1 == "aInspirer" || param.Item1 == "aWep" || param.Item1 == "aStr" || param.Item1 == "aFight")
@@ -872,7 +871,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         WeatherManager.Instance.CurrentVis = dropdown.captionText.text;
         
         if (!WeatherManager.Instance.CurrentVis.Equals(oldVis))
-            game.SetLosCheckAll("statChange(SR)|weatherChange(override)"); //loscheckall
+            GameManager.Instance.SetLosCheckAll("statChange(SR)|weatherChange(override)"); //loscheckall
     }
     public void SetOverrideWindSpeed()
     {
@@ -983,7 +982,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             //run melee control re-eval if R, Str, M, F is changed
             if (activeSoldier.IsMeleeEngaged() && (code == "R" || code == "Str" || code == "M" || code == "F"))
-                StartCoroutine(game.DetermineMeleeControllerMultiple(activeSoldier));
+                StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(activeSoldier));
         }
 
         //clear override input
@@ -1017,7 +1016,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         
         if (int.TryParse(locationInput.text, out int newlocationInput))
         {
-            if ((xyz.Equals("X") && newlocationInput >= 1 && newlocationInput <= game.maxX) || (xyz.Equals("Y") && newlocationInput >= 1 && newlocationInput <= game.maxY) || (xyz.Equals("Z") && newlocationInput >= 0 && newlocationInput <= game.maxZ))
+            if ((xyz.Equals("X") && newlocationInput >= 1 && newlocationInput <= GameManager.Instance.maxX) || (xyz.Equals("Y") && newlocationInput >= 1 && newlocationInput <= GameManager.Instance.maxY) || (xyz.Equals("Z") && newlocationInput >= 0 && newlocationInput <= GameManager.Instance.maxZ))
             {
                 activeSoldier.SetLosCheck("losChange|move(override)"); //losCheck
 
@@ -1131,7 +1130,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         };
 
         experimentalistWeatherIcons.gameObject.SetActive(false);
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (s.IsOnturnAndAlive() && s.IsExperimentalist())
             {
@@ -1181,7 +1180,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     
     public void DisplaySoldiers()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (OverrideView)
             {
@@ -1235,7 +1234,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void RenderSoldierVisuals()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (OverrideView)
                 s.renderer.enabled = true;
@@ -1254,7 +1253,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 c.renderer.enabled = true;
             else
             {
-                if (c.revealed || (c.placedBy != null && c.placedBy.soldierTeam == game.currentTeam))
+                if (c.revealed || (c.placedBy != null && c.placedBy.soldierTeam == GameManager.Instance.currentTeam))
                     c.renderer.enabled = true;
                 else
                     c.renderer.enabled = false;
@@ -1266,7 +1265,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 tc.beam.renderer.enabled = true;
             else
             {
-                if (tc.placedBy != null && tc.placedBy.soldierTeam == game.currentTeam)
+                if (tc.placedBy != null && tc.placedBy.soldierTeam == GameManager.Instance.currentTeam)
                     tc.beam.renderer.enabled = true;
                 else
                     tc.beam.renderer.enabled = false;
@@ -1277,7 +1276,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         int p1DeadCount = 0, p2DeadCount = 0;
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (s.IsDead() || s.IsUnconscious())
             {
@@ -1288,11 +1287,11 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }    
         }
 
-        if (p1DeadCount == game.AllSoldiers().Count / 2)
-            game.GameOver("<color=blue>Team 2</color> Victory");
+        if (p1DeadCount == GameManager.Instance.AllSoldiers().Count / 2)
+            GameManager.Instance.GameOver("<color=blue>Team 2</color> Victory");
 
-        if (p2DeadCount == game.AllSoldiers().Count / 2)
-            game.GameOver("<color=red>Team 1</color> Victory");
+        if (p2DeadCount == GameManager.Instance.AllSoldiers().Count / 2)
+            GameManager.Instance.GameOver("<color=red>Team 1</color> Victory");
     }
     public void DisplayItems()
     {
@@ -1312,7 +1311,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void DisplaySoldiersGameOver()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             s.soldierUI.gameObject.SetActive(true);
             s.fielded = true;
@@ -1323,14 +1322,14 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void ChangeRoundIndicators()
     {
-        if (!game.gameOver)
+        if (!GameManager.Instance.gameOver)
         {
-            roundIndicator.text = $"Round {game.currentRound}";
-            if (game.currentTeam == 1)
+            roundIndicator.text = $"Round {GameManager.Instance.currentRound}";
+            if (GameManager.Instance.currentTeam == 1)
                 teamTurnIndicator.text = "<color=red>";
             else
                 teamTurnIndicator.text = "<color=blue>";
-            teamTurnIndicator.text += $"Team {game.currentTeam}</color> Turn";
+            teamTurnIndicator.text += $"Team {GameManager.Instance.currentTeam}</color> Turn";
         }
     }
     public string FormatFloatTime(float time)
@@ -1346,18 +1345,18 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void TurnTimerColour()
     {
-        if (turnTime > game.maxTurnTime)
+        if (turnTime > GameManager.Instance.maxTurnTime)
         {
             //play banzai sfx
             SoundManager.Instance.PlayBanzai();
 
             turnTimer.color = Color.red;
         }
-        else if (turnTime > game.maxTurnTime * 0.75)
+        else if (turnTime > GameManager.Instance.maxTurnTime * 0.75)
         {
             turnTimer.color = new Color(1f, 0.5f, 0f);
         }
-        else if (turnTime > game.maxTurnTime * 0.5)
+        else if (turnTime > GameManager.Instance.maxTurnTime * 0.5)
         {
             turnTimer.color = Color.yellow;
         }
@@ -1414,7 +1413,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         else
             politicsButton.gameObject.SetActive(false);
 
-        if (game.gameOver)
+        if (GameManager.Instance.gameOver)
             GreyAll("Game Over");
         else if (activeSoldier.IsDead())
             GreyOutButtons(AddAllButtons(buttonStates), "Dead");
@@ -1428,7 +1427,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             GreyOutButtons(AddAllButtons(buttonStates), "No AP");
         else if (activeSoldier.IsUsingBinocularsInReconMode())
             GreyOutButtons(AddAllButtons(buttonStates), "<color=green>Binoculars (Recon)</color>");
-        else if (activeSoldier.IsFrozen() && game.frozenTurn)
+        else if (activeSoldier.IsFrozen() && GameManager.Instance.frozenTurn)
         {
             GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), shotButton), "<color=orange>Frozen</color>");
             if (!activeSoldier.HasAnyAmmo())
@@ -1735,10 +1734,10 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             OpenEndSoldierTurnAlertUI();
         else
         {
-            if (game.modaTurn)
-                game.EndModaTurn();
-            if (game.frozenTurn)
-                game.EndFrozenTurn();
+            if (GameManager.Instance.modaTurn)
+                GameManager.Instance.EndModaTurn();
+            if (GameManager.Instance.frozenTurn)
+                GameManager.Instance.EndFrozenTurn();
             activeSoldier.UnsetActiveSoldier();
             soldierOptionsUI.SetActive(false);
             SoldierManager.Instance.enemyDisplayColumn.SetActive(true);
@@ -1839,12 +1838,12 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         //reset soldier location and ap
         activeSoldier.illusionedThisMove = true;
-        activeSoldier.X = (int)game.tempMove.Item1.x;
-        activeSoldier.Y = (int)game.tempMove.Item1.y;
-        activeSoldier.Z = (int)game.tempMove.Item1.z;
-        activeSoldier.TerrainOn = game.tempMove.Item2;
-        activeSoldier.ap += game.tempMove.Item3;
-        activeSoldier.mp += game.tempMove.Item4;
+        activeSoldier.X = (int)GameManager.Instance.tempMove.Item1.x;
+        activeSoldier.Y = (int)GameManager.Instance.tempMove.Item1.y;
+        activeSoldier.Z = (int)GameManager.Instance.tempMove.Item1.z;
+        activeSoldier.TerrainOn = GameManager.Instance.tempMove.Item2;
+        activeSoldier.ap += GameManager.Instance.tempMove.Item3;
+        activeSoldier.mp += GameManager.Instance.tempMove.Item4;
 
         //destroy detection alerts
         foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
@@ -1937,7 +1936,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             Dictionary<string, List<string>> allSoldiersNotRevealingHidden = new();
             Dictionary<string, List<string>> allSoldiersRevealingFinal = new();
 
-            foreach (Soldier s in game.AllSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
                 allSoldiersRevealing.Add(s.id, new List<string>());
                 allSoldiersRevealedBy.Add(s.id, new List<string>());
@@ -1947,7 +1946,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 allSoldiersRevealingFinal.Add(s.id, new List<string>());
 
                 //add soldiers that can't possibly be seen cause out of any collider
-                foreach (Soldier s2 in game.AllSoldiers())
+                foreach (Soldier s2 in GameManager.Instance.AllSoldiers())
                 {
                     if (s.IsOppositeTeamAs(s2) && s2.IsAlive())
                     {
@@ -2138,7 +2137,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             //combine old revealing list with fresh revealing list and not revealing list
             foreach (KeyValuePair<string, List<string>> keyValuePair in allSoldiersRevealing)
             {
-                //print(keyValuePair.Key + " " + game.FindSoldierById(keyValuePair.Key).soldierName);
+                //print(keyValuePair.Key + " " + GameManager.Instance.FindSoldierById(keyValuePair.Key).soldierName);
                 List<string> arrayOfRevealingList = allSoldiersRevealing[keyValuePair.Key];
                 List<string> arrayOfOldRevealingList = SoldierManager.Instance.FindSoldierById(keyValuePair.Key).LOSToTheseSoldiersAndRevealing;
                 List<string> arrayOfNotRevealingList = new();
@@ -2166,7 +2165,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
 
             //repopulate each soldier's los lists
-            foreach (Soldier s in game.AllSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
                 foreach (string soldierOutOfSR in allSoldiersNotRevealingOutOfSR.GetValueOrDefault(s.Id))
                     s.AddSoldierOutOfSR(soldierOutOfSR);
@@ -2628,8 +2627,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             shotUI.coverLevelDropdown.interactable = false;
         }
 
-        game.UpdateShotType(shooter);
-        game.UpdateShotUI(shooter);
+        GameManager.Instance.UpdateShotType(shooter);
+        GameManager.Instance.UpdateShotUI(shooter);
 
         shotUI.gameObject.SetActive(true);
     }
@@ -2663,7 +2662,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         if (OverrideKey())
         {
             if (shotResultUI.transform.Find("RunSecondShot").gameObject.activeInHierarchy)
-                game.ConfirmShot(false);
+                GameManager.Instance.ConfirmShot(false);
             else
             {
                 SetShotResolvedFlagTo(true);
@@ -2713,7 +2712,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             if (activeSoldier.CheckAP(ap))
             {
                 Soldier shooter = SoldierManager.Instance.FindSoldierById(shotUI.shooterID.text);
-                IAmShootable target = game.FindShootableById(shotUI.targetDropdown.captionText.text);
+                IAmShootable target = GameManager.Instance.FindShootableById(shotUI.targetDropdown.captionText.text);
                 Item gun1 = null, gun2 = null;
                 Tuple<int, int, int> chances1 = null, chances2 = null;
 
@@ -2733,7 +2732,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                     if (shotUI.shotTypeDropdown.value == 1)
                         chances1 = Tuple.Create(100, 0, 100);
                     else
-                        chances1 = game.CalculateHitPercentage(shooter, target, gun1);
+                        chances1 = GameManager.Instance.CalculateHitPercentage(shooter, target, gun1);
                 }
                 
                 //if first shot is valid, display details
@@ -2785,7 +2784,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                         if (shotUI.shotTypeDropdown.value == 1)
                             chances2 = Tuple.Create(100, 0, 100);
                         else
-                            chances2 = game.CalculateHitPercentage(shooter, target, gun2);
+                            chances2 = GameManager.Instance.CalculateHitPercentage(shooter, target, gun2);
                     }
 
                     //only continue if shot is valid
@@ -2903,7 +2902,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
 
         //generate target list
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             TMP_Dropdown.OptionData defender = null;
             if (s.IsAlive() && attacker.IsOppositeTeamAs(s) && s.IsRevealed() && attacker.PhysicalObjectWithinMeleeRadius(s))
@@ -2942,7 +2941,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 meleeUI.defenderWeaponImage.sprite = fist;
 
             CheckMeleeType();
-            game.UpdateMeleeUI();
+            GameManager.Instance.UpdateMeleeUI();
 
             meleeUI.gameObject.SetActive(true);
         }
@@ -3008,7 +3007,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
                 Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
-                int meleeDamage = game.CalculateMeleeResult(attacker, defender);
+                int meleeDamage = GameManager.Instance.CalculateMeleeResult(attacker, defender);
 
                 meleeConfirmUI.transform.Find("OptionPanel").Find("Damage").Find("DamageDisplay").GetComponent<TextMeshProUGUI>().text = meleeDamage.ToString();
 
@@ -3016,7 +3015,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 meleeConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayMeleeParameters();
 
                 //add rounding to equation view
-                meleeConfirmUI.transform.Find("EquationPanel").Find("Rounding").GetComponent<TextMeshProUGUI>().text = $"Rounding: {game.meleeParameters.Find(tuple => tuple.Item1 == "rounding").Item2}";
+                meleeConfirmUI.transform.Find("EquationPanel").Find("Rounding").GetComponent<TextMeshProUGUI>().text = $"Rounding: {GameManager.Instance.meleeParameters.Find(tuple => tuple.Item1 == "rounding").Item2}";
 
                 meleeConfirmUI.SetActive(true);
             }
@@ -3079,14 +3078,14 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void DenyBreakEngagementRequest()
     {
         meleeUI.meleeTypeDropdown.value = 0;
-        game.UpdateMeleeUI();
+        GameManager.Instance.UpdateMeleeUI();
         CloseMeleeBreakEngagementRequestUI();
     }
     public void AcceptBreakEngagementRequest()
     {
         if (OverrideKey())
         {
-            game.UpdateMeleeUI();
+            GameManager.Instance.UpdateMeleeUI();
             CloseMeleeBreakEngagementRequestUI();
         }
     }
@@ -3244,7 +3243,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         else
             moveUI.startlocationUI.SetActive(false);
 
-        game.UpdateMoveUI();
+        GameManager.Instance.UpdateMoveUI();
         
         moveUI.gameObject.SetActive(true);
     }
@@ -3294,7 +3293,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         if (OverrideKey())
         {
-            game.ConfirmMove(true);
+            GameManager.Instance.ConfirmMove(true);
             CloseOvermoveUI();
         }
         else
@@ -3325,7 +3324,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         InventorySourcePanel groundInventoryPanel = Instantiate(inventoryPanelGroundPrefab, configUI.externalItemSourcesPanel.transform).Init(null);
         InventorySourceIcon groundInventoryButton = Instantiate(groundInventoryIconPrefab.GetComponent<InventorySourceIcon>().Init(groundInventoryPanel), inventorySourceIconsUI.transform);
-        foreach (Item i in game.FindNearbyItems())
+        foreach (Item i in GameManager.Instance.FindNearbyItems())
         {
             if (i.transform.parent == null)
             {
@@ -3341,7 +3340,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void AddAllyInventorySourceButtons()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (s.IsFielded() && activeSoldier.PhysicalObjectWithinItemRadius(s) && (activeSoldier.IsSameTeamAs(s) || s.IsUnconscious() || s.IsDead()) && s.IsInteractable())
             {
@@ -3360,7 +3359,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         bool poisNearby = false;
 
-        foreach (GoodyBox gb in game.AllGoodyBoxes())
+        foreach (GoodyBox gb in GameManager.Instance.AllGoodyBoxes())
         {
             if (activeSoldier.PhysicalObjectWithinItemRadius(gb))
             {
@@ -3375,7 +3374,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             else if (activeSoldier.IsLocater()) //locater ability
             {
                 bool gbIsRevealed = false;
-                foreach (Soldier s in game.AllFieldedFriendlySoldiers())
+                foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
                 {
                     if (s.IsAbleToSee() && s.PhysicalObjectWithinMaxRadius(gb))
                         gbIsRevealed = true;
@@ -3391,7 +3390,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
         }
                 
-        foreach (DrugCabinet dc in game.AllDrugCabinets())
+        foreach (DrugCabinet dc in GameManager.Instance.AllDrugCabinets())
         {
             if (activeSoldier.PhysicalObjectWithinItemRadius(dc))
             {
@@ -3406,7 +3405,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             else if (activeSoldier.IsLocater()) //locater ability
             {
                 bool dcIsRevealed = false;
-                foreach (Soldier s in game.AllFieldedFriendlySoldiers())
+                foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
                 {
                     if (s.IsAbleToSee() && s.PhysicalObjectWithinMaxRadius(dc))
                         dcIsRevealed = true;
@@ -3517,7 +3516,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         //generate terminal list
         List<TMP_Dropdown.OptionData> terminalDetailsList = new();
-        foreach (Terminal t in game.AllTerminals())
+        foreach (Terminal t in GameManager.Instance.AllTerminals())
         {
             TMP_Dropdown.OptionData terminalDetails = null;
             if (t.terminalEnabled && activeSoldier.PhysicalObjectWithinMeleeRadius(t))
@@ -3529,7 +3528,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         }
         dipelecUI.dipElecTerminalDropdown.AddOptions(terminalDetailsList);
 
-        game.UpdateDipElecUI();
+        GameManager.Instance.UpdateDipElecUI();
         dipelecUI.gameObject.SetActive(true);
     }
     public void CloseDipElecUI()
@@ -3672,7 +3671,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         List<TMP_Dropdown.OptionData> disarmOptionDataList = new();
         TMP_Dropdown.OptionData disarmOptionData;
 
-        foreach (IAmDisarmable disarmable in game.AllDisarmable())
+        foreach (IAmDisarmable disarmable in GameManager.Instance.AllDisarmable())
         {
             if (activeSoldier.PhysicalObjectWithinMeleeRadius((PhysicalObject)disarmable))
             {
@@ -3709,7 +3708,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         List<TMP_Dropdown.OptionData> dragOptionDataList = new();
         TMP_Dropdown.OptionData dragOptionData;
 
-        foreach (Soldier soldier in game.AllSoldiers())
+        foreach (Soldier soldier in GameManager.Instance.AllSoldiers())
         {
             if (activeSoldier.PhysicalObjectWithinMeleeRadius(soldier) && !soldier.IsWearingJuggernautArmour(false) && (soldier.IsSameTeamAs(activeSoldier) || soldier.IsDead() || soldier.IsPlayingDead() || soldier.IsUnconscious() || soldier.IsMeleeControlledBy(activeSoldier)))
             {
@@ -4174,7 +4173,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
         if (itemUsed.itemName.Contains("Medikit"))
         {
-            foreach (Soldier s in game.AllSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (activeSoldier.IsSameTeamAsIncludingSelf(s) && (s.IsInjured() || s.IsTraumatised()) && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
@@ -4187,13 +4186,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             if (targetOptionDataList.Count > 0)
             {
-                game.UpdateSoldierUsedOn(useItemUI.GetComponent<UseItemUI>());
+                GameManager.Instance.UpdateSoldierUsedOn(useItemUI.GetComponent<UseItemUI>());
                 useItemUI.SetActive(true);
             }
         }
         else if (itemUsed.itemName.Contains("Syringe"))
         {
-            foreach (Soldier s in game.AllSoldiers())
+            foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (s.IsAlive() && activeSoldier.PhysicalObjectWithinMeleeRadius(s))
@@ -4206,13 +4205,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             if (targetOptionDataList.Count > 0)
             {
-                game.UpdateSoldierUsedOn(useItemUI.GetComponent<UseItemUI>());
+                GameManager.Instance.UpdateSoldierUsedOn(useItemUI.GetComponent<UseItemUI>());
                 useItemUI.SetActive(true);
             }
         }
         else if (itemUsed.itemName.Equals("Poison_Satchel"))
         {
-            foreach (Item i in game.FindNearbyItems())
+            foreach (Item i in GameManager.Instance.FindNearbyItems())
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (i.IsPoisonable())
@@ -4225,7 +4224,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             if (targetOptionDataList.Count > 0)
             {
-                game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
+                GameManager.Instance.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                 useItemUI.SetActive(true);
             }
         }
@@ -4246,7 +4245,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
+                    GameManager.Instance.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -4265,7 +4264,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
+                    GameManager.Instance.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -4284,7 +4283,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
+                    GameManager.Instance.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -4303,7 +4302,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
+                    GameManager.Instance.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -4322,7 +4321,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
+                    GameManager.Instance.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -4341,7 +4340,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                 if (targetOptionDataList.Count > 0)
                 {
-                    game.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
+                    GameManager.Instance.UpdateItemUsedOn(useItemUI.GetComponent<UseItemUI>());
                     useItemUI.SetActive(true);
                 }
             }
@@ -4628,7 +4627,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void OpenOverrideInsertObjectsUI()
     {
         insertObjectsUI.gameObject.SetActive(true);
-        game.UpdateInsertGameObjectsUI();
+        GameManager.Instance.UpdateInsertGameObjectsUI();
     }
     public void ClearOverrideInsertObjectsUI()
     {
@@ -4667,11 +4666,11 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void OpenPlayerTurnOverUI()
     {
         string displayText;
-        if (game.currentTeam == 1)
+        if (GameManager.Instance.currentTeam == 1)
             displayText = "<color=red>";
         else
             displayText = "<color=blue>";
-        displayText += "Team " + game.currentTeam + "</color>: Leave Command Zone.";
+        displayText += "Team " + GameManager.Instance.currentTeam + "</color>: Leave Command Zone.";
         teamTurnOverUI.transform.Find("OptionPanel").Find("Title").Find("TitleText").GetComponent<TextMeshProUGUI>().text = displayText;
         teamTurnOverUI.SetActive(true);
     }
@@ -4683,11 +4682,11 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void OpenPlayerTurnStartUI()
     {
         string displayText;
-        if (game.currentTeam == 1)
+        if (GameManager.Instance.currentTeam == 1)
             displayText = "<color=red>";
         else
             displayText = "<color=blue>";
-        displayText += "Team " + game.currentTeam + "</color>: Enter Command Zone.";
+        displayText += "Team " + GameManager.Instance.currentTeam + "</color>: Enter Command Zone.";
         teamTurnStartUI.transform.Find("OptionPanel").Find("Title").Find("TitleText").GetComponent<TextMeshProUGUI>().text = displayText;
         teamTurnStartUI.SetActive(true);
     }

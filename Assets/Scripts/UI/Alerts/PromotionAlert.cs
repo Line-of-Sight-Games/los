@@ -191,7 +191,7 @@ public class PromotionAlert : SoldierAlert
             FileUtility.WriteToReport($"{soldier.soldierName} granted chosen ability: {abilityDropdown.captionText.text}"); //write to report
             promotionComplete = true;
 
-            //soldier.game.SoundManager.Instance.PlayPromotion();
+            //soldier.GameManager.Instance.SoundManager.Instance.PlayPromotion();
         }
 
     }

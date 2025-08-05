@@ -24,7 +24,6 @@ public class SoundManager : MonoBehaviour
             Instance = null;
     }
 
-    public MainGame game;
     public bool banzaiPlayed, isMute;
 
     //audio stuff
@@ -2583,7 +2582,7 @@ public class SoundManager : MonoBehaviour
     public int EnemyCount(Soldier s) 
     {
         int enemyCount = 0;
-        foreach (Soldier s1 in game.AllSoldiers())
+        foreach (Soldier s1 in GameManager.Instance.AllSoldiers())
         {
             if (s.IsOppositeTeamAs(s1) && !s1.IsDead())
                 enemyCount++;

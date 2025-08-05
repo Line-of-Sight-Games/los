@@ -29,7 +29,6 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     public Item itemPrefab;
     public ItemReader reader;
     public GameObject battlefield;
-    public MainGame game;
 
     public int[,] scoreTable = new int[,]
     {

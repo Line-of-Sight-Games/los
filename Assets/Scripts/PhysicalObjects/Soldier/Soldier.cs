@@ -47,11 +47,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public GameObject soldierSnapshotAlertPrefab;
     public SoldierUI soldierUI, soldierUIPrefab;
 
-    private void Awake()
-    {
-        game = FindFirstObjectByType<MainGame>();
-    }
-
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
     {
         id = GenerateGuid();
@@ -295,9 +290,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         gunnerGunsBlessed = (details["gunnerGunsBlessed"] as JArray).Select(token => token.ToString()).ToList();
         politicianUsed = (bool)details["politicianUsed"];
 
-        //link to maingame object
-        game = FindFirstObjectByType<MainGame>();
-
         isDataLoaded = true;
     }
     public Soldier LinkWithUI(Transform displayPanel)
@@ -311,13 +303,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public void SetActiveSoldier()
     {
         MenuManager.Instance.activeSoldier = this;
-        game.activeSoldier = this;
+        GameManager.Instance.activeSoldier = this;
         selected = true;
     }
     public void UnsetActiveSoldier()
     {
         MenuManager.Instance.activeSoldier = null;
-        game.activeSoldier = null;
+        GameManager.Instance.activeSoldier = null;
         selected = false;
     }
     public bool IsFielded()
@@ -492,7 +484,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsOnturn()
     {
-        if (soldierTeam == game.currentTeam)
+        if (soldierTeam == GameManager.Instance.currentTeam)
             return true;
         return false;
     }
@@ -504,7 +496,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsOffturn()
     {
-        if (soldierTeam != game.currentTeam)
+        if (soldierTeam != GameManager.Instance.currentTeam)
             return true;
         return false;
     }
@@ -570,14 +562,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (!IsMeleeControlled())
         {
             if (HasAnyAmmo())
-                game.StartFrozenTurn(this);
+                GameManager.Instance.StartFrozenTurn(this);
             else if (HasGunsInInventory())
             {
                 DropHandheldItems();
                 Item inventoryGun = RandomGunFromInventory();
                 inventoryGun.MoveItem(inventoryGun.owner, inventoryGun.whereEquipped, this, "LeftHand");
                 if (HasAnyAmmo())
-                    game.StartFrozenTurn(this);
+                    GameManager.Instance.StartFrozenTurn(this);
             }
         }
     }
@@ -711,7 +703,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (HelperFunctions.CheckInScene("Battlefield"))
         {
-            if (game.currentRound > 0 && WeatherManager.Instance.savedWeather.Count > 0)
+            if (GameManager.Instance.currentRound > 0 && WeatherManager.Instance.savedWeather.Count > 0)
             {
                 CalculateActiveStats();
                 DisplayStats();
@@ -730,7 +722,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (HelperFunctions.CheckInScene("Battlefield"))
         {
-            if (game.currentRound > 0 && WeatherManager.Instance.savedWeather.Count > 0)
+            if (GameManager.Instance.currentRound > 0 && WeatherManager.Instance.savedWeather.Count > 0)
             {
                 stats.L.Val = stats.L.BaseVal;
                 stats.H.Val = stats.H.BaseVal;
@@ -787,7 +779,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //check if soldier becomes blind
         if (stats.SR.Val == 0)
         {
-            game.BreakAllControllingMeleeEngagments(this);
+            GameManager.Instance.BreakAllControllingMeleeEngagments(this);
             UnsetOverwatch();
         }
     }
@@ -1064,7 +1056,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         //remove all engagements
         if (IsMeleeEngaged())
-            StartCoroutine(game.DetermineMeleeControllerMultiple(this));
+            StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
 
         SetLosCheck("losChange|statChange(SR)(C)|playdeadActive"); //losCheck
     }
@@ -1431,7 +1423,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     }
 
                     //if not broken by health state change break remaining melee engagements
-                    game.BreakAllControllingMeleeEngagments(this);
+                    GameManager.Instance.BreakAllControllingMeleeEngagments(this);
                 }
 
                 //apply stun affect from tranquiliser
@@ -1480,8 +1472,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (IsBroken())
             {
                 BrokenDropAllItems();
-                foreach (Soldier s in game.AllSoldiers())
-                    game.BreakMeleeEngagement(this, s);
+                foreach (Soldier s in GameManager.Instance.AllSoldiers())
+                    GameManager.Instance.BreakMeleeEngagement(this, s);
             }
         }
     }
@@ -1570,7 +1562,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             instantSpeed = Mathf.RoundToInt(((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove() * ApplySmokeModsMove() * ApplyTabunModsMove()) + stats.Str.Val + ApplyFightModsMove());
 
             //halve movement for team 1 on first turn
-            if (soldierTeam == 1 && game.currentRound == 1)
+            if (soldierTeam == 1 && GameManager.Instance.currentRound == 1)
                 instantSpeed /= 2;
 
             //cap lowest speed at 3cm
@@ -1748,7 +1740,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool FindMeleeTargets()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (s.IsAlive() && IsOppositeTeamAs(s) && s.IsRevealed() && PhysicalObjectWithinMeleeRadius(s))
                 return true;
 
@@ -1773,7 +1765,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //set display values
         SetLoudActionDisplayDetails(loudActionRadius);
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (s.IsConscious() && this.IsOppositeTeamAs(s) && PhysicalObjectWithinRadius(s,loudActionRadius))
             {
@@ -1809,7 +1801,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //set display values
         SetLoudActionDisplayDetails(999);
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (s.IsConscious() && this.IsOppositeTeamAs(s))
             {
@@ -1919,7 +1911,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public void RemoveAllLOSToAllSoldiers()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (s.IsOppositeTeamAs(this))
                 RemoveAllLOSToSoldier(s.Id);
     }
@@ -2716,7 +2708,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
             //remove all engagements
             if (IsMeleeEngaged())
-                StartCoroutine(game.DetermineMeleeControllerMultiple(this));
+                StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
 
             SetLosCheck("statChange(C)(SR)|stunActive"); //losCheck
         }
@@ -2806,10 +2798,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         //remove all engagements
         if (IsMeleeEngaged())
-            StartCoroutine(game.DetermineMeleeControllerMultiple(this));
+            StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
 
         //set sound flags after ally made uncon
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (s.IsSameTeamAs(this))
                 SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
@@ -2839,7 +2831,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             if (modaProtect)
             {
                 MenuManager.Instance.AddSoldierAlert(this, "DEATH RESISTED", Color.green, $"Resists death with Modafinil. He gets an immediate turn.", -1, -1);
-                game.StartModaTurn(this, killedBy, damageSource);
+                GameManager.Instance.StartModaTurn(this, killedBy, damageSource);
             }
             else 
             {
@@ -2863,14 +2855,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 //remove all engagements
                 if (IsMeleeEngaged())
-                    StartCoroutine(game.DetermineMeleeControllerMultiple(this));
+                    StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
 
                 //check if critical trauma
                 int tp = 1;
                 if (damageSource.Contains("Critical") || damageSource.Contains("Melee") || damageSource.Contains("Explosive") || damageSource.Contains("Deathroll"))
                     tp++;
                 //run trauma check
-                game.TraumaCheck(this, tp, IsCommander(), damageSource.Contains("Lastandicide"));
+                GameManager.Instance.TraumaCheck(this, tp, IsCommander(), damageSource.Contains("Lastandicide"));
 
                 //re-render as dead
                 CheckSpecialityColor(soldierSpeciality);
@@ -2882,13 +2874,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 {
                     //pay xp for relevant damage type kill
                     if (damageSource.Contains("Shot"))
-                        MenuManager.Instance.AddXpAlert(killedBy, game.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
+                        MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
                     else if (damageSource.Contains("Melee"))
                     {
                         if (damageSource.Contains("Counter"))
-                            MenuManager.Instance.AddXpAlert(killedBy, game.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
+                            MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
                         else
-                            MenuManager.Instance.AddXpAlert(killedBy, game.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
+                            MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
                         killedBy.BrawlerMeleeKillReward(damageSource);
                     }
@@ -2901,14 +2893,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 }
 
                 //set fight flags for allied avenger(s)
-                foreach (Soldier s in game.AllSoldiers())
+                foreach (Soldier s in GameManager.Instance.AllSoldiers())
                     if (this.IsSameTeamAs(s) && s.IsAvenger())
                         s.SetAvenging();
 
                 //set sound flags after soldier killed JA
                 if (IsWearingJuggernautArmour(false))
                 {
-                    foreach (Soldier s in game.AllSoldiers())
+                    foreach (Soldier s in GameManager.Instance.AllSoldiers())
                     {
                         if (s.IsSameTeamAs(this))
                             SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyKilledJA(s);
@@ -2918,7 +2910,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 }
                 else //set sound flags after soldier killed
                 {
-                    foreach (Soldier s in game.AllSoldiers())
+                    foreach (Soldier s in GameManager.Instance.AllSoldiers())
                     {
                         if (s.IsSameTeamAs(this))
                             SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
@@ -3017,13 +3009,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (!isActive)
         {
-            foreach (Terminal t in game.AllTerminals())
+            foreach (Terminal t in GameManager.Instance.AllTerminals())
                 if (PhysicalObjectWithinMeleeRadius(t))
                     return true;
         }
         else
         {
-            foreach (Terminal t in game.AllTerminals())
+            foreach (Terminal t in GameManager.Instance.AllTerminals())
                 if (PhysicalObjectWithinMeleeRadius(t) && t.terminalEnabled)
                     return true;
         }
@@ -3031,7 +3023,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool DisarmableInRange()
     {
-        foreach (IAmDisarmable d in game.AllDisarmable())
+        foreach (IAmDisarmable d in GameManager.Instance.AllDisarmable())
             if (PhysicalObjectWithinMeleeRadius((PhysicalObject)d))
                 return true;
 
@@ -3039,7 +3031,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool DraggableInRange()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (PhysicalObjectWithinMeleeRadius(s) && !s.IsWearingJuggernautArmour(false) && (s.IsSameTeamAs(this) || s.IsDead() || s.IsPlayingDead() || s.IsUnconscious() || s.IsMeleeControlledBy(this)))
                 return true;
 
@@ -3050,7 +3042,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         List<Tuple<float, Terminal>> soldierDistanceToTerminals = new();
 
         foreach (Terminal t in FindObjectsByType<Terminal>(default))
-            soldierDistanceToTerminals.Add(Tuple.Create(game.CalculateRange(this, t), t));
+            soldierDistanceToTerminals.Add(Tuple.Create(GameManager.Instance.CalculateRange(this, t), t));
 
         soldierDistanceToTerminals = soldierDistanceToTerminals.OrderBy(t => t.Item1).ToList();
 
@@ -3063,9 +3055,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         List<Tuple<float, Soldier>> soldierDistances = new();
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (s.IsAlive() && this.IsSameTeamAs(s))
-                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+                soldierDistances.Add(Tuple.Create(GameManager.Instance.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
 
@@ -3078,9 +3070,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         List<Tuple<float, Soldier>> soldierDistances = new();
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (this.IsSameTeamAs(s) && s.IsAbleToWalk() && !s.IsRevoker())
-                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+                soldierDistances.Add(Tuple.Create(GameManager.Instance.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
 
@@ -3093,9 +3085,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         List<Tuple<float, Soldier>> soldierDistances = new();
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (s.IsAlive() && this.IsOppositeTeamAs(s))
-                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+                soldierDistances.Add(Tuple.Create(GameManager.Instance.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
 
@@ -3108,9 +3100,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         List<Tuple<float, Soldier>> soldierDistances = new();
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (s.IsAlive() && this.IsOppositeTeamAs(s) && s.IsRevealed())
-                soldierDistances.Add(Tuple.Create(game.CalculateRange(this, s), s));
+                soldierDistances.Add(Tuple.Create(GameManager.Instance.CalculateRange(this, s), s));
 
         soldierDistances = soldierDistances.OrderBy(t => t.Item1).ToList();
 
@@ -3122,9 +3114,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         bool objectIsRevealed = false;
 
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (s.IsAbleToSee() && this.IsSameTeamAsIncludingSelf(s))
-                if (game.CalculateRange(s, obj) <= s.SRColliderFull.radius)
+                if (GameManager.Instance.CalculateRange(s, obj) <= s.SRColliderFull.radius)
                     objectIsRevealed = true;
         return objectIsRevealed;
     }
@@ -3393,7 +3385,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasUnresolvedBrokenAllies()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (this.IsSameTeamAs(s) && s.IsBroken() && s.ap > 0)
                 return true;
 
@@ -3401,7 +3393,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasBrokenAllies()
     {
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
             if (this.IsSameTeamAs(s) && s.IsBroken())
                 return true;
 
@@ -3440,7 +3432,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int GetKd()
     {
         int kd = 0;
-        foreach (Soldier s in game.AllSoldiers())
+        foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (this.IsOppositeTeamAs(s) && s.IsDead())
                 kd++;

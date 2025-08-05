@@ -7,8 +7,6 @@ using UnityEngine.UI;
 
 public class OverwatchShotUI : MonoBehaviour
 {
-    public MainGame game;
-
     public TextMeshProUGUI shooterID;
     public SoldierPortrait shooterPortrait;
     public TMP_Dropdown shotTypeDropdown;
@@ -96,10 +94,10 @@ public class OverwatchShotUI : MonoBehaviour
             //play shot sfx
             SoundManager.Instance.PlayShotResolution(gun);
 
-            game.tempShooterTarget = Tuple.Create(shooter, target);
+            GameManager.Instance.tempShooterTarget = Tuple.Create(shooter, target);
             int randNum1 = HelperFunctions.RandomShotNumber();
             int randNum2 = HelperFunctions.RandomCritNumber();
-            Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
+            Tuple<int, int, int> chances = GameManager.Instance.CalculateHitPercentage(shooter, target, gun);
             gun.SpendSingleAmmo();
             //print($"shotparams: {MenuManager.Instance.DisplayShotParameters()}\n\n{chances.Item1}|{chances.Item2}>>>{randNum1}|{randNum2}");
 
@@ -198,7 +196,7 @@ public class OverwatchShotUI : MonoBehaviour
             }
             else
             {
-                string missString = game.RandomShotMissString();
+                string missString = GameManager.Instance.RandomShotMissString();
 
                 FileUtility.WriteToReport($"{shooter.soldierName} misses {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%), shot goes {missString}"); //write to report
 
@@ -282,7 +280,7 @@ public class OverwatchShotUI : MonoBehaviour
             target.TerrainOn = terrainDropdown.captionText.text;
 
             //calculate hit percentage
-            Tuple<int, int, int> chances = game.CalculateHitPercentage(shooter, target, gun);
+            Tuple<int, int, int> chances = GameManager.Instance.CalculateHitPercentage(shooter, target, gun);
 
             //only shot suppression hit chance if suppressed
             if (shooter.IsSuppressed())
