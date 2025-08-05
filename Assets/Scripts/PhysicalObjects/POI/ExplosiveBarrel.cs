@@ -13,7 +13,6 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     {
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
-        poiManager = FindFirstObjectByType<POIManager>();
     }
 
     public ExplosiveBarrel Init(Tuple<Vector3, string> location)
@@ -72,9 +71,9 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         //create explosion objects
-        Explosion explosion1 = Instantiate(menu.poiManager.explosionPrefab).Init(3, new(X, Y, Z));
-        Explosion explosion2 = Instantiate(menu.poiManager.explosionPrefab).Init(8, new(X, Y, Z));
-        Explosion explosion3 = Instantiate(menu.poiManager.explosionPrefab).Init(15, new(X, Y, Z));
+        Explosion explosion1 = Instantiate(POIManager.Instance.explosionPrefab).Init(3, new(X, Y, Z));
+        Explosion explosion2 = Instantiate(POIManager.Instance.explosionPrefab).Init(8, new(X, Y, Z));
+        Explosion explosion3 = Instantiate(POIManager.Instance.explosionPrefab).Init(15, new(X, Y, Z));
 
         foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
         {
@@ -100,7 +99,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         //show explosion ui
         menu.OpenExplosionUI();
         
-        poiManager.DestroyPOI(this);
+        POIManager.Instance.DestroyPOI(this);
     }
     public bool Triggered
     { get { return triggered; } set { triggered = value; } }

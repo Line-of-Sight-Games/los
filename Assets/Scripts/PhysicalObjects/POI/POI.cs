@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class POI : PhysicalObject
 {
-    public POIManager poiManager;
     public Dictionary<string, object> details;
     public string poiType;
     public Sprite poiPortrait;

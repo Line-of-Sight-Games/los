@@ -18,7 +18,6 @@ public class BinocularBeam : POI, IDataPersistence
     {
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
-        poiManager = FindFirstObjectByType<POIManager>();
     }
     private void Update()
     {
@@ -101,7 +100,7 @@ public class BinocularBeam : POI, IDataPersistence
 
         yield return new WaitForSeconds(0.01f);
 
-        poiManager.DestroyPOI(this);
+        POIManager.Instance.DestroyPOI(this);
     }
     public float GetBeamSize()
     {

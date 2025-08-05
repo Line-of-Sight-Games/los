@@ -17,7 +17,6 @@ public class TabunCloud : POI, IDataPersistence
     {
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
-        poiManager = FindFirstObjectByType<POIManager>();
     }
 
     public TabunCloud Init(Tuple<Vector3, string> location, string thrownBy)

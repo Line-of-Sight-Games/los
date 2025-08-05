@@ -74,13 +74,13 @@ public class ExplosionList : MonoBehaviour
                             //set terminal destroyer to 3 hp
                             if (explodedBy.hp > 3)
                                 explodedBy.TakeDamage(explodedBy, explodedBy.hp - 3, true, new() { "Dipelec" }, Vector3.zero);
-                            menu.poiManager.DestroyPOI(terminal);
+                            POIManager.Instance.DestroyPOI(terminal);
                         }
                     }
                     else if (hitByExplosion is DeploymentBeacon deploymentBeacon)
                     {
                         if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
-                            menu.poiManager.DestroyPOI(deploymentBeacon);
+                            POIManager.Instance.DestroyPOI(deploymentBeacon);
                     }
                     else if (hitByExplosion is Soldier hitSoldier)
                     {
@@ -133,7 +133,7 @@ public class ExplosionList : MonoBehaviour
                             hitItem.CheckExplosionGrenade(explodedBy, new(hitItem.X, hitItem.Y, hitItem.Z));
                         else if (hitItem.IsClaymore())
                         {
-                            Instantiate(menu.poiManager.claymorePrefab).Init(new(hitItem.X, hitItem.Y, hitItem.Z), Tuple.Create(0, hitItem.X, hitItem.Y, true, explodedBy.Id)).CheckExplosionClaymore(explodedBy, true);
+                            Instantiate(POIManager.Instance.claymorePrefab).Init(new(hitItem.X, hitItem.Y, hitItem.Z), Tuple.Create(0, hitItem.X, hitItem.Y, true, explodedBy.Id)).CheckExplosionClaymore(explodedBy, true);
                             hitItem.DestroyItem(explodedBy);
                         }
                     }

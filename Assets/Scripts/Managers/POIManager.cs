@@ -5,6 +5,25 @@ using UnityEngine;
 
 public class POIManager : MonoBehaviour, IDataPersistence
 {
+    public static POIManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     public List<string> allPOIIds = new();
     public List<POI> allPOIs = new();
     public POI poiPrefab;

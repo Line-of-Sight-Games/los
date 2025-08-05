@@ -961,9 +961,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             game.soundManager.PlayExplosion();
 
             //create explosion objects
-            Explosion explosion1 = Instantiate(menu.poiManager.explosionPrefab).Init(3, position);
-            Explosion explosion2 = Instantiate(menu.poiManager.explosionPrefab).Init(8, position);
-            Explosion explosion3 = Instantiate(menu.poiManager.explosionPrefab).Init(15, position);
+            Explosion explosion1 = Instantiate(POIManager.Instance.explosionPrefab).Init(3, position);
+            Explosion explosion2 = Instantiate(POIManager.Instance.explosionPrefab).Init(8, position);
+            Explosion explosion3 = Instantiate(POIManager.Instance.explosionPrefab).Init(15, position);
             
             foreach (PhysicalObject obj in game.AllBattlefieldObjects())
             {
@@ -989,10 +989,10 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         else if (IsFlashbang())
         {
             //create explosion objects
-            Explosion explosion1 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(0.5f, position);
-            Explosion explosion2 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(3, position);
-            Explosion explosion3 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(8, position);
-            Explosion explosion4 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(15, position);
+            Explosion explosion1 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(0.5f, position);
+            Explosion explosion2 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(3, position);
+            Explosion explosion3 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(8, position);
+            Explosion explosion4 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(15, position);
 
             foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
             {
@@ -1029,7 +1029,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         else if (IsSmoke())
         {
-            Instantiate(game.poiManager.smokeCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
+            Instantiate(POIManager.Instance.smokeCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
 
             //set sound flags after enemy use smoke
             foreach (Soldier s in game.AllSoldiers())
@@ -1040,7 +1040,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         }
         else if (IsTabun())
         {
-            Instantiate(game.poiManager.tabunCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
+            Instantiate(POIManager.Instance.tabunCloudPrefab).Init(Tuple.Create(new Vector3(position.x, position.y, position.z), string.Empty), explodedBy.Id);
             
             //set sound flags after enemy use tabun
             foreach (Soldier s in game.AllSoldiers())

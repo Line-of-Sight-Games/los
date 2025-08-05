@@ -18,7 +18,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public SoldierManager soldierManager;
     public ItemManager itemManager;
     public MainGame game;
-    public POIManager poiManager;
     public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 

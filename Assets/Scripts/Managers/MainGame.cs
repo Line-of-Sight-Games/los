@@ -14,7 +14,6 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public MainMenu menu;
     public ItemManager itemManager;
     public SoldierManager soldierManager;
-    public POIManager poiManager;
     public SoundManager soundManager;
 
     public MoveUI moveUI;
@@ -452,7 +451,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             //increment recon binoculars
             if (s.IsUsingBinocularsInReconMode())
             {
-                if (poiManager.FindPOIById(s.binocularBeamId.Split("|")[0]) is BinocularBeam binocBeam)
+                if (POIManager.Instance.FindPOIById(s.binocularBeamId.Split("|")[0]) is BinocularBeam binocBeam)
                 {
                         binocBeam.turnsActive++;
                         if (binocBeam.turnsActive % 2 == 0)
@@ -2780,7 +2779,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             activeSoldier.DeductAP(1);
 
-            POI poiToDisarm = poiManager.FindPOIById(menu.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            POI poiToDisarm = POIManager.Instance.FindPOIById(menu.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item disarmedItem = null;
             Soldier placedBy = null;
 
@@ -2809,7 +2808,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             disarmedItem.X = poiToDisarm.X;
             disarmedItem.Y = poiToDisarm.Y;
             disarmedItem.Z = poiToDisarm.Z;
-            menu.poiManager.DestroyPOI(poiToDisarm);
+            POIManager.Instance.DestroyPOI(poiToDisarm);
             
             activeSoldier.PerformLoudAction(6);
             menu.CloseDisarmUI();
@@ -3270,7 +3269,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 FileUtility.WriteToReport($"{activeSoldier.soldierName} places claymore at ({x}, {y}, {z})."); //write to report
 
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                Instantiate(poiManager.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, false, activeSoldier.Id));
+                Instantiate(POIManager.Instance.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, false, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseClaymoreUI();
@@ -3295,7 +3294,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 soundManager.PlayUseDepBeacon();
 
                 useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
-                Instantiate(poiManager.deploymentBeaconPrefab).Init(new(x, y, z), activeSoldier.Id);
+                Instantiate(POIManager.Instance.deploymentBeaconPrefab).Init(new(x, y, z), activeSoldier.Id);
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseDeploymentBeaconUI();
@@ -3321,7 +3320,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 
                 SetLosCheckAllEnemies("losChange|thermalCamActive"); //loscheckallenemies
-                Instantiate(poiManager.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, activeSoldier.Id));
+                Instantiate(POIManager.Instance.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, activeSoldier.Id));
 
                 activeSoldier.PerformLoudAction(10);
                 menu.CloseThermalCamUI();
@@ -3350,8 +3349,8 @@ public class MainGame : MonoBehaviour, IDataPersistence
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;
 
         //create explosion objects
-        Explosion explosion1 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(radius / 2, position);
-        Explosion explosion2 = Instantiate(menu.poiManager.explosionPrefab, position, default).Init(radius, position);
+        Explosion explosion1 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(radius / 2, position);
+        Explosion explosion2 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(radius, position);
 
         foreach (PhysicalObject obj in AllBattlefieldObjects())
         {
@@ -3418,7 +3417,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
     public void UpdateDipElecRewardAndChance()
     {
         //read terminal
-        Terminal terminal = poiManager.FindPOIById(dipelecUI.SelectedTerminalId) as Terminal;
+        Terminal terminal = POIManager.Instance.FindPOIById(dipelecUI.SelectedTerminalId) as Terminal;
 
         //set dipelec type
         dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
@@ -3473,7 +3472,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
             int passCount = 0;
             string resultString = "";
 
-            Terminal terminal = poiManager.FindPOIById(dipelecUI.SelectedTerminalId) as Terminal;
+            Terminal terminal = POIManager.Instance.FindPOIById(dipelecUI.SelectedTerminalId) as Terminal;
 
             FileUtility.WriteToReport($"{activeSoldier.soldierName} attempts to interact with terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
 
@@ -3952,7 +3951,7 @@ public class MainGame : MonoBehaviour, IDataPersistence
         {
             if (insertObjectsUI.objectTypeDropdown.value == 1)
             {
-                GoodyBox gb = Instantiate(poiManager.gbPrefab).Init(spawnLocation);
+                GoodyBox gb = Instantiate(POIManager.Instance.gbPrefab).Init(spawnLocation);
                 //fill gb with items
                 foreach (Transform child in insertObjectsUI.gbItemsPanel)
                 {
@@ -3963,12 +3962,12 @@ public class MainGame : MonoBehaviour, IDataPersistence
                 }
             }
             else if (insertObjectsUI.objectTypeDropdown.value == 2)
-                Instantiate(poiManager.terminalPrefab).Init(spawnLocation, insertObjectsUI.terminalTypeDropdown.captionText.text);
+                Instantiate(POIManager.Instance.terminalPrefab).Init(spawnLocation, insertObjectsUI.terminalTypeDropdown.captionText.text);
             else if (insertObjectsUI.objectTypeDropdown.value == 3)
-                Instantiate(poiManager.barrelPrefab).Init(spawnLocation);
+                Instantiate(POIManager.Instance.barrelPrefab).Init(spawnLocation);
             else if (insertObjectsUI.objectTypeDropdown.value == 4)
             {
-                DrugCabinet dc = Instantiate(poiManager.drugCabinetPrefab).Init(spawnLocation);
+                DrugCabinet dc = Instantiate(POIManager.Instance.drugCabinetPrefab).Init(spawnLocation);
                 //fill dc with items
                 foreach (Transform child in insertObjectsUI.dcItemsPanel)
                 {

@@ -12,7 +12,6 @@ public class DeploymentBeacon : POI, IDataPersistence, IAmDisarmable
     {
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
-        poiManager = FindFirstObjectByType<POIManager>();
     }
 
     private void Update()

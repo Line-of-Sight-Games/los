@@ -19,13 +19,12 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     {
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
-        poiManager = FindFirstObjectByType<POIManager>();
     }
     private void Update()
     {
         placedBy = menu.soldierManager.FindSoldierById(placedById);
         if (Exploded)
-            poiManager.DestroyPOI(this);
+            POIManager.Instance.DestroyPOI(this);
     }
     public Claymore Init(Vector3 location, Tuple<int, int, int, bool, string> otherDetails)
     {
