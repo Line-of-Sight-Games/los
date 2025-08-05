@@ -95,7 +95,7 @@ public class OverwatchShotUI : MonoBehaviour
             FileUtility.WriteToReport($"{shooter.soldierName} overwatch shoots at {targetSoldier.soldierName}"); //write to report
 
             //play shot sfx
-            game.soundManager.PlayShotResolution(gun);
+            SoundManager.Instance.PlayShotResolution(gun);
 
             game.tempShooterTarget = Tuple.Create(shooter, target);
             int randNum1 = HelperFunctions.RandomShotNumber();

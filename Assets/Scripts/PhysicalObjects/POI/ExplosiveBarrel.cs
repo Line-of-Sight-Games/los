@@ -65,7 +65,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
     public void CheckExplosionBarrel(Soldier explodedBy)
     {
         //play explosion sfx
-        game.soundManager.PlayExplosion();
+        SoundManager.Instance.PlayExplosion();
 
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"Explosive Barrel | Detonated: {X},{Y},{Z}", new(X, Y, Z)).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.id;

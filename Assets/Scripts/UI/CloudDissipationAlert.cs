@@ -4,7 +4,7 @@ public class CloudDissipationAlert : MonoBehaviour
 {
     public void PlayButtonPress()
     {
-        FindFirstObjectByType<SoundManager>().PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
     }
 
     // Update is called once per frame

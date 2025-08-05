@@ -1445,7 +1445,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     TakeStun(1);
                     
                 //set sound flags after damage
-                game.soundManager.SetSoldierSelectionSoundFlagAfterDamage(this);
+                SoundManager.Instance.SetSoldierSelectionSoundFlagAfterDamage(this);
             }
         }
 
@@ -1795,7 +1795,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (vulnerableTurns > 0)
                 {
                     //set sound flags for hearing sound
-                    game.soundManager.SetSoldierSelectionSoundFlagAfterHeardSound(s);
+                    SoundManager.Instance.SetSoldierSelectionSoundFlagAfterHeardSound(s);
 
                     if (vulnerableTurns > maxVulnerableTurns)
                         maxVulnerableTurns = vulnerableTurns;
@@ -1831,7 +1831,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 if (vulnerableTurns > 0) 
                 {
                     //set sound flags for hearing sound
-                    game.soundManager.SetSoldierSelectionSoundFlagAfterHeardSound(s);
+                    SoundManager.Instance.SetSoldierSelectionSoundFlagAfterHeardSound(s);
 
                     if (vulnerableTurns > maxVulnerableTurns)
                         maxVulnerableTurns = vulnerableTurns;
@@ -1946,7 +1946,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
             //play see enemy dialogue
             if (IsOnturn())
-                game.soundManager.PlaySoldierSeeEnemy(this);
+                SoundManager.Instance.PlaySoldierSeeEnemy(this);
         }
 
         //add reference of this soldier revealing others
@@ -2818,7 +2818,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         foreach (Soldier s in game.AllSoldiers())
         {
             if (s.IsSameTeamAs(this))
-                game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
+                SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
         }
 
         SetLosCheck("losChange|statChange(C)(SR)|healthState(unconscious)"); //losCheck
@@ -2851,7 +2851,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 //play kill enemy dialogue
                 if (killedBy != null && killedBy.IsOnturn() && killedBy.IsConscious())
-                    game.soundManager.PlaySoldierKillEnemy(killedBy);
+                    SoundManager.Instance.PlaySoldierKillEnemy(killedBy);
 
                 menu.AddSoldierAlert(this, "DEATH", Color.red, $"Dies from {HelperFunctions.PrintList(damageSource)}.", hp, 0);
 
@@ -2917,9 +2917,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     foreach (Soldier s in game.AllSoldiers())
                     {
                         if (s.IsSameTeamAs(this))
-                            game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledJA(s);
+                            SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyKilledJA(s);
                         else
-                            game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyKilledJA(s);
+                            SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyKilledJA(s);
                     }
                 }
                 else //set sound flags after soldier killed
@@ -2927,9 +2927,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     foreach (Soldier s in game.AllSoldiers())
                     {
                         if (s.IsSameTeamAs(this))
-                            game.soundManager.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
+                            SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyKilledOrUncon(s);
                         else
-                            game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyKilled(s);
+                            SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyKilled(s);
                     }
                 }
             }
@@ -3307,7 +3307,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool StructuralCollapseCheck(int structureHeight)
     {
         //play structural collapse sfx
-        game.soundManager.PlayStructuralCollapse();
+        SoundManager.Instance.PlayStructuralCollapse();
 
         int survivalPassesNeeded = Mathf.FloorToInt(structureHeight / 10f);
         int survivalPassesAchieved = 0;

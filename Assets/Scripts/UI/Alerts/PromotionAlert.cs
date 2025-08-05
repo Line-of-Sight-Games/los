@@ -57,11 +57,6 @@ public class PromotionAlert : SoldierAlert
         new string[] { "Witness", "Hypnotist" },
     };
 
-    private void Start()
-    {
-        soundManager = FindFirstObjectByType<SoundManager>();
-    }
-
     public void PromoteSoldier()
     {
         string choiceStat = statDropdown.captionText.text;
@@ -97,7 +92,7 @@ public class PromotionAlert : SoldierAlert
                     randomStatText.text = stats[2];
                     randomStatText.gameObject.SetActive(true);
 
-                    soldier.game.soundManager.PlayPromotion();
+                    SoundManager.Instance.PlayPromotion();
 
                     if (soldier.NextRank() == "Major")
                     {
@@ -119,7 +114,7 @@ public class PromotionAlert : SoldierAlert
 
                                 promotionComplete = true;
 
-                                soldier.game.soundManager.PlayFailedUpgrade();
+                                SoundManager.Instance.PlayFailedUpgrade();
                             }
                             else if (chance == 1)
                             {
@@ -137,7 +132,7 @@ public class PromotionAlert : SoldierAlert
                                 soldier.soldierAbilities.Add(ability);
                                 promotionComplete = true;
 
-                                soldier.game.soundManager.PlayNewAbility();
+                                SoundManager.Instance.PlayNewAbility();
                             }
                             else if (chance == 2)
                             {
@@ -156,7 +151,7 @@ public class PromotionAlert : SoldierAlert
                                 soldier.soldierAbilities.Add(localAbilities[0][1]);
                                 promotionComplete = true;
 
-                                soldier.game.soundManager.PlaySucceededUpgrade();
+                                SoundManager.Instance.PlaySucceededUpgrade();
                             }
                         }
 
@@ -196,7 +191,7 @@ public class PromotionAlert : SoldierAlert
             FileUtility.WriteToReport($"{soldier.soldierName} granted chosen ability: {abilityDropdown.captionText.text}"); //write to report
             promotionComplete = true;
 
-            //soldier.game.soundManager.PlayPromotion();
+            //soldier.game.SoundManager.Instance.PlayPromotion();
         }
 
     }

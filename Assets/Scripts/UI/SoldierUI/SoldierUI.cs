@@ -7,7 +7,6 @@ public class SoldierUI : MonoBehaviour
     public MainMenu menu;
     public MainGame game;
     public SoldierManager soldierManager;
-    public SoundManager soundManager;
     public Soldier linkedSoldier;
     public TMP_InputField xSize, ySize, zSize;
     public int x, y, z;
@@ -22,7 +21,6 @@ public class SoldierUI : MonoBehaviour
         menu = FindFirstObjectByType<MainMenu>();
         game = FindFirstObjectByType<MainGame>();
         soldierManager = FindFirstObjectByType<SoldierManager>();
-        soundManager = FindFirstObjectByType<SoundManager>();
     }
     public void DisplayInFriendlyColumn()
     {
@@ -35,30 +33,30 @@ public class SoldierUI : MonoBehaviour
     public void FieldButtonClicked()
     {
         //play button press sfx
-        soundManager.PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
 
         FieldSoldier();
     }
     public void ActionButtonClicked()
     {
         //play button press sfx
-        soundManager.PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
         //play select generic dialogue
-        soundManager.PlaySoldierSelection(linkedSoldier);
+        SoundManager.Instance.PlaySoldierSelection(linkedSoldier);
 
         OpenSoldierMenu("");
     }
     public void ConfirmFieldButtonClicked()
     {
         //play button press sfx
-        soundManager.PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
 
         ConfirmFieldSoldier();
     }
     public void CancelFieldButtonClicked()
     {
         //play button press sfx
-        soundManager.PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
 
         CancelFieldSoldier();
     }
@@ -79,7 +77,7 @@ public class SoldierUI : MonoBehaviour
             if (x >= 1 && x <= linkedSoldier.game.maxX && y >= 1 && y <= linkedSoldier.game.maxY && z >= 0 && z <= linkedSoldier.game.maxZ)
             {
                 //play move confirm dialogue
-                soundManager.PlaySoldierConfirmMove(linkedSoldier);
+                SoundManager.Instance.PlaySoldierConfirmMove(linkedSoldier);
 
                 //deploy the soldier
                 game.PerformSpawn(linkedSoldier, System.Tuple.Create(new Vector3(x, y, z), terrainDropdown.captionText.text));

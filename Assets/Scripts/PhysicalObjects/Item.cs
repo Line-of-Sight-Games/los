@@ -446,23 +446,23 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         if (linkedSoldier != null)
         {
             //play pickup general sfx
-            game.soundManager.PlayConfigGeneral();
+            SoundManager.Instance.PlayConfigGeneral();
 
             //thermal goggles
             if (itemName.Equals("Thermal_Goggles"))
             {
                 //play equip armour sfx
-                game.soundManager.PlayEquipArmour();
+                SoundManager.Instance.PlayEquipArmour();
                 
                 linkedSoldier.SetLosCheck("statChange(SR)|thermalEquipped"); //losCheck
             }
             else if (IsJuggernautArmour())
             {
                 //play equip armour sfx
-                game.soundManager.PlayEquipArmour();
+                SoundManager.Instance.PlayEquipArmour();
 
                 //play equip armour dialogue
-                game.soundManager.PlaySoldierEquipArmour(linkedSoldier);
+                SoundManager.Instance.PlaySoldierEquipArmour(linkedSoldier);
 
                 //unset cover
                 linkedSoldier.UnsetCover();
@@ -470,7 +470,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             else if (itemName.Equals("Armour_Exo"))
             {
                 //play equip armour sfx
-                game.soundManager.PlayEquipArmour();
+                SoundManager.Instance.PlayEquipArmour();
 
                 //take exo armour health
                 linkedSoldier.stats.H.BaseVal -= 3;
@@ -479,7 +479,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             else if (itemName.Equals("Armour_Stimulant"))
             {
                 //play equip armour sfx
-                game.soundManager.PlayEquipArmour();
+                SoundManager.Instance.PlayEquipArmour();
 
                 //reset sustenance for stim armour
                 linkedSoldier.ResetRoundsWithoutFood();
@@ -495,38 +495,38 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             else if (IsBodyArmour())
             {
                 //play equip armour sfx
-                game.soundManager.PlayEquipArmour();
+                SoundManager.Instance.PlayEquipArmour();
 
                 //play pickup armour dialogue
-                game.soundManager.PlaySoldierEquipArmour(linkedSoldier);
+                SoundManager.Instance.PlaySoldierEquipArmour(linkedSoldier);
             }
             else if (IsBackpack())
             {
                 //play equip wearable gear
-                game.soundManager.PlayEquipWearableGear();
+                SoundManager.Instance.PlayEquipWearableGear();
             }
             else if (IsBrace())
             {
                 //play equip wearable gear
-                game.soundManager.PlayEquipWearableGear();
+                SoundManager.Instance.PlayEquipWearableGear();
             }
             else if (IsBag())
             {
                 //play equip wearable gear
-                game.soundManager.PlayEquipWearableGear();
+                SoundManager.Instance.PlayEquipWearableGear();
             }
             else if (itemName.Equals("Logistics_Belt"))
             {
                 //play equip wearable gear
-                game.soundManager.PlayEquipWearableGear();
+                SoundManager.Instance.PlayEquipWearableGear();
 
                 //add ap
                 linkedSoldier.ap++;
             }
             else if (IsUHF())
-                game.soundManager.PlaySoldierPickupUHF(linkedSoldier);
+                SoundManager.Instance.PlaySoldierPickupUHF(linkedSoldier);
             else if (IsULF())
-                game.soundManager.PlaySoldierPickupULF(linkedSoldier);
+                SoundManager.Instance.PlaySoldierPickupULF(linkedSoldier);
             else if (itemName.Equals("Syringe_Unlabelled"))
             {
                 //label unlabelled syringes
@@ -581,7 +581,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public void RunDropEffect(Soldier linkedSoldier)
     {
         //play drop general sfx (clashes with item use sound for consumables)
-        //game.soundManager.PlayConfigGeneral(); 
+        //game.SoundManager.Instance.PlayConfigGeneral(); 
 
         //minus ap for logistics belt
         if (itemName.Equals("Logistics_Belt"))
@@ -790,9 +790,9 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 foreach (Soldier s in game.AllSoldiers())
                 {
                     if (s.IsSameTeamAs(linkedSoldier))
-                        game.soundManager.SetSoldierSelectionSoundFlagAfterAllyUseULF(s);
+                        SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyUseULF(s);
                     else
-                        game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseULF(s);
+                        SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyUseULF(s);
                 }
             }
             else
@@ -817,7 +817,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 case "Ammo_SMG_Pi":
                 case "Ammo_Sn":
                     //play reload sfx
-                    game.soundManager.PlayReload(itemUsedOn);
+                    SoundManager.Instance.PlayReload(itemUsedOn);
 
                     (this.ammo, itemUsedOn.ammo) = (itemUsedOn.ammo, this.ammo);
                     if (this.ammo != 0)
@@ -825,7 +825,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     break;
                 case "E_Tool":
                     //play use etool
-                    game.soundManager.PlayUseETool();
+                    SoundManager.Instance.PlayUseETool();
 
                     menu.OpenEtoolResultUI();
                     break;
@@ -833,14 +833,14 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     if (poisonedBy == null || poisonedBy == "")
                     {
                         //play use food pack
-                        game.soundManager.PlayUseFood();
+                        SoundManager.Instance.PlayUseFood();
 
                         linkedSoldier.roundsWithoutFood -= 10;
                     }
                     else
                     {
                         //play use poison
-                        game.soundManager.PlayUsePoisonedItem();
+                        SoundManager.Instance.PlayUsePoisonedItem();
 
                         linkedSoldier.TakePoisoning(poisonedBy, true);
                     }
@@ -851,25 +851,25 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     if (poisonedBy == null || poisonedBy == "")
                     {
                         //play use medikit
-                        game.soundManager.PlayUseMedikit();
+                        SoundManager.Instance.PlayUseMedikit();
 
                         //play heal ally dialogue
                         if (linkedSoldier != soldierUsedOn) //only if it's an ally you're healing
-                            game.soundManager.PlaySoldierHealAlly(linkedSoldier);
+                            SoundManager.Instance.PlaySoldierHealAlly(linkedSoldier);
 
                         soldierUsedOn.TakeHeal(linkedSoldier, hpGranted + linkedSoldier.stats.Heal.Val, linkedSoldier.stats.Heal.Val, false, false);
                     }
                     else
                     {
                         //play use poison
-                        game.soundManager.PlayUsePoisonedItem();
+                        SoundManager.Instance.PlayUsePoisonedItem();
 
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
                     }
                     break;
                 case "Poison_Satchel":
                     //play use poison
-                    game.soundManager.PlayUsePoisonSatchel();
+                    SoundManager.Instance.PlayUsePoisonSatchel();
 
                     itemUsedOn.poisonedBy = linkedSoldier.Id;
                     break;
@@ -884,14 +884,14 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     if (poisonedBy == null || poisonedBy == "")
                     {
                         //play use syringe
-                        game.soundManager.PlayUseSyringe();
+                        SoundManager.Instance.PlayUseSyringe();
 
                         soldierUsedOn.TakeDrug(itemName.Split('_')[1], linkedSoldier);
                     }
                     else
                     {
                         //play use poison
-                        game.soundManager.PlayUsePoisonedItem();
+                        SoundManager.Instance.PlayUsePoisonedItem();
 
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
                     }
@@ -900,14 +900,14 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                     if (poisonedBy == null || poisonedBy == "")
                     {
                         //play use syringe
-                        game.soundManager.PlayUseSyringe();
+                        SoundManager.Instance.PlayUseSyringe();
 
                         soldierUsedOn.TakeDrug(itemManager.drugTable[HelperFunctions.RandomNumber(0, itemManager.drugTable.Length - 1)], linkedSoldier);
                     }
                     else
                     {
                         //play use poison
-                        game.soundManager.PlayUsePoisonedItem();
+                        SoundManager.Instance.PlayUsePoisonedItem();
 
                         soldierUsedOn.TakePoisoning(poisonedBy, true);
                     }
@@ -915,14 +915,14 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
                 case "Water_Canteen":
                     if (poisonedBy == null || poisonedBy == "")
                     {
-                        game.soundManager.PlayUseWater();
+                        SoundManager.Instance.PlayUseWater();
 
                         linkedSoldier.roundsWithoutFood -= 5;
                     }
                     else
                     {
                         //play use poison
-                        game.soundManager.PlayUsePoisonedItem();
+                        SoundManager.Instance.PlayUsePoisonedItem();
 
                         linkedSoldier.TakePoisoning(poisonedBy, true);
                     }
@@ -950,7 +950,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
     public void CheckExplosionGrenade(Soldier explodedBy, Vector3 position)
     {
         //play use grenade sfx
-        game.soundManager.PlayUseGrenade(this);
+        SoundManager.Instance.PlayUseGrenade(this);
 
         GameObject explosionList = Instantiate(menu.explosionListPrefab, menu.explosionUI.transform).GetComponent<ExplosionList>().Init($"{itemName} | Detonated: {position.x},{position.y},{position.z}", position).gameObject;
         explosionList.transform.Find("ExplodedBy").GetComponent<TextMeshProUGUI>().text = explodedBy.Id;
@@ -958,7 +958,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         if (IsFrag())
         {
             //play explosion sfx
-            game.soundManager.PlayExplosion();
+            SoundManager.Instance.PlayExplosion();
 
             //create explosion objects
             Explosion explosion1 = Instantiate(POIManager.Instance.explosionPrefab).Init(3, position);
@@ -1035,7 +1035,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             foreach (Soldier s in game.AllSoldiers())
             {
                 if (s.IsOppositeTeamAs(explodedBy))
-                    game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseSmoke(s);
+                    SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyUseSmoke(s);
             }
         }
         else if (IsTabun())
@@ -1046,7 +1046,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             foreach (Soldier s in game.AllSoldiers())
             {
                 if (s.IsOppositeTeamAs(explodedBy))
-                    game.soundManager.SetSoldierSelectionSoundFlagAfterEnemyUseTabun(s);
+                    SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyUseTabun(s);
             }
         }
 

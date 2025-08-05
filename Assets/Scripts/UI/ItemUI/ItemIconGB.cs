@@ -8,7 +8,6 @@ using UnityEditor;
 
 public class ItemIconGB : MonoBehaviour
 {
-    public SoundManager soundManager;
     public ItemAssets itemAssets;
     public Item linkedItem;
     public int pickupNumber = 0;
@@ -20,7 +19,6 @@ public class ItemIconGB : MonoBehaviour
     {
         itemAssets = FindFirstObjectByType<ItemAssets>();
         game = FindFirstObjectByType<MainGame>();
-        soundManager = FindFirstObjectByType<SoundManager>();
         transform.Find("ItemImage").GetComponent<Image>().sprite = itemAssets.GetSprite(this.gameObject.name);
         transform.Find("Arrow").GetComponent<Image>().sprite = arrows[0];
         destination = null;
@@ -42,7 +40,7 @@ public class ItemIconGB : MonoBehaviour
 
     public void PlayButtonPress()
     {
-        soundManager.PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
     }
     public void Update()
     {

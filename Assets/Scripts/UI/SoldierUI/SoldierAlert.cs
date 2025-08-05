@@ -6,7 +6,6 @@ using TMPro;
 
 public class SoldierAlert : MonoBehaviour
 {
-    public SoundManager soundManager;
     public Soldier soldier;
     public SoldierPortrait soldierPortrait;
 
@@ -32,14 +31,10 @@ public class SoldierAlert : MonoBehaviour
         FileUtility.WriteToReport($"{soldier.soldierName}: {description}"); //write to report
         return this;
     }
-    private void Start()
-    {
-        soundManager = FindFirstObjectByType<SoundManager>();
-    }
 
     public void PlayButtonPress()
     {
-        soundManager.PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
     }
 
     public void SetSoldier(Soldier initSoldier)

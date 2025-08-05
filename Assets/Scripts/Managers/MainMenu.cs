@@ -18,7 +18,6 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public SoldierManager soldierManager;
     public ItemManager itemManager;
     public MainGame game;
-    public SoundManager soundManager;
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 
     public DetectionUI detectionUI;
@@ -490,17 +489,17 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void ToggleMute()
     {
         muteIcon.SetActive(!muteIcon.activeSelf);
-        soundManager.isMute = !soundManager.isMute;
+        SoundManager.Instance.isMute = !SoundManager.Instance.isMute;
     }
     public void Mute()
     {
         muteIcon.SetActive(true);
-        soundManager.isMute = true;
+        SoundManager.Instance.isMute = true;
     }
     public void UnMute()
     {
         muteIcon.SetActive(false);
-        soundManager.isMute = false;
+        SoundManager.Instance.isMute = false;
     }
     
     public string DisplayShotParameters()
@@ -674,7 +673,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             //enter override
             OverrideView = true;
 
-            soundManager.PlayOverrideAlarm(); //play override alarm sfx
+            SoundManager.Instance.PlayOverrideAlarm(); //play override alarm sfx
 
             endTurnButton.SetActive(false);
             enterOverrideButton.SetActive(false);
@@ -1333,7 +1332,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (turnTime > game.maxTurnTime)
         {
             //play banzai sfx
-            soundManager.PlayBanzai();
+            SoundManager.Instance.PlayBanzai();
 
             turnTimer.color = Color.red;
         }
@@ -1812,7 +1811,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             detectionAlertUI.SetActive(true);
 
             //play detection alarm sfx
-            soundManager.PlayDetectionAlarm();
+            SoundManager.Instance.PlayDetectionAlarm();
         }
     }
     public void CloseGMAlertDetectionUI()
@@ -2085,7 +2084,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
                     Claymore claymore = cAlert.claymore;
 
                     //play claymore detect dialogue
-                    soundManager.PlaySoldierDetectClaymore(detector);
+                    SoundManager.Instance.PlaySoldierDetectClaymore(detector);
 
                     claymore.revealed = true;
                 }
@@ -3235,7 +3234,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenOvermoveUI(string message)
     {
         //play overmove alarm sfx
-        soundManager.PlayOvermoveAlarm();
+        SoundManager.Instance.PlayOvermoveAlarm();
 
         overmoveUI.transform.Find("Warning").GetComponent<TextMeshProUGUI>().text = message;
         overmoveUI.SetActive(true);
@@ -3247,7 +3246,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenSuppressionMoveUI()
     {
         //play overmove alarm sfx
-        soundManager.PlayOvermoveAlarm();
+        SoundManager.Instance.PlayOvermoveAlarm();
 
         suppressionMoveUI.SetActive(true);
     }
@@ -3282,7 +3281,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             CloseOvermoveUI();
         }
         else
-            soundManager.PlayOverrideAlarm(); //play override alarm sfx
+            SoundManager.Instance.PlayOverrideAlarm(); //play override alarm sfx
     }
     public void ConfirmSuppressionMove()
     {
@@ -3292,7 +3291,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
             CloseSuppressionMoveUI();
         }
         else
-            soundManager.PlayOverrideAlarm(); //play override alarm sfx
+            SoundManager.Instance.PlayOverrideAlarm(); //play override alarm sfx
     }
 
 
@@ -3409,7 +3408,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
         if (activeSoldier.IsAbleToSee() && poisNearby)
         {
             //play configure near GB dialogue
-            soundManager.PlaySoldierConfigNearGB(activeSoldier);
+            SoundManager.Instance.PlaySoldierConfigNearGB(activeSoldier);
         }
     }
     public void AddGlobalInventorySourceButton()
@@ -4404,7 +4403,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenULFResultUI(string message)
     {
         //play ulf dialogue
-        soundManager.PlayULFResult(message);
+        SoundManager.Instance.PlayULFResult(message);
 
         ULFResultUI.transform.Find("OptionPanel").Find("Result").Find("Text").GetComponent<TextMeshProUGUI>().text = message;
         ULFResultUI.SetActive(true);
@@ -4436,7 +4435,7 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenUHFUI(UseItemUI useItemUI)
     {
         //play uhf dial up dialogue
-        soundManager.PlayUHFDialUp();
+        SoundManager.Instance.PlayUHFDialUp();
 
         UHFUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         UHFUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
@@ -4475,11 +4474,11 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     {
         //play grenade use dialogue
         if (useItemUI.itemUsed.IsTabun())
-            soundManager.PlaySoldierUseTabun(activeSoldier);
+            SoundManager.Instance.PlaySoldierUseTabun(activeSoldier);
         else if (useItemUI.itemUsed.IsSmoke())
-            soundManager.PlaySoldierUseSmoke(activeSoldier);
+            SoundManager.Instance.PlaySoldierUseSmoke(activeSoldier);
         else
-            soundManager.PlaySoldierUseGrenade(activeSoldier);
+            SoundManager.Instance.PlaySoldierUseGrenade(activeSoldier);
 
 
         grenadeUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
@@ -4510,9 +4509,9 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     public void OpenClaymoreUI(UseItemUI useItemUI)
     {
         //play claymore placement sfx
-        soundManager.PlayPlaceClaymore();
+        SoundManager.Instance.PlayPlaceClaymore();
         //play claymore placement dialogue
-        soundManager.PlaySoldierPlaceClaymore(activeSoldier);
+        SoundManager.Instance.PlaySoldierPlaceClaymore(activeSoldier);
 
         claymoreUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
         claymoreUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;

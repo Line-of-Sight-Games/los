@@ -4,13 +4,11 @@ public class InventorySourcePanel : MonoBehaviour
 {
     public MainMenu menu;
     public IHaveInventory linkedInventorySource;
-    public SoundManager soundManager;
     public ItemSlot itemSlotPrefab;
     public ItemIcon itemIconPrefab;
 
     public InventorySourcePanel Init(IHaveInventory inventorySource)
     {
-        soundManager = FindFirstObjectByType<SoundManager>();
         menu = FindFirstObjectByType<MainMenu>();
         linkedInventorySource = inventorySource;
 
@@ -40,7 +38,7 @@ public class InventorySourcePanel : MonoBehaviour
 
     public void ButtonSoundTrigger()
     {
-        soundManager.PlayButtonPress();
+        SoundManager.Instance.PlayButtonPress();
     }
 
     public void AddGBInventoryContents(GoodyBox gb)
