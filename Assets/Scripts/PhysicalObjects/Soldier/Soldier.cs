@@ -302,15 +302,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void SetActiveSoldier()
     {
-        MenuManager.Instance.activeSoldier = this;
-        GameManager.Instance.activeSoldier = this;
+        ActiveSoldier.Instance.SetActiveSoldier(this);
         selected = true;
-    }
-    public void UnsetActiveSoldier()
-    {
-        MenuManager.Instance.activeSoldier = null;
-        GameManager.Instance.activeSoldier = null;
-        selected = false;
     }
     public bool IsFielded()
     {

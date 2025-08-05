@@ -36,14 +36,14 @@ public class ValidThrowChecker : MonoBehaviour
         {
             if (GetThrowLocation(out Vector3 throwLocation))
             {
-                if (MenuManager.Instance.activeSoldier.IsAbleToSee() && MenuManager.Instance.activeSoldier.HasStrength())
+                if (ActiveSoldier.Instance.S.IsAbleToSee() && ActiveSoldier.Instance.S.HasStrength())
                 {
-                    if (!IsWithinBounds(MenuManager.Instance.activeSoldier, throwLocation))
+                    if (!IsWithinBounds(ActiveSoldier.Instance.S, throwLocation))
                         throwBeyondRadius.SetActive(true);
                 }
                 else
                 {
-                    if (!IsWithinDropBounds(MenuManager.Instance.activeSoldier, throwLocation)) //dropping allowed while blind within 3 or 0 strength
+                    if (!IsWithinDropBounds(ActiveSoldier.Instance.S, throwLocation)) //dropping allowed while blind within 3 or 0 strength
                         throwBeyondBlindRadius.SetActive(true);
                 }
             }
@@ -89,7 +89,7 @@ public class ValidThrowChecker : MonoBehaviour
         {
             foreach (Soldier s in GameManager.Instance.AllSoldiers())
             {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(MenuManager.Instance.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
+                if (s.IsAbleToSee() && s.IsSameTeamAs(ActiveSoldier.Instance.S) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
                 {
                     if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
                         catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });
@@ -104,7 +104,7 @@ public class ValidThrowChecker : MonoBehaviour
     {
         itemWillBreak.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && MenuManager.Instance.activeSoldier.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
+        if (GetThrowLocation(out Vector3 throwLocation) && ActiveSoldier.Instance.S.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
             itemWillBreak.SetActive(true);
     }
 }

@@ -24,7 +24,7 @@ public class DragUI : MonoBehaviour
             if (HelperFunctions.ValidateIntInput(xPos, out int x) && HelperFunctions.ValidateIntInput(yPos, out int y) && HelperFunctions.ValidateIntInput(zPos, out int z) && terrainDropdown.value != 0)
             {
                 moveLocation = new(x, y, z);
-                if (MenuManager.Instance.activeSoldier.PointWithinRadius(moveLocation, MenuManager.Instance.activeSoldier.GetMaxDragRange()))
+                if (ActiveSoldier.Instance.S.PointWithinRadius(moveLocation, ActiveSoldier.Instance.S.GetMaxDragRange()))
                 {
                     legitMove = true;
                     apCost.text = GetDragAPCost().ToString();
@@ -72,7 +72,7 @@ public class DragUI : MonoBehaviour
     }
     public int GetDragAPCost()
     {
-        return Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(new(MenuManager.Instance.activeSoldier.X, MenuManager.Instance.activeSoldier.Y, MenuManager.Instance.activeSoldier.Z), new(moveLocation.x, moveLocation.y, moveLocation.z))) / MenuManager.Instance.activeSoldier.stats.Str.Val);
+        return Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(new(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y, ActiveSoldier.Instance.S.Z), new(moveLocation.x, moveLocation.y, moveLocation.z))) / ActiveSoldier.Instance.S.stats.Str.Val);
     }
     public int GetDropDistance()
     {
@@ -88,7 +88,7 @@ public class DragUI : MonoBehaviour
     {
         if (pressCount.Equals(0)) //first press
         {
-            drager = MenuManager.Instance.activeSoldier;
+            drager = ActiveSoldier.Instance.S;
             dragee = SoldierManager.Instance.FindSoldierById(targetDropdown.captionText.text);
             targetDropdown.interactable = false;
             maxDragRange.text = drager.GetMaxDragRange().ToString();

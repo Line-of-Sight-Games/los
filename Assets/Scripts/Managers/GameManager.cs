@@ -52,7 +52,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public List<string> tempDamageSource;
 
     public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI;
-    public Soldier activeSoldier;
 
     public GameManager Init()
     {
@@ -275,7 +274,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         tempDamageSource.Add("Modafinil");
 
         //deactivate modafinil turn
-        activeSoldier.Kill(tempSoldier, tempDamageSource);
+        ActiveSoldier.Instance.S.Kill(tempSoldier, tempDamageSource);
         modaTurn = false;
         SwitchTeam(tempTeam);
     }
@@ -541,19 +540,19 @@ public class GameManager : MonoBehaviour, IDataPersistence
     //draining soldier AP and MA (MP below) after use during turn
     public void EndSoldierTurn()
     {
-        activeSoldier.DrainAP();
-        activeSoldier.DrainMP();
+        ActiveSoldier.Instance.S.DrainAP();
+        ActiveSoldier.Instance.S.DrainMP();
     }
 
     //cover functions
     public void ConfirmCover()
     {
-        if (activeSoldier.CheckAP(1))
+        if (ActiveSoldier.Instance.S.CheckAP(1))
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} takes cover"); //write to report
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} takes cover"); //write to report
 
-            activeSoldier.DeductAP(1);
-            activeSoldier.SetCover();
+            ActiveSoldier.Instance.S.DeductAP(1);
+            ActiveSoldier.Instance.S.SetCover();
         }
 
         MenuManager.Instance.CloseTakeCoverUI();
@@ -562,16 +561,16 @@ public class GameManager : MonoBehaviour, IDataPersistence
     //playdead functions
     public void CheckPlaydead()
     {
-        if (activeSoldier.IsPlayingDead())
-            activeSoldier.UnsetPlaydead();
+        if (ActiveSoldier.Instance.S.IsPlayingDead())
+            ActiveSoldier.Instance.S.UnsetPlaydead();
         else
             MenuManager.Instance.OpenPlaydeadAlertUI();
     }
     public void ConfirmPlaydead()
     {
-        FileUtility.WriteToReport($"{activeSoldier.soldierName} plays dead"); //write to report
+        FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} plays dead"); //write to report
 
-        activeSoldier.SetPlaydead();
+        ActiveSoldier.Instance.S.SetPlaydead();
         MenuManager.Instance.ClosePlaydeadAlertUI();
     }
 
@@ -580,13 +579,13 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         if (HelperFunctions.ValidateIntInput(overwatchUI.xPos, out int x) && HelperFunctions.ValidateIntInput(overwatchUI.yPos, out int y) && HelperFunctions.ValidateIntInput(overwatchUI.radius, out int r) && HelperFunctions.ValidateIntInput(overwatchUI.arc, out int a))
         {
-            if (activeSoldier.CheckAP(2))
+            if (ActiveSoldier.Instance.S.CheckAP(2))
             {
                 //play overwatch confirm dialogue
-                SoundManager.Instance.PlaySoldierEnterOverwatch(activeSoldier);
+                SoundManager.Instance.PlaySoldierEnterOverwatch(ActiveSoldier.Instance.S);
 
-                activeSoldier.DrainAP();
-                activeSoldier.SetOverwatch(x, y, r, a);
+                ActiveSoldier.Instance.S.DrainAP();
+                ActiveSoldier.Instance.S.SetOverwatch(x, y, r, a);
             }
             MenuManager.Instance.CloseOverwatchUI();
         }
@@ -597,7 +596,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     //move functions
     public void FleeSoldier()
     {
-        activeSoldier.InstantKill(activeSoldier, new List<string>() { "Flee" });
+        ActiveSoldier.Instance.S.InstantKill(ActiveSoldier.Instance.S, new List<string>() { "Flee" });
     }
     public int CalculateFallDamage(Soldier soldier, int fallDistance)
     {
@@ -623,10 +622,10 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         if (ap > 0)
         {
-            if (ap > 1 && activeSoldier.InstantSpeed <= 6)
+            if (ap > 1 && ActiveSoldier.Instance.S.InstantSpeed <= 6)
                 ap--;
 
-            if (ap > 1 && activeSoldier.IsSprinter())
+            if (ap > 1 && ActiveSoldier.Instance.S.IsSprinter())
                 ap--;
 
             if (moveUI.coverToggle.isOn)
@@ -638,7 +637,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public void UpdateMoveDonated()
     {
         if (moveUI.moveTypeDropdown.captionText.text.Contains("Planner"))
-            moveUI.moveDonated.text = activeSoldier.HalfMove.ToString();
+            moveUI.moveDonated.text = ActiveSoldier.Instance.S.HalfMove.ToString();
     }
     public void UpdateMoveUI()
     {
@@ -661,7 +660,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     }
     public int CalculateMoveDistance(Vector3 moveToLocation)
     {
-        return Mathf.RoundToInt(Vector3.Distance(new Vector3(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), moveToLocation));
+        return Mathf.RoundToInt(Vector3.Distance(new Vector3(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y, ActiveSoldier.Instance.S.Z), moveToLocation));
     }
     public void ConfirmMove(bool force)
     {
@@ -669,13 +668,13 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         if (moveUI.moveTypeDropdown.captionText.text.Contains("Planner"))
         {
-            if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap))
+            if (ActiveSoldier.Instance.S.CheckMP(1) && ActiveSoldier.Instance.S.CheckAP(ap))
             {
                 //planner donation proceeds
-                activeSoldier.DeductAP(ap);
-                activeSoldier.DrainMP();
+                ActiveSoldier.Instance.S.DeductAP(ap);
+                ActiveSoldier.Instance.S.DrainMP();
                 foreach (Transform child in moveUI.closestAllyUI.transform.Find("ClosestAllyPanel"))
-                    SoldierManager.Instance.FindSoldierByName(child.Find("SoldierName").GetComponent<TextMeshProUGUI>().text).plannerDonatedMove += activeSoldier.HalfMove;
+                    SoldierManager.Instance.FindSoldierByName(child.Find("SoldierName").GetComponent<TextMeshProUGUI>().text).plannerDonatedMove += ActiveSoldier.Instance.S.HalfMove;
             }
             MenuManager.Instance.CloseMoveUI();
         }
@@ -683,22 +682,22 @@ public class GameManager : MonoBehaviour, IDataPersistence
         {
             if (GetMoveLocation(out Tuple<Vector3, string> moveToLocation))
             {
-                if (activeSoldier.X != moveToLocation.Item1.x || activeSoldier.Y != moveToLocation.Item1.y || activeSoldier.Z != moveToLocation.Item1.z)
+                if (ActiveSoldier.Instance.S.X != moveToLocation.Item1.x || ActiveSoldier.Instance.S.Y != moveToLocation.Item1.y || ActiveSoldier.Instance.S.Z != moveToLocation.Item1.z)
                 {
-                    if (force || (moveToLocation.Item1.x <= activeSoldier.X + 3 && moveToLocation.Item1.x >= activeSoldier.X - 3 && moveToLocation.Item1.y <= activeSoldier.Y + 3 && moveToLocation.Item1.y >= activeSoldier.Y - 3))
+                    if (force || (moveToLocation.Item1.x <= ActiveSoldier.Instance.S.X + 3 && moveToLocation.Item1.x >= ActiveSoldier.Instance.S.X - 3 && moveToLocation.Item1.y <= ActiveSoldier.Instance.S.Y + 3 && moveToLocation.Item1.y >= ActiveSoldier.Instance.S.Y - 3))
                     {
-                        if (activeSoldier.CheckAP(ap))
+                        if (ActiveSoldier.Instance.S.CheckAP(ap))
                         {
                             //play move dialogue
                             if (moveUI.meleeToggle.isOn)
-                                SoundManager.Instance.PlaySoldierMeleeMove(activeSoldier); //play melee move dialogue
+                                SoundManager.Instance.PlaySoldierMeleeMove(ActiveSoldier.Instance.S); //play melee move dialogue
                             else
-                                SoundManager.Instance.PlaySoldierConfirmMove(activeSoldier); //play standard move dialogue
+                                SoundManager.Instance.PlaySoldierConfirmMove(ActiveSoldier.Instance.S); //play standard move dialogue
 
-                            PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
+                            PerformMove(ActiveSoldier.Instance.S, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
 
                             //trigger loud action
-                            activeSoldier.PerformLoudAction(10);
+                            ActiveSoldier.Instance.S.PerformLoudAction(10);
                         }
                         MenuManager.Instance.CloseMoveUI();
                     }
@@ -714,34 +713,34 @@ public class GameManager : MonoBehaviour, IDataPersistence
             //get maxmove
             float maxMove;
             if (moveUI.moveTypeDropdown.captionText.text.Contains("Full"))
-                maxMove = activeSoldier.FullMove;
+                maxMove = ActiveSoldier.Instance.S.FullMove;
             else if (moveUI.moveTypeDropdown.captionText.text.Contains("Half"))
-                maxMove = activeSoldier.HalfMove;
+                maxMove = ActiveSoldier.Instance.S.HalfMove;
             else
-                maxMove = activeSoldier.TileMove;
+                maxMove = ActiveSoldier.Instance.S.TileMove;
 
             if (GetMoveLocation(out Tuple<Vector3, string> moveToLocation))
             {
-                if (activeSoldier.X != moveToLocation.Item1.x || activeSoldier.Y != moveToLocation.Item1.y || activeSoldier.Z != moveToLocation.Item1.z)
+                if (ActiveSoldier.Instance.S.X != moveToLocation.Item1.x || ActiveSoldier.Instance.S.Y != moveToLocation.Item1.y || ActiveSoldier.Instance.S.Z != moveToLocation.Item1.z)
                 {
                     //skip supression check if it's already happened before, otherwise run it
-                    if (!activeSoldier.IsSuppressed() || (activeSoldier.IsSuppressed() && (moveUI.moveTypeDropdown.interactable == false || activeSoldier.SuppressionCheck())))
+                    if (!ActiveSoldier.Instance.S.IsSuppressed() || (ActiveSoldier.Instance.S.IsSuppressed() && (moveUI.moveTypeDropdown.interactable == false || ActiveSoldier.Instance.S.SuppressionCheck())))
                     {
                         int distance = CalculateMoveDistance(moveToLocation.Item1);
                         if (force || distance <= maxMove)
                         {
-                            if (activeSoldier.CheckMP(1) && activeSoldier.CheckAP(ap)) 
+                            if (ActiveSoldier.Instance.S.CheckMP(1) && ActiveSoldier.Instance.S.CheckAP(ap)) 
                             {
                                 //play move dialogue
                                 if (moveUI.meleeToggle.isOn)
-                                    SoundManager.Instance.PlaySoldierMeleeMove(activeSoldier); //play melee move dialogue
+                                    SoundManager.Instance.PlaySoldierMeleeMove(ActiveSoldier.Instance.S); //play melee move dialogue
                                 else
                                 {
                                     if (!moveUI.moveTypeDropdown.captionText.text.Contains("Tile"))
-                                        SoundManager.Instance.PlaySoldierConfirmMove(activeSoldier); //play standard move dialogue
+                                        SoundManager.Instance.PlaySoldierConfirmMove(ActiveSoldier.Instance.S); //play standard move dialogue
                                 }
 
-                                PerformMove(activeSoldier, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
+                                PerformMove(ActiveSoldier.Instance.S, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, false);
                             }
                             MenuManager.Instance.CloseMoveUI();
                         }
@@ -932,7 +931,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 targetOptionDataList.Add(targetOptionData);
 
                 //remove option if soldier is engaged and this soldier is not on the engagement list
-                if (activeSoldier.IsMeleeEngaged() && !activeSoldier.IsMeleeEngagedWith(s))
+                if (ActiveSoldier.Instance.S.IsMeleeEngaged() && !ActiveSoldier.Instance.S.IsMeleeEngagedWith(s))
                     targetOptionDataList.Remove(targetOptionData);
             }
         }
@@ -1667,7 +1666,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 FileUtility.WriteToReport($"{shooter.soldierName} attempts avenger retry."); //write to report
         }
         else
-            activeSoldier.DeductAP(ap);
+            ActiveSoldier.Instance.S.DeductAP(ap);
 
         MenuManager.Instance.SetShotResolvedFlagTo(false);
 
@@ -2509,7 +2508,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         if (int.TryParse(meleeUI.apCost.text, out int ap))
         {
-            if (activeSoldier.CheckAP(ap))
+            if (ActiveSoldier.Instance.S.CheckAP(ap))
             {
                 FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}"); //write to report
 
@@ -2519,7 +2518,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     damageType.Add("Charge");
 
                 MenuManager.Instance.SetMeleeResolvedFlagTo(false);
-                activeSoldier.DeductAP(ap);
+                ActiveSoldier.Instance.S.DeductAP(ap);
 
                 int meleeDamage = CalculateMeleeResult(attacker, defender);
                 string damageMessage;
@@ -2610,7 +2609,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                             //play melee breakeven sfx
                             SoundManager.Instance.PlayMeleeResolution("breakeven");
                             //play melee breakeven dialogue
-                            SoundManager.Instance.PlaySoldierMeleeBreakeven(activeSoldier);
+                            SoundManager.Instance.PlaySoldierMeleeBreakeven(ActiveSoldier.Instance.S);
 
                             damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
                         }
@@ -2728,11 +2727,11 @@ public class GameManager : MonoBehaviour, IDataPersistence
             ap = 3;
 
         //apply adept ap reduction
-        if (activeSoldier.IsAdept() && ap > 1)
+        if (ActiveSoldier.Instance.S.IsAdept() && ap > 1)
             ap -= 1;
 
         //configure free on first soldier turn is they haven't used ap
-        if (activeSoldier.roundsFielded == 0 && !activeSoldier.usedAP)
+        if (ActiveSoldier.Instance.S.roundsFielded == 0 && !ActiveSoldier.Instance.S.usedAP)
             ap = 0;
 
         configUI.apCost.text = ap.ToString();
@@ -2742,7 +2741,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         List<Item> nearbyItems = new();
         foreach (Item i in FindObjectsByType<Item>(default))
-            if (activeSoldier.PhysicalObjectWithinItemRadius(i))
+            if (ActiveSoldier.Instance.S.PhysicalObjectWithinItemRadius(i))
                 nearbyItems.Add(i);
 
         return nearbyItems;
@@ -2750,11 +2749,11 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public void ConfirmConfigure()
     {
         int ap = UpdateConfigureAP();
-        if (activeSoldier.CheckAP(ap))
+        if (ActiveSoldier.Instance.S.CheckAP(ap))
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} configures."); //write to report
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} configures."); //write to report
 
-            activeSoldier.DeductAP(ap);
+            ActiveSoldier.Instance.S.DeductAP(ap);
             foreach (ItemIcon itemIcon in configUI.GetComponentsInChildren<ItemIcon>(true))
             {
                 Item item = itemIcon.item;
@@ -2768,7 +2767,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
             if (MenuManager.Instance.configureButton.GetComponentInChildren<TextMeshProUGUI>().text.Equals("Spawn Config")) { } //if spawn config, make it silent
             else
-                activeSoldier.PerformLoudAction(5);
+                ActiveSoldier.Instance.S.PerformLoudAction(5);
 
             MenuManager.Instance.CloseConfigureUI();
         }
@@ -2789,9 +2788,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
     //disarm functions
     public void ConfirmDisarm()
     {
-        if (activeSoldier.CheckAP(1))
+        if (ActiveSoldier.Instance.S.CheckAP(1))
         {
-            activeSoldier.DeductAP(1);
+            ActiveSoldier.Instance.S.DeductAP(1);
 
             POI poiToDisarm = POIManager.Instance.FindPOIById(MenuManager.Instance.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
             Item disarmedItem = null;
@@ -2815,8 +2814,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
             }
 
             //xp for disarming enemy objects
-            if (placedBy != null && activeSoldier.IsOppositeTeamAs(placedBy))
-                MenuManager.Instance.AddXpAlert(activeSoldier, 2, "Disarmed enemy device.", true);
+            if (placedBy != null && ActiveSoldier.Instance.S.IsOppositeTeamAs(placedBy))
+                MenuManager.Instance.AddXpAlert(ActiveSoldier.Instance.S, 2, "Disarmed enemy device.", true);
 
             //set item to same position as poi and destroy poi
             disarmedItem.X = poiToDisarm.X;
@@ -2824,7 +2823,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
             disarmedItem.Z = poiToDisarm.Z;
             POIManager.Instance.DestroyPOI(poiToDisarm);
             
-            activeSoldier.PerformLoudAction(6);
+            ActiveSoldier.Instance.S.PerformLoudAction(6);
             MenuManager.Instance.CloseDisarmUI();
         }
     }
@@ -2852,7 +2851,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         Soldier soldierUsedOn = useItemUI.soldierUsedOn;
         ItemIcon linkedIcon = useItemUI.itemUsedIcon;
 
-        FileUtility.WriteToReport($"{activeSoldier.soldierName} uses {itemUsed.itemName}."); //write to report
+        FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} uses {itemUsed.itemName}."); //write to report
 
         switch (itemUsed.itemName)
         {
@@ -2912,7 +2911,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 break;
 
         }
-        activeSoldier.DeductAP(ap);
+        ActiveSoldier.Instance.S.DeductAP(ap);
         MenuManager.Instance.CloseUseItemUI();
     }
     public void ConfirmDropThrowItem(UseItemUI useItemUI)
@@ -2923,7 +2922,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         else
             MenuManager.Instance.OpenDropUI(useItemUI);
 
-        activeSoldier.DeductAP(ap);
+        ActiveSoldier.Instance.S.DeductAP(ap);
         MenuManager.Instance.CloseDropThrowItemUI();
     }
     public void UpdateSoldierUsedOn(UseItemUI useItemUI)
@@ -2942,7 +2941,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         GameObject totalMiss = useUHFUI.transform.Find("OptionPanel").Find("TotalMiss").gameObject;
         TMP_Dropdown strikeOption = useUHFUI.transform.Find("OptionPanel").Find("StrikeOptions").Find("StrikeOptionsDropdown").GetComponent<TMP_Dropdown>();
 
-        int dipelecScore = ItemManager.Instance.scoreTable[activeSoldier.stats.Dip.Val, activeSoldier.stats.Elec.Val];
+        int dipelecScore = ItemManager.Instance.scoreTable[ActiveSoldier.Instance.S.stats.Dip.Val, ActiveSoldier.Instance.S.stats.Elec.Val];
         Tuple<int, string, int, int, int> strike = ItemManager.Instance.GetStrike(strikeOption.captionText.text);
         int rolls = strike.Item4;
         int radius = strike.Item3;
@@ -3018,17 +3017,17 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 {
                     MenuManager.Instance.CloseUHFUI();
                     useUHFUI.itemUsed.UseItem(useUHFUI.itemUsedIcon, useUHFUI.itemUsedOn, useUHFUI.soldierUsedOn);
-                    CheckExplosionUHF(activeSoldier, new Vector3(x, y, z), radius, damage);
+                    CheckExplosionUHF(ActiveSoldier.Instance.S, new Vector3(x, y, z), radius, damage);
                 }
             }
 
             //perform loud action
-            activeSoldier.PerformLoudAction(14);
+            ActiveSoldier.Instance.S.PerformLoudAction(14);
 
             //set sound flags after enemy use UHF
             foreach (Soldier s in AllSoldiers())
             {
-                if (s.IsSameTeamAs(activeSoldier))
+                if (s.IsSameTeamAs(ActiveSoldier.Instance.S))
                     SoundManager.Instance.SetSoldierSelectionSoundFlagAfterAllyUseUHF(s);
                 else
                     SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyUseUHF(s);
@@ -3037,9 +3036,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
     }
     public void ConfirmULF(UseItemUI useULFUI)
     {
-        if (activeSoldier.CheckAP(3))
+        if (ActiveSoldier.Instance.S.CheckAP(3))
         {
-            activeSoldier.DeductAP(3);
+            ActiveSoldier.Instance.S.DeductAP(3);
             useULFUI.itemUsed.UseULF(useULFUI.itemUsedFromSlotName);
             MenuManager.Instance.CloseUseULFUI();
         }
@@ -3052,8 +3051,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
         if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y))
         {
             //set riot shield facing
-            activeSoldier.riotXPoint = x;
-            activeSoldier.riotYPoint = y;
+            ActiveSoldier.Instance.S.riotXPoint = x;
+            ActiveSoldier.Instance.S.riotYPoint = y;
 
             MenuManager.Instance.CloseRiotShieldUI();
             useRiotShield.itemUsed.UseItem(useRiotShield.itemUsedIcon, useRiotShield.itemUsedOn, useRiotShield.soldierUsedOn);
@@ -3073,11 +3072,11 @@ public class GameManager : MonoBehaviour, IDataPersistence
             {
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
-                int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), throwLocation));
+                int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y, ActiveSoldier.Instance.S.Z), throwLocation));
                 int scatterDegree = HelperFunctions.RandomNumber(0, 360);
-                int scatterDistance = activeSoldier.StrengthCheck() switch
+                int scatterDistance = ActiveSoldier.Instance.S.StrengthCheck() switch
                 {
-                    false => Mathf.CeilToInt(HelperFunctions.DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
+                    false => Mathf.CeilToInt(HelperFunctions.DiceRoll() * ActiveSoldier.Instance.S.stats.Str.Val / 2.0f),
                     _ => -1,
                 };
 
@@ -3099,7 +3098,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         {
             if (scatteredOffMap.activeInHierarchy)
             {
-                activeSoldier.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
+                ActiveSoldier.Instance.S.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
                 MenuManager.Instance.CloseGrenadeUI();
             }
             else
@@ -3107,7 +3106,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 if (HelperFunctions.ValidateIntInput(throwTarget.XPos, out int x) && HelperFunctions.ValidateIntInput(throwTarget.YPos, out int y) && HelperFunctions.ValidateIntInput(throwTarget.ZPos, out int z))
                 {
                     useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
-                    useGrenade.itemUsed.CheckExplosionGrenade(activeSoldier, new Vector3(x, y, z));
+                    useGrenade.itemUsed.CheckExplosionGrenade(ActiveSoldier.Instance.S, new Vector3(x, y, z));
                     MenuManager.Instance.CloseGrenadeUI();
                 }
             }
@@ -3128,11 +3127,11 @@ public class GameManager : MonoBehaviour, IDataPersistence
             {
                 int newX, newY;
                 throwTarget.GetThrowLocation(out Vector3 throwLocation);
-                int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(activeSoldier.X, activeSoldier.Y, activeSoldier.Z), throwLocation));
+                int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y, ActiveSoldier.Instance.S.Z), throwLocation));
                 int scatterDegree = HelperFunctions.RandomNumber(0, 360);
-                int scatterDistance = activeSoldier.StrengthCheck() switch
+                int scatterDistance = ActiveSoldier.Instance.S.StrengthCheck() switch
                 {
-                    false => Mathf.CeilToInt(HelperFunctions.DiceRoll() * activeSoldier.stats.Str.Val / 2.0f),
+                    false => Mathf.CeilToInt(HelperFunctions.DiceRoll() * ActiveSoldier.Instance.S.stats.Str.Val / 2.0f),
                     _ => -1,
                 };
 
@@ -3160,7 +3159,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         {
             if (scatteredOffMap.activeInHierarchy)
             {
-                activeSoldier.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
+                ActiveSoldier.Instance.S.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
                 MenuManager.Instance.CloseThrowUI();
             }
             else
@@ -3169,7 +3168,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 {
                     if (itemWillBreak.activeInHierarchy)
                     {
-                        throwItemUI.itemUsed.TakeDamage(activeSoldier, 1, new() { "Fall" }); //destroy item
+                        throwItemUI.itemUsed.TakeDamage(ActiveSoldier.Instance.S, 1, new() { "Fall" }); //destroy item
                     }
                     else if (catcher.activeInHierarchy)
                     {
@@ -3179,9 +3178,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
                             //if soldier has left hand free catch it there, otherwise catch in right hand
                             if (catchingSoldier.LeftHandItem == null)
-                                throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                                throwItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
                             else
-                                throwItemUI.itemUsed.MoveItem(activeSoldier, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+                                throwItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
                         }
                         else
                         {
@@ -3198,7 +3197,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                         throwItemUI.itemUsed.Y = y;
                         throwItemUI.itemUsed.Z = z;
                     }
-                    activeSoldier.PerformLoudAction(5);
+                    ActiveSoldier.Instance.S.PerformLoudAction(5);
                     MenuManager.Instance.CloseThrowUI();
                 }
             }
@@ -3215,12 +3214,12 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y) && HelperFunctions.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} drops {dropItemUI.itemUsed.itemName}."); //write to report
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} drops {dropItemUI.itemUsed.itemName}."); //write to report
 
             if (itemWillBreak.activeInHierarchy)
             {
                 FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} breaks."); //write to report
-                dropItemUI.itemUsed.TakeDamage(activeSoldier, 1, new() { "Fall" }); //destroy item
+                dropItemUI.itemUsed.TakeDamage(ActiveSoldier.Instance.S, 1, new() { "Fall" }); //destroy item
             }
             else if (catcher.activeInHierarchy)
             {
@@ -3232,9 +3231,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
                     //if soldier has left hand free catch it there, otherwise catch in right hand
                     if (catchingSoldier.LeftHandItem == null)
-                        dropItemUI.itemUsed.MoveItem(activeSoldier, dropItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
+                        dropItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, dropItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
                     else
-                        dropItemUI.itemUsed.MoveItem(activeSoldier, dropItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
+                        dropItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, dropItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
                 }
                 else
                 {
@@ -3251,7 +3250,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 dropItemUI.itemUsed.Y = y;
                 dropItemUI.itemUsed.Z = z;
             }
-            activeSoldier.PerformLoudAction(5);
+            ActiveSoldier.Instance.S.PerformLoudAction(5);
             MenuManager.Instance.CloseDropUI();
         }
     }
@@ -3259,10 +3258,10 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         if (HelperFunctions.ValidateIntInput(MenuManager.Instance.binocularsUI.xPos, out int x) && HelperFunctions.ValidateIntInput(MenuManager.Instance.binocularsUI.yPos, out int y))
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} uses binoculars ({x}, {y})."); //write to report
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} uses binoculars ({x}, {y})."); //write to report
 
             MenuManager.Instance.binocularsUI.binocularsUsed.UseItem(MenuManager.Instance.binocularsUI.binocularsUsedIcon, null, null);
-            StartCoroutine(activeSoldier.SetUsingBinoculars(new(x, y), MenuManager.Instance.binocularsUI.binocularMode));
+            StartCoroutine(ActiveSoldier.Instance.S.SetUsingBinoculars(new(x, y), MenuManager.Instance.binocularsUI.binocularMode));
 
             MenuManager.Instance.CloseBinocularsUI();
         }
@@ -3278,14 +3277,14 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         if (HelperFunctions.ValidateIntInput(placedX, out int x) && HelperFunctions.ValidateIntInput(placedY, out int y) && HelperFunctions.ValidateIntInput(placedZ, out int z) && HelperFunctions.ValidateIntInput(facingX, out int fx) && HelperFunctions.ValidateIntInput(facingY, out int fy))
         {
-            if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
+            if (CalculateRange(ActiveSoldier.Instance.S, new Vector3(x, y, z)) <= ActiveSoldier.Instance.S.SRColliderMin.radius)
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} places claymore at ({x}, {y}, {z})."); //write to report
+                FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} places claymore at ({x}, {y}, {z})."); //write to report
 
                 useClaymore.itemUsed.UseItem(useClaymore.itemUsedIcon, useClaymore.itemUsedOn, useClaymore.soldierUsedOn);
-                Instantiate(POIManager.Instance.claymorePrefab).Init(new(x, y, z), Tuple.Create(activeSoldier.ActiveC, fx, fy, false, activeSoldier.Id));
+                Instantiate(POIManager.Instance.claymorePrefab).Init(new(x, y, z), Tuple.Create(ActiveSoldier.Instance.S.ActiveC, fx, fy, false, ActiveSoldier.Instance.S.Id));
 
-                activeSoldier.PerformLoudAction(10);
+                ActiveSoldier.Instance.S.PerformLoudAction(10);
                 MenuManager.Instance.CloseClaymoreUI();
             }
             else
@@ -3300,17 +3299,17 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         if (HelperFunctions.ValidateIntInput(placedX, out int x) && HelperFunctions.ValidateIntInput(placedY, out int y) && HelperFunctions.ValidateIntInput(placedZ, out int z))
         {
-            if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
+            if (CalculateRange(ActiveSoldier.Instance.S, new Vector3(x, y, z)) <= ActiveSoldier.Instance.S.SRColliderMin.radius)
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} places deployment beacon at ({x}, {y}, {z})."); //write to report
+                FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} places deployment beacon at ({x}, {y}, {z})."); //write to report
 
                 //play use deployment beacon
                 SoundManager.Instance.PlayUseDepBeacon();
 
                 useDeploymentBeacon.itemUsed.UseItem(useDeploymentBeacon.itemUsedIcon, useDeploymentBeacon.itemUsedOn, useDeploymentBeacon.soldierUsedOn);
-                Instantiate(POIManager.Instance.deploymentBeaconPrefab).Init(new(x, y, z), activeSoldier.Id);
+                Instantiate(POIManager.Instance.deploymentBeaconPrefab).Init(new(x, y, z), ActiveSoldier.Instance.S.Id);
 
-                activeSoldier.PerformLoudAction(10);
+                ActiveSoldier.Instance.S.PerformLoudAction(10);
                 MenuManager.Instance.CloseDeploymentBeaconUI();
             }
             else
@@ -3327,16 +3326,16 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         if (HelperFunctions.ValidateIntInput(placedX, out int x) && HelperFunctions.ValidateIntInput(placedY, out int y) && HelperFunctions.ValidateIntInput(placedZ, out int z) && HelperFunctions.ValidateIntInput(facingX, out int fx) && HelperFunctions.ValidateIntInput(facingY, out int fy))
         {
-            if (CalculateRange(activeSoldier, new Vector3(x, y, z)) <= activeSoldier.SRColliderMin.radius)
+            if (CalculateRange(ActiveSoldier.Instance.S, new Vector3(x, y, z)) <= ActiveSoldier.Instance.S.SRColliderMin.radius)
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} places thermal cam at ({x}, {y}, {z})."); //write to report
+                FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} places thermal cam at ({x}, {y}, {z})."); //write to report
 
                 useThermalCam.itemUsed.UseItem(useThermalCam.itemUsedIcon, useThermalCam.itemUsedOn, useThermalCam.soldierUsedOn);
                 
                 SetLosCheckAllEnemies("losChange|thermalCamActive"); //loscheckallenemies
-                Instantiate(POIManager.Instance.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, activeSoldier.Id));
+                Instantiate(POIManager.Instance.thermalCamPrefab).Init(new(x, y, z), Tuple.Create(fx, fy, ActiveSoldier.Instance.S.Id));
 
-                activeSoldier.PerformLoudAction(10);
+                ActiveSoldier.Instance.S.PerformLoudAction(10);
                 MenuManager.Instance.CloseThermalCamUI();
             }
             else
@@ -3436,9 +3435,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
         //set dipelec type
         dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
 
-        if (terminal.terminalType == "Dip Only" || terminal.SoldiersAlreadyHacked.Contains(activeSoldier.Id))
+        if (terminal.terminalType == "Dip Only" || terminal.SoldiersAlreadyHacked.Contains(ActiveSoldier.Instance.S.Id))
             dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Hack");
-        if (terminal.terminalType == "Elec Only" || terminal.SoldiersAlreadyNegotiated.Contains(activeSoldier.Id))
+        if (terminal.terminalType == "Elec Only" || terminal.SoldiersAlreadyNegotiated.Contains(ActiveSoldier.Instance.S.Id))
             dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Negotiation");
 
         if (dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Hack") && dipelecUI.dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
@@ -3453,22 +3452,22 @@ public class GameManager : MonoBehaviour, IDataPersistence
         {
             dipelecUI.levelUI.SetActive(true);
             for (int i = 1; i <= 6; i++)
-                if (activeSoldier.stats.Dip.Val + activeSoldier.TacticianBonus() < i)
+                if (ActiveSoldier.Instance.S.stats.Dip.Val + ActiveSoldier.Instance.S.TacticianBonus() < i)
                     dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
             if (dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Contains($"{dipelecUI.dipElecLevelDropdown.value + 1}"))
                 dipelecUI.dipElecLevelDropdown.value = 0;
 
-            dipelecUI.successChanceDisplay.text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Dip.Val + activeSoldier.TacticianBonus(), dipelecUI.dipElecLevelDropdown.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
+            dipelecUI.successChanceDisplay.text = Mathf.FloorToInt(CumulativeBinomialProbability(ActiveSoldier.Instance.S.stats.Dip.Val + ActiveSoldier.Instance.S.TacticianBonus(), dipelecUI.dipElecLevelDropdown.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
         }
         else if (dipelecUI.dipElecTypeDropdown.value == 1)
         {
             dipelecUI.levelUI.SetActive(true);
             for (int i = 1; i <= 6; i++)
-                if (activeSoldier.stats.Elec.Val + activeSoldier.CalculatorBonus() < i)
+                if (ActiveSoldier.Instance.S.stats.Elec.Val + ActiveSoldier.Instance.S.CalculatorBonus() < i)
                     dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Add($"{i}");
             if (dipelecUI.dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Contains($"{dipelecUI.dipElecLevelDropdown.value + 1}"))
                 dipelecUI.dipElecLevelDropdown.value = 0;
-            dipelecUI.successChanceDisplay.text = Mathf.FloorToInt(CumulativeBinomialProbability(activeSoldier.stats.Elec.Val + activeSoldier.CalculatorBonus(), dipelecUI.dipElecLevelDropdown.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
+            dipelecUI.successChanceDisplay.text = Mathf.FloorToInt(CumulativeBinomialProbability(ActiveSoldier.Instance.S.stats.Elec.Val + ActiveSoldier.Instance.S.CalculatorBonus(), dipelecUI.dipElecLevelDropdown.value + 1, 0.5f, 0.5f) * 100f).ToString() + "%";
         }
         else
         {
@@ -3478,23 +3477,23 @@ public class GameManager : MonoBehaviour, IDataPersistence
     }
     public void ConfirmDipElec()
     {
-        if (activeSoldier.CheckAP(3))
+        if (ActiveSoldier.Instance.S.CheckAP(3))
         {
             MenuManager.Instance.FreezeTimer();
-            activeSoldier.DeductAP(3);
+            ActiveSoldier.Instance.S.DeductAP(3);
             bool terminalDisabled = false;
             int passCount = 0;
             string resultString = "";
 
             Terminal terminal = POIManager.Instance.FindPOIById(dipelecUI.SelectedTerminalId) as Terminal;
 
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} attempts to interact with terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} attempts to interact with terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
 
             if (dipelecUI.dipElecTypeDropdown.value == 0)
             {
                 resultString += "Negotiation";
-                terminal.SoldiersAlreadyNegotiated.Add(activeSoldier.Id);
-                for (int i = 0; i < activeSoldier.stats.Dip.Val; i++)
+                terminal.SoldiersAlreadyNegotiated.Add(ActiveSoldier.Instance.S.Id);
+                for (int i = 0; i < ActiveSoldier.Instance.S.stats.Dip.Val; i++)
                 {
                     if (HelperFunctions.RandomDipelecCoinFlip())
                         passCount++;
@@ -3503,8 +3502,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
             else if (dipelecUI.dipElecTypeDropdown.value == 1)
             {
                 resultString += "Hack";
-                terminal.SoldiersAlreadyHacked.Add(activeSoldier.Id);
-                for (int i = 0; i < activeSoldier.stats.Elec.Val; i++)
+                terminal.SoldiersAlreadyHacked.Add(ActiveSoldier.Instance.S.Id);
+                for (int i = 0; i < ActiveSoldier.Instance.S.stats.Elec.Val; i++)
                 {
                     if (HelperFunctions.RandomDipelecCoinFlip())
                         passCount++;
@@ -3518,7 +3517,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 int targetLevel = dipelecUI.dipElecLevelDropdown.value + 1;
                 if (passCount >= targetLevel)
                 {
-                    FileUtility.WriteToReport($"{activeSoldier.soldierName} succeeds at level {targetLevel} {resultString}."); //write to report
+                    FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} succeeds at level {targetLevel} {resultString}."); //write to report
 
                     for (int i = targetLevel; i >= 1; i--)
                     {
@@ -3528,13 +3527,13 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     }
 
                     //add xp for successful dipelec
-                    MenuManager.Instance.AddXpAlert(activeSoldier, (int)Mathf.Pow(2, targetLevel-1), $"Successful level {targetLevel} {resultString}", true);
+                    MenuManager.Instance.AddXpAlert(ActiveSoldier.Instance.S, (int)Mathf.Pow(2, targetLevel-1), $"Successful level {targetLevel} {resultString}", true);
 
                     resultString += $"SuccessL{targetLevel}";
                 }
                 else
                 {
-                    FileUtility.WriteToReport($"{activeSoldier.soldierName} fails to {resultString}."); //write to report
+                    FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} fails to {resultString}."); //write to report
 
                     MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>{resultString} failed</color>";
                     GameObject dipelecReward = Instantiate(MenuManager.Instance.dipelecRewardPrefab, MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
@@ -3545,14 +3544,14 @@ public class GameManager : MonoBehaviour, IDataPersistence
             }
             else
             {
-                FileUtility.WriteToReport($"{activeSoldier.soldierName} disables terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
+                FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} disables terminal at ({terminal.X}, {terminal.Y}, {terminal.Z})."); //write to report
 
                 GameObject dipelecReward = Instantiate(MenuManager.Instance.dipelecRewardPrefab, MenuManager.Instance.dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                 dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>Terminal disabled</color>";
 
                 terminal.terminalEnabled = false;
-                if (activeSoldier.hp > 3)
-                    activeSoldier.TakeDamage(activeSoldier, activeSoldier.hp - 3, true, new() { "Dipelec" }, Vector3.zero);
+                if (ActiveSoldier.Instance.S.hp > 3)
+                    ActiveSoldier.Instance.S.TakeDamage(ActiveSoldier.Instance.S, ActiveSoldier.Instance.S.hp - 3, true, new() { "Dipelec" }, Vector3.zero);
             }
             //play dipelec result sfx
             SoundManager.Instance.PlayDipelecResolution(resultString);
@@ -3581,12 +3580,12 @@ public class GameManager : MonoBehaviour, IDataPersistence
     //lastandicide functions
     public void Lastandicide()
     {
-        if (activeSoldier.CheckAP(1))
+        if (ActiveSoldier.Instance.S.CheckAP(1))
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} lastandicides"); //write to report
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} lastandicides"); //write to report
 
-            activeSoldier.DeductAP(1);
-            activeSoldier.InstantKill(activeSoldier, new List<string> { "Lastandicide" });
+            ActiveSoldier.Instance.S.DeductAP(1);
+            ActiveSoldier.Instance.S.InstantKill(ActiveSoldier.Instance.S, new List<string> { "Lastandicide" });
         }
     }
 
@@ -3745,14 +3744,14 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
         {
-            FileUtility.WriteToReport($"{activeSoldier.soldierName} bloodlets."); //write to report
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} bloodlets."); //write to report
 
-            activeSoldier.TakeBloodlettingDamage();
+            ActiveSoldier.Instance.S.TakeBloodlettingDamage();
             MenuManager.Instance.CloseDamageEventUI();
         }
         else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Other") && int.TryParse(damageEventUI.otherInput.text, out int otherDamage))
         {
-            activeSoldier.TakeDamage(null, otherDamage, false, new() { damageEventUI.damageSource.text }, Vector3.zero);
+            ActiveSoldier.Instance.S.TakeDamage(null, otherDamage, false, new() { damageEventUI.damageSource.text }, Vector3.zero);
             MenuManager.Instance.CloseDamageEventUI();
         }
         else
@@ -3761,33 +3760,33 @@ public class GameManager : MonoBehaviour, IDataPersistence
             if (GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation))
             {
                 if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Fall"))
-                    activeSoldier.TakeDamage(null, CalculateFallDamage(activeSoldier, int.Parse(damageEventUI.fallInput.text)), false, new() { "Fall" }, Vector3.zero);
+                    ActiveSoldier.Instance.S.TakeDamage(null, CalculateFallDamage(ActiveSoldier.Instance.S, int.Parse(damageEventUI.fallInput.text)), false, new() { "Fall" }, Vector3.zero);
                 else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Collapse"))
                 {
                     int structureHeight = int.Parse(damageEventUI.structureHeight.text);
                     //add xp if survives, otherwise kill
-                    if (activeSoldier.StructuralCollapseCheck(structureHeight))
+                    if (ActiveSoldier.Instance.S.StructuralCollapseCheck(structureHeight))
                     {
-                        MenuManager.Instance.AddXpAlert(activeSoldier, activeSoldier.stats.R.Val, $"Survived a {structureHeight}cm structural collapse.", true);
-                        MenuManager.Instance.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse.", -1, -1);
+                        MenuManager.Instance.AddXpAlert(ActiveSoldier.Instance.S, ActiveSoldier.Instance.S.stats.R.Val, $"Survived a {structureHeight}cm structural collapse.", true);
+                        MenuManager.Instance.AddSoldierAlert(ActiveSoldier.Instance.S, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse.", -1, -1);
                     }
                     else
                     {
-                        if (activeSoldier.IsWearingJuggernautArmour(false))
+                        if (ActiveSoldier.Instance.S.IsWearingJuggernautArmour(false))
                         {
-                            activeSoldier.MakeUnconscious(null, new() { "Structural Collapse" });
-                            MenuManager.Instance.AddSoldierAlert(activeSoldier, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse with Juggernaut Armour.", -1, -1);
+                            ActiveSoldier.Instance.S.MakeUnconscious(null, new() { "Structural Collapse" });
+                            MenuManager.Instance.AddSoldierAlert(ActiveSoldier.Instance.S, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse with Juggernaut Armour.", -1, -1);
                         }
                         else
                         {
-                            activeSoldier.InstantKill(null, new() { "Structural Collapse" });
-                            activeSoldier.SetCrushed();
+                            ActiveSoldier.Instance.S.InstantKill(null, new() { "Structural Collapse" });
+                            ActiveSoldier.Instance.S.SetCrushed();
                         }
                     }
                 }
 
                 //move actually proceeds
-                PerformMove(activeSoldier, 0, fallCollapseLocation, false, false, string.Empty, true);
+                PerformMove(ActiveSoldier.Instance.S, 0, fallCollapseLocation, false, false, string.Empty, true);
 
                 MenuManager.Instance.CloseDamageEventUI();
 

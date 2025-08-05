@@ -20,7 +20,7 @@ public class BinocReconPopup : MonoBehaviour
     }
     public void ShowBinocReconPopup()
     {
-        if (MenuManager.Instance.activeSoldier.ap >= 2)
+        if (ActiveSoldier.Instance.S.ap >= 2)
         {
             relocateButton.interactable = true;
             notEnoughApIndicator.SetActive(false);
@@ -45,7 +45,7 @@ public class BinocReconPopup : MonoBehaviour
 
     public void RelocateButtonClick()
     {
-        MenuManager.Instance.activeSoldier.DrainAP();
+        ActiveSoldier.Instance.S.DrainAP();
         MenuManager.Instance.OpenBinocularsUI(binocsUsed, binocsItemIcon, "Recon");
         HideBinocReconPopup();
     }

@@ -20,7 +20,7 @@ public class ValidDropChecker : MonoBehaviour
     {
         invalidThrow.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && (Vector2.Distance(new(throwLocation.x, throwLocation.y), new(MenuManager.Instance.activeSoldier.X, MenuManager.Instance.activeSoldier.Y)) > 3 || throwLocation.z > MenuManager.Instance.activeSoldier.Z + 3))
+        if (GetThrowLocation(out Vector3 throwLocation) && (Vector2.Distance(new(throwLocation.x, throwLocation.y), new(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y)) > 3 || throwLocation.z > ActiveSoldier.Instance.S.Z + 3))
             invalidThrow.SetActive(true);
     }
     public bool GetThrowLocation(out Vector3 throwLocation)
@@ -42,7 +42,7 @@ public class ValidDropChecker : MonoBehaviour
         {
             foreach (Soldier s in GameManager.Instance.AllFieldedSoldiers())
             {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(MenuManager.Instance.activeSoldier) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
+                if (s.IsAbleToSee() && s.IsSameTeamAs(ActiveSoldier.Instance.S) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
                 {
                     if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
                         catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });
@@ -57,7 +57,7 @@ public class ValidDropChecker : MonoBehaviour
     {
         itemWillBreak.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && MenuManager.Instance.activeSoldier.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !invalidThrow.activeInHierarchy)
+        if (GetThrowLocation(out Vector3 throwLocation) && ActiveSoldier.Instance.S.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !invalidThrow.activeInHierarchy)
             itemWillBreak.SetActive(true);
     }
 }

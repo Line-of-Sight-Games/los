@@ -333,15 +333,15 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     {
                         int ap = item.usageAP;
                         //adept ability
-                        if (MenuManager.Instance.activeSoldier.IsAdept() && item.usageAP > 1)
+                        if (ActiveSoldier.Instance.S.IsAdept() && item.usageAP > 1)
                             ap--;
                         //gunner ability
-                        if (MenuManager.Instance.activeSoldier.IsGunner() && item.IsAmmo())
+                        if (ActiveSoldier.Instance.S.IsGunner() && item.IsAmmo())
                             ap = 1;
 
-                        if (MenuManager.Instance.activeSoldier.CheckAP(ap))
+                        if (ActiveSoldier.Instance.S.CheckAP(ap))
                         {
-                            if (MenuManager.Instance.activeSoldier.HandsFreeToUseItem(item))
+                            if (ActiveSoldier.Instance.S.HandsFreeToUseItem(item))
                                 MenuManager.Instance.OpenUseItemUI(item, transform.parent.name, this, ap);
                         }
                     }

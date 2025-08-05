@@ -21,19 +21,19 @@ public class DropthrowPopup : MonoBehaviour
     }
     public void ShowDropThrowPopup()
     {
-        if (MenuManager.Instance.activeSoldier.stats.Str.Val == 0)
+        if (ActiveSoldier.Instance.S.stats.Str.Val == 0)
         {
             throwButton.interactable = false;
             noThrowIndicatorText.text = "Too Weak";
             noThrowIndicator.SetActive(true);
         }
-        if (MenuManager.Instance.activeSoldier.IsBlind())
+        if (ActiveSoldier.Instance.S.IsBlind())
         {
             throwButton.interactable = false;
             noThrowIndicatorText.text = "Blind";
             noThrowIndicator.SetActive(true);
         }
-        else if (!MenuManager.Instance.activeSoldier.HandsFreeToThrowItem(itemToDropThrow))
+        else if (!ActiveSoldier.Instance.S.HandsFreeToThrowItem(itemToDropThrow))
         {
             throwButton.interactable = false;
             noThrowIndicatorText.text = "Hands Full";
