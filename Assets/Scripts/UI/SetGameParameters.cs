@@ -31,7 +31,7 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
         data.currentRound = 1;
         data.currentTeam = 1;
         data.maxRounds = maxRounds;
-        data.maxTurnTime = maxTurnTime * 60;
+        data.maxTurnTime = maxTurnTime;
         data.maxX = x;
         data.maxY = y;
         data.maxZ = z;
