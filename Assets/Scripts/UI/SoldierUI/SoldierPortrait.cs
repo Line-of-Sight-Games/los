@@ -75,7 +75,8 @@ public class SoldierPortrait : MonoBehaviour
             soldierName.text = linkedSoldier.soldierName;
 
             //load location
-            soldierLocation.text = $"X:{linkedSoldier.X} Y:{linkedSoldier.Y} Z:{linkedSoldier.Z}";
+            if (soldierLocation != null)
+                soldierLocation.text = $"X:{linkedSoldier.X} Y:{linkedSoldier.Y} Z:{linkedSoldier.Z}";
         }
     }
 }

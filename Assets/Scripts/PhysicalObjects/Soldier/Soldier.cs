@@ -44,7 +44,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public Material selectedMaterial, deadMaterial;
     public List<Material> materials;
 
-    public GameObject soldierSnapshotAlertPrefab;
+    public InformerAlert informerAlertPrefab;
     public SoldierUI soldierUI, soldierUIPrefab;
 
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
@@ -1424,10 +1424,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void AddSoldierSnapshot(Soldier attackedBy)
     {
-        GameObject snapshot = Instantiate(soldierSnapshotAlertPrefab, MenuManager.Instance.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
+        InformerAlert snapshot = Instantiate(informerAlertPrefab, MenuManager.Instance.damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(this, attackedBy);
 
-        snapshot.GetComponent<SoldierAlert>().SetSoldier(this);
-        snapshot.transform.Find("SoldierID").GetComponent<TextMeshProUGUI>().text = attackedBy.Id;
         snapshot.transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(attackedBy);
         snapshot.transform.Find("SnapshotDetails").GetComponent<TextMeshProUGUI>().text = $"{soldierName} has informed on an attacker ({attackedBy.soldierName}). Click to see details.";
 

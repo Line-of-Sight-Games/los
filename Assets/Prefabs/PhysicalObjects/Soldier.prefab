@@ -46,7 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3e8331a85a7c545b128a2c7547472b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
   soldiersWithinHalfSR: []
@@ -117,7 +116,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fd59c7ca939b7244b19830529b5d829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
   soldiersWithinMinSR: []
@@ -225,6 +223,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -246,6 +246,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -280,10 +281,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 928312497079157461}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -361,6 +362,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -382,6 +385,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -447,6 +451,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -468,6 +474,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -524,8 +531,6 @@ MonoBehaviour:
   y: 0
   z: 0
   bodyCollider: {fileID: 4332433177688512971}
-  game: {fileID: 0}
-  menu: {fileID: 0}
   soldierName: 
   soldierTerrain: 
   soldierSpeciality: 
@@ -552,6 +557,7 @@ MonoBehaviour:
   moveResolvedFlag: 1
   losCheck: 0
   isSpeaking: 0
+  politicianUsed: 0
   causeOfLosCheck: no change
   hp: 6
   ap: 0
@@ -567,7 +573,6 @@ MonoBehaviour:
   lastLoudActionCounter: 0
   lastLoudRadius: 0
   stunnedTurnsVulnerable: 0
-  overwatchShotCounter: 0
   suppressionValue: 0
   healthRemovedFromStarve: 0
   bleedoutTurns: 0
@@ -625,11 +630,10 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 2ce6e73b3cdeb1a419b3fa7d4e0705c7, type: 2}
   - {fileID: 2100000, guid: 6e83e4994daf1bf4bbfa03d6931ddc9c, type: 2}
   - {fileID: 2100000, guid: 5e797a46cd49e1c4a9c6935442ff413d, type: 2}
-  soldierSnapshotAlertPrefab: {fileID: 7610803231150565594, guid: d22a824efc98b3f46ac5dd60c7474fb0, type: 3}
+  informerAlertPrefab: {fileID: 1952906063512422342, guid: d22a824efc98b3f46ac5dd60c7474fb0, type: 3}
   soldierUI: {fileID: 0}
   soldierUIPrefab: {fileID: 1334493526485889466, guid: 0f3751c0026db9a4982c469260e5f172, type: 3}
-  soldierManager: {fileID: 0}
-  itemManager: {fileID: 0}
+  isDataLoaded: 0
 --- !u!1 &6495660182425278179
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,6 +695,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -712,6 +718,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -761,7 +768,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b152ab90aa6e434db48f68b6fc6bf7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
 --- !u!135 &4952051446501971680
@@ -831,7 +837,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc2aa39e72fbeb4c88d5e283cc7e98f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menu: {fileID: 0}
   linkedObject: {fileID: 4380717690802720386}
   linkedSoldier: {fileID: 4380717690802720386}
   halfCollider: {fileID: 3053533329258264112}
