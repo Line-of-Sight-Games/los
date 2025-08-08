@@ -132,7 +132,7 @@ public class DataPersistenceManager : MonoBehaviour
             yield return null;
         }
 
-        if (ItemManager.Instance != null)
+        if (ItemManager.Instance != null && SoldierManager.Instance != null)
         {
             ItemManager.Instance.AssignItemsToOwners();
             progressBar.value = 0.98f;
@@ -167,13 +167,14 @@ public class DataPersistenceManager : MonoBehaviour
         progress?.Report(1f);
     }
 
-    private bool AllObjectsLoaded()
+    public bool AllObjectsLoaded()
     {
         dataPersistanceObjects = FindAllDataPersistenceObjects(); // Refresh list
         foreach (var obj in dataPersistanceObjects)
         {
             if (!obj.IsDataLoaded) // Implement this property in IDataPersistence
             {
+                print($"DataPersistence object {obj.GetType().Name} is not loaded yet.");
                 return false;
             }
         }

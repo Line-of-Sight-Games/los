@@ -19,12 +19,14 @@ public class ActiveSoldier : MonoBehaviour
     public void SetActiveSoldier(Soldier soldier)
     {
         S = soldier;
-        // Optional: fire event for observers
+
+        S.selected = true;
     }
 
     public void UnsetActiveSoldier()
     {
+        S.selected = false;
+
         S = null;
-        // Optional: fire event for observers
     }
 }

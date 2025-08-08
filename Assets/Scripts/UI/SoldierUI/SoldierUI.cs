@@ -83,7 +83,7 @@ public class SoldierUI : MonoBehaviour
 
     public void OpenSoldierMenu(string type)
     {
-        linkedSoldier.SetActiveSoldier();
+        ActiveSoldier.Instance.SetActiveSoldier(linkedSoldier);
 
         SoldierManager.Instance.enemyDisplayColumn.SetActive(false);
         SoldierManager.Instance.friendlyDisplayColumn.SetActive(false);

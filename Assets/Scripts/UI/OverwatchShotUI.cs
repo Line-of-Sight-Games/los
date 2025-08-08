@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class OverwatchShotUI : MonoBehaviour
 {
+    public ShotUI shotUI;
+
     public TextMeshProUGUI shooterID;
     public SoldierPortrait shooterPortrait;
     public TMP_Dropdown shotTypeDropdown;
@@ -24,7 +26,7 @@ public class OverwatchShotUI : MonoBehaviour
 
     public OverwatchShotUI Init(Soldier shooter, Soldier target)
     {
-        MenuManager.Instance.SetShotResolvedFlagTo(false);
+        shotUI.SetShotResolvedFlagTo(false);
 
         //set shooter
         shooterID.text = shooter.Id;
@@ -86,7 +88,7 @@ public class OverwatchShotUI : MonoBehaviour
                 targetSoldier.Y = locationAtShot.Item2;
                 targetSoldier.Z = locationAtShot.Item3;
                 targetSoldier.TerrainOn = locationAtShot.Item4;
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
             }
 
             FileUtility.WriteToReport($"{shooter.soldierName} overwatch shoots at {targetSoldier.soldierName}"); //write to report
@@ -94,36 +96,36 @@ public class OverwatchShotUI : MonoBehaviour
             //play shot sfx
             SoundManager.Instance.PlayShotResolution(gun);
 
-            GameManager.Instance.tempShooterTarget = Tuple.Create(shooter, target);
+            shotUI.tempShooterTarget = Tuple.Create(shooter, target);
             int randNum1 = HelperFunctions.RandomShotNumber();
             int randNum2 = HelperFunctions.RandomCritNumber();
-            Tuple<int, int, int> chances = GameManager.Instance.CalculateHitPercentage(shooter, target, gun);
+            Tuple<int, int, int> chances = shotUI.CalculateHitPercentage(shooter, target, gun);
             gun.SpendSingleAmmo();
             //print($"shotparams: {MenuManager.Instance.DisplayShotParameters()}\n\n{chances.Item1}|{chances.Item2}>>>{randNum1}|{randNum2}");
 
             //display suppression indicator
             if (shooter.IsSuppressed())
             {
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
 
                 if (shooter.ResilienceCheck())
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} resists suppression."); //write to report
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                    shotUI.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
                     actingHitChance = chances.Item1;
                 }
                 else
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} suffers suppression."); //write to report
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
+                    shotUI.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
                     actingHitChance = chances.Item3;
                 }
             }
             else
             {
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
                 actingHitChance = chances.Item1;
             }
 
@@ -132,7 +134,7 @@ public class OverwatchShotUI : MonoBehaviour
             {
                 FileUtility.WriteToReport($"{shooter.soldierName} hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
 
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                 //standard shot crit hits
                 if (randNum2 <= chances.Item2)
@@ -140,7 +142,7 @@ public class OverwatchShotUI : MonoBehaviour
                     FileUtility.WriteToReport($"The shot is critical!"); //write to report
 
                     targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Overwatch", "Shot" }, Vector3.zero);
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
+                    shotUI.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                     //paying xp for hit
                     if (actingHitChance < 10)
@@ -151,7 +153,7 @@ public class OverwatchShotUI : MonoBehaviour
                 else
                 {
                     targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Overwatch", "Shot" }, Vector3.zero);
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
+                    shotUI.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                     //paying xp for hit
                     if (actingHitChance < 10)
@@ -192,7 +194,7 @@ public class OverwatchShotUI : MonoBehaviour
                 }
 
                 //don't show los check button if shot hits
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
             }
             else
             {
@@ -200,20 +202,20 @@ public class OverwatchShotUI : MonoBehaviour
 
                 FileUtility.WriteToReport($"{shooter.soldierName} misses {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%), shot goes {missString}"); //write to report
 
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
 
                 //show los check button if shot doesn't hit
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+                shotUI.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                 //show guardsman retry if gun has ammo
                 if (shooter.IsGuardsman() && shooter.guardsmanRetryUsed == false && shooter.HasAnyAmmo() && !targetSoldier.IsRevoker())
                 {
                     shooter.guardsmanRetryUsed = true;
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
+                    shotUI.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(true);
                 }
                 else
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+                    shotUI.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
 
                 //paying xp for dodge
                 if (actingHitChance > 90)
@@ -240,7 +242,7 @@ public class OverwatchShotUI : MonoBehaviour
             else
                 shooter.PerformLoudAction();
 
-            MenuManager.Instance.StartCoroutine(MenuManager.Instance.OpenShotResultUI(false));
+            MenuManager.Instance.StartCoroutine(shotUI.OpenShotResultUI(false));
 
             //refresh detections (potentially trigger more overwatch)
             targetSoldier.SetLosCheck("losChange|postOverwatch"); //losCheck
@@ -280,7 +282,7 @@ public class OverwatchShotUI : MonoBehaviour
             target.TerrainOn = terrainDropdown.captionText.text;
 
             //calculate hit percentage
-            Tuple<int, int, int> chances = GameManager.Instance.CalculateHitPercentage(shooter, target, gun);
+            Tuple<int, int, int> chances = shotUI.CalculateHitPercentage(shooter, target, gun);
 
             //only shot suppression hit chance if suppressed
             if (shooter.IsSuppressed())
@@ -293,7 +295,7 @@ public class OverwatchShotUI : MonoBehaviour
             shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
 
             //add parameter to equation view
-            shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = MenuManager.Instance.DisplayShotParameters();
+            shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = shotUI.DisplayShotParameters();
 
             shotConfirmUI.SetActive(true);
         }

@@ -52,8 +52,6 @@ public static class HelperFunctions
     }
     public static int RandomShotNumber()
     {
-        if (Input.GetKey(KeyCode.Mouse1))
-            return 1;
         return RandomNumber(1, 100);
     }
     public static int RandomCritNumber()

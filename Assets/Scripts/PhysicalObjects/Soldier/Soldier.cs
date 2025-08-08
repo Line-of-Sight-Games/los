@@ -300,11 +300,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return this;
     }
-    public void SetActiveSoldier()
-    {
-        ActiveSoldier.Instance.SetActiveSoldier(this);
-        selected = true;
-    }
     public bool IsFielded()
     {
         if (fielded)
