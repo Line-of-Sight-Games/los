@@ -1181,8 +1181,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //block damage if it's first turn and soldier has not used ap
         if (damage > 0 && roundsFielded == 0 && !usedAP)
         {
+            int preDamage = damage;
             damage = 0;
-            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE INVALID", Color.cyan, $"{soldierName} can't be damaged before using AP. {damage} {HelperFunctions.PrintList(damageSource)} damage resisted.", hp, hp);
+            MenuManager.Instance.AddSoldierAlert(this, "DAMAGE INVALID", Color.cyan, $"{soldierName} can't be damaged before using AP. {preDamage} {HelperFunctions.PrintList(damageSource)} damage resisted.", preDamage, damage);
         }
 
         //apply insulator damage halving
