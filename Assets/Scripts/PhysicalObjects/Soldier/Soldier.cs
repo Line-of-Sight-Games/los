@@ -1176,7 +1176,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         InstantKill(SoldierManager.Instance.FindSoldierById(madeUnconBy), madeUnconBydamageList);
     }
 
-    public int ApplyDamageMods(Soldier damagedBy, int damage, List<string> damageSource, Vector3 explosionLocation)
+    public (int, int) ApplyDamageMods(Soldier damagedBy, int damage, List<string> damageSource, Vector3 explosionLocation)
     {
         //block damage if it's first turn and soldier has not used ap
         if (damage > 0 && roundsFielded == 0 && !usedAP)
@@ -1258,10 +1258,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
 
         //apply armour absorbing
+        int absorbedDamage = 0;
         if (damage > 0 && (damageSource.Contains("Shot") || damageSource.Contains("Melee") || damageSource.Contains("Explosive")))
         {
-            int absorbedDamage = damage;
-
             //tank the damage on the armour if wearing BA or JA
             if (IsWearingJuggernautArmour(true))
             {
@@ -1283,12 +1282,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (damage < 0)
             damage = 0;
 
-        return damage;
+        return (damage, absorbedDamage);
     }
 
     public int TakeDamage(Soldier damagedBy, int damage, bool skipDamageMods, List<string> damageSource, Vector3 explosionLocation)
     {
         int actualDamage = 0;
+        int absorbedDamage = 0;
 
         if (IsAlive())
         {
@@ -1297,7 +1297,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
             //apply damage mods
             if (!skipDamageMods)
-                damage = ApplyDamageMods(damagedBy, damage, damageSource, explosionLocation);
+                (damage, absorbedDamage) = ApplyDamageMods(damagedBy, damage, damageSource, explosionLocation);
 
             //make sure damage came from another soldier
             if (damagedBy != null && this.IsOppositeTeamAs(damagedBy))
@@ -1415,7 +1415,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             }
         }
 
-        return actualDamage;
+        return actualDamage + absorbedDamage;
     }
     public void AddSoldierSnapshot(Soldier attackedBy)
     {
