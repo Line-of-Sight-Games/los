@@ -168,17 +168,30 @@ public class ShotUI : MonoBehaviour
 
         shotResultUI.SetActive(true);
     }
-    public void CloseShotResultUI()
+    public void ShotResultUIConfirmClicked()
     {
         if (MenuManager.Instance.OverrideKey())
         {
-            if (shotResultUI.transform.Find("RunSecondShot").gameObject.activeInHierarchy)
-                ConfirmShot(false);
-            else
-            {
-                SetShotResolvedFlagTo(true);
-                shotResultUI.SetActive(false);
-            }
+            CloseShotResultUI();
+        }
+    }
+    public void ShotResultUILOSCheckClicked()
+    {
+        if (MenuManager.Instance.OverrideKey())
+        {
+            GameManager.Instance.DetectionAlertAllNonCoroutine();
+            CloseShotResultUI();
+        }
+    }
+
+    public void CloseShotResultUI()
+    {
+        if (shotResultUI.transform.Find("RunSecondShot").gameObject.activeInHierarchy)
+            ConfirmShot(false);
+        else
+        {
+            SetShotResolvedFlagTo(true);
+            shotResultUI.SetActive(false);
         }
     }
     public void ClearShotUI()
