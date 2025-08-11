@@ -382,7 +382,7 @@ public class ShotUI : MonoBehaviour
         if (shooter.id == "0")
             shooter = SoldierManager.Instance.FindSoldierById(shooterID.text);
 
-        if (!MenuManager.Instance.clearShotFlag)
+        if (!clearShotFlag)
         {
             UpdateShotAP(shooter);
             if (shotTypeDropdown.value == 0)

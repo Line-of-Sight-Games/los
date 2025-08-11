@@ -1992,7 +1992,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         bool actualRemove = SoldiersRevealingThisSoldier.Remove(id);
         
-        //show the losLostList popup if no more soldier's revealing
+        //show the lostLOS list popup if no more soldier's revealing
         if (actualRemove && !SoldiersRevealingThisSoldier.Any() && IsAlive() && !IsPlayingDead())
         {
             MenuManager.Instance.AddLostLosAlert(this);

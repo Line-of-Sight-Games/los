@@ -66,7 +66,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     private float playTimeTotal;
     public float turnTime;
     public string meleeChargeIndicator;
-    public bool timerStop, overrideView, clearShotFlag, clearMeleeFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
+    public bool timerStop, overrideView, clearMeleeFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite fist, explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
 
