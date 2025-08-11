@@ -698,9 +698,9 @@ public class ShotUI : MonoBehaviour
     {
         float smokeMod = 0;
 
-        if (shooter.IsSmokeBlinded())
+        if (shooter.IsInSmokeBlindZone())
             smokeMod = 0.9f;
-        else if (shooter.IsSmokeCovered())
+        else if (shooter.IsInSmokeDefenceZone())
             smokeMod = 0.45f;
 
         //report parameters

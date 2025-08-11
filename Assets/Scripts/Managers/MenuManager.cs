@@ -1780,11 +1780,19 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public bool AllDetectionsMutual()
     {
-        foreach (Transform child in detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
+        Transform content = detectionUI.transform.Find("OptionPanel/Scroll/View/Content");
+
+        foreach (Transform child in content)
         {
-            if (!child.Find("DetectionArrow").GetComponent<Image>().sprite.ToString().Contains("Detection2Way"))
+            if (!child.TryGetComponent<SoldierAlertLOS>(out var detectionAlert))
+                continue;
+
+            bool isTwoWay = detectionAlert.arrow.sprite != null && detectionAlert.arrow.sprite.name.Contains("Detection2Way");
+
+            if (!(isTwoWay && detectionAlert.s1Toggle.interactable && detectionAlert.s2Toggle.interactable))
                 return false;
         }
+
         return true;
     }
     public void OpenDetectionUI()
@@ -2810,7 +2818,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             moveTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Exo Jump</color>"));
         moveUI.moveTypeDropdown.AddOptions(moveTypeDetails);
 
-        if (ActiveSoldier.Instance.S.IsSmokeBlinded())
+        if (ActiveSoldier.Instance.S.IsInSmokeBlindZone())
         {
             moveUI.moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("0");
             moveUI.moveTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1");

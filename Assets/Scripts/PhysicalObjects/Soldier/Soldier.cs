@@ -893,14 +893,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsInSmoke())
         {
-            if (IsSmokeBlinded())
+            if (IsInSmokeBlindZone())
             {
                 stats.E.Val += 6;
                 stats.P.Val -= 2;
                 if (!IsWearingThermalGoggles())
                     stats.SR.Val -= 120;
             }
-            else if (IsSmokeCovered())
+            else if (IsInSmokeDefenceZone())
             {
                 stats.E.Val += 3;
                 stats.P.Val -= 1;
@@ -1656,9 +1656,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         float smokeModMove = 0;
 
-        if (IsSmokeBlinded())
+        if (IsInSmokeBlindZone())
             smokeModMove = 0.9f;
-        else if (IsSmokeCovered())
+        else if (IsInSmokeDefenceZone())
             smokeModMove = 0.45f;
 
         return 1 - smokeModMove;
@@ -2452,23 +2452,23 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsInSmoke()
     {
-        if (IsSmokeBlinded() || IsSmokeCovered())
+        if (IsInSmokeBlindZone() || IsInSmokeDefenceZone())
             return true;
         return false;
     }
-    public bool IsSmokeBlinded()
+    public bool IsInSmokeBlindZone()
     {
         if (CheckState("SmokeBlinded"))
             return true;
         return false;
     }
-    public bool IsSmokeCovered()
+    public bool IsInSmokeDefenceZone()
     {
         if (CheckState("SmokeCovered"))
             return true;
         return false;
     }
-    public void SetSmokeCovered()
+    public void SetInSmokeDefenceZone()
     {
         UnsetState("SmokeBlinded");
         SetState("SmokeCovered");
@@ -2476,7 +2476,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         SetLosCheck("statChange(P)(SR)|smokeActive(defencezone)"); //losCheck
     }
-    public void SetSmokeBlinded()
+    public void SetInSmokeBlindZone()
     {
         UnsetState("SmokeCovered");
         SetState("SmokeBlinded");
@@ -3114,12 +3114,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         if (this.IsWithinSphere(cloud.innerCloud))
                         {
                             currentlyInSmoke = true;
-                            SetSmokeBlinded();
+                            SetInSmokeBlindZone();
                         }
                         else if (this.IsWithinSphere(cloud.outerCloud))
                         {
                             currentlyInSmoke = true;
-                            SetSmokeCovered();
+                            SetInSmokeDefenceZone();
                         }
 
                         //if soldier wasn't in smoke before check and becomes smoke covered, increment soldiers covered for xp purposes
@@ -4441,9 +4441,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public string GetSmokedState()
     {
-        if (IsSmokeBlinded())
+        if (IsInSmokeBlindZone())
             return $", <color=red>Smoke - Blind Zone</color>";
-        else if (IsSmokeCovered())
+        else if (IsInSmokeDefenceZone())
             return $", <color=red>Smoke - Defence Zone</color>";
         return "";
     }
