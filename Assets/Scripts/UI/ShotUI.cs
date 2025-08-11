@@ -38,7 +38,6 @@ public class ShotUI : MonoBehaviour
     public GameObject shotResultUI;
 
     public bool clearShotFlag;
-    public bool shotResolvedFlag;
 
     public Tuple<Soldier, IAmShootable> tempShooterTarget;
     public List<Tuple<string, string>> shotParameters = new();
@@ -1477,6 +1476,6 @@ public class ShotUI : MonoBehaviour
         else
             MenuManager.Instance.FreezeTimer();
 
-        shotResolvedFlag = value;
+        MenuManager.Instance.shotResolvedFlag = value;
     }
 }
