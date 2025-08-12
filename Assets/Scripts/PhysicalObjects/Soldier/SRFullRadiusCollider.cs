@@ -22,7 +22,7 @@ public class SRFullRadiusCollider : SoldierTriggerCollider
             return "AVOID";
         else if (detector.IsOnOverwatch())
         {
-            if (detectee.causeOfLosCheck.Contains("move"))
+            if (detectee.causeOfLosCheck.Contains("move") || (detectee.causeOfLosCheck.Contains("Overwatch")))
                 return "OVERWATCH";
             else
                 return "DETECT";

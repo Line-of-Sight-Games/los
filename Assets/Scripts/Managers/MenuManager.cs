@@ -2164,7 +2164,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public IEnumerator OpenLostLOSList()
     {
-        yield return new WaitUntil(() => meleeResolvedFlag == true);
+        yield return new WaitUntil(() => meleeResolvedFlag);
 
         bool display = false;
         foreach (Transform child in lostLosUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))

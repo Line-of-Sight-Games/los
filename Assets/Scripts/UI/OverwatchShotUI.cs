@@ -20,6 +20,7 @@ public class OverwatchShotUI : MonoBehaviour
     public TMP_InputField zPos;
     public TMP_Dropdown terrainDropdown;
     public GameObject shotConfirmUI;
+    public GameObject outOfRange;
 
     Tuple<int, int, int, string> intendedLocation;
     Tuple<int, int, int, string> locationAtShot;
@@ -261,9 +262,10 @@ public class OverwatchShotUI : MonoBehaviour
         yPos.text = "";
         zPos.text = "";
         terrainDropdown.value = 0;
+        outOfRange.SetActive(false);
         shotConfirmUI.SetActive(false);
     }
-    public void OpenShotOverwatchConfirmUI()
+    public void OpenOverwatchShotConfirmUI()
     {
         if (HelperFunctions.ValidateIntInput(xPos, out int xOver) && HelperFunctions.ValidateIntInput(yPos, out int yOver) && HelperFunctions.ValidateIntInput(zPos, out int zOver) && terrainDropdown.value != 0)
         {
@@ -276,28 +278,34 @@ public class OverwatchShotUI : MonoBehaviour
             intendedLocation = Tuple.Create(target.X, target.Y, target.Z, target.TerrainOn);
             //set target position temporarily to point of shot
             locationAtShot = Tuple.Create(xOver, yOver, zOver, terrainDropdown.captionText.text);
-            target.X = xOver;
-            target.Y = yOver;
-            target.Z = zOver;
-            target.TerrainOn = terrainDropdown.captionText.text;
 
-            //calculate hit percentage
-            Tuple<int, int, int> chances = shotUI.CalculateHitPercentage(shooter, target, gun);
+            if (shooter.PhysicalObjectWithinOverwatchCone(new Vector3(locationAtShot.Item1, locationAtShot.Item2, locationAtShot.Item3)))
+            {
+                target.X = xOver;
+                target.Y = yOver;
+                target.Z = zOver;
+                target.TerrainOn = terrainDropdown.captionText.text;
 
-            //only shot suppression hit chance if suppressed
-            if (shooter.IsSuppressed())
-                shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(true);
+                //calculate hit percentage
+                Tuple<int, int, int> chances = shotUI.CalculateHitPercentage(shooter, target, gun);
+
+                //only shot suppression hit chance if suppressed
+                if (shooter.IsSuppressed())
+                    shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(true);
+                else
+                    shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(false);
+
+                shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").Find("SuppressedHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item3.ToString() + "%";
+                shotConfirmUI.transform.Find("OptionPanel").Find("HitChance").Find("HitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item1.ToString() + "%";
+                shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
+
+                //add parameter to equation view
+                shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = shotUI.DisplayShotParameters();
+
+                shotConfirmUI.SetActive(true);
+            }
             else
-                shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").gameObject.SetActive(false);
-
-            shotConfirmUI.transform.Find("OptionPanel").Find("SuppressedHitChance").Find("SuppressedHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item3.ToString() + "%";
-            shotConfirmUI.transform.Find("OptionPanel").Find("HitChance").Find("HitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item1.ToString() + "%";
-            shotConfirmUI.transform.Find("OptionPanel").Find("CritHitChance").Find("CritHitChanceDisplay").GetComponent<TextMeshProUGUI>().text = chances.Item2.ToString() + "%";
-
-            //add parameter to equation view
-            shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = shotUI.DisplayShotParameters();
-
-            shotConfirmUI.SetActive(true);
+                outOfRange.SetActive(true);
         }
     }
 }

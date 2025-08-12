@@ -549,7 +549,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
             }
             MenuManager.Instance.CloseOverwatchUI();
         }
-
     }
 
 
