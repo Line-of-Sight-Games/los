@@ -6,8 +6,8 @@ using System.Linq;
 public class ValidThrowChecker : MonoBehaviour
 {
     public TMP_InputField XPos, YPos, ZPos;
-    public GameObject throwBeyondRadius, throwBeyondBlindRadius, pressedOnce, catcher, itemWillBreak, scatteredOffMap;
-    public TMP_Dropdown catcherDropdown;
+    public GameObject throwBeyondRadius, throwBeyondBlindRadius, pressedOnce, groundOrAlly, catcher, itemWillBreak, scatteredOffMap;
+    public TMP_Dropdown groundOrAllyDropdown, catcherDropdown;
     public UseItemUI useItemUI;
 
     private void Update()

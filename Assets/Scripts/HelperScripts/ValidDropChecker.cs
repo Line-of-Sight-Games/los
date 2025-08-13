@@ -1,27 +1,16 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using System.Linq;
 
 public class ValidDropChecker : MonoBehaviour
 {
     public TMP_InputField XPos, YPos, ZPos;
-    public GameObject invalidThrow, catcher, itemWillBreak;
-    public TMP_Dropdown catcherDropdown;
+    public GameObject invalidThrow, groundOrAlly, catcher, itemWillBreak;
+    public TMP_Dropdown groundOrAllyDropdown, catcherDropdown;
     public UseItemUI useItemUI;
 
     private void Update()
     {
-        CheckDroppingRange();
-        CheckForCatchers();
         CheckForItemBreak();
-    }
-    public void CheckDroppingRange()
-    {
-        invalidThrow.SetActive(false);
-
-        if (GetThrowLocation(out Vector3 throwLocation) && (Vector2.Distance(new(throwLocation.x, throwLocation.y), new(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y)) > 3 || throwLocation.z > ActiveSoldier.Instance.S.Z + 3))
-            invalidThrow.SetActive(true);
     }
     public bool GetThrowLocation(out Vector3 throwLocation)
     {
@@ -32,26 +21,6 @@ public class ValidDropChecker : MonoBehaviour
             return true;
         }
         return false;
-    }
-    public void CheckForCatchers()
-    {
-        catcher.SetActive(false);
-        catcherDropdown.ClearOptions();
-
-        if (GetThrowLocation(out Vector3 throwLocation))
-        {
-            foreach (Soldier s in GameManager.Instance.AllFieldedSoldiers())
-            {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(ActiveSoldier.Instance.S) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
-                {
-                    if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
-                        catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });
-                }
-            }
-
-            if (catcherDropdown.options.Count > 0)
-                catcher.SetActive(true);
-        }
     }
     public void CheckForItemBreak()
     {

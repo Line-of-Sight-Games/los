@@ -45,12 +45,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public DamageEventUI damageEventUI;
     public OverwatchUI overwatchUI;
     public DragUI dragUI;
+    public DropUI dropUI;
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
     public BinocularsUI binocularsUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, dropUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, throwUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
     
     public SoldierAlert soldierAlertPrefab;
     public XpAlert xpAlertPrefab;
@@ -3663,29 +3664,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         ClearThrowUI();
         throwUI.SetActive(false);
-    }
-    public void OpenDropUI(UseItemUI useItemUI)
-    {
-        dropUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
-        dropUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
-        dropUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
-
-        dropUI.transform.Find("OptionPanel").Find("ItemName").Find("Text").GetComponent<TextMeshProUGUI>().text = $"Dropping {useItemUI.itemUsed.itemName} from {useItemUI.itemUsedFromSlotName} slot.";
-        dropUI.SetActive(true);
-    }
-    public void ClearDropUI()
-    {
-        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>().interactable = true;
-        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>().interactable = true;
-        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>().interactable = true;
-        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
-        dropUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>().text = "";
-    }
-    public void CloseDropUI()
-    {
-        ClearDropUI();
-        dropUI.SetActive(false);
     }
     public void OpenUseItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon, int ap)
     {

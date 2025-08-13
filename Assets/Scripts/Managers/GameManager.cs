@@ -1835,7 +1835,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         if (useItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Throw"))
             MenuManager.Instance.OpenThrowUI(useItemUI);
         else
-            MenuManager.Instance.OpenDropUI(useItemUI);
+            MenuManager.Instance.dropUI.OpenDropUI(useItemUI);
 
         ActiveSoldier.Instance.S.DeductAP(ap);
         MenuManager.Instance.CloseDropThrowItemUI();
@@ -2125,57 +2125,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     MenuManager.Instance.CloseThrowUI();
                 }
             }
-        }
-    }
-    public void ConfirmDrop(UseItemUI dropItemUI)
-    {
-        TMP_InputField targetX = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("XPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetY = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("YPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetZ = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ZPos").GetComponent<TMP_InputField>();
-        GameObject invalidThrow = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("InvalidThrow").gameObject;
-        GameObject itemWillBreak = dropItemUI.transform.Find("OptionPanel").Find("DropTarget").Find("ItemWillBreak").gameObject;
-        GameObject catcher = dropItemUI.transform.Find("OptionPanel").Find("Catcher").gameObject;
-
-        if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y) && HelperFunctions.ValidateIntInput(targetZ, out int z) && !invalidThrow.activeInHierarchy)
-        {
-            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} drops {dropItemUI.itemUsed.itemName}."); //write to report
-
-            if (itemWillBreak.activeInHierarchy)
-            {
-                FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} breaks."); //write to report
-                dropItemUI.itemUsed.TakeDamage(ActiveSoldier.Instance.S, 1, new() { "Fall" }); //destroy item
-            }
-            else if (catcher.activeInHierarchy)
-            {
-                if (dropItemUI.itemUsed.IsCatchable())
-                {
-                    Soldier catchingSoldier = SoldierManager.Instance.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
-
-                    FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} is caught by {catchingSoldier.soldierName}."); //write to report
-
-                    //if soldier has left hand free catch it there, otherwise catch in right hand
-                    if (catchingSoldier.LeftHandItem == null)
-                        dropItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, dropItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
-                    else
-                        dropItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, dropItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
-                }
-                else
-                {
-                    dropItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(dropItemUI.itemUsed, dropItemUI.itemUsedFromSlotName); //move item to ground
-                    dropItemUI.itemUsed.X = x;
-                    dropItemUI.itemUsed.Y = y;
-                    dropItemUI.itemUsed.Z = z;
-                }
-            }
-            else
-            {
-                dropItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(dropItemUI.itemUsed, dropItemUI.itemUsedFromSlotName); //move item to ground
-                dropItemUI.itemUsed.X = x;
-                dropItemUI.itemUsed.Y = y;
-                dropItemUI.itemUsed.Z = z;
-            }
-            ActiveSoldier.Instance.S.PerformLoudAction(5);
-            MenuManager.Instance.CloseDropUI();
         }
     }
     public void ConfirmBinoculars()
