@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -48,7 +49,7 @@ public static class HelperFunctions
     }
     public static int RandomNumber(int min, int max)
     {
-        return Random.Range(min, max + 1);
+        return UnityEngine.Random.Range(min, max + 1);
     }
     public static int RandomShotNumber()
     {
@@ -64,7 +65,7 @@ public static class HelperFunctions
             return true;
         else
         {
-            if (HelperFunctions.RandomNumber(0, 1) == 1)
+            if (RandomNumber(0, 1) == 1)
                 return true;
         }
         return false;
@@ -101,6 +102,17 @@ public static class HelperFunctions
         Debug.Log($"{fExistingSup}|{fAddingSup}");
 
         return Mathf.RoundToInt(100 * (1 - (1 - fExistingSup) * (1 - fAddingSup)));
+    }
+    public static Tuple<int, int> CalculateScatteredCoordinates(int targetX, int targetY, float scatterDegree, float scatterDistance)
+    {
+        // Convert degree to radians
+        double radians = Math.PI * scatterDegree / 180.0;
+
+        // Calculate new coordinates
+        int newX = Mathf.RoundToInt((float)(targetX + scatterDistance * Math.Cos(radians)));
+        int newY = Mathf.RoundToInt((float)(targetY + scatterDistance * Math.Sin(radians)));
+
+        return Tuple.Create(newX, newY);
     }
     public static string FindStringInColXReturnStringInColYInMatrix(string[,] matrix, string searchString, int x, int y)
     {

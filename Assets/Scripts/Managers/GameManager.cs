@@ -1833,7 +1833,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         int.TryParse(useItemUI.transform.Find("APCost").Find("APCostDisplay").GetComponent<TextMeshProUGUI>().text, out int ap);
         if (useItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text.Contains("Throw"))
-            MenuManager.Instance.OpenThrowUI(useItemUI);
+            MenuManager.Instance.throwUI.OpenThrowUI(useItemUI);
         else
             MenuManager.Instance.dropUI.OpenDropUI(useItemUI);
 
@@ -1902,7 +1902,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
                 if (scatterDistance != -1)
                 {
-                    (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
+                    (newX, newY) = HelperFunctions.CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
                     if (newX > 0 && newX <= maxX && newY > 0 && newY <= maxY)
                     {
@@ -1985,7 +1985,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public void ConfirmGrenade(UseItemUI useGrenade)
     {
         string grenadeName = useGrenade.transform.Find("OptionPanel").Find("GrenadeType").Find("Text").GetComponent<TextMeshProUGUI>().text;
-        ValidThrowChecker throwTarget = useGrenade.transform.Find("OptionPanel").Find("Target").GetComponent<ValidThrowChecker>();
+        ValidGrenadeThrowChecker throwTarget = useGrenade.transform.Find("OptionPanel").Find("Target").GetComponent<ValidGrenadeThrowChecker>();
         GameObject throwBeyondRadius = useGrenade.transform.Find("OptionPanel").Find("Target").Find("ThrowBeyondRadius").gameObject;
         GameObject throwBeyondBlindRadius = useGrenade.transform.Find("OptionPanel").Find("Target").Find("ThrowBeyondBlindRadius").gameObject;
         GameObject scatteredOffMap = useGrenade.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject;
@@ -2008,7 +2008,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     useGrenade.transform.Find("OptionPanel").Find("Target").Find("PreciseThrow").gameObject.SetActive(true);
                 else
                 {
-                    (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
+                    (newX, newY) = HelperFunctions.CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
 
                     throwTarget.XPos.text = $"{newX}";
                     throwTarget.YPos.text = $"{newY}";
@@ -2022,7 +2022,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
         {
             if (scatteredOffMap.activeInHierarchy)
             {
-                ActiveSoldier.Instance.S.Inventory.ConsumeItemInSlot(useGrenade.itemUsed, useGrenade.itemUsedFromSlotName); //destroy grenade
+                FileUtility.WriteToReport($"{useGrenade.itemUsed.itemName} falls off map."); //write to report
+                useGrenade.itemUsed.TakeDamage(ActiveSoldier.Instance.S, 1, new() { "Fall" }); //destroy item
                 MenuManager.Instance.CloseGrenadeUI();
             }
             else
@@ -2032,97 +2033,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     useGrenade.itemUsed.UseItem(useGrenade.itemUsedIcon, useGrenade.itemUsedOn, useGrenade.soldierUsedOn);
                     useGrenade.itemUsed.CheckExplosionGrenade(ActiveSoldier.Instance.S, new Vector3(x, y, z));
                     MenuManager.Instance.CloseGrenadeUI();
-                }
-            }
-        }
-    }
-    public void ConfirmThrow(UseItemUI throwItemUI)
-    {
-        ValidThrowChecker throwTarget = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").GetComponent<ValidThrowChecker>();
-        GameObject throwBeyondRadius = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ThrowBeyondRadius").gameObject;
-        GameObject throwBeyondBlindRadius = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ThrowBeyondBlindRadius").gameObject;
-        GameObject scatteredOffMap = throwItemUI.transform.Find("OptionPanel").Find("ScatteredOffMap").gameObject;
-        GameObject itemWillBreak = throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("ItemWillBreak").gameObject;
-        GameObject catcher = throwItemUI.transform.Find("OptionPanel").Find("Catcher").gameObject;
-
-        if (!throwItemUI.transform.Find("PressedOnce").gameObject.activeInHierarchy) //first press
-        {
-            if (HelperFunctions.ValidateIntInput(throwTarget.XPos, out int x) && HelperFunctions.ValidateIntInput(throwTarget.YPos, out int y) && HelperFunctions.ValidateIntInput(throwTarget.ZPos, out int z) && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
-            {
-                int newX, newY;
-                throwTarget.GetThrowLocation(out Vector3 throwLocation);
-                int throwDistance = Mathf.RoundToInt(Vector3.Distance(new(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y, ActiveSoldier.Instance.S.Z), throwLocation));
-                int scatterDegree = HelperFunctions.RandomNumber(0, 360);
-                int scatterDistance = ActiveSoldier.Instance.S.StrengthCheck() switch
-                {
-                    false => Mathf.CeilToInt(HelperFunctions.DiceRoll() * ActiveSoldier.Instance.S.stats.Str.Val / 2.0f),
-                    _ => -1,
-                };
-
-                if (scatterDistance == -1 || throwDistance <= 3)
-                    throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("PreciseThrow").gameObject.SetActive(true);
-                else
-                {
-                    (newX, newY) = CalculateScatteredCoordinates(x, y, scatterDegree, scatterDistance);
-
-                    throwTarget.XPos.text = $"{newX}";
-                    throwTarget.YPos.text = $"{newY}";
-
-                    if (newX <= 0 || newX > maxX || newY <= 0 || newY > maxY) //if scattering off map
-                        scatteredOffMap.SetActive(true);
-
-                    throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("FinalPosition").gameObject.SetActive(true);
-                }
-
-                throwItemUI.transform.Find("PressedOnce").gameObject.SetActive(true);
-                throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("XPos").GetComponent<LocationInputController>().SetMin(1);
-                throwItemUI.transform.Find("OptionPanel").Find("ThrowTarget").Find("YPos").GetComponent<LocationInputController>().SetMin(1);
-            }
-        }
-        else //second press
-        {
-            if (scatteredOffMap.activeInHierarchy)
-            {
-                ActiveSoldier.Instance.S.Inventory.ConsumeItemInSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //destroy item
-                MenuManager.Instance.CloseThrowUI();
-            }
-            else
-            {
-                if (HelperFunctions.ValidateIntInput(throwTarget.YPos, out int x) && HelperFunctions.ValidateIntInput(throwTarget.YPos, out int y) && HelperFunctions.ValidateIntInput(throwTarget.ZPos, out int z))
-                {
-                    if (itemWillBreak.activeInHierarchy)
-                    {
-                        throwItemUI.itemUsed.TakeDamage(ActiveSoldier.Instance.S, 1, new() { "Fall" }); //destroy item
-                    }
-                    else if (catcher.activeInHierarchy)
-                    {
-                        if (throwItemUI.itemUsed.IsCatchable())
-                        {
-                            Soldier catchingSoldier = SoldierManager.Instance.FindSoldierByName(catcher.GetComponentInChildren<TMP_Dropdown>().captionText.text);
-
-                            //if soldier has left hand free catch it there, otherwise catch in right hand
-                            if (catchingSoldier.LeftHandItem == null)
-                                throwItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, throwItemUI.itemUsedFromSlotName, catchingSoldier, "LeftHand");
-                            else
-                                throwItemUI.itemUsed.MoveItem(ActiveSoldier.Instance.S, throwItemUI.itemUsedFromSlotName, catchingSoldier, "RightHand");
-                        }
-                        else
-                        {
-                            throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
-                            throwItemUI.itemUsed.X = x;
-                            throwItemUI.itemUsed.Y = y;
-                            throwItemUI.itemUsed.Z = z;
-                        }
-                    }
-                    else
-                    {
-                        throwItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(throwItemUI.itemUsed, throwItemUI.itemUsedFromSlotName); //move item to ground
-                        throwItemUI.itemUsed.X = x;
-                        throwItemUI.itemUsed.Y = y;
-                        throwItemUI.itemUsed.Z = z;
-                    }
-                    ActiveSoldier.Instance.S.PerformLoudAction(5);
-                    MenuManager.Instance.CloseThrowUI();
                 }
             }
         }
@@ -2214,17 +2124,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
             else
                 useThermalCam.transform.Find("OptionPanel").Find("OutOfRange").gameObject.SetActive(true);
         }
-    }
-    static Tuple<int, int> CalculateScatteredCoordinates(int targetX, int targetY, float scatterDegree, float scatterDistance)
-    {
-        // Convert degree to radians
-        double radians = Math.PI * scatterDegree / 180.0;
-
-        // Calculate new coordinates
-        int newX = Mathf.RoundToInt((float)(targetX + scatterDistance * Math.Cos(radians)));
-        int newY = Mathf.RoundToInt((float)(targetY + scatterDistance * Math.Sin(radians)));
-
-        return Tuple.Create(newX, newY);
     }
     public void CheckExplosionUHF(Soldier explodedBy, Vector3 position, int radius, int damage)
     {

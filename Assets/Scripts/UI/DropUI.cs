@@ -34,16 +34,16 @@ public class DropUI : MonoBehaviour
     {
         if (GetThrowLocation(out Vector3 throwLocation))
         {
-            if (Vector2.Distance(new(throwLocation.x, throwLocation.y), new(ActiveSoldier.Instance.S.X, ActiveSoldier.Instance.S.Y)) > 3 || throwLocation.z > ActiveSoldier.Instance.S.Z + 3)
-            {
-                invalidThrow.SetActive(true);
-                groundOrAlly.SetActive(false);
-            }
-            else
+            if (IsWithinDropBounds(ActiveSoldier.Instance.S, throwLocation))
             {
                 invalidThrow.SetActive(false);
                 groundOrAlly.SetActive(true);
                 return true;
+            }
+            else
+            {
+                invalidThrow.SetActive(true);
+                groundOrAlly.SetActive(false);
             }
         }
         else
@@ -53,12 +53,17 @@ public class DropUI : MonoBehaviour
         }
         return false;
     }
-
+    public bool IsWithinDropBounds(Soldier throwingSoldier, Vector3 throwLocation)
+    {
+        if (Vector2.Distance(throwLocation, new(throwingSoldier.X, throwingSoldier.Y)) <= 3 && throwLocation.z <= (throwingSoldier.Z + 3))
+            return true;
+        return false;
+    }
     public void CheckForCatchers()
     {
         if (GetThrowLocation(out Vector3 throwLocation) && groundOrAllyDropdown.captionText.text.Equals("Ally"))
         {
-            Debug.Log($"Checking for catchers at {throwLocation}");
+            catcherDropdown.ClearOptions();
             foreach (Soldier s in GameManager.Instance.AllFieldedSoldiers())
             {
                 if (s.IsAbleToSee() && s.IsSameTeamAs(ActiveSoldier.Instance.S) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
@@ -97,15 +102,15 @@ public class DropUI : MonoBehaviour
     }
     public void ConfirmDrop(UseItemUI dropItemUI)
     {
-        if (HelperFunctions.ValidateIntInput(XPos, out int x) && HelperFunctions.ValidateIntInput(YPos, out int y) && HelperFunctions.ValidateIntInput(ZPos, out int z) && !invalidThrow.activeInHierarchy)
+        if (GetThrowLocation(out Vector3 throwLocation) && !invalidThrow.activeInHierarchy)
         {
             FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} drops {dropItemUI.itemUsed.itemName}."); //write to report
 
             if (itemWillBreak.activeInHierarchy)
             {
-                dropItemUI.itemUsed.X = x;
-                dropItemUI.itemUsed.Y = y;
-                dropItemUI.itemUsed.Z = z;
+                dropItemUI.itemUsed.X = (int)throwLocation.x;
+                dropItemUI.itemUsed.Y = (int)throwLocation.y;
+                dropItemUI.itemUsed.Z = (int)throwLocation.z;
                 FileUtility.WriteToReport($"{dropItemUI.itemUsed.itemName} breaks."); //write to report
                 dropItemUI.itemUsed.TakeDamage(ActiveSoldier.Instance.S, 1, new() { "Fall" }); //destroy item
             }
@@ -126,17 +131,17 @@ public class DropUI : MonoBehaviour
                 else
                 {
                     dropItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(dropItemUI.itemUsed, dropItemUI.itemUsedFromSlotName); //move item to ground
-                    dropItemUI.itemUsed.X = x;
-                    dropItemUI.itemUsed.Y = y;
-                    dropItemUI.itemUsed.Z = z;
+                    dropItemUI.itemUsed.X = (int)throwLocation.x;
+                    dropItemUI.itemUsed.Y = (int)throwLocation.y;
+                    dropItemUI.itemUsed.Z = (int)throwLocation.z;
                 }
             }
             else
             {
                 dropItemUI.itemUsed.owner?.Inventory.RemoveItemFromSlot(dropItemUI.itemUsed, dropItemUI.itemUsedFromSlotName); //move item to ground
-                dropItemUI.itemUsed.X = x;
-                dropItemUI.itemUsed.Y = y;
-                dropItemUI.itemUsed.Z = z;
+                dropItemUI.itemUsed.X = (int)throwLocation.x;
+                dropItemUI.itemUsed.Y = (int)throwLocation.y;
+                dropItemUI.itemUsed.Z = (int)throwLocation.z;
             }
             ActiveSoldier.Instance.S.PerformLoudAction(5);
             CloseDropUI();

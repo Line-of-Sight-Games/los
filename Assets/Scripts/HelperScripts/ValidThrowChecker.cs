@@ -1,73 +1,15 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using System.Linq;
 
 public class ValidThrowChecker : MonoBehaviour
 {
     public TMP_InputField XPos, YPos, ZPos;
-    public GameObject throwBeyondRadius, throwBeyondBlindRadius, pressedOnce, groundOrAlly, catcher, itemWillBreak, scatteredOffMap;
-    public TMP_Dropdown groundOrAllyDropdown, catcherDropdown;
+    public GameObject invalidThrow, catcher, itemWillBreak;
     public UseItemUI useItemUI;
 
     private void Update()
     {
-        CheckThrowingRange();
-        CheckOffMap();
-        if (!useItemUI.name.Contains("Grenade")) //don't run when throwing grenade in anger
-        {
-            CheckForCatchers();
-            CheckForItemBreak();
-        }
-    }
-    public void CheckOffMap()
-    {
-        scatteredOffMap.SetActive(false);
-
-        if (GetThrowLocation(out Vector3 throwLocation) && (throwLocation.x <= 0 || throwLocation.x > GameManager.Instance.maxX || throwLocation.y <= 0 || throwLocation.y > GameManager.Instance.maxY)) //is scattering off map
-            scatteredOffMap.SetActive(true);
-    }
-    public void CheckThrowingRange()
-    {
-        throwBeyondRadius.SetActive(false);
-        throwBeyondBlindRadius.SetActive(false);
-
-        if (!pressedOnce.activeInHierarchy)
-        {
-            if (GetThrowLocation(out Vector3 throwLocation))
-            {
-                if (ActiveSoldier.Instance.S.IsAbleToSee() && ActiveSoldier.Instance.S.HasStrength())
-                {
-                    if (!IsWithinBounds(ActiveSoldier.Instance.S, throwLocation))
-                        throwBeyondRadius.SetActive(true);
-                }
-                else
-                {
-                    if (!IsWithinDropBounds(ActiveSoldier.Instance.S, throwLocation)) //dropping allowed while blind within 3 or 0 strength
-                        throwBeyondBlindRadius.SetActive(true);
-                }
-            }
-            
-        }
-    }
-    public bool IsWithinBounds(Soldier throwingSoldier, Vector3 throwLocation)
-    {
-        int deltaX = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow((int)throwLocation.x - throwingSoldier.X, 2)));
-        int deltaY = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow((int)throwLocation.y - throwingSoldier.Y, 2)));
-        int deltaZ = Mathf.Min((int)throwLocation.z - throwingSoldier.Z, Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow((int)throwLocation.z - throwingSoldier.Z, 2))));
-        int s = throwingSoldier.stats.Str.Val;
-
-        print($"s={s} | deltaX={deltaX} | deltaY={deltaY} | Z={deltaZ} | rhs={(100 * Mathf.Pow(s, 2) - (Mathf.Pow(deltaX, 2) + Mathf.Pow(deltaY, 2))) / (20 * s)}");
-
-        if (deltaZ <= (100 * Mathf.Pow(s, 2) - (Mathf.Pow(deltaX, 2) + Mathf.Pow(deltaY, 2))) / (20 * s))
-            return true;
-        return false;
-    }
-    public bool IsWithinDropBounds(Soldier throwingSoldier, Vector3 throwLocation)
-    {
-        if (Vector2.Distance(throwLocation, new(throwingSoldier.X, throwingSoldier.Y)) <= 3 && throwLocation.z <= (throwingSoldier.Z + 3))
-            return true;
-        return false;
+        CheckForItemBreak();
     }
     public bool GetThrowLocation(out Vector3 throwLocation)
     {
@@ -79,32 +21,12 @@ public class ValidThrowChecker : MonoBehaviour
         }
         return false;
     }
-    public void CheckForCatchers()
-    {
-        print("running");
-        catcher.SetActive(false);
-        catcherDropdown.ClearOptions();
-
-        if (GetThrowLocation(out Vector3 throwLocation))
-        {
-            foreach (Soldier s in GameManager.Instance.AllSoldiers())
-            {
-                if (s.IsAbleToSee() && s.IsSameTeamAs(ActiveSoldier.Instance.S) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
-                {
-                    if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
-                        catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });
-                }
-            }
-
-            if (catcherDropdown.options.Count > 0)
-                catcher.SetActive(true);
-        }
-    }
     public void CheckForItemBreak()
     {
         itemWillBreak.SetActive(false);
 
-        if (GetThrowLocation(out Vector3 throwLocation) && ActiveSoldier.Instance.S.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !throwBeyondRadius.activeInHierarchy && !throwBeyondBlindRadius.activeInHierarchy)
+        if (GetThrowLocation(out Vector3 throwLocation) && ActiveSoldier.Instance.S.Z - throwLocation.z > 8 && useItemUI.itemUsed.IsFragile() && !catcher.activeInHierarchy && !invalidThrow.activeInHierarchy)
             itemWillBreak.SetActive(true);
     }
 }
+

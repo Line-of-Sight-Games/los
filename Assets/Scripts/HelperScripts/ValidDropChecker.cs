@@ -4,8 +4,7 @@ using UnityEngine;
 public class ValidDropChecker : MonoBehaviour
 {
     public TMP_InputField XPos, YPos, ZPos;
-    public GameObject invalidThrow, groundOrAlly, catcher, itemWillBreak;
-    public TMP_Dropdown groundOrAllyDropdown, catcherDropdown;
+    public GameObject invalidThrow, catcher, itemWillBreak;
     public UseItemUI useItemUI;
 
     private void Update()
