@@ -284,7 +284,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
-            else if (s2.IsOnOverwatch() && !s2.PhysicalObjectWithinOverwatchCone(s1)) //s1 is not in the overwatch cone of s2
+            else if (!s1Label.text.Contains("GLIMPSE") && s2.IsOnOverwatch() && !s2.PhysicalObjectWithinOverwatchCone(s1)) //s1 is not in the overwatch cone of s2 and the alert was NOT a glimpse
                 s1Toggle.interactable = false;
             else
                 s1Toggle.interactable = true;
@@ -302,7 +302,7 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
-            else if (s1.IsOnOverwatch() && !s1.PhysicalObjectWithinOverwatchCone(s2)) //s2 is not in the overwatch cone of s1
+            else if (!s2Label.text.Contains("GLIMPSE") && s1.IsOnOverwatch() && !s1.PhysicalObjectWithinOverwatchCone(s2)) //s2 is not in the overwatch cone of s1 and the alert was NOT a glimpse
                 s2Toggle.interactable = false;
             else
                 s2Toggle.interactable = true;
