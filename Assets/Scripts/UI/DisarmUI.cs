@@ -42,7 +42,7 @@ public class DisarmUI : MonoBehaviour
         {
             ActiveSoldier.Instance.S.DeductAP(1);
 
-            POI poiToDisarm = POIManager.Instance.FindPOIById(SelectedDisarmbaleId);
+            POI poiToDisarm = POIManager.Instance.FindPOIById(SelectedDisarmableId);
             Item disarmedItem = null;
             Soldier placedBy = null;
 
@@ -78,5 +78,5 @@ public class DisarmUI : MonoBehaviour
         }
     }
 
-    public string SelectedDisarmbaleId => allDisarmableIds[disarmableDropdown.value];
+    public string SelectedDisarmableId => allDisarmableIds[disarmableDropdown.value];
 }

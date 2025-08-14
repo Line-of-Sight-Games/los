@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class ShotUI : MonoBehaviour
 {
+    public List<string> allShootableIds = new();
+
     public OverwatchShotUI overwatchShotUI;
 
     public TextMeshProUGUI shooterID;
@@ -22,7 +24,6 @@ public class ShotUI : MonoBehaviour
     public TMP_InputField coverXPos;
     public TMP_InputField coverYPos;
     public TMP_InputField coverZPos;
-    public TextMeshProUGUI barrelLocation;
     public TextMeshProUGUI suppressionValue;
     public TextMeshProUGUI apCost;
     public Button backButton;
@@ -31,11 +32,12 @@ public class ShotUI : MonoBehaviour
     public GameObject suppressionValueUI;
     public GameObject coverLocationUI;
     public GameObject invalidCoverLocationUI;
-    public GameObject barrelLocationUI;
     public GameObject coverLevelUI;
     public GameObject flankersShotUI;
     public GameObject shotConfirmUI;
     public GameObject shotResultUI;
+    public GameObject targetIsJammer;
+    public GameObject targetIsJammerRevoked;
 
     public bool clearShotFlag;
 
@@ -197,6 +199,8 @@ public class ShotUI : MonoBehaviour
     public void ClearShotUI()
     {
         clearShotFlag = true;
+        allShootableIds.Clear();
+
         shotTypeDropdown.interactable = true;
         shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         shotTypeDropdown.value = 0;
@@ -212,6 +216,7 @@ public class ShotUI : MonoBehaviour
         targetDropdown.interactable = true;
         targetDropdown.ClearOptions();
         targetDropdown.value = 0;
+        targetIsJammer.SetActive(false);
 
         coverLevelDropdown.interactable = true;
         coverLevelDropdown.value = 0;
@@ -235,107 +240,114 @@ public class ShotUI : MonoBehaviour
         {
             if (ActiveSoldier.Instance.S.CheckAP(ap))
             {
-                Soldier shooter = SoldierManager.Instance.FindSoldierById(shooterID.text);
-                IAmShootable target = GameManager.Instance.FindShootableById(targetDropdown.captionText.text);
-                Item gun1 = null, gun2 = null;
-                Tuple<int, int, int> chances1 = null, chances2 = null;
-
-                //if shooting with two guns
-                if (gunDropdown.value == 2)
+                if (!targetIsJammer.activeInHierarchy)
                 {
-                    gun1 = shooter.EquippedGuns[0];
-                    gun2 = shooter.EquippedGuns[1];
-                }
-                else
-                    gun1 = shooter.EquippedGuns[gunDropdown.value];
-                shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text = gunDropdown.captionText.text;
+                    Soldier shooter = SoldierManager.Instance.FindSoldierById(shooterID.text);
+                    IAmShootable target = GameManager.Instance.FindShootableById(SelectedShootableId);
+                    Item gun1 = null, gun2 = null;
+                    Tuple<int, int, int> chances1 = null, chances2 = null;
 
-                //if gun is valid, get chance for first shot
-                if (gun1 != null)
-                {
-                    if (shotTypeDropdown.value == 1)
-                        chances1 = Tuple.Create(100, 0, 100);
-                    else
-                        chances1 = CalculateHitPercentage(shooter, target, gun1);
-                }
-
-                //if first shot is valid, display details
-                if (chances1 != null)
-                {
-                    //show gun image
-                    shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("GunImage").GetComponent<Image>().sprite = gun1.itemImage;
-
-                    //only shot suppression hit chance if suppressed
-                    if (shooter.IsSuppressed() && shotTypeDropdown.value != 1)
+                    //if shooting with two guns
+                    if (gunDropdown.value == 2)
                     {
-                        shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("SuppressedHitChance").gameObject.SetActive(true);
-                        shotConfirmUI.transform.Find("OptionPanel").Find("HitChanceLabels").Find("SuppressedHitChance").gameObject.SetActive(true);
+                        gun1 = shooter.EquippedGuns[0];
+                        gun2 = shooter.EquippedGuns[1];
                     }
                     else
-                    {
-                        shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("SuppressedHitChance").gameObject.SetActive(false);
-                        shotConfirmUI.transform.Find("OptionPanel").Find("HitChanceLabels").Find("SuppressedHitChance").gameObject.SetActive(false);
-                    }
+                        gun1 = shooter.EquippedGuns[gunDropdown.value];
+                    shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text = gunDropdown.captionText.text;
 
-                    shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("SuppressedHitChance").GetComponent<TextMeshProUGUI>().text = chances1.Item3.ToString() + "%";
-                    shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("HitChance").GetComponent<TextMeshProUGUI>().text = chances1.Item1.ToString() + "%";
-                    shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("CritHitChance").GetComponent<TextMeshProUGUI>().text = chances1.Item2.ToString() + "%";
-
-                    //enable back button only if shot is aimed and under 25%
-                    if (aimTypeDropdown.captionText.text.Contains("Aimed") && chances1.Item1 <= 25)
-                        shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = true;
-                    else
-                        shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
-
-                    //add parameter to equation view
-                    shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayShotParameters();
-
-
-                    shotConfirmUI.SetActive(true);
-                }
-
-                //if shooting with two guns
-                if (gunDropdown.value == 2)
-                {
-                    shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").gameObject.SetActive(true);
-
-                    //show gun image
-                    shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("GunImage").GetComponent<Image>().sprite = gun2.itemImage;
-
-                    //if gun is valid
-                    if (gun2 != null)
+                    //if gun is valid, get chance for first shot
+                    if (gun1 != null)
                     {
                         if (shotTypeDropdown.value == 1)
-                            chances2 = Tuple.Create(100, 0, 100);
+                            chances1 = Tuple.Create(100, 0, 100);
                         else
-                            chances2 = CalculateHitPercentage(shooter, target, gun2);
+                            chances1 = CalculateHitPercentage(shooter, target, gun1);
                     }
 
-                    //only continue if shot is valid
-                    if (chances2 != null)
+                    //if first shot is valid, display details
+                    if (chances1 != null)
                     {
+                        //show gun image
+                        shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("GunImage").GetComponent<Image>().sprite = gun1.itemImage;
+
                         //only shot suppression hit chance if suppressed
                         if (shooter.IsSuppressed() && shotTypeDropdown.value != 1)
-                            shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("SuppressedHitChance").gameObject.SetActive(true);
+                        {
+                            shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("SuppressedHitChance").gameObject.SetActive(true);
+                            shotConfirmUI.transform.Find("OptionPanel").Find("HitChanceLabels").Find("SuppressedHitChance").gameObject.SetActive(true);
+                        }
                         else
-                            shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("SuppressedHitChance").gameObject.SetActive(false);
+                        {
+                            shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("SuppressedHitChance").gameObject.SetActive(false);
+                            shotConfirmUI.transform.Find("OptionPanel").Find("HitChanceLabels").Find("SuppressedHitChance").gameObject.SetActive(false);
+                        }
 
-                        shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("SuppressedHitChance").GetComponent<TextMeshProUGUI>().text = chances2.Item3.ToString() + "%";
-                        shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("HitChance").GetComponent<TextMeshProUGUI>().text = chances2.Item1.ToString() + "%";
-                        shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("CritHitChance").GetComponent<TextMeshProUGUI>().text = chances2.Item2.ToString() + "%";
+                        shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("SuppressedHitChance").GetComponent<TextMeshProUGUI>().text = chances1.Item3.ToString() + "%";
+                        shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("HitChance").GetComponent<TextMeshProUGUI>().text = chances1.Item1.ToString() + "%";
+                        shotConfirmUI.transform.Find("OptionPanel").Find("PrimaryGun").Find("CritHitChance").GetComponent<TextMeshProUGUI>().text = chances1.Item2.ToString() + "%";
 
-                        //back button always disabled for unaimed shot
-                        shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
+                        //enable back button only if shot is aimed and under 25%
+                        if (aimTypeDropdown.captionText.text.Contains("Aimed") && chances1.Item1 <= 25)
+                            shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = true;
+                        else
+                            shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
 
                         //add parameter to equation view
-                        //shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayShotParameters();
+                        shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayShotParameters();
+
 
                         shotConfirmUI.SetActive(true);
                     }
+
+                    //if shooting with two guns
+                    if (gunDropdown.value == 2)
+                    {
+                        shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").gameObject.SetActive(true);
+
+                        //show gun image
+                        shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("GunImage").GetComponent<Image>().sprite = gun2.itemImage;
+
+                        //if gun is valid
+                        if (gun2 != null)
+                        {
+                            if (shotTypeDropdown.value == 1)
+                                chances2 = Tuple.Create(100, 0, 100);
+                            else
+                                chances2 = CalculateHitPercentage(shooter, target, gun2);
+                        }
+
+                        //only continue if shot is valid
+                        if (chances2 != null)
+                        {
+                            //only shot suppression hit chance if suppressed
+                            if (shooter.IsSuppressed() && shotTypeDropdown.value != 1)
+                                shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("SuppressedHitChance").gameObject.SetActive(true);
+                            else
+                                shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("SuppressedHitChance").gameObject.SetActive(false);
+
+                            shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("SuppressedHitChance").GetComponent<TextMeshProUGUI>().text = chances2.Item3.ToString() + "%";
+                            shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("HitChance").GetComponent<TextMeshProUGUI>().text = chances2.Item1.ToString() + "%";
+                            shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").Find("CritHitChance").GetComponent<TextMeshProUGUI>().text = chances2.Item2.ToString() + "%";
+
+                            //back button always disabled for unaimed shot
+                            shotConfirmUI.transform.Find("OptionPanel").Find("Back").GetComponent<Button>().interactable = false;
+
+                            //add parameter to equation view
+                            //shotConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayShotParameters();
+
+                            shotConfirmUI.SetActive(true);
+                        }
+                    }
+                    else
+                        shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").gameObject.SetActive(false);
                 }
                 else
-                    shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").gameObject.SetActive(false);
+                    MenuManager.Instance.generalAlertUI.Activate("Cannot target a Jammer");
             }
+            else
+                MenuManager.Instance.generalAlertUI.Activate("Not enough AP to take the shot");
         }
     }
     public void ExitShotConfirmUI()
@@ -409,18 +421,20 @@ public class ShotUI : MonoBehaviour
         foreach (Soldier s in GameManager.Instance.AllFieldedSoldiers())
         {
             TMP_Dropdown.OptionData targetOptionData = null;
+            Sprite targetPotrait;
             if (s.IsAlive() && shooter.IsOppositeTeamAs(s) && s.IsRevealed())
             {
                 if (shooter.CanSeeInOwnRight(s))
-                    targetOptionData = new(s.Id, s.soldierPortrait, Color.white);
+                    targetPotrait = s.soldierPortrait;
                 else
                 {
-                    if (s.IsJammer() && !shooter.IsRevoker())
-                        targetOptionData = new(s.Id, s.LoadPortraitJammed(s.soldierPortraitText), Color.white);
+                    if (s.IsJammer())
+                        targetPotrait = s.LoadPortraitJammed(s.soldierPortraitText);
                     else
-                        targetOptionData = new(s.Id, s.LoadPortraitTeamsight(s.soldierPortraitText), Color.white);
+                        targetPotrait = s.LoadPortraitTeamsight(s.soldierPortraitText);
                 }
-
+                allShootableIds.Add(s.Id);
+                targetOptionData = new($"X:{s.X} Y:{s.Y} Z:{s.Z}", targetPotrait, Color.white);
             }
 
             if (targetOptionData != null)
@@ -442,13 +456,17 @@ public class ShotUI : MonoBehaviour
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (shooter.PhysicalObjectIsRevealed(b))
-                    targetOptionData = new(b.Id, MenuManager.Instance.explosiveBarrelSprite, Color.white);
+                {
+                    allShootableIds.Add(b.Id);
+                    targetOptionData = new($"X:{b.X} Y:{b.Y} Z:{b.Z}", MenuManager.Instance.explosiveBarrelSprite, Color.white);
+                }
 
                 if (targetOptionData != null)
                     targetOptionDataList.Add(targetOptionData);
             }
 
             //add coverman
+            allShootableIds.Add("coverman");
             targetOptionDataList.Add(new("coverman", MenuManager.Instance.covermanSprite, Color.white));
         }
         else if (shotTypeDropdown.value == 1)
@@ -493,12 +511,10 @@ public class ShotUI : MonoBehaviour
     }
     public void UpdateTarget(Soldier shooter)
     {
-        print($"caption text -> {targetDropdown.captionText.text}");
-        IAmShootable target = GameManager.Instance.FindShootableById(targetDropdown.captionText.text);
+        IAmShootable target = GameManager.Instance.FindShootableById(SelectedShootableId);
 
         //initialise
         coverLocationUI.SetActive(false);
-        barrelLocationUI.SetActive(false);
         coverLevelUI.SetActive(false);
 
         print($"updating target -> {target}");
@@ -511,8 +527,6 @@ public class ShotUI : MonoBehaviour
         }
         else if (target is ExplosiveBarrel targetBarrel)
         {
-            barrelLocation.text = $"X:{targetBarrel.X} Y:{targetBarrel.Y} Z:{targetBarrel.Z}";
-            barrelLocationUI.SetActive(true);
             shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
             MenuManager.Instance.ClearFlankersUI(MenuManager.Instance.flankersShotUI);
         }
@@ -521,13 +535,32 @@ public class ShotUI : MonoBehaviour
             if (targetSoldier.IsInCover())
                 coverLevelUI.SetActive(true);
 
+            if (targetSoldier.IsJammer())
+            {
+                if (shooter.IsRevoker())
+                {
+                    targetIsJammerRevoked.SetActive(true);
+                    targetIsJammer.SetActive(false);
+                }
+                else
+                {
+                    targetIsJammerRevoked.SetActive(false);
+                    targetIsJammer.SetActive(true);
+                }
+            }
+            else
+            {
+                targetIsJammerRevoked.SetActive(false);
+                targetIsJammer.SetActive(false);
+            }
+
             UpdateTargetFlanking(shooter, targetSoldier);
         }
     }
     public void UpdateSuppressionValue(Soldier shooter)
     {
         int suppressionValue = 0;
-        IAmShootable target = GameManager.Instance.FindShootableById(targetDropdown.captionText.text);
+        IAmShootable target = GameManager.Instance.FindShootableById(SelectedShootableId);
         string suppressionBracket = GameManager.Instance.CalculateRangeBracket(GameManager.Instance.CalculateRange(shooter, target as PhysicalObject)) switch
         {
             "Melee" or "CQB" => "cQBSupPen",
@@ -1133,7 +1166,7 @@ public class ShotUI : MonoBehaviour
     public void ConfirmShot(bool retry)
     {
         Soldier shooter = SoldierManager.Instance.FindSoldierById(shooterID.text);
-        IAmShootable target = GameManager.Instance.FindShootableById(targetDropdown.captionText.text);
+        IAmShootable target = GameManager.Instance.FindShootableById(SelectedShootableId);
         Item gun = null;
         bool runSecondShot = false;
         string gunNames = MenuManager.Instance.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text;
@@ -1491,4 +1524,6 @@ public class ShotUI : MonoBehaviour
 
         MenuManager.Instance.shotResolvedFlag = value;
     }
+
+    public string SelectedShootableId => allShootableIds[targetDropdown.value];
 }
