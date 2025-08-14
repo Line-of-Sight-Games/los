@@ -21,10 +21,10 @@ public class DipElecUI : MonoBehaviour
         List<TMP_Dropdown.OptionData> terminalDetailsList = new();
         foreach (Terminal t in GameManager.Instance.AllTerminals())
         {
-            TMP_Dropdown.OptionData terminalDetails = null;
+            TMP_Dropdown.OptionData terminalDetails;
             if (t.terminalEnabled && ActiveSoldier.Instance.S.PhysicalObjectWithinMeleeRadius(t))
             {
-                allTerminalIds.Add(t.id);
+                allTerminalIds.Add(t.Id);
                 terminalDetails = new($"X:{t.X} Y:{t.Y} Z:{t.Z}", t.poiPortrait, Color.white);
                 terminalDetailsList.Add(terminalDetails);
             }

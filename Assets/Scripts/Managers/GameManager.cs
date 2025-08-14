@@ -34,7 +34,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public ShotUI shotUI;
     public MeleeUI meleeUI;
     public ConfigureUI configUI;
-    public DipElecUI dipelecUI;
     public DamageEventUI damageEventUI;
     public OverwatchUI overwatchUI;
     public InsertObjectsUI insertObjectsUI;
@@ -1700,48 +1699,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
 
 
-    //disarm functions
-    public void ConfirmDisarm()
-    {
-        if (ActiveSoldier.Instance.S.CheckAP(1))
-        {
-            ActiveSoldier.Instance.S.DeductAP(1);
-
-            POI poiToDisarm = POIManager.Instance.FindPOIById(MenuManager.Instance.disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
-            Item disarmedItem = null;
-            Soldier placedBy = null;
-
-            if (poiToDisarm is Claymore claymoreToDisarm)
-            {
-                disarmedItem = ItemManager.Instance.SpawnItem("Claymore");
-                placedBy = claymoreToDisarm.placedBy;
-            }
-            else if (poiToDisarm is DeploymentBeacon depbeaconToDisarm)
-            {
-                disarmedItem = ItemManager.Instance.SpawnItem("Deployment_Beacon");
-                placedBy = depbeaconToDisarm.placedBy;
-            }
-            else if (poiToDisarm is ThermalCamera thermalcamToDisarm)
-            {
-                SetLosCheckAllEnemies("losChange|thermalCamDeactive"); //loscheckallenemies
-                disarmedItem = ItemManager.Instance.SpawnItem("Thermal_Camera");
-                placedBy = thermalcamToDisarm.placedBy;
-            }
-
-            //xp for disarming enemy objects
-            if (placedBy != null && ActiveSoldier.Instance.S.IsOppositeTeamAs(placedBy))
-                MenuManager.Instance.AddXpAlert(ActiveSoldier.Instance.S, 2, "Disarmed enemy device.", true);
-
-            //set item to same position as poi and destroy poi
-            disarmedItem.X = poiToDisarm.X;
-            disarmedItem.Y = poiToDisarm.Y;
-            disarmedItem.Z = poiToDisarm.Z;
-            POIManager.Instance.DestroyPOI(poiToDisarm);
-            
-            ActiveSoldier.Instance.S.PerformLoudAction(6);
-            MenuManager.Instance.CloseDisarmUI();
-        }
-    }
+    
 
 
 

@@ -3232,37 +3232,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
 
 
-    //disarm functions
-    public void OpenDisarmUI()
-    {
-        List<TMP_Dropdown.OptionData> disarmOptionDataList = new();
-        TMP_Dropdown.OptionData disarmOptionData;
-
-        foreach (IAmDisarmable disarmable in GameManager.Instance.AllDisarmable())
-        {
-            if (ActiveSoldier.Instance.S.PhysicalObjectWithinMeleeRadius((PhysicalObject)disarmable))
-            {
-                disarmOptionData = new(disarmable.Id, disarmable.DisarmImage, Color.white);
-                disarmOptionDataList.Add(disarmOptionData);
-            }
-        }
-
-        disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().AddOptions(disarmOptionDataList);
-        disarmUI.SetActive(true);
-    }
-    public void CloseDisarmUI()
-    {
-        ClearDisarmUI();
-        disarmUI.gameObject.SetActive(false);
-    }
-    public void ClearDisarmUI()
-    {
-        disarmUI.transform.Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().ClearOptions();
-    }
-
-
-
-
 
 
 
