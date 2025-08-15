@@ -3657,13 +3657,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool IsUsingBinocularsInFlashMode()
     {
-        if (IsUsingBinoculars() && binocularBeamId.Split('|')[1].Equals("Flash"))
+        if (IsUsingBinoculars() && BinocularUseMode().Equals("Flash"))
             return true;
         return false;
     }
     public bool IsUsingBinocularsInReconMode()
     {
-        if (IsUsingBinoculars() && binocularBeamId.Split('|')[1].Equals("Recon"))
+        if (IsUsingBinoculars() && BinocularUseMode().Equals("Recon"))
             return true;
         return false;
     }
