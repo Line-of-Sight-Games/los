@@ -25,7 +25,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
-    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced;
     public Statline stats;
     public Inventory inventory;
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
@@ -164,6 +164,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "riotXPoint", riotXPoint },
             { "riotYPoint", riotYPoint },
             { "binocularBeamId", binocularBeamId },
+            { "lastSoldierBinoced", lastSoldierBinoced },
 
             //save ability details
             { "plannerDonatedMove", plannerDonatedMove },
@@ -273,6 +274,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         riotXPoint = Convert.ToInt32(details["riotXPoint"]);
         riotYPoint = Convert.ToInt32(details["riotYPoint"]);
         binocularBeamId = (string)details["binocularBeamId"];
+        lastSoldierBinoced = (string)details["lastSoldierBinoced"];
 
         //load ability details
         plannerDonatedMove = Convert.ToInt32(details["plannerDonatedMove"]);

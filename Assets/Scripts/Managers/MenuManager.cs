@@ -1925,7 +1925,14 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                                     //pay xp for binoc detection (only if it's a "new" detection)
                                     if (counter.IsUsingBinoculars() && detector.IsHidden())
-                                        AddXpAlert(counter, 4, $"Detected {detector.soldierName} with binoculars ({counter.BinocularUseMode()}).", true);
+                                    {
+                                        if (!HelperFunctions.SoldierBinocedString(detector).Equals(counter.lastSoldierBinoced)) //only pay xp if soldier is NOT in same spot as last time
+                                        {
+                                            counter.lastSoldierBinoced = HelperFunctions.SoldierBinocedString(detector);
+                                            AddXpAlert(counter, 4, $"Detected {detector.soldierName} with binoculars ({counter.BinocularUseMode()}).", true);
+                                        }
+                                    }
+                                        
                                 }
                                 else //avoidance
                                     AddXpAlert(detector, 1 + detector.ShadowXpBonus(counter.IsRevoker()), $"Avoided detection.", true); //xp
@@ -1945,7 +1952,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                                     //pay xp for binoc detection (only if it's a "new" detection)
                                     if (counter.IsUsingBinoculars() && detector.IsHidden())
-                                        AddXpAlert(counter, 4, $"Detected {detector.soldierName} with binoculars ({counter.BinocularUseMode()}).", true);
+                                    {
+                                        if (!HelperFunctions.SoldierBinocedString(detector).Equals(counter.lastSoldierBinoced)) //only pay xp if soldier is NOT in same spot as last time
+                                        {
+                                            counter.lastSoldierBinoced = HelperFunctions.SoldierBinocedString(detector);
+                                            AddXpAlert(counter, 4, $"Detected {detector.soldierName} with binoculars ({counter.BinocularUseMode()}).", true);
+                                        }
+                                    }
                                 }
                                 else //avoidance
                                 {
@@ -1983,7 +1996,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                                     //pay xp for binoc detection (only if it's a "new" detection)
                                     if (detector.IsUsingBinoculars() && counter.IsHidden())
-                                        AddXpAlert(detector, 4, $"Detected {counter.soldierName} with binoculars ({detector.BinocularUseMode()}).", true);
+                                    {
+                                        if (!HelperFunctions.SoldierBinocedString(counter).Equals(detector.lastSoldierBinoced)) //only pay xp if soldier is NOT in same spot as last time
+                                        {
+                                            detector.lastSoldierBinoced = HelperFunctions.SoldierBinocedString(counter);
+                                            AddXpAlert(detector, 4, $"Detected {counter.soldierName} with binoculars ({detector.BinocularUseMode()}).", true);
+                                        }
+                                    }
                                 }
                                 else //avoidance
                                     AddXpAlert(counter, 1 + counter.ShadowXpBonus(detector.IsRevoker()), $"Avoided detection.", true); //xp
@@ -2003,7 +2022,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
                                     //pay xp for binoc detection (only if it's a "new" detection)
                                     if (detector.IsUsingBinoculars() && counter.IsHidden())
-                                        AddXpAlert(detector, 4, $"Detected {counter.soldierName} with binoculars ({detector.BinocularUseMode()}).", true);
+                                    {
+                                        if (!HelperFunctions.SoldierBinocedString(counter).Equals(detector.lastSoldierBinoced)) //only pay xp if soldier is NOT in same spot as last time
+                                        {
+                                            detector.lastSoldierBinoced = HelperFunctions.SoldierBinocedString(counter);
+                                            AddXpAlert(detector, 4, $"Detected {counter.soldierName} with binoculars ({detector.BinocularUseMode()}).", true);
+                                        }
+                                    }
                                 }
                                 else
                                 {
