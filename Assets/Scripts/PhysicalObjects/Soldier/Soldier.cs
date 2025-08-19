@@ -3637,7 +3637,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasActiveAndCorrectlyAngledRiotShield(Vector3 damageOriginPoint)
     {
-        if(HasActiveRiotShield() && HelperFunctions.IsWithinAngle(new(riotXPoint, riotYPoint), damageOriginPoint, new(X, Y), 67.5f))
+        if(HasActiveRiotShield() && riotXPoint > 0 && riotYPoint > 0 && HelperFunctions.IsWithinAngle(new(riotXPoint, riotYPoint), damageOriginPoint, new(X, Y), 67.5f))
             return true;
         return false;
     }
@@ -4519,6 +4519,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return binocsState;
     }
+    public string GetRiotShieldState()
+    {
+        if (IsCarryingRiotShield())
+        {
+            if (HasActiveRiotShield())
+            {
+                if (riotXPoint > 0 && riotYPoint > 0)
+                    return $", <color=green>Riot Shield({riotXPoint},{riotYPoint})</color>";
+                else
+                    return ", <color=yellow>Riot Shield(Unoriented)</color>";
+            }
+            else
+                return ", <color=yellow>Riot Shield(Inactive)</color>";
+        }
+        return "";
+    }
     public string GetPlannerBuffState()
     {
         if (plannerDonatedMove > 0)
@@ -4586,6 +4602,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             status += GetDrugState();
             status += GetULFState();
             status += GetBinocsState();
+            status += GetRiotShieldState();
 
             status += GetPlannerBuffState();
             status += GetPatriotState();
