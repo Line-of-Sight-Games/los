@@ -1728,7 +1728,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         foreach (Transform child in detectionUI.detectionAlertsPanel)
         {
             childCount++;
-            if (child.Find("DetectionArrow").GetComponent<Image>().sprite.ToString().Contains("verwatch"))
+            if (child.Find("Arrow").GetComponent<Image>().sprite.ToString().Contains("verwatch"))
                 overwatchCount++;
         }
 

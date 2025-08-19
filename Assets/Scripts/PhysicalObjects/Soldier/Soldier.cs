@@ -2484,7 +2484,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         SetState("SmokeBlinded");
         MenuManager.Instance.AddSoldierAlert(this, "SMOKE BLINDED", Color.yellow, $"{soldierName} is in a smoke cloud (<color=red>Blind Zone</color>).", -1, -1);
 
-        SetLosCheck("statChange(P)(SR)|smokeActive(blindzone)"); //losCheck
+        SetLosCheck("losChange|statChange(P)(SR)|smokeActive(blindzone)"); //losCheck
     }
     public void UnsetSmoked()
     {

@@ -35,10 +35,13 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public GameObject s2BinocularImage;
     public Toggle s2Toggle;
 
-    public GameObject causeOfLosCheckDetectorObject;
-    public TextMeshProUGUI causeOfLosCheckDetector;
-    public GameObject causeOfLosCheckCounterObject;
-    public TextMeshProUGUI causeOfLosCheckCounter;
+    public GameObject causeOfLosCheckS1Object;
+    public GameObject causeOfLosCheckS2Object;
+    public TextMeshProUGUI causeOfLosCheckS1;
+    public TextMeshProUGUI causeOfLosCheckS2;
+
+    public TextMeshProUGUI causeOfToggleStateS1;
+    public TextMeshProUGUI causeOfToggleStateS2;
 
     public SoldierAlertLOS Init(Soldier s1, Soldier s2)
     {
@@ -54,8 +57,8 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         UpdateS1EndBoundary();
         UpdateS2StartBoundary();
         UpdateS2EndBoundary();
-        causeOfLosCheckDetector.text = $"{s1.causeOfLosCheck}";
-        causeOfLosCheckCounter.text = $"{s2.causeOfLosCheck}";
+        causeOfLosCheckS1.text = $"{s1.causeOfLosCheck}";
+        causeOfLosCheckS2.text = $"{s2.causeOfLosCheck}";
         s1Portrait.Init(s1);
         s2Portrait.Init(s2);
         if (s1.IsUsingBinoculars())
@@ -235,77 +238,122 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (!s1.causeOfLosCheck.Contains("losChange") && !s2.causeOfLosCheck.Contains("losChange")) //no physical change to los at all
         {
             //s1 toggle
-            if (s1Label.text.Equals("OUT OF SR"))
+            if (s1Label.text.Equals("OUT OF SR")) //s1 is out of s2 SR
             {
+                causeOfToggleStateS1.text = $"s1 is out of s2 SR";
                 s1Toggle.interactable = false;
             }
-            else if ((s1Label.text.Contains("DETECT") || s1Label.text.Contains("AVOID")) && (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id)))
+            else if ((s1Label.text.Contains("DETECT") || s1Label.text.Contains("AVOID")) && (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))) //s2 had LOS to s1 previously approved, and no change to s1 physical position
             {
+                causeOfToggleStateS1.text = $"s2 had LOS to s1 previously approved, and no change to s1 physical position";
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
-            else if ((s1Label.text.Contains("DETECT") || s1Label.text.Contains("AVOID")) && (s2.NoLOSToTheseSoldiers.Contains(s1.Id)))
+            else if ((s1Label.text.Contains("DETECT") || s1Label.text.Contains("AVOID")) && (s2.NoLOSToTheseSoldiers.Contains(s1.Id))) //s2 had LOS to s1 previously denied, and no change to s1 physical position
             {
+                causeOfToggleStateS1.text = $"s2 had LOS to s1 previously denied, and no change to s1 physical position";
                 s1Toggle.interactable = false;
             }
             else
-                s1Toggle.interactable = true;
+            {
+                s1Toggle.interactable = true; 
+                causeOfToggleStateS1.text = $"GM to evaluate LOS";
+            }
                 
 
             //s2 toggle
-            if (s2Label.text.Equals("OUT OF SR"))
+            if (s2Label.text.Equals("OUT OF SR")) //s2 is out of s1 SR
             {
+                causeOfToggleStateS2.text = $"s2 is out of s1 SR";
                 s2Toggle.interactable = false;
             }
-            else if ((s2Label.text.Contains("DETECT") || s2Label.text.Contains("AVOID")) && (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id)))
+            else if ((s2Label.text.Contains("DETECT") || s2Label.text.Contains("AVOID")) && (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))) //s1 had LOS to s2 previously approved, and no change to s2 physical position
             {
+                causeOfToggleStateS2.text = $"s1 had LOS to s2 previously approved, and no change to s2 physical position";
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
-            else if ((s2Label.text.Contains("DETECT") || s2Label.text.Contains("AVOID")) && (s1.NoLOSToTheseSoldiers.Contains(s2.Id)))
+            else if ((s2Label.text.Contains("DETECT") || s2Label.text.Contains("AVOID")) && (s1.NoLOSToTheseSoldiers.Contains(s2.Id))) //s1 had LOS to s2 previously denied, and no change to s2 physical position
             {
+                causeOfToggleStateS2.text = $"s1 had LOS to s2 previously denied, and no change to s2 physical position";
                 s2Toggle.interactable = false;
             }
             else
+            {
+                causeOfToggleStateS2.text = $"GM to evaluate LOS"; 
                 s2Toggle.interactable = true;
+            }
         }
         else
         {
             //locking options for s1 toggle
             if (s1Label.text.Equals("OUT OF SR")) //s1 is out of s2 SR
-                s1Toggle.interactable = false;
-            else if (s2.trenXRayEffect) //s2 has xray effect
             {
+                causeOfToggleStateS1.text = $"s1 is out of s2 SR";
+                s1Toggle.interactable = false;
+            }
+            else if (s2.trenXRayEffect) //s2 has xray effect, guaranteeing LOS to s1
+            {
+                causeOfToggleStateS1.text = $"s2 has xray effect, guaranteeing LOS to s1";
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
             else if (s1Label.text.Contains("RETREAT") && (s2.LOSToTheseSoldiersAndRevealing.Contains(s1.Id) || s2.LOSToTheseSoldiersButHidden.Contains(s1.Id))) //s1 was detected or avoided leaving s2 SR and had LOS pre-approved
             {
+                causeOfToggleStateS1.text = $"s1 was detected or avoided leaving s2 SR and had LOS pre-approved";
                 s1Toggle.isOn = true;
                 s1Toggle.interactable = false;
             }
             else if (!s1Label.text.Contains("GLIMPSE") && s2.IsOnOverwatch() && !s2.PhysicalObjectWithinOverwatchCone(s1)) //s1 is not in the overwatch cone of s2 and the alert was NOT a glimpse
+            {
+                causeOfToggleStateS1.text = $"s1 is not in the overwatch cone of s2 and the alert was NOT a glimpse";
                 s1Toggle.interactable = false;
+            }
+            else if (s1.IsInSmokeBlindZone() && !s2.IsWearingThermalGoggles()) //s1 is in a smoke blind zone and s2 does not have thermal goggles
+            {
+                causeOfToggleStateS1.text = $"s1 is in a smoke blind zone and s2 does not have thermal goggles";
+                s1Toggle.interactable = false;
+            }
             else
+            {
+                causeOfToggleStateS1.text = $"GM to evaluate LOS";
                 s1Toggle.interactable = true;
+            }
+                
 
             //locking options for s2 toggle
             if (s2Label.text.Equals("OUT OF SR")) //s2 out of s1 SR
-                s2Toggle.interactable = false;
-            else if (s1.trenXRayEffect) //s1 has xray effect
             {
+                causeOfToggleStateS2.text = $"s2 out of s1 SR";
+                s2Toggle.interactable = false;
+            }
+            else if (s1.trenXRayEffect) //s1 has xray effect, guaranteeing LOS to s2
+            {
+                causeOfToggleStateS2.text = $"s1 has xray effect, guaranteeing LOS to s2";
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
             else if (s2Label.text.Contains("RETREAT") && (s1.LOSToTheseSoldiersAndRevealing.Contains(s2.Id) || s1.LOSToTheseSoldiersButHidden.Contains(s2.Id))) //s2 was detected or avoided leaving s1 SR and had LOS pre-approved
             {
+                causeOfToggleStateS2.text = $"s2 was detected or avoided leaving s1 SR and had LOS pre-approved";
                 s2Toggle.isOn = true;
                 s2Toggle.interactable = false;
             }
             else if (!s2Label.text.Contains("GLIMPSE") && s1.IsOnOverwatch() && !s1.PhysicalObjectWithinOverwatchCone(s2)) //s2 is not in the overwatch cone of s1 and the alert was NOT a glimpse
+            {
+                causeOfToggleStateS2.text = $"s2 is not in the overwatch cone of s1 and the alert was NOT a glimpse";
                 s2Toggle.interactable = false;
+            }
+            else if (s2.IsInSmokeBlindZone() && !s1.IsWearingThermalGoggles()) //s1 is in a smoke blind zone and s2 does not have thermal goggles
+            {
+                causeOfToggleStateS2.text = $"s1 is in a smoke blind zone and s2 does not have thermal goggles";
+                s2Toggle.interactable = false;
+            }
             else
+            {
+                causeOfToggleStateS2.text = $"GM to evaluate LOS";
                 s2Toggle.interactable = true;
+            }
         }
     }
     public bool LabelIndicatesDetectOrOverwatch(TextMeshProUGUI label)
@@ -325,13 +373,13 @@ public class SoldierAlertLOS : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void OnPointerEnter(PointerEventData eventData)
     {
         MenuManager.Instance.CreateLOSArrowPair(s1, s2);
-        causeOfLosCheckDetectorObject.SetActive(true);
-        causeOfLosCheckCounterObject.SetActive(true);
+        causeOfLosCheckS1Object.SetActive(true);
+        causeOfLosCheckS2Object.SetActive(true);
     }
     public void OnPointerExit(PointerEventData eventData)
     {
         MenuManager.Instance.DestroyLOSArrowPair(s1, s2);
-        causeOfLosCheckDetectorObject.SetActive(false);
-        causeOfLosCheckCounterObject.SetActive(false);
+        causeOfLosCheckS1Object.SetActive(false);
+        causeOfLosCheckS2Object.SetActive(false);
     }
 }
