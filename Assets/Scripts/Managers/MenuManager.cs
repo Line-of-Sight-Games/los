@@ -1834,8 +1834,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             detectionScroller.verticalNormalizedPosition = 0.05f;
             foreach (Transform child in detectionAlert)
             {
-                child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn = true;
-                child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = true;
+                child.Find("S1").Find("S1Toggle").GetComponent<Toggle>().isOn = true;
+                child.Find("S2").Find("S2Toggle").GetComponent<Toggle>().isOn = true;
             }
 
             ConfirmDetections();
@@ -1851,8 +1851,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             detectionScroller.verticalNormalizedPosition = 0.05f;
             foreach (Transform child in detectionAlert)
             {
-                child.Find("Detector").Find("DetectorToggle").GetComponent<Toggle>().isOn = false;
-                child.Find("Counter").Find("CounterToggle").GetComponent<Toggle>().isOn = false;
+                child.Find("S1").Find("S1Toggle").GetComponent<Toggle>().isOn = false;
+                child.Find("S2").Find("S2Toggle").GetComponent<Toggle>().isOn = false;
             }
 
             ConfirmDetections();
