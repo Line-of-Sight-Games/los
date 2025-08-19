@@ -524,18 +524,22 @@ public class ShotUI : MonoBehaviour
             coverLocationUI.SetActive(true);
             shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
             MenuManager.Instance.ClearFlankersUI(MenuManager.Instance.flankersShotUI);
+            targetIsJammerRevoked.SetActive(false);
+            targetIsJammer.SetActive(false);
         }
         else if (target is ExplosiveBarrel targetBarrel)
         {
             shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Suppression");
             MenuManager.Instance.ClearFlankersUI(MenuManager.Instance.flankersShotUI);
+            targetIsJammerRevoked.SetActive(false);
+            targetIsJammer.SetActive(false);
         }
         else if (target is Soldier targetSoldier)
         {
             if (targetSoldier.IsInCover())
                 coverLevelUI.SetActive(true);
 
-            if (targetSoldier.IsJammer())
+            if (targetSoldier.IsJammer() && !shooter.CanSeeInOwnRight(targetSoldier))
             {
                 if (shooter.IsRevoker())
                 {
