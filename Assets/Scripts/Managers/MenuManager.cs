@@ -1724,7 +1724,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         CloseSoldierStatsUI();
 
         detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(false);
-        detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(false);
         int childCount = 0, overwatchCount = 0;
         foreach (Transform child in detectionUI.detectionAlertsPanel)
         {
@@ -1743,13 +1742,12 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 detectionUI.transform.Find("MultiOverwatchAlert").gameObject.SetActive(false);
 
             //illusionist ability
-            if (ActiveSoldier.Instance.S != null)
+            if (ActiveSoldier.Instance.S != null && ActiveSoldier.Instance.S.causeOfLosCheck.Contains("move")) //only triggers on moves
             {
                 if (ActiveSoldier.Instance.S.IsIllusionist() && ActiveSoldier.Instance.S.IsHidden() && !ActiveSoldier.Instance.S.illusionedThisMove)
                 {
-                    //FIX illusionist triggering on non-move actions
+                    detectionUI.illusionistMoveTriggered = true; 
                     detectionAlertUI.transform.Find("OptionPanel").Find("IllusionistAlert").gameObject.SetActive(true);
-                    detectionUI.transform.Find("OptionPanel").Find("IllusionistButton").gameObject.SetActive(true);
                 }
             }
 
@@ -2159,9 +2157,11 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void CloseDetectionUI()
     {
-        SetDetectionResolvedFlagTo(true);
+        detectionUI.illusionistMoveTriggered = false;
         detectionUI.ClearAllAlerts();
         detectionUI.gameObject.SetActive(false);
+
+        SetDetectionResolvedFlagTo(true);
     }
     public void AddLostLosAlert(Soldier soldier)
     {

@@ -15,6 +15,30 @@ public class DetectionUI : MonoBehaviour
     public ClaymoreAlertLOS claymoreAlertLosPrefab;
     public ThermalCamAlertLOS thermalCamAlertLosPrefab;
 
+    public GameObject illusionistButton;
+
+    public bool illusionistMoveTriggered;
+
+    public void Update()
+    {
+        if (illusionistMoveTriggered)
+        {
+            bool illusionistButtonActive = false;
+            foreach (SoldierAlertLOS alert in allSoldierDetectionAlerts)
+            {
+                if ((ActiveSoldier.Instance.S.Equals(alert.s1) && alert.s1Toggle.isOn && alert.s1Label.text.Contains("DETECT")) || (ActiveSoldier.Instance.S.Equals(alert.s2) && alert.s2Toggle.isOn && alert.s2Label.text.Contains("DETECT")))
+                    illusionistButtonActive = true;
+            }
+
+            if (illusionistButtonActive)
+                illusionistButton.SetActive(true);
+            else
+                illusionistButton.SetActive(false);
+        }
+        else
+            illusionistButton.SetActive(false);
+    }
+
     //los alerts soldiers
     public bool LOSAlertAlreadyExists(Soldier s1, Soldier s2)
     {
