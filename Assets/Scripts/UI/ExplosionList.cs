@@ -84,7 +84,7 @@ public class ExplosionList : MonoBehaviour
                             if (child.Find("IsAffected").GetComponent<Toggle>().isOn)
                             {   
                                 int actualDamage = hitSoldier.TakeDamage(explodedBy, damage, false, new() { "Explosive" }, explosionLocation);
-                                int actualStun = hitSoldier.TakeStun(stun);
+                                int actualStun = hitSoldier.TakeStun(stun, explosionLocation);
 
                                 //do xp calculations, enemy - friendly damage
                                 if (hitSoldier.IsOppositeTeamAs(explodedBy))

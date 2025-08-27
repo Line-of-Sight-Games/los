@@ -1411,7 +1411,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 //apply stun affect from tranquiliser
                 if (damagedBy != null && damagedBy.IsTranquiliser() && (damageSource.Contains("Shot") || damageSource.Contains("Melee")) && !IsRevoker())
-                    TakeStun(1);
+                    TakeStun(1, Vector3.zero);
                     
                 //set sound flags after damage
                 SoundManager.Instance.SetSoldierSelectionSoundFlagAfterDamage(this);
@@ -2698,36 +2698,42 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         SetLosCheck("statChange(C)(SR)|stunDeactive"); //losCheck
     }
-    public int TakeStun(int stunRounds)
+    public int TakeStun(int stunRounds, Vector3 explosionLocation)
     {
+        int actualRoundsStun = 0;
         if (IsAlive())
         {
             if (stunRounds > 0)
             {
-                int resistedRounds = 0, actualRoundsStun = 0;
-                for (int i = 0; i < stunRounds; i++)
+                if (HasActiveAndCorrectlyAngledRiotShield(explosionLocation))
                 {
-                    if (ResilienceCheck())
-                        resistedRounds++;
+                    MenuManager.Instance.AddSoldierAlert(this, "STUN RESISTED", Color.green, $"Blocks {stunRounds} rounds of stun with riot shield.", -1, -1);
                 }
-                actualRoundsStun = stunRounds - resistedRounds;
+                else
+                {
+                    int resistedRounds = 0;
+                    for (int i = 0; i < stunRounds; i++)
+                    {
+                        if (ResilienceCheck())
+                            resistedRounds++;
+                    }
+                    actualRoundsStun = stunRounds - resistedRounds;
 
-                if (resistedRounds > 0)
-                {
-                    MenuManager.Instance.AddSoldierAlert(this, "STUN RESISTED", Color.green, $"Resists {resistedRounds} rounds of stun.", -1, -1);
-                    MenuManager.Instance.AddXpAlert(this, resistedRounds, $"Resisting stun ({resistedRounds} rounds).", true);
+                    if (resistedRounds > 0)
+                    {
+                        MenuManager.Instance.AddSoldierAlert(this, "STUN RESISTED", Color.green, $"Resists {resistedRounds} rounds of stun.", -1, -1);
+                        MenuManager.Instance.AddXpAlert(this, resistedRounds, $"Resisting stun ({resistedRounds} rounds).", true);
+                    }
+                    if (actualRoundsStun > 0)
+                    {
+                        MenuManager.Instance.AddSoldierAlert(this, "STUN SUFFERED", Color.red, $"Suffers {stunRounds - resistedRounds} rounds of stun.", -1, -1);
+                        SetStunned(actualRoundsStun * 2);
+                    }
                 }
-                if (actualRoundsStun > 0)
-                {
-                    MenuManager.Instance.AddSoldierAlert(this, "STUN SUFFERED", Color.red, $"Suffers {stunRounds - resistedRounds} rounds of stun.", -1, -1);
-                    SetStunned(actualRoundsStun * 2);
-                }
-
-                return actualRoundsStun;
             }
         }
 
-        return 0;
+        return actualRoundsStun;
     }
     public void ClearHealthState()
     {
@@ -3637,7 +3643,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool HasActiveAndCorrectlyAngledRiotShield(Vector3 damageOriginPoint)
     {
-        if(HasActiveRiotShield() && riotXPoint > 0 && riotYPoint > 0 && HelperFunctions.IsWithinAngle(new(riotXPoint, riotYPoint), damageOriginPoint, new(X, Y), 67.5f))
+        if(HasActiveRiotShield() && riotXPoint > 0 && riotYPoint > 0 && damageOriginPoint != Vector3.zero && HelperFunctions.IsWithinAngle(new(riotXPoint, riotYPoint), damageOriginPoint, new(X, Y), 67.5f))
             return true;
         return false;
     }
