@@ -227,10 +227,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78e586d796cafee4c81b672d9d28164f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menu: {fileID: 0}
-  soundManager: {fileID: 0}
   itemSlotPrefab: {fileID: 5753408940522442620, guid: 04db5a567d1e5fe4793369e3c42dde07, type: 3}
   itemIconPrefab: {fileID: -3382003001501138857, guid: 2cd921e8715b2764a850d2c46266f867, type: 3}
+  closeButtonText: {fileID: 9088059341683400727}
 --- !u!1 &9088059342664075590
 GameObject:
   m_ObjectHideFlags: 0

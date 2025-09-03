@@ -1,10 +1,12 @@
 using UnityEngine;
+using TMPro;
 
 public class InventorySourcePanel : MonoBehaviour
 {
     public IHaveInventory linkedInventorySource;
     public ItemSlot itemSlotPrefab;
     public ItemIcon itemIconPrefab;
+    public TextMeshProUGUI closeButtonText;
 
     public InventorySourcePanel Init(IHaveInventory inventorySource)
     {
@@ -14,6 +16,21 @@ public class InventorySourcePanel : MonoBehaviour
         {
             transform.Find("SoldierLoadout").GetComponent<InventoryDisplayPanelSoldier>().Init(linkedSoldier);
             transform.Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(linkedSoldier);
+
+            if (linkedSoldier.IsSameTeamAs(ActiveSoldier.Instance.S))
+            {
+                if (linkedSoldier.IsAlive())
+                    closeButtonText.text = "Close Ally Inventory";
+                else
+                    closeButtonText.text = "Close Dead Ally Inventory";
+            }
+            else
+            {
+                if (linkedSoldier.IsAlive())
+                    closeButtonText.text = "Close Enemy Inventory";
+                else
+                    closeButtonText.text = "Close Dead Enemy Inventory";
+            }
         }
         else if (linkedInventorySource is GoodyBox linkedGoodyBox)
         {
