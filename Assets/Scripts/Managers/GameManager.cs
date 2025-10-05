@@ -1771,9 +1771,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
             case "Deployment_Beacon":
                 MenuManager.Instance.OpenDeploymentBeaconUI(useItemUI);
                 break;
-            case "Riot_Shield":
-                MenuManager.Instance.OpenRiotShieldUI(useItemUI);
-                break;
             case "Thermal_Camera":
                 MenuManager.Instance.OpenThermalCamUI(useItemUI);
                 break;
@@ -1925,19 +1922,17 @@ public class GameManager : MonoBehaviour, IDataPersistence
             MenuManager.Instance.CloseUseULFUI();
         }
     }
-    public void ConfirmRiotShield(UseItemUI useRiotShield)
+    public void ConfirmRiotShield()
     {
-        TMP_InputField targetX = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("XPos").GetComponent<TMP_InputField>();
-        TMP_InputField targetY = useRiotShield.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("YPos").GetComponent<TMP_InputField>();
-
-        if (HelperFunctions.ValidateIntInput(targetX, out int x) && HelperFunctions.ValidateIntInput(targetY, out int y))
+        if (HelperFunctions.ValidateIntInput(MenuManager.Instance.riotShieldUI.xPos, out int x) && HelperFunctions.ValidateIntInput(MenuManager.Instance.riotShieldUI.yPos, out int y))
         {
+            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} orients riot shield ({x}, {y})."); //write to report
+
             //set riot shield facing
             ActiveSoldier.Instance.S.riotXPoint = x;
             ActiveSoldier.Instance.S.riotYPoint = y;
 
             MenuManager.Instance.CloseRiotShieldUI();
-            useRiotShield.itemUsed.UseItem(useRiotShield.itemUsedIcon, useRiotShield.itemUsedOn, useRiotShield.soldierUsedOn);
         }
     }
     public void ConfirmGrenade(UseItemUI useGrenade)

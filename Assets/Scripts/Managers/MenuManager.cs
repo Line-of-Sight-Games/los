@@ -51,8 +51,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public OverwatchShotUI overwatchShotUI;
     public GeneralAlertUI generalAlertUI;
     public BinocularsUI binocularsUI;
+    public RiotShieldUI riotShieldUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, cannotUseItemUI, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, riotShieldUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
     
     public SoldierAlert soldierAlertPrefab;
     public XpAlert xpAlertPrefab;
@@ -794,31 +795,47 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void SetOverrideVisibility()
     {
         TMP_Dropdown dropdown = overrideVisibilityDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Visibility changed from {WeatherManager.Instance.CurrentVis} to {dropdown.captionText.text}"); //write to report
-
         string oldVis = WeatherManager.Instance.CurrentVis;
         WeatherManager.Instance.CurrentVis = dropdown.captionText.text;
         
         if (!WeatherManager.Instance.CurrentVis.Equals(oldVis))
+        {
+            FileUtility.WriteToReport($"(Override) Weather changed: Visibility changed from {oldVis} to {WeatherManager.Instance.CurrentVis}"); //write to report
             GameManager.Instance.SetLosCheckAll("statChange(SR)|weatherChange(override)"); //loscheckall
+        }
     }
     public void SetOverrideWindSpeed()
     {
         TMP_Dropdown dropdown = overrideWindSpeedDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Wind speed changed from {WeatherManager.Instance.CurrentWindSpeed} to {dropdown.captionText.text}"); //write to report
+        string oldWindSpeed = WeatherManager.Instance.CurrentWindSpeed;
         WeatherManager.Instance.CurrentWindSpeed = dropdown.captionText.text;
+
+        if (!WeatherManager.Instance.CurrentWindSpeed.Equals(oldWindSpeed))
+        {
+            FileUtility.WriteToReport($"(Override) Weather changed: Wind speed changed from {oldWindSpeed} to {WeatherManager.Instance.CurrentWindSpeed}"); //write to report
+        }
     }
     public void SetOverrideWindDirection()
     {
         TMP_Dropdown dropdown = overrideWindDirectionDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Wind direction changed from {WeatherManager.Instance.CurrentWindDirection} to {dropdown.captionText.text}"); //write to report
+        string oldWindDirection = WeatherManager.Instance.CurrentWindDirection;
         WeatherManager.Instance.CurrentWindDirection = dropdown.captionText.text;
+
+        if (!WeatherManager.Instance.CurrentWindDirection.Equals(oldWindDirection))
+        {
+            FileUtility.WriteToReport($"(Override) Weather changed: Wind direction changed from {oldWindDirection} to {WeatherManager.Instance.CurrentWindDirection}"); //write to report
+        }
     }
     public void SetOverrideRain()
     {
         TMP_Dropdown dropdown = overrideRainDropdown.GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) Weather changed: Rain intensity changed from {WeatherManager.Instance.CurrentRain} to {dropdown.captionText.text}"); //write to report
+        string oldRain = WeatherManager.Instance.CurrentRain;
         WeatherManager.Instance.CurrentRain = dropdown.captionText.text;
+
+        if (!WeatherManager.Instance.CurrentRain.Equals(oldRain))
+        {
+            FileUtility.WriteToReport($"(Override) Weather changed: Rain intensity changed from {oldRain} to {WeatherManager.Instance.CurrentRain}"); //write to report
+        }
     }
     public void ChangeHP()
     {
@@ -1413,6 +1430,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 buttonStates.Add(meleeButton, "No Target");
             else if (ActiveSoldier.Instance.S.stats.SR.Val == 0)
                 buttonStates.Add(meleeButton, "Blind");
+            else if (ActiveSoldier.Instance.S.HasActiveRiotShield())
+                buttonStates.Add(meleeButton, "Riot Shield");
 
             //block dipelec button
             if (!ActiveSoldier.Instance.S.TerminalInRange(default))
@@ -3621,15 +3640,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
 
     //item functions
-    public void OpenCannotUseItemUI(string message)
-    {
-        cannotUseItemUI.transform.Find("OptionPanel").Find("Message").Find("Text").GetComponent<TextMeshProUGUI>().text = message;
-        cannotUseItemUI.SetActive(true);
-    }
-    public void CloseCannotUseItemUI()
-    {
-        cannotUseItemUI.SetActive(false);
-    }
     public void OpenUseItemUI(Item itemUsed, string itemUsedFromSlotName, ItemIcon linkedIcon, int ap)
     {
         useItemUI.transform.Find("OptionPanel").Find("Target").gameObject.SetActive(true);
@@ -3976,23 +3986,20 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
         UHFUI.SetActive(true);
     }
-    public void CloseRiotShieldUI()
+    public void OpenRiotShieldUI()
     {
-        ClearRiotShieldUI();
-        riotShieldUI.SetActive(false);
+        CloseSoldierStatsUI();
+        riotShieldUI.gameObject.SetActive(true);
     }
     public void ClearRiotShieldUI()
     {
-        riotShieldUI.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("XPos").GetComponent<TMP_InputField>().text = "";
-        riotShieldUI.transform.Find("OptionPanel").Find("RiotShieldTarget").Find("YPos").GetComponent<TMP_InputField>().text = "";
+        riotShieldUI.xPos.text = string.Empty;
+        riotShieldUI.yPos.text = string.Empty;
     }
-    public void OpenRiotShieldUI(UseItemUI useItemUI)
+    public void CloseRiotShieldUI()
     {
-        riotShieldUI.GetComponent<UseItemUI>().itemUsed = useItemUI.itemUsed;
-        riotShieldUI.GetComponent<UseItemUI>().itemUsedIcon = useItemUI.itemUsedIcon;
-        riotShieldUI.GetComponent<UseItemUI>().itemUsedFromSlotName = useItemUI.itemUsedFromSlotName;
-
-        riotShieldUI.SetActive(true);
+        ClearRiotShieldUI();
+        riotShieldUI.gameObject.SetActive(false);
     }
     public void OpenGrenadeUI(UseItemUI useItemUI)
     {

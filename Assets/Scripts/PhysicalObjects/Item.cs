@@ -579,6 +579,13 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
         //play drop general sfx (clashes with item use sound for consumables)
         //GameManager.Instance.SoundManager.Instance.PlayConfigGeneral(); 
 
+        //unorient riot shield co-ords
+        if (itemName.Equals("Riot_Shield"))
+        {
+            linkedSoldier.riotXPoint = 0;
+            linkedSoldier.riotYPoint = 0;
+        }
+
         //minus ap for logistics belt
         if (itemName.Equals("Logistics_Belt"))
             linkedSoldier.DeductAP(1);

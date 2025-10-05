@@ -956,7 +956,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             stats.P.Val -= 2;
         }
 
-        if (HasActiveRiotShield())
+        if (HasActiveAndAngledRiotShield())
             stats.C.Val = 0;
 
         if (IsUsingBinocularsInReconMode())
@@ -3212,7 +3212,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (message == "")
             return true;
         else
-            MenuManager.Instance.OpenCannotUseItemUI(message);
+            MenuManager.Instance.generalAlertUI.Activate(message);
 
         return false;
     }
@@ -3461,7 +3461,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (fullyFree)
         {
-            print("checking hands fully free");
             if (LeftHandItem == null && RightHandItem == null)
                 return true;
             else if (LeftHandItem != null && RightHandItem == null)
@@ -3471,7 +3470,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         else
         {
-            print("checking hands free");
             if (LeftHandItem == null && RightHandItem == null)
                 return true;
             else if (LeftHandItem != null && (RightHandItem == null || RightHandItem.IsWeapon() || RightHandItem.IsSMG() || RightHandItem.IsPistol()))
@@ -3641,9 +3639,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return true;
         return false;
     }
+    public bool HasActiveAndAngledRiotShield()
+    {
+        if (HasActiveRiotShield() && riotXPoint > 0 && riotYPoint > 0)
+            return true;
+        return false;
+    }
     public bool HasActiveAndCorrectlyAngledRiotShield(Vector3 damageOriginPoint)
     {
-        if(HasActiveRiotShield() && riotXPoint > 0 && riotYPoint > 0 && damageOriginPoint != Vector3.zero && HelperFunctions.IsWithinAngle(new(riotXPoint, riotYPoint), damageOriginPoint, new(X, Y), 67.5f))
+        if(HasActiveAndAngledRiotShield() && damageOriginPoint != Vector3.zero && HelperFunctions.IsWithinAngle(new(riotXPoint, riotYPoint), damageOriginPoint, new(X, Y), 67.5f))
             return true;
         return false;
     }
@@ -4531,13 +4535,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             if (HasActiveRiotShield())
             {
-                if (riotXPoint > 0 && riotYPoint > 0)
+                if (HasActiveAndAngledRiotShield())
                     return $", <color=green>Riot Shield({riotXPoint},{riotYPoint})</color>";
                 else
                     return ", <color=yellow>Riot Shield(Unoriented)</color>";
             }
             else
-                return ", <color=yellow>Riot Shield(Inactive)</color>";
+                return ", <color=orange>Riot Shield(Inactive)</color>";
         }
         return "";
     }

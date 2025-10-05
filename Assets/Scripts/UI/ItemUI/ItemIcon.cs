@@ -24,6 +24,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public SpyJamPopup spyJamPopup;
     public BinocReconPopup binocReconPopup;
     public BinocInHandPopup binocInHandPopup;
+    public RiotShieldPopup riotShieldPopup;
 
     void Start()
     {
@@ -31,6 +32,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         spyJamPopup = FindFirstObjectByType<SpyJamPopup>(FindObjectsInactive.Include);
         binocReconPopup = FindFirstObjectByType<BinocReconPopup>(FindObjectsInactive.Include);
         binocInHandPopup = FindFirstObjectByType<BinocInHandPopup>(FindObjectsInactive.Include);
+        riotShieldPopup = FindFirstObjectByType<RiotShieldPopup>(FindObjectsInactive.Include);
     }
 
     public ItemIcon Init(Item item, ItemSlot originalSlot)
@@ -315,7 +317,21 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 }
                 else if (item.SoldierNestedOn().IsAbleToUseItems())
                 {
-                    if (item.IsULF())
+                    if (item.IsRiotShield() && item.SoldierNestedOn().HasActiveRiotShield())
+                    {
+                        print("showing riot shield popup");
+                        Vector2 mousePosition = Input.mousePosition;
+                        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                            riotShieldPopup.transform.parent.GetComponent<RectTransform>(),
+                            mousePosition,
+                            null,
+                            out Vector2 localPoint
+                        );
+
+                        riotShieldPopup.GetComponent<RectTransform>().anchoredPosition = localPoint;
+                        riotShieldPopup.ShowRiotShieldPopup();
+                    }
+                    else if (item.IsULF())
                     {
                         Vector2 mousePosition = Input.mousePosition;
                         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -346,7 +362,6 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                         }
                     }
                 }
-                
             }
             else
                 MenuManager.Instance.generalAlertUI.Activate("This item is not usable in this way.");
