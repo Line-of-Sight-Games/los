@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour, IDataPersistence
@@ -28,11 +29,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         if (Instance == this)
             Instance = null;
     }
-
-    //secret override key
-    public KeyCode overrideKey = KeyCode.LeftShift;
-    public KeyCode secondOverrideKey = KeyCode.Space;
-    public KeyCode deathKey = KeyCode.D;
 
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
 
@@ -200,7 +196,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
 
             //check for game mute
-            if (Input.GetKeyDown(KeyCode.M))
+            if (Keyboard.current.mKey.wasPressedThisFrame)
             {
                 if (OverrideKey())
                     ToggleMute();
@@ -247,31 +243,31 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     //helper functions - menu
     public bool OverrideKey()
     {
-        if (Input.GetKey(overrideKey))
+        if (Keyboard.current.shiftKey.isPressed)
             return true; 
         return false;
     }
     public bool SecondOverrideKey()
     {
-        if (Input.GetKey(secondOverrideKey))
+        if (Keyboard.current.spaceKey.isPressed)
             return true;
         return false;
     }
     public bool SecondOverrideKeyDown()
     {
-        if (Input.GetKeyDown(secondOverrideKey))
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
             return true;
         return false;
     }
     public bool SecondOverrideKeyUp()
     {
-        if (Input.GetKeyUp(secondOverrideKey))
+        if (Keyboard.current.spaceKey.wasReleasedThisFrame)
             return true;
         return false;
     }
     public bool DeathKey()
     {
-        if (Input.GetKey(deathKey))
+        if (Keyboard.current.dKey.wasPressedThisFrame)
             return true;
         return false;
     }
@@ -1804,10 +1800,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         foreach (Transform child in content)
         {
             if (!child.TryGetComponent<SoldierAlertLOS>(out var detectionAlert))
-                continue;
+                return false;
 
             bool isTwoWay = detectionAlert.arrow.sprite != null && detectionAlert.arrow.sprite.name.Contains("Detection2Way");
-
             if (!(isTwoWay && detectionAlert.s1Toggle.interactable && detectionAlert.s2Toggle.interactable))
                 return false;
         }

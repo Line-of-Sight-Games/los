@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class OpeningMenu : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class OpeningMenu : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
             overwriteWarning.SetActive(false);
     }
     public bool ActiveGame()

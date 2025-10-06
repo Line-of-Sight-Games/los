@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class TabManager : MonoBehaviour
 {
@@ -19,10 +20,10 @@ public class TabManager : MonoBehaviour
     {
         if (system.currentSelectedGameObject != null)
         {
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (Keyboard.current.tabKey.wasPressedThisFrame)
             {
                 Selectable next;
-                if (Input.GetKey(KeyCode.LeftShift))
+                if (Keyboard.current.leftShiftKey.isPressed)
                     next = system.currentSelectedGameObject.GetComponent<Selectable>().FindSelectableOnDown();
                 else
                     next = system.currentSelectedGameObject.GetComponent<Selectable>().FindSelectableOnUp();
