@@ -59,6 +59,7 @@ public class OpeningMenu : MonoBehaviour
     public void PlayNewGame()
     {
         coreDataHandler.Delete();
+        DataPersistenceManager.Instance.NewGame(); //delete gamedata
         SceneManager.LoadScene("Create");
     }
     public void GoBack()
