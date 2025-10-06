@@ -14,5 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Battlefield.unity
     guid: 489f817189d513149847fdf2772b726b
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 116a3a9e405c51a469645589fdf89c1c, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 56332b38935434d44a73e6a532f8133c, type: 3}
   m_UseUCBPForAssetBundles: 0
