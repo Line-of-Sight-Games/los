@@ -9,7 +9,7 @@ public class OverwatchShotUI : MonoBehaviour
 {
     public ShotUI shotUI;
 
-    public TextMeshProUGUI shooterID;
+    public TextMeshProUGUI shooterID, targetID;
     public SoldierPortrait shooterPortrait;
     public TMP_Dropdown shotTypeDropdown;
     public Image gunImage;
@@ -29,8 +29,9 @@ public class OverwatchShotUI : MonoBehaviour
     {
         shotUI.SetShotResolvedFlagTo(false);
 
-        //set shooter
+        //set shooter and target
         shooterID.text = shooter.Id;
+        targetID.text = target.Id;
 
         shotTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
         List<TMP_Dropdown.OptionData> targetDetails = new();
@@ -56,7 +57,7 @@ public class OverwatchShotUI : MonoBehaviour
         gunImage.sprite = shooter.EquippedGuns.First().itemImage;
 
         //set target
-        TMP_Dropdown.OptionData option = new(target.soldierName, target.soldierPortrait, Color.white);
+        TMP_Dropdown.OptionData option = new(target.Id, target.soldierPortrait, Color.white);
         targetDetails.Add(option);
         targetDropdown.AddOptions(targetDetails);
         targetDropdown.interactable = false;
@@ -70,8 +71,8 @@ public class OverwatchShotUI : MonoBehaviour
     }
     public void ConfirmShotOverwatch(bool retry)
     {
-        Soldier shooter = SoldierManager.Instance.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-        IAmShootable target = SoldierManager.Instance.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+        Soldier shooter = SoldierManager.Instance.FindSoldierById(shooterID.text);
+        IAmShootable target = SoldierManager.Instance.FindSoldierById(targetID.text);
         Item gun = shooter.EquippedGuns.First();
         int actingHitChance;
 
@@ -258,6 +259,7 @@ public class OverwatchShotUI : MonoBehaviour
     }
     public void ClearOverwatchShotUI()
     {
+        targetDropdown.ClearOptions(); 
         xPos.text = "";
         yPos.text = "";
         zPos.text = "";
@@ -270,8 +272,8 @@ public class OverwatchShotUI : MonoBehaviour
         if (HelperFunctions.ValidateIntInput(xPos, out int xOver) && HelperFunctions.ValidateIntInput(yPos, out int yOver) && HelperFunctions.ValidateIntInput(zPos, out int zOver) && terrainDropdown.value != 0)
         {
             //find shooter
-            Soldier shooter = SoldierManager.Instance.FindSoldierById(transform.Find("Shooter").GetComponent<TextMeshProUGUI>().text);
-            Soldier target = SoldierManager.Instance.FindSoldierByName(transform.Find("TargetPanel").Find("Target").Find("TargetDropdown").GetComponent<TMP_Dropdown>().captionText.text);
+            Soldier shooter = SoldierManager.Instance.FindSoldierById(shooterID.text);
+            Soldier target = SoldierManager.Instance.FindSoldierById(targetID.text);
             Item gun = shooter.EquippedGuns.First();
 
             //save target intended location
