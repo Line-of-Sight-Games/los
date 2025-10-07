@@ -196,9 +196,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
 
             //check for game mute
-            if (Keyboard.current.mKey.wasPressedThisFrame)
+            if (HelperFunctions.MuteKeyDown())
             {
-                if (OverrideKey())
+                if (HelperFunctions.OverrideKeyPressed())
                     ToggleMute();
             }
 
@@ -241,49 +241,19 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
 
     //helper functions - menu
-    public bool OverrideKey()
-    {
-        if (Keyboard.current.shiftKey.isPressed)
-            return true; 
-        return false;
-    }
-    public bool SecondOverrideKey()
-    {
-        if (Keyboard.current.spaceKey.isPressed)
-            return true;
-        return false;
-    }
-    public bool SecondOverrideKeyDown()
-    {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
-            return true;
-        return false;
-    }
-    public bool SecondOverrideKeyUp()
-    {
-        if (Keyboard.current.spaceKey.wasReleasedThisFrame)
-            return true;
-        return false;
-    }
-    public bool DeathKey()
-    {
-        if (Keyboard.current.dKey.wasPressedThisFrame)
-            return true;
-        return false;
-    }
     public void DisplayLOSGizmos()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             //create gizmos upon key press
-            if (SecondOverrideKeyDown())
+            if (HelperFunctions.SecondOverrideKeyDown())
             {
                 CreateLOSArrows();
                 RevealSightRadiusSpheres();
             }
 
             //reveal GM objects while held
-            if (SecondOverrideKey())
+            if (HelperFunctions.SecondOverrideKeyPressed())
             {
                 DisplayGMObjects();
             }
@@ -293,7 +263,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
 
             //destroy gizmos upon key release
-            if (SecondOverrideKeyUp())
+            if (HelperFunctions.SecondOverrideKeyUp())
             {
                 DestroyLOSArrows();
                 HideSightRadiusSphere();
@@ -598,7 +568,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void ConfirmEnterOverride()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             CloseOverrideMenu();
             SetOverrideView();
@@ -1811,7 +1781,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void OpenDetectionUI()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             //actually open the alert log
             if (detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content").childCount > 0)
@@ -1840,7 +1810,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void PayAllDetections()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             Transform detectionAlert = detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
             ScrollRect detectionScroller = detectionUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
@@ -1857,7 +1827,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void DenyAllDetections()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             Transform detectionAlert = detectionUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
             ScrollRect detectionScroller = detectionUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
@@ -2358,7 +2328,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     //trauma functions - menu
     public void OpenTraumaUI()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             foreach (Transform child in traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
                 if (child.GetComponent<SoldierAlert>().soldier.IsDead())
@@ -2752,7 +2722,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void AcceptBreakEngagementRequest()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             GameManager.Instance.UpdateMeleeUI();
             CloseMeleeBreakEngagementRequestUI();
@@ -2960,7 +2930,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void ConfirmOvermove()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             GameManager.Instance.ConfirmMove(true);
             CloseOvermoveUI();
@@ -2970,7 +2940,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void ConfirmSuppressionMove()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             OpenMoveUI(true);
             CloseSuppressionMoveUI();
@@ -3497,7 +3467,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
     public void OpenXpLogUI()
     {
-        if (OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             Transform xpAlerts = xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
             foreach (Transform child in xpAlerts)

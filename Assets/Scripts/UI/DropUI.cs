@@ -1,7 +1,9 @@
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
-using System.Linq;
+using UnityEngine.UI;
 
 public class DropUI : MonoBehaviour
 {
@@ -63,7 +65,6 @@ public class DropUI : MonoBehaviour
     {
         if (GetThrowLocation(out Vector3 throwLocation) && groundOrAllyDropdown.captionText.text.Equals("Ally"))
         {
-            catcherDropdown.ClearOptions();
             foreach (Soldier s in GameManager.Instance.AllFieldedSoldiers())
             {
                 if (s.IsAbleToSee() && s.IsSameTeamAs(ActiveSoldier.Instance.S) && s.PointWithinRadius(throwLocation, 3) && s.HasAHandFree(true))
@@ -71,6 +72,8 @@ public class DropUI : MonoBehaviour
                     if (!catcherDropdown.options.Any(option => option.text == s.soldierName))
                         catcherDropdown.AddOptions(new List<TMP_Dropdown.OptionData> { new(s.soldierName, s.soldierPortrait, Color.white) });
                 }
+                else
+                    HelperFunctions.RemoveOption(catcherDropdown, s.soldierName);
             }
 
             if (catcherDropdown.options.Count > 0)

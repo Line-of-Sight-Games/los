@@ -3,11 +3,76 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 
 public static class HelperFunctions
 {
+    public static bool AnyKeyPressed()
+    {
+        if (Keyboard.current.anyKey.isPressed || Mouse.current.leftButton.isPressed || Mouse.current.rightButton.isPressed)
+            return true;
+        return false;
+    }
+    public static Vector2 MousePosition()
+    {
+        return Mouse.current.position.ReadValue();
+    }
+    public static bool RightMousePressed()
+    {
+        if (Mouse.current.rightButton.isPressed)
+            return true;
+        return false;
+    }
+    public static bool OverrideKeyPressed()
+    {
+        if (Keyboard.current.shiftKey.isPressed)
+            return true;
+        return false;
+    }
+    public static bool SecondOverrideKeyPressed()
+    {
+        if (Keyboard.current.spaceKey.isPressed)
+            return true;
+        return false;
+    }
+    public static bool SecondOverrideKeyDown()
+    {
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+            return true;
+        return false;
+    }
+    public static bool SecondOverrideKeyUp()
+    {
+        if (Keyboard.current.spaceKey.wasReleasedThisFrame)
+            return true;
+        return false;
+    }
+    public static bool DeathKeyPressed()
+    {
+        if (Keyboard.current.dKey.wasPressedThisFrame)
+            return true;
+        return false;
+    }
+    public static bool MuteKeyDown()
+    {
+        if (Keyboard.current.mKey.wasPressedThisFrame)
+            return true;
+        return false;
+    }
+    public static void RemoveOption(TMP_Dropdown dropdown, string option)
+    {
+        for (int i = 0; i < dropdown.options.Count; i++)
+        {
+            if (dropdown.options[i].text == option)
+            {
+                dropdown.options.RemoveAt(i);
+                dropdown.RefreshShownValue();
+                break;
+            }
+        }
+    }
     public static bool CheckInScene(string sceneName)
     {
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName(sceneName))
@@ -53,15 +118,21 @@ public static class HelperFunctions
     }
     public static int RandomShotNumber()
     {
-        return RandomNumber(1, 100);
+        if (RightMousePressed())
+            return 1;
+        else
+            return RandomNumber(1, 100);
     }
     public static int RandomCritNumber()
     {
-        return RandomNumber(1, 100);
+        if (RightMousePressed())
+            return 1;
+        else
+            return RandomNumber(1, 100);
     }
     public static bool RandomDipelecCoinFlip()
     {
-        if (Input.GetKey(KeyCode.Mouse1))
+        if (RightMousePressed())
             return true;
         else
         {

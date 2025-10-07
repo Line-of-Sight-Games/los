@@ -172,14 +172,14 @@ public class ShotUI : MonoBehaviour
     }
     public void ShotResultUIConfirmClicked()
     {
-        if (MenuManager.Instance.OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             CloseShotResultUI();
         }
     }
     public void ShotResultUILOSCheckClicked()
     {
-        if (MenuManager.Instance.OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             GameManager.Instance.DetectionAlertAllNonCoroutine();
             CloseShotResultUI();

@@ -1,11 +1,10 @@
 using UnityEngine;
 
-
 public class RiotShieldPopup : MonoBehaviour
 {
     void Update()
     {
-        if (Input.anyKey && !RectTransformUtility.RectangleContainsScreenPoint(GetComponent<RectTransform>(), Input.mousePosition, null))
+        if (HelperFunctions.AnyKeyPressed() && !RectTransformUtility.RectangleContainsScreenPoint(GetComponent<RectTransform>(), HelperFunctions.MousePosition(), null))
         {
             HideRiotShieldPopup();
         }

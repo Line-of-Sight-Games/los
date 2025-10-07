@@ -65,7 +65,7 @@ public class DipElecUI : MonoBehaviour
     }
     public void CloseDipelecResultUI()
     {
-        if (MenuManager.Instance.OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             if (dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").childCount > 1)
                 Destroy(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").GetChild(dipelecResultUI.transform.Find("OptionPanel").Find("Rewards").childCount - 1).gameObject);

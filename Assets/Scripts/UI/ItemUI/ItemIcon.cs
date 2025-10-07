@@ -1,10 +1,11 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using System.Linq;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -287,10 +288,9 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             {
                 if (item.IsBinoculars() && item.SoldierNestedOn().IsUsingBinocularsInReconMode()) //give option to relocate or stop recon
                 {
-                    Vector2 mousePosition = Input.mousePosition;
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(
                         binocReconPopup.transform.parent.GetComponent<RectTransform>(),
-                        mousePosition,
+                        HelperFunctions.MousePosition(),
                         null,
                         out Vector2 localPoint
                     );
@@ -302,10 +302,9 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 }
                 else if (item.IsBinoculars() && item.whereEquipped.Contains("Hand")) //give option to use either recon or flash mode
                 {
-                    Vector2 mousePosition = Input.mousePosition;
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(
                         binocInHandPopup.transform.parent.GetComponent<RectTransform>(),
-                        mousePosition,
+                        HelperFunctions.MousePosition(),
                         null,
                         out Vector2 localPoint
                     );
@@ -319,11 +318,9 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 {
                     if (item.IsRiotShield() && item.SoldierNestedOn().HasActiveRiotShield())
                     {
-                        print("showing riot shield popup");
-                        Vector2 mousePosition = Input.mousePosition;
                         RectTransformUtility.ScreenPointToLocalPointInRectangle(
                             riotShieldPopup.transform.parent.GetComponent<RectTransform>(),
-                            mousePosition,
+                            HelperFunctions.MousePosition(),
                             null,
                             out Vector2 localPoint
                         );
@@ -333,10 +330,9 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     }
                     else if (item.IsULF())
                     {
-                        Vector2 mousePosition = Input.mousePosition;
                         RectTransformUtility.ScreenPointToLocalPointInRectangle(
                             spyJamPopup.transform.parent.GetComponent<RectTransform>(),
-                            mousePosition,
+                            HelperFunctions.MousePosition(),
                             null,
                             out Vector2 localPoint
                         );
@@ -373,10 +369,9 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         {
             if (item.IsThrowable())
             {
-                Vector2 mousePosition = Input.mousePosition;
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     dropThrowPopup.transform.parent.GetComponent<RectTransform>(),
-                    mousePosition,
+                    HelperFunctions.MousePosition(),
                     null,
                     out Vector2 localPoint
                 );

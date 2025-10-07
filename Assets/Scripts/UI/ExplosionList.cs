@@ -20,7 +20,7 @@ public class ExplosionList : MonoBehaviour
     }
     public void ConfirmExplosion(GameObject explosionList)
     {
-        if (MenuManager.Instance.OverrideKey())
+        if (HelperFunctions.OverrideKeyPressed())
         {
             int posDamage = 0, negDamage = 0, posStun = 0, negStun = 0;
             ScrollRect explosionScroller = explosionList.transform.Find("Scroll").GetComponent<ScrollRect>();

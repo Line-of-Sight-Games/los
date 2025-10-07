@@ -28,7 +28,7 @@ public class InventorySourceIconGoodyBox : InventorySourceIcon
     {
         if (locaterDisplay.activeSelf) //locater ability
         {
-            if (MenuManager.Instance.OverrideKey())
+            if (HelperFunctions.OverrideKeyPressed())
             {
                 MenuManager.Instance.inventorySourceViewOnly = this.inventorySourceViewOnly;
                 OpenItemPanel();

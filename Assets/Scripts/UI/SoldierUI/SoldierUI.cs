@@ -101,7 +101,7 @@ public class SoldierUI : MonoBehaviour
     }
     public void DeathRoll()
     {
-        if (MenuManager.Instance.OverrideView && MenuManager.Instance.DeathKey())
+        if (MenuManager.Instance.OverrideView && HelperFunctions.DeathKeyPressed())
         {
             if (HelperFunctions.DiceRoll() == 1)
             {
