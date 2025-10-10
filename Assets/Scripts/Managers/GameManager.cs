@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Linq;
+using TMPro;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour, IDataPersistence
 {
@@ -854,15 +855,25 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
 
     //melee functions
-    public void UpdateMeleeUI()
+    public void MeleeTargetDropdownChanged()
+    {
+        Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
+
+        if (!MenuManager.Instance.clearMeleeFlag)
+        {
+            UpdateMeleeTypeOptions();
+            UpdateMeleeAP(attacker);
+        }
+    }
+    public void MeleeTypeDropdownChanged()
     {
         Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
         Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
         if (!MenuManager.Instance.clearMeleeFlag)
         {
-            UpdateMeleeAP(attacker);
-            if (meleeUI.meleeTypeDropdown.value == 0) //If it's an actual attack
+            CheckMeleeType();
+            if (meleeUI.meleeTypeDropdown.captionText.text.Contains("Attack")) //If it's an actual attack
             {
                 UpdateMeleeDefenderWeapon(defender);
                 UpdateMeleeFlankingAgainstAttacker(attacker, defender);
@@ -939,19 +950,60 @@ public class GameManager : MonoBehaviour, IDataPersistence
         Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
         Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
+        //reset dropdown
+        meleeUI.meleeTypeDropdown.ClearOptions();
+        meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
+
         List<TMP_Dropdown.OptionData> meleeTypeDetails = new()
         {
+            new TMP_Dropdown.OptionData("Select action..."),
             new TMP_Dropdown.OptionData(MenuManager.Instance.meleeChargeIndicator),
             new TMP_Dropdown.OptionData("Engagement Only"),
         };
 
+        //block engagement if melee engaged
+        if (attacker.IsMeleeEngaged())
+            meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Engagement Only");
+
+        //add options for disengage or request disengage if melee engaged
         if (defender.controlledBySoldiersList.Contains(attacker.id))
             meleeTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Disengage</color>"));
         else if (defender.controllingSoldiersList.Contains(attacker.id))
             meleeTypeDetails.Add(new TMP_Dropdown.OptionData("<color=red>Request Disengage</color>"));
 
-        meleeUI.meleeTypeDropdown.ClearOptions();
         meleeUI.meleeTypeDropdown.AddOptions(meleeTypeDetails);
+
+        //block attack option if attacker has riot shield - force only disengage or disengage request
+        if (attacker.HasActiveRiotShield())
+            meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add(MenuManager.Instance.meleeChargeIndicator);
+
+        //block attacks against a soldier with a riot shield
+        if (defender.HasActiveRiotShield())
+            meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("1"); //grey out attack option
+        else
+            meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Remove("1");
+
+        CheckMeleeType();
+    }
+    public void CheckMeleeType()
+    {
+        if (meleeUI.meleeTypeDropdown.captionText.text.Contains("Attack"))
+        {
+            meleeUI.attackerWeaponUI.SetActive(true);
+            meleeUI.defenderWeaponUI.SetActive(true);
+            meleeUI.flankersMeleeAttackerUI.SetActive(true);
+            meleeUI.flankersMeleeDefenderUI.SetActive(true);
+        }
+        else
+        {
+            meleeUI.attackerWeaponUI.SetActive(false);
+            meleeUI.defenderWeaponUI.SetActive(false);
+            meleeUI.flankersMeleeAttackerUI.SetActive(false);
+            meleeUI.flankersMeleeDefenderUI.SetActive(false);
+        }
+
+        if (meleeUI.meleeTypeDropdown.captionText.text.Contains("Request"))
+            MenuManager.Instance.OpenMeleeBreakEngagementRequestUI();
     }
     public float AttackerMeleeSkill(Soldier attacker)
     {
@@ -1420,161 +1472,158 @@ public class GameManager : MonoBehaviour, IDataPersistence
         Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
         Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
-        if (int.TryParse(meleeUI.apCost.text, out int ap))
+        if (int.TryParse(meleeUI.apCost.text, out int ap) && ActiveSoldier.Instance.S.CheckAP(ap))
         {
-            if (ActiveSoldier.Instance.S.CheckAP(ap))
+            FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}"); //write to report
+
+            //determine if damage is from melee or melee charge
+            List<string> damageType = new() { "Melee" };
+            if (ap == 0)
+                damageType.Add("Charge");
+
+            MenuManager.Instance.SetMeleeResolvedFlagTo(false);
+            ActiveSoldier.Instance.S.DeductAP(ap);
+
+            int meleeDamage = CalculateMeleeResult(attacker, defender);
+            string damageMessage;
+            bool counterattack = false, instantKill = false, loudAction = true, disengage = false;
+
+            //engagement only options
+            if (meleeUI.meleeTypeDropdown.captionText.text.Equals("Engagement Only"))
             {
-                FileUtility.WriteToReport($"{attacker.soldierName} starting melee attack on {defender.soldierName}"); //write to report
-
-                //determine if damage is from melee or melee charge
-                List<string> damageType = new() { "Melee" };
-                if (ap == 0)
-                    damageType.Add("Charge");
-
-                MenuManager.Instance.SetMeleeResolvedFlagTo(false);
-                ActiveSoldier.Instance.S.DeductAP(ap);
-
-                int meleeDamage = CalculateMeleeResult(attacker, defender);
-                string damageMessage;
-                bool counterattack = false, instantKill = false, loudAction = true, disengage = false;
-
-                //engagement only options
-                if (meleeUI.meleeTypeDropdown.value == 1)
+                damageMessage = "<color=orange>No Damage\n(Engagement Only)</color>";
+                //loudAction = false;
+            }
+            else if (meleeUI.meleeTypeDropdown.captionText.text.Contains("Disengage"))
+            {
+                damageMessage = "<color=orange>No Damage\n(Disengagement)</color>";
+                disengage = true;
+                //loudAction = false;
+            }
+            else
+            {
+                //instant kill scenarios
+                if (attacker.IsHidden() && attacker.stats.M.Val > defender.stats.M.Val) //stealth kill
                 {
-                    damageMessage = "<color=orange>No Damage\n(Enagament Only)</color>";
-                    //loudAction = false;
+                    damageMessage = "<color=green>INSTANT KILL\n(Stealth Attack)</color>";
+                    instantKill = true;
+                    loudAction = false;
                 }
-                else if (meleeUI.meleeTypeDropdown.value == 2)
+                else if (defender.IsOnOverwatch() && attacker.stats.M.Val > defender.stats.M.Val) //overwatcher kill
                 {
-                    damageMessage = "<color=orange>No Damage\n(Disengagement)</color>";
-                    disengage = true;
-                    //loudAction = false;
+                    damageMessage = "<color=green>INSTANT KILL\n(Overwatcher)</color>";
+                    instantKill = true;
+                    loudAction = false;
+                }
+                else if (defender.IsUnconscious()) //unconscious kill
+                {
+                    damageMessage = "<color=green>INSTANT KILL\n(Unconscious)</color>";
+                    instantKill = true;
+                    loudAction = false;
+                }
+                else if (defender.IsPlayingDead()) //playdead kill
+                {
+                    damageMessage = "<color=green>INSTANT KILL\n(Playdead)</color>";
+                    instantKill = true;
+                    loudAction = false;
                 }
                 else
                 {
-                    //instant kill scenarios
-                    if (attacker.IsHidden() && attacker.stats.M.Val > defender.stats.M.Val) //stealth kill
-                    {
-                        damageMessage = "<color=green>INSTANT KILL\n(Stealth Attack)</color>";
-                        instantKill = true;
-                        loudAction = false;
-                    }
-                    else if (defender.IsOnOverwatch() && attacker.stats.M.Val > defender.stats.M.Val) //overwatcher kill
-                    {
-                        damageMessage = "<color=green>INSTANT KILL\n(Overwatcher)</color>";
-                        instantKill = true;
-                        loudAction = false;
-                    }
-                    else if (defender.IsUnconscious()) //unconscious kill
-                    {
-                        damageMessage = "<color=green>INSTANT KILL\n(Unconscious)</color>";
-                        instantKill = true;
-                        loudAction = false;
-                    }
-                    else if (defender.IsPlayingDead()) //playdead kill
-                    {
-                        damageMessage = "<color=green>INSTANT KILL\n(Playdead)</color>";
-                        instantKill = true;
-                        loudAction = false;
-                    }
-                    else
-                    {
-                        //drop impractical handheld items
-                        attacker.DropWeakerHandheldItem();
-                        defender.DropWeakerHandheldItem();
+                    //drop impractical handheld items
+                    attacker.DropWeakerHandheldItem();
+                    defender.DropWeakerHandheldItem();
 
-                        if (meleeDamage > 0)
+                    if (meleeDamage > 0)
+                    {
+                        //play melee success sfx
+                        if (damageType.Contains("Charge"))
+                            SoundManager.Instance.PlayMeleeResolution("successCharge"); //play melee success charge sfx
+                        else
+                            SoundManager.Instance.PlayMeleeResolution("successStatic"); //play melee success static sfx
+
+                        if (attacker.IsWearingExoArmour() && !defender.IsWearingJuggernautArmour(false)) //exo kill on standard man
                         {
-                            //play melee success sfx
-                            if (damageType.Contains("Charge"))
-                                SoundManager.Instance.PlayMeleeResolution("successCharge"); //play melee success charge sfx
-                            else
-                                SoundManager.Instance.PlayMeleeResolution("successStatic"); //play melee success static sfx
-
-                            if (attacker.IsWearingExoArmour() && !defender.IsWearingJuggernautArmour(false)) //exo kill on standard man
-                            {
-                                damageMessage = "<color=green>INSTANT KILL\n(Exo Armour)</color>";
-                                instantKill = true;
-                            }
-                            else
-                            {
-                                if (defender.IsWearingJuggernautArmour(false) && !attacker.IsWearingExoArmour())
-                                    damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
-                                else
-                                    damageMessage = "<color=green>Successful Attack\n(" + meleeDamage + " Damage)</color>";
-                                defender.TakeDamage(attacker, meleeDamage, false, damageType, Vector3.zero);
-                                attacker.BrawlerMeleeHitReward();
-                            }
+                            damageMessage = "<color=green>INSTANT KILL\n(Exo Armour)</color>";
+                            instantKill = true;
                         }
-                        else if (meleeDamage < 0)
+                        else
                         {
-                            damageType.Add("Counter");
+                            if (defender.IsWearingJuggernautArmour(false) && !attacker.IsWearingExoArmour())
+                                damageMessage = "<color=orange>No Damage\n(Juggernaut Immune)</color>";
+                            else
+                                damageMessage = "<color=green>Successful Attack\n(" + meleeDamage + " Damage)</color>";
+                            defender.TakeDamage(attacker, meleeDamage, false, damageType, Vector3.zero);
+                            attacker.BrawlerMeleeHitReward();
+                        }
+                    }
+                    else if (meleeDamage < 0)
+                    {
+                        damageType.Add("Counter");
                             
-                            //play melee counterattack sfx
-                            SoundManager.Instance.PlayMeleeResolution("counter");
+                        //play melee counterattack sfx
+                        SoundManager.Instance.PlayMeleeResolution("counter");
 
-                            counterattack = true;
-                            meleeDamage *= -1;
-                            damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
-                            attacker.TakeDamage(defender, meleeDamage, false, damageType, Vector3.zero);
-                        }
-                        else
-                        {
-                            //play melee breakeven sfx
-                            SoundManager.Instance.PlayMeleeResolution("breakeven");
-                            //play melee breakeven dialogue
-                            SoundManager.Instance.PlaySoldierMeleeBreakeven(ActiveSoldier.Instance.S);
-
-                            damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
-                        }
-                    }
-
-                    //reset bloodrage even if non-successful attack
-                    attacker.UnsetBloodRage();
-
-                    //push a zero damage attack to the defender for abilities trigger
-                    defender.TakeDamage(attacker, 0, true, damageType, Vector3.zero);
-                }
-
-                //add xp for successful melee attack
-                if (meleeUI.meleeTypeDropdown.value == 0)
-                {
-                    if (!damageMessage.Contains("No Damage"))
-                    {
-                        if (counterattack)
-                            MenuManager.Instance.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
-                        else
-                            MenuManager.Instance.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
+                        counterattack = true;
+                        meleeDamage *= -1;
+                        damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
+                        attacker.TakeDamage(defender, meleeDamage, false, damageType, Vector3.zero);
                     }
                     else
                     {
-                        if (meleeDamage == 0)
-                            MenuManager.Instance.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
+                        //play melee breakeven sfx
+                        SoundManager.Instance.PlayMeleeResolution("breakeven");
+                        //play melee breakeven dialogue
+                        SoundManager.Instance.PlaySoldierMeleeBreakeven(ActiveSoldier.Instance.S);
+
+                        damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
                     }
                 }
 
-                //kill if instantKill
-                if (instantKill)
-                    defender.InstantKill(attacker, new List<string>() { "Melee" });
+                //reset bloodrage even if non-successful attack
+                attacker.UnsetBloodRage();
 
-                //attacker and defender exit cover
-                attacker.UnsetCover();
-                defender.UnsetCover();
-
-                //attacker and defender exit overwatch
-                attacker.UnsetOverwatch();
-                defender.UnsetOverwatch();
-
-                //add melee alert
-                MenuManager.Instance.AddMeleeAlert(attacker, defender, damageMessage, DetermineMeleeController(attacker, defender, counterattack, disengage));
-
-                //trigger loud action
-                if (loudAction)
-                    attacker.PerformLoudAction();
-
-                StartCoroutine(MenuManager.Instance.OpenMeleeResultUI());
-                MenuManager.Instance.CloseMeleeUI();
+                //push a zero damage attack to the defender for abilities trigger
+                defender.TakeDamage(attacker, 0, true, damageType, Vector3.zero);
             }
+
+            //add xp for successful melee attack
+            if (meleeUI.meleeTypeDropdown.value == 0)
+            {
+                if (!damageMessage.Contains("No Damage"))
+                {
+                    if (counterattack)
+                        MenuManager.Instance.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
+                    else
+                        MenuManager.Instance.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
+                }
+                else
+                {
+                    if (meleeDamage == 0)
+                        MenuManager.Instance.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
+                }
+            }
+
+            //kill if instantKill
+            if (instantKill)
+                defender.InstantKill(attacker, new List<string>() { "Melee" });
+
+            //attacker and defender exit cover
+            attacker.UnsetCover();
+            defender.UnsetCover();
+
+            //attacker and defender exit overwatch
+            attacker.UnsetOverwatch();
+            defender.UnsetOverwatch();
+
+            //add melee alert
+            MenuManager.Instance.AddMeleeAlert(attacker, defender, damageMessage, DetermineMeleeController(attacker, defender, counterattack, disengage));
+
+            //trigger loud action
+            if (loudAction)
+                attacker.PerformLoudAction();
+
+            StartCoroutine(MenuManager.Instance.OpenMeleeResultUI());
+            MenuManager.Instance.CloseMeleeUI();
         }
     }
     public IEnumerator DetermineMeleeControllerMultiple(Soldier s1)

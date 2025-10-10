@@ -3724,6 +3724,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if ((LeftHandItem != null && LeftHandItem.IsGun() && RightHandItem == null) || (RightHandItem != null && RightHandItem.IsGun() && LeftHandItem == null))
             return true;
 
+        // Check if one hand is a riot shield and the other is empty
+        if ((LeftHandItem != null && LeftHandItem.IsRiotShield() && RightHandItem == null) || (RightHandItem != null && RightHandItem.IsRiotShield() && LeftHandItem == null))
+            return true;
+
         // Check if a weapon is equipped in either hand and the other hand is empty or contains a pistol, SMG or weapon
         if ((LeftHandItem != null && LeftHandItem.IsWeapon() && (RightHandItem == null || RightHandItem.IsPistol() || RightHandItem.IsSMG() || RightHandItem.IsWeapon())) || (RightHandItem != null && RightHandItem.IsWeapon() && (LeftHandItem == null || LeftHandItem.IsPistol() || LeftHandItem.IsSMG() || LeftHandItem.IsWeapon())))
             return true;

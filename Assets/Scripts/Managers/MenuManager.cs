@@ -2516,29 +2516,14 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         meleeUI.attackerID.text = attacker.id;
 
         meleeChargeIndicator = meleeCharge;
-        meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
 
         List<TMP_Dropdown.OptionData> defenderDetails = new();
-
-        //generate melee type dropdown
-        List<TMP_Dropdown.OptionData> meleeTypeDetails = new()
-        {
-            new TMP_Dropdown.OptionData(meleeCharge),
-            new TMP_Dropdown.OptionData("Engagement Only"),
-        };
-        meleeUI.meleeTypeDropdown.AddOptions(meleeTypeDetails);
-
-        //block engagement only if melee controlled
-        if (attacker.IsMeleeEngaged())
-            meleeUI.meleeTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Engagement Only");
 
         //display best attacker weapon
         if (attacker.BestMeleeWeapon != null)
             meleeUI.attackerWeaponImage.sprite = attacker.BestMeleeWeapon.itemImage;
         else
             meleeUI.attackerWeaponImage.sprite = fist;
-
-
 
         //generate target list
         foreach (Soldier s in GameManager.Instance.AllSoldiers())
@@ -2568,20 +2553,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
 
-            if (defender.controlledBySoldiersList.Contains(ActiveSoldier.Instance.S.id))
-                meleeUI.meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=green>Disengage</color>") });
-            else if (defender.controllingSoldiersList.Contains(ActiveSoldier.Instance.S.id))
-                meleeUI.meleeTypeDropdown.AddOptions(new List<TMP_Dropdown.OptionData>() { new ("<color=red>Request Disengage</color>") });
-
             //show defender weapon
             if (defender.BestMeleeWeapon != null)
                 meleeUI.defenderWeaponImage.sprite = defender.BestMeleeWeapon.itemImage;
             else
                 meleeUI.defenderWeaponImage.sprite = fist;
 
-            CheckMeleeType();
-            GameManager.Instance.UpdateMeleeUI();
-
+            GameManager.Instance.UpdateMeleeTypeOptions();
             meleeUI.gameObject.SetActive(true);
         }
         else
@@ -2596,26 +2574,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             Destroy(child.gameObject);
         flankersUI.SetActive(false);
     }
-    public void CheckMeleeType()
-    {
-        if (meleeUI.meleeTypeDropdown.value == 0)
-        {
-            meleeUI.attackerWeaponUI.SetActive(true);
-            meleeUI.defenderWeaponUI.SetActive(true);
-            meleeUI.flankersMeleeAttackerUI.SetActive(true);
-            meleeUI.flankersMeleeDefenderUI.SetActive(true);
-        }
-        else
-        {
-            meleeUI.attackerWeaponUI.SetActive(false);
-            meleeUI.defenderWeaponUI.SetActive(false);
-            meleeUI.flankersMeleeAttackerUI.SetActive(false);
-            meleeUI.flankersMeleeDefenderUI.SetActive(false);
-        }
-        
-        if (meleeUI.meleeTypeDropdown.captionText.text.Contains("Request"))
-            OpenMeleeBreakEngagementRequestUI();
-    }
+    
     public void ClearMeleeUI()
     {
         clearMeleeFlag = true;
@@ -2638,9 +2597,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void OpenMeleeConfirmUI()
     {
-        if (int.TryParse(meleeUI.apCost.text, out int ap))
+        if (!meleeUI.meleeTypeDropdown.captionText.text.Contains("Select"))
         {
-            if (ActiveSoldier.Instance.S.CheckAP(ap))
+            if (int.TryParse(meleeUI.apCost.text, out int ap) && ActiveSoldier.Instance.S.CheckAP(ap))
             {
                 //find attacker and defender
                 Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
@@ -2659,6 +2618,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 meleeConfirmUI.SetActive(true);
             }
         }
+        else
+            generalAlertUI.Activate("Select a melee type");
     }
     public void ClearMeleeConfirmUI()
     {
@@ -2717,16 +2678,12 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void DenyBreakEngagementRequest()
     {
         meleeUI.meleeTypeDropdown.value = 0;
-        GameManager.Instance.UpdateMeleeUI();
         CloseMeleeBreakEngagementRequestUI();
     }
     public void AcceptBreakEngagementRequest()
     {
         if (HelperFunctions.OverrideKeyPressed())
-        {
-            GameManager.Instance.UpdateMeleeUI();
             CloseMeleeBreakEngagementRequestUI();
-        }
     }
     public void CloseMeleeBreakEngagementRequestUI()
     {
