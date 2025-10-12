@@ -670,6 +670,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void SetOverrideTerrainOn()
     {
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideTerrainOn").Find("TerrainDropdown").GetComponent<TMP_Dropdown>();
+        string oldTerrainOn = ActiveSoldier.Instance.S.TerrainOn;
         string terrainOnString = dropdown.value switch
         {
             0 => "Alpine",
@@ -678,9 +679,12 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             3 => "Urban",
             _ => "Unknown",
         };
-        FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} terrain on changed from {ActiveSoldier.Instance.S.TerrainOn} to {terrainOnString}"); //write to report
-        
+
         ActiveSoldier.Instance.S.TerrainOn = terrainOnString;
+        if (!oldTerrainOn.Equals(terrainOnString))
+        {
+            FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} terrain on changed from {oldTerrainOn} to {ActiveSoldier.Instance.S.TerrainOn}"); //write to report
+        }
     }
     public void HideOverrideWeather()
     {
@@ -921,36 +925,33 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
         abilityInput.text = "";
     }
-    public void ChangeLocation(string xyz)
+    public void ChangeLocation()
     {
-        string overrideLocation = "OverrideLocation" + xyz;
-        TMP_InputField locationInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideLocation").Find(overrideLocation).GetComponent<TMP_InputField>();
+        TMP_InputField xPos = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideLocation").Find("OverrideLocationX").GetComponent<TMP_InputField>();
+        TMP_InputField yPos = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideLocation").Find("OverrideLocationY").GetComponent<TMP_InputField>();
+        TMP_InputField zPos = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideLocation").Find("OverrideLocationZ").GetComponent<TMP_InputField>();
         
-        if (int.TryParse(locationInput.text, out int newlocationInput))
+        if (int.TryParse(xPos.text, out int x) && int.TryParse(yPos.text, out int y) && int.TryParse(zPos.text, out int z))
         {
-            if ((xyz.Equals("X") && newlocationInput >= 1 && newlocationInput <= GameManager.Instance.maxX) || (xyz.Equals("Y") && newlocationInput >= 1 && newlocationInput <= GameManager.Instance.maxY) || (xyz.Equals("Z") && newlocationInput >= 0 && newlocationInput <= GameManager.Instance.maxZ))
+            Vector3 newlocationInput = new(x, y, z);
+            if (HelperFunctions.IsValidLocation(newlocationInput, new Vector3(GameManager.Instance.maxX, GameManager.Instance.maxY, GameManager.Instance.maxZ)))
             {
                 ActiveSoldier.Instance.S.SetLosCheck("losChange|move(override)"); //losCheck
 
-                if (xyz.Equals("X"))
-                {
-                    FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} location changed from {ActiveSoldier.Instance.S.X}, {ActiveSoldier.Instance.S.Y}, {ActiveSoldier.Instance.S.Z} to {newlocationInput}, {ActiveSoldier.Instance.S.Y}, {ActiveSoldier.Instance.S.Z}"); //write to report
-                    ActiveSoldier.Instance.S.X = newlocationInput;
-                }
-                else if (xyz.Equals("Y"))
-                {
-                    FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} location changed from {ActiveSoldier.Instance.S.X}, {ActiveSoldier.Instance.S.Y}, {ActiveSoldier.Instance.S.Z} to {ActiveSoldier.Instance.S.X}, {newlocationInput}, {ActiveSoldier.Instance.S.Z}"); //write to report
-                    ActiveSoldier.Instance.S.Y = newlocationInput;
-                }
-                else
-                {
-                    FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} location changed from {ActiveSoldier.Instance.S.X}, {ActiveSoldier.Instance.S.Y}, {ActiveSoldier.Instance.S.Z} to {ActiveSoldier.Instance.S.X}, {ActiveSoldier.Instance.S.Z}, {newlocationInput}"); //write to report
-                    ActiveSoldier.Instance.S.Z = newlocationInput;
-                }
+                FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} location changed from ({ActiveSoldier.Instance.S.X}, {ActiveSoldier.Instance.S.Y}, {ActiveSoldier.Instance.S.Z}) to ({(int)newlocationInput.x}, {(int)newlocationInput.y}, {(int)newlocationInput.z})"); //write to report
+                ActiveSoldier.Instance.S.X = (int)newlocationInput.x;
+                ActiveSoldier.Instance.S.Y = (int)newlocationInput.y;
+                ActiveSoldier.Instance.S.Z = (int)newlocationInput.z;
             }
+            else
+                generalAlertUI.Activate("Please enter location within battlefield bounds");
         }
+        else
+            generalAlertUI.Activate("Please enter valid location");
 
-        locationInput.text = string.Empty;
+        xPos.text = string.Empty;
+        yPos.text = string.Empty;
+        zPos.text = string.Empty;
     }
     public void ChangeRoundsWithoutFood()
     {

@@ -93,6 +93,14 @@ public static class HelperFunctions
         }
         return false;
     }
+    public static bool IsValidLocation(Vector3 location, Vector3 ordinateMax)
+    {
+        if (location.x >= 1 && location.x <= ordinateMax.x &&
+            location.y >= 1 && location.y <= ordinateMax.y &&
+            location.z >= 0 && location.z <= ordinateMax.z)
+            return true;
+        return false;
+    }
     public static int DiceRoll()
     {
         return RandomNumber(1, 6);
