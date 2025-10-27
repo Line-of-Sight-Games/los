@@ -145,8 +145,10 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 1.0.2
-  preloadedAssets: []
+  bundleVersion: 1.0.3
+  preloadedAssets:
+  - {fileID: 11400000, guid: 116a3a9e405c51a469645589fdf89c1c, type: 2}
+  - {fileID: -944628639613478452, guid: 56332b38935434d44a73e6a532f8133c, type: 3}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
