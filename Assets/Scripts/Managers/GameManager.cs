@@ -305,7 +305,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
             }
         }
     }
-    public void EndTeamTurn()
+    public IEnumerator EndTeamTurn()
     {
         //pre xp check stuff
         foreach (Soldier s in AllFieldedSoldiers())
@@ -397,6 +397,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         MenuManager.Instance.CheckXP();
 
+        yield return new WaitUntil(() => MenuManager.Instance.xpResolvedFlag);
+
         //post xp stuff
         foreach (Soldier s in AllFieldedSoldiers())
         {
@@ -404,7 +406,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
             {
                 //dish out poison damage
                 if (s.IsPoisoned())
-                    StartCoroutine(s.TakePoisonDamage());
+                    s.TakePoisonDamage();
             }
             else if (s.IsOffturnAndAlive()) //run things that trigger at the end of enemy team turn
             {
@@ -417,7 +419,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
             {
                 s.bleedoutTurns--;
                 if (s.bleedoutTurns <= 0)
-                    StartCoroutine(s.BleedoutKill());    
+                    s.BleedoutKill();
             }
 
             //increment recon binoculars
@@ -477,15 +479,24 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 }
 
                 yield return new WaitUntil(() => MenuManager.Instance.inspirerResolvedFlag);
-
-                s.GenerateAP();
             }
             else //run things that trigger at the start of opposition team turn
             {
                 
             }
         }
+
         MenuManager.Instance.CheckXP();
+
+        yield return new WaitUntil(() => MenuManager.Instance.xpResolvedFlag);
+
+        foreach (Soldier s in AllFieldedSoldiers())
+        {
+            if (s.IsOnturnAndAlive())
+            {
+                s.GenerateAP();
+            }
+        }
     }
     public void StartRound()
     {
@@ -508,8 +519,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         if (ActiveSoldier.Instance.S.CheckAP(1))
         {
-            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} takes cover"); //write to report
-
             ActiveSoldier.Instance.S.DeductAP(1);
             ActiveSoldier.Instance.S.SetCover();
         }
@@ -1483,7 +1492,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
             MenuManager.Instance.SetMeleeResolvedFlagTo(false);
             ActiveSoldier.Instance.S.DeductAP(ap);
 
-            int meleeDamage = CalculateMeleeResult(attacker, defender);
             string damageMessage;
             bool counterattack = false, instantKill = false, loudAction = true, disengage = false;
 
@@ -1528,6 +1536,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
+                    //calculate melee result
+                    int meleeDamage = CalculateMeleeResult(attacker, defender);
+
                     //drop impractical handheld items
                     attacker.DropWeakerHandheldItem();
                     defender.DropWeakerHandheldItem();
@@ -1554,6 +1565,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
                             defender.TakeDamage(attacker, meleeDamage, false, damageType, Vector3.zero);
                             attacker.BrawlerMeleeHitReward();
                         }
+
+                        //add xp to attacker for successful melee attack
+                        MenuManager.Instance.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
                     }
                     else if (meleeDamage < 0)
                     {
@@ -1566,6 +1580,12 @@ public class GameManager : MonoBehaviour, IDataPersistence
                         meleeDamage *= -1;
                         damageMessage = "<color=red>Counterattacked\n(" + meleeDamage + " Damage)</color>";
                         attacker.TakeDamage(defender, meleeDamage, false, damageType, Vector3.zero);
+
+                        //push a zero damage attack to the defender even if counterattcking to trigger abilities
+                        defender.TakeDamage(attacker, 0, true, damageType, Vector3.zero);
+
+                        //add xp to defender for successful melee counterattack
+                        MenuManager.Instance.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
                     }
                     else
                     {
@@ -1575,31 +1595,17 @@ public class GameManager : MonoBehaviour, IDataPersistence
                         SoundManager.Instance.PlaySoldierMeleeBreakeven(ActiveSoldier.Instance.S);
 
                         damageMessage = "<color=orange>No Damage\n(Evenly Matched)</color>";
+
+                        //push a zero damage attack to the defender even if counterattcking to trigger abilities
+                        defender.TakeDamage(attacker, 0, true, damageType, Vector3.zero);
+
+                        //add xp to defender for successful melee block
+                        MenuManager.Instance.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
                     }
                 }
 
                 //reset bloodrage even if non-successful attack
                 attacker.UnsetBloodRage();
-
-                //push a zero damage attack to the defender for abilities trigger
-                defender.TakeDamage(attacker, 0, true, damageType, Vector3.zero);
-            }
-
-            //add xp for successful melee attack
-            if (meleeUI.meleeTypeDropdown.value == 0)
-            {
-                if (!damageMessage.Contains("No Damage"))
-                {
-                    if (counterattack)
-                        MenuManager.Instance.AddXpAlert(defender, 2 + meleeDamage, $"Melee counterattack attack on {attacker.soldierName} for {meleeDamage} damage.", false);
-                    else
-                        MenuManager.Instance.AddXpAlert(attacker, 1, $"Successful melee attack on {defender.soldierName}.", false);
-                }
-                else
-                {
-                    if (meleeDamage == 0)
-                        MenuManager.Instance.AddXpAlert(defender, 2, $"Melee block against {attacker.soldierName}.", false);
-                }
             }
 
             //kill if instantKill
@@ -2240,7 +2246,10 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     //print(friendly.soldierName + " trauma check actually running");
                     //desensitised
                     if (friendly.IsDesensitised())
-                        MenuManager.Instance.AddTraumaAlert(friendly, tp, friendly.soldierName + " is " + friendly.GetTraumaState() + ". He is immune to trauma.", 0, 0, "");
+                    {
+                        MenuManager.Instance.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is {friendly.GetTraumaState()}. He is immune to trauma.", 0, 0, "");
+                        FileUtility.WriteToReport($"{friendly.soldierName} is {friendly.GetTraumaState().Replace(",", "").Trim()}, he is immune to trauma ({tp}tp)"); //write to report
+                    }
                     else
                     {
                         //guaranteed trauma from commander death and/or lastandicide
@@ -2251,7 +2260,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                         }
                         if (lastandicide)
                         {
-                            MenuManager.Instance.AddTraumaAlert(friendly, 1, deadSoldier.soldierName + " committed Lastandicide, an automatic trauma point has been accrued.", 0, 0, "");
+                            MenuManager.Instance.AddTraumaAlert(friendly, 1, $"{deadSoldier.soldierName} committed Lastandicide, an automatic trauma point has been accrued.", 0, 0, "");
                             showTraumaUI = true;
                         }
 

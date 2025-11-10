@@ -631,7 +631,11 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void SetOverrideHealthState()
     {
         TMP_Dropdown dropdown = soldierOptionsUI.transform.Find("SoldierBanner").Find("SoldierStatsUI").Find("General").Find("OverrideHealthState").Find("HealthStateDropdown").GetComponent<TMP_Dropdown>();
-        FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} health state changed"); //write to report
+        string oldHealthState =
+            ActiveSoldier.Instance.S.IsDead() ? "Dead" :
+            ActiveSoldier.Instance.S.IsUnconscious() ? "Unconscious" :
+            ActiveSoldier.Instance.S.IsLastStand() ? "Last Stand" :
+            "Active";
 
         if (dropdown.value == 3)
         {
@@ -652,6 +656,16 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         {
             if (!ActiveSoldier.Instance.S.IsActive())
                 ActiveSoldier.Instance.S.MakeActive();
+        }
+
+        string currentHealthState =
+            ActiveSoldier.Instance.S.IsDead() ? "Dead" :
+            ActiveSoldier.Instance.S.IsUnconscious() ? "Unconscious" :
+            ActiveSoldier.Instance.S.IsLastStand() ? "Last Stand" :
+            "Active";
+        if (!oldHealthState.Equals(currentHealthState))
+        {
+            FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} health state changed from {oldHealthState} to {currentHealthState}"); //write to report
         }
     }
     public void GetOverrideTerrainOn(Transform soldierStatsUI)
@@ -2344,9 +2358,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         traumaUI.SetActive(false);
     }
-    public void AddTraumaAlert(Soldier friendly, int trauma, string reason, int rolls, int xpOnResist, string range)
+    public void AddTraumaAlert(Soldier friendly, int trauma, string description, int rolls, int xpOnResist, string range)
     {
-        Instantiate(traumaAlertPrefab, traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(friendly, trauma, reason, rolls, xpOnResist, range);
+        Instantiate(traumaAlertPrefab, traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(friendly, trauma, description, rolls, xpOnResist, range);
     }
 
     public IEnumerator OpenTraumaAlertUI()
@@ -3515,7 +3529,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         if (showPromotionUI)
             OpenPromotionUI();
         else
-            SetXpResolvedFlagTo(true);
+            ClosePromotionUI();
     }
     public void AddPromotionAlert(Soldier soldier)
     {
@@ -3553,7 +3567,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 if (child.GetComponent<SoldierAlert>().soldier.IsOnturn())
                     Destroy(child.gameObject);
 
-            ClosePromotionUI();
             CheckPromotion(promotionAlertsList);
         }
     }

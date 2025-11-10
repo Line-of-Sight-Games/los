@@ -100,9 +100,9 @@ public class DipElecUI : MonoBehaviour
             else if (dipElecTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Contains("Negotiation"))
                 dipElecTypeDropdown.value = 1;
         }
-        UpdateDipElecRewardAndChance();
+        UpdateDipElecLevelandChance();
     }
-    public void UpdateDipElecRewardAndChance()
+    public void UpdateDipElecLevelandChance()
     {
         //set level dropdown and success chance
         dipElecLevelDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();
@@ -176,7 +176,7 @@ public class DipElecUI : MonoBehaviour
                 int targetLevel = dipElecLevelDropdown.value + 1;
                 if (passCount >= targetLevel)
                 {
-                    FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} succeeds at level {targetLevel} {resultString}."); //write to report
+                    FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} succeeds at level {targetLevel} {resultString} ({successChanceDisplay.text})"); //write to report
 
                     for (int i = targetLevel; i >= 1; i--)
                     {
@@ -192,7 +192,7 @@ public class DipElecUI : MonoBehaviour
                 }
                 else
                 {
-                    FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} fails to {resultString}."); //write to report
+                    FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} fails at {resultString} ({successChanceDisplay.text})"); //write to report
 
                     dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=red>{resultString} failed</color>";
                     GameObject dipelecReward = Instantiate(MenuManager.Instance.dipelecRewardPrefab, dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));

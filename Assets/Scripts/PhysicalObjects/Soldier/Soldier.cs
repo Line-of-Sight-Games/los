@@ -1166,14 +1166,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         SetOnDrug(drugName);
     }
-    public IEnumerator TakePoisonDamage()
+    public void TakePoisonDamage()
     {
-        yield return new WaitUntil(() => MenuManager.Instance.xpResolvedFlag == true);
         TakeDamage(SoldierManager.Instance.FindSoldierById(poisonedBy), 2, false, new() { "Poison" }, Vector3.zero);
     }
-    public IEnumerator BleedoutKill()
+    public void BleedoutKill()
     {
-        yield return new WaitUntil(() => MenuManager.Instance.xpResolvedFlag == true);
         madeUnconBydamageList.Add("Bleedout");
         InstantKill(SoldierManager.Instance.FindSoldierById(madeUnconBy), madeUnconBydamageList);
     }
@@ -1441,7 +1439,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (tp < 5)
         {
             tp += trauma;
-            FileUtility.WriteToReport($"{soldierName} takes {trauma} trauma points. He is {GetTraumaState()}."); //write to report
 
             //perform frozen shenanigans
             if (IsFrozen())
@@ -2587,6 +2584,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         guardsmanRetryUsed = false;
         SetState("Overwatch");
 
+        FileUtility.WriteToReport($"{soldierName} goes on overwatch at point ({x},{y}) cone ({r},{a})"); //write to report
+
         SetLosCheck("losChange|overwatchActive"); //losCheck
     }
     public void UnsetOverwatch()
@@ -2641,10 +2640,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void SetCover()
     {
+        FileUtility.WriteToReport($"{soldierName} takes cover."); //write to report
         SetState("Cover");
     }
     public void UnsetCover()
     {
+        FileUtility.WriteToReport($"{soldierName} stops taking cover."); //write to report
         UnsetState("Cover");
     }
     public bool IsInteractable()

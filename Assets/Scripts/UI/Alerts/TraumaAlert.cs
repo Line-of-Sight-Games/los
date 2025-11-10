@@ -55,31 +55,52 @@ public class TraumaAlert : SoldierAlert
         {
             if (description.text.Contains("automatic"))
             {
+                if (description.text.Contains("Commander"))
+                    FileUtility.WriteToReport($"{soldier.soldierName} suffers automatic trauma due to commander death ({trauma}tp)"); //write to report
+                else if (description.text.Contains("Lastandicide"))
+                    FileUtility.WriteToReport($"{soldier.soldierName} suffers automatic trauma due to ally Lastandicide ({trauma}tp)"); //write to report
+
                 //automatic trauma
                 title.text = "TRAUMA GAINED";
                 description.text = $"{soldier.soldierName} took {trauma} trauma.";
             }
             else
             {
-                //do the trauma check
-                for (int i = 0; i < rolls; i++)
+                if (soldier.IsResilient())
+                    resisted = true;
+                else
                 {
-                    if (soldier.ResilienceCheck())
-                        resisted = true;
+                    //do the trauma check
+                    for (int i = 0; i < rolls; i++)
+                    {
+                        if (soldier.ResilienceCheck())
+                            resisted = true;
+                    }
                 }
 
                 if (resisted)
                 {
                     if (description.text.Contains("Tabun"))
-                        MenuManager.Instance.AddXpAlert(soldier, xpOnResist, $"Resisted tabun trauma.", true);
+                    {
+                        MenuManager.Instance.AddXpAlert(soldier, xpOnResist, $"Resisted trauma from tabun gas.", true);
+                        FileUtility.WriteToReport($"{soldier.soldierName} resists trauma from tabun gas ({trauma}tp)"); //write to report
+                    }
                     else
+                    {
                         MenuManager.Instance.AddXpAlert(soldier, xpOnResist, $"Resisted trauma from death witnessed at {range} range.", true);
+                        FileUtility.WriteToReport($"{soldier.soldierName} resists trauma from death witnessed at {range} range ({trauma}tp)"); //write to report
+                    }
 
                     title.text = "<color=green>TRAUMA RESISTED</color>";
                     description.text = $"{soldier.soldierName} resisted the trauma.";
                 }
                 else
                 {
+                    if (description.text.Contains("Tabun"))
+                        FileUtility.WriteToReport($"{soldier.soldierName} suffers trauma from tabun gas ({trauma}tp). He is {soldier.GetTraumaState().Replace(", ", "").Trim()}"); //write to report
+                    else
+                        FileUtility.WriteToReport($"{soldier.soldierName} suffers trauma from death witnessed at {range} range ({trauma}tp). He is {soldier.GetTraumaState().Replace(", ", "").Trim()}"); //write to report
+
                     title.text = "TRAUMA GAINED";
                     description.text = $"{soldier.soldierName} failed to resist and took {trauma} trauma.";
                 }

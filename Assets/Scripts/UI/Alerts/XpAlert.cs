@@ -44,7 +44,7 @@ public class XpAlert : SoldierAlert
             if (description.text.Contains("Override"))
                 soldier.xp -= xp;
             soldier.IncrementXP(xp, learnerEnabled);
-            FileUtility.WriteToReport($"{soldier.soldierName} got {xp} xp for: {description}"); //write to report
+            FileUtility.WriteToReport($"{soldier.soldierName} got {xp} xp for: {description.text}"); //write to report
         }
     }
 }
