@@ -1173,13 +1173,13 @@ public class ShotUI : MonoBehaviour
         IAmShootable target = GameManager.Instance.FindShootableById(SelectedShootableId);
         Item gun = null;
         bool runSecondShot = false;
-        string gunNames = MenuManager.Instance.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text;
+        string gunNames = shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text;
         print(gunNames);
         if (gunNames.Contains("|"))
         {
-            string[] guns = MenuManager.Instance.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Split('|');
+            string[] guns = shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text.Split('|');
             gun = shooter.GetEquippedGun(guns[0]);
-            MenuManager.Instance.shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text = guns[1];
+            shotConfirmUI.transform.Find("GunName").GetComponent<TextMeshProUGUI>().text = guns[1];
             runSecondShot = true;
         }
         else
@@ -1188,10 +1188,10 @@ public class ShotUI : MonoBehaviour
         int.TryParse(apCost.text, out int ap);
         int actingHitChance;
         bool resistSuppression;
-        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
-        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
-        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(false);
-        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
+        shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(false);
+        shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(false);
+        shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(false);
+        shotResultUI.transform.Find("OptionPanel").Find("GuardsmanRetry").gameObject.SetActive(false);
 
         tempShooterTarget = Tuple.Create(shooter, target);
         if (runSecondShot || retry)
@@ -1225,20 +1225,20 @@ public class ShotUI : MonoBehaviour
             //display shooter suppression indicator
             if (shooter.IsSuppressed())
             {
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
+                shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").gameObject.SetActive(true);
 
                 if (resistSuppression)
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} resists suppression."); //write to report
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
+                    shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Resisted Suppression</color>";
                     actingHitChance = chances.Item1;
                 }
                 else
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} suffers suppression."); //write to report
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
+                    shotResultUI.transform.Find("OptionPanel").Find("SuppressionResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=orange>Suffered Suppression</color>";
                     actingHitChance = chances.Item3;
                 }
             }
@@ -1257,7 +1257,7 @@ public class ShotUI : MonoBehaviour
                 };
 
                 //show los check button
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+                shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                 //standard shot hits cover
                 if (randNum1 <= actingHitChance)
@@ -1267,13 +1267,13 @@ public class ShotUI : MonoBehaviour
                     //play cover destruction
                     SoundManager.Instance.PlayCoverDestruction();
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                    shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                     //critical shot hits cover
                     if (randNum2 <= chances.Item2)
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
+                        shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> COVER DESTROYED </color>";
                     else
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
+                        shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Cover hit (" + coverDamage + " damage)</color>";
                 }
                 else
                 {
@@ -1284,27 +1284,27 @@ public class ShotUI : MonoBehaviour
                     //play shot miss dialogue
                     SoundManager.Instance.PlaySoldierShotMiss(shooter);
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                    shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is ExplosiveBarrel targetBarrel)
             {
                 //show los check button
-                MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+                shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                 //standard shot hits barrel
                 if (randNum1 <= actingHitChance)
                 {
                     FileUtility.WriteToReport($"{shooter.soldierName} hits explosive barrel at ({target.X}, {target.Y}, {target.Z}) ({actingHitChance}%|{chances.Item2}%)"); //write to report
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                    shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
 
                     //critical shot hits barrel
                     if (randNum2 <= chances.Item2)
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
+                        shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes (Crit)!</color>";
                     else
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
+                        shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green>Barrel Explodes!</color>";
                     targetBarrel.CheckExplosionBarrel(shooter);
                 }
                 else
@@ -1316,8 +1316,8 @@ public class ShotUI : MonoBehaviour
                     //play shot miss dialogue
                     SoundManager.Instance.PlaySoldierShotMiss(shooter);
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                    shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                 }
             }
             else if (target is Soldier targetSoldier) //check if target is soldier
@@ -1335,10 +1335,10 @@ public class ShotUI : MonoBehaviour
                         if (randNum3 > 0)
                         {
                             targetSoldier = originalTarget.EngagedSoldiers[randNum3 - 1];
-                            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee aiming for {originalTarget.soldierName}, hit {targetSoldier.soldierName}.";
+                            shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee aiming for {originalTarget.soldierName}, hit {targetSoldier.soldierName}.";
                         }
                         else
-                            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee and hit intended target.";
+                            shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Shot into melee and hit intended target.";
 
                         FileUtility.WriteToReport($"{shooter.soldierName} shoots into melee aiming for {originalTarget.soldierName}, hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
                     }
@@ -1346,7 +1346,7 @@ public class ShotUI : MonoBehaviour
                     {
                         FileUtility.WriteToReport($"{shooter.soldierName} hits {targetSoldier.soldierName} ({actingHitChance}%|{chances.Item2}%)."); //write to report
 
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
+                        shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Shot directly on target.";
                     }
 
 
@@ -1356,7 +1356,7 @@ public class ShotUI : MonoBehaviour
                         FileUtility.WriteToReport($"The shot is critical!"); //write to report
 
                         targetSoldier.TakeDamage(shooter, gun.critDamage, false, new() { "Critical", "Shot" }, Vector3.zero);
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
+                        shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> CRITICAL SHOT </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
                         {
@@ -1370,7 +1370,7 @@ public class ShotUI : MonoBehaviour
                     else
                     {
                         targetSoldier.TakeDamage(shooter, gun.damage, false, new() { "Shot" }, Vector3.zero);
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
+                        shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "<color=green> Hit </color>";
 
                         if (targetSoldier.IsSelf(originalTarget)) //only pay xp if you hit correct target 
                         {
@@ -1401,14 +1401,14 @@ public class ShotUI : MonoBehaviour
                     //set sound flags after enemy misses shot
                     SoundManager.Instance.SetSoldierSelectionSoundFlagAfterEnemyMissesShot(targetSoldier);
 
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
+                    shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = "Miss";
+                    shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Missed by {missString}.\n\nDamage event ({gun.damage}) on alternate target, or cover damage {gun.DisplayGunCoverDamage()}.";
                     //show los check button if shot misses
-                    MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
+                    shotResultUI.transform.Find("OptionPanel").Find("LosCheck").gameObject.SetActive(true);
 
                     //show avenger retry if opponent has killed
                     if (shooter.IsAvenger() && targetSoldier.hasKilled && gun.CheckAnyAmmo() && !retry && !targetSoldier.IsRevoker())
-                        MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
+                        shotResultUI.transform.Find("OptionPanel").Find("AvengerRetry").gameObject.SetActive(true);
 
                     //paying xp for dodge
                     if (actingHitChance > 90)
@@ -1442,8 +1442,8 @@ public class ShotUI : MonoBehaviour
                 _ => 0,
             };
             (target as Soldier).SetSuppression(suppressionValue);
-            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"<color=green> Supressing ({suppressionValue})</color>";
-            MenuManager.Instance.shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Suppressing {(target as Soldier).soldierName} until next round.";
+            shotResultUI.transform.Find("OptionPanel").Find("Result").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"<color=green> Supressing ({suppressionValue})</color>";
+            shotResultUI.transform.Find("OptionPanel").Find("ScatterResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = $"Suppressing {(target as Soldier).soldierName} until next round.";
         }
 
         //trigger loud action

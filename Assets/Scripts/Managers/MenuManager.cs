@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour, IDataPersistence
@@ -49,7 +48,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public BinocularsUI binocularsUI;
     public RiotShieldUI riotShieldUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, shotConfirmUI, shotResultUI, overmoveUI, suppressionMoveUI, meleeBreakEngagementRequestUI, meleeResultUI, meleeConfirmUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, meleeAlertPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, overmoveUI, suppressionMoveUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
     
     public SoldierAlert soldierAlertPrefab;
     public XpAlert xpAlertPrefab;
@@ -64,10 +63,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public Button shotButton, moveButton, meleeButton, configureButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton, lastandicideButton, politicsButton;
     private float playTimeTotal;
     public float turnTime;
-    public string meleeChargeIndicator;
-    public bool timerStop, overrideView, clearMeleeFlag, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
+    public bool timerStop, overrideView, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
-    public Sprite fist, explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
+    public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
 
     private readonly string[][] allStats =
     {
@@ -401,15 +399,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
         xpResolvedFlag = value;
     }
-    public void SetMeleeResolvedFlagTo(bool value)
-    {
-        if (value)
-            UnfreezeTimer();
-        else
-            FreezeTimer();
-
-        meleeResolvedFlag = value;
-    }
     public void SetExplosionResolvedFlagTo(bool value)
     {
         if (value)
@@ -476,76 +465,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         muteIcon.SetActive(false);
         SoundManager.Instance.isMute = false;
     }
-    public string DisplayMeleeParameters()
-    {
-        List<string> colouredParameters = new();
-        foreach (Tuple<string, string> param in GameManager.Instance.meleeParameters)
-        {
-
-            if (param.Item1 == "aM" || param.Item1 == "aJuggernaut" || param.Item1 == "aInspirer" || param.Item1 == "aWep" || param.Item1 == "aStr" || param.Item1 == "aFight")
-            {
-                if (float.Parse(param.Item2) > 0)
-                    colouredParameters.Add($"<color=green>{param}</color>");
-                else if (float.Parse(param.Item2) < 0)
-                    colouredParameters.Add($"<color=red>{param}</color>");
-                else
-                    colouredParameters.Add($"{param}");
-            }
-            else if (param.Item1 == "dM" || param.Item1 == "dJuggernaut" || param.Item1 == "dWep" || param.Item1 == "charge" || param.Item1 == "dStr" || param.Item1 == "dFight")
-            {
-                if (float.Parse(param.Item2) > 0)
-                    colouredParameters.Add($"<color=red>{param}</color>");
-                else if (float.Parse(param.Item2) < 0)
-                    colouredParameters.Add($"<color=green>{param}</color>");
-                else
-                    colouredParameters.Add($"{param}");
-            }
-            else if (param.Item1 == "aSustenance" || param.Item1 == "aHP" || param.Item1 == "aTer" || param.Item1 == "aFlank" || param.Item1 == "kd" || param.Item1 == "aSuppression" || param.Item1 == "bloodrage")
-            {
-                if (float.Parse(param.Item2) > 1)
-                    colouredParameters.Add($"<color=green>{param}</color>");
-                else if (float.Parse(param.Item2) < 1)
-                    colouredParameters.Add($"<color=red>{param}</color>");
-                else
-                    colouredParameters.Add($"{param}");
-            }
-            else if (param.Item1 == "dSustenance" || param.Item1 == "dHP" || param.Item1 == "dTer" || param.Item1 == "dFlank" || param.Item1 == "dSuppression")
-            {
-                if (float.Parse(param.Item2) < 1)
-                    colouredParameters.Add($"<color=green>{param}</color>");
-                else if (float.Parse(param.Item2) > 1)
-                    colouredParameters.Add($"<color=red>{param}</color>");
-                else
-                    colouredParameters.Add($"{param}");
-            }
-        }
-
-        return $"{colouredParameters.Find(str => str.Contains("aM"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aJuggernaut"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aInspirer"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aSustenance"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aWep"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aHP"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aTer"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aFlank"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("kd"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aSuppression"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aStr"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dM"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dJuggernaut"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dInspirer"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dSustenance"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dWep"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("charge"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dHP"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dTer"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dFlank"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dSuppression"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dStr"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("dFight"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("aFight"))} " +
-                $"| {colouredParameters.Find(str => str.Contains("bloodrage"))}";
-    }
+    
 
 
 
@@ -912,7 +832,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             //run melee control re-eval if R, Str, M, F is changed
             if (ActiveSoldier.Instance.S.IsMeleeEngaged() && (code == "R" || code == "Str" || code == "M" || code == "F"))
-                StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(ActiveSoldier.Instance.S));
+                StartCoroutine(meleeUI.DetermineMeleeControllerMultiple(ActiveSoldier.Instance.S));
         }
 
         //clear override input
@@ -1486,7 +1406,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void GreyAll(string reason)
     {
-        soldierOptionsUI.transform.Find("SoldierActions").Find("AllReason").GetComponent<TextMeshProUGUI>().text = reason;
+        soldierOptionsUI.transform.Find("AllReason").GetComponent<TextMeshProUGUI>().text = reason;
 
         foreach (Button b in actionButtons)
             GreyOut(b, "");
@@ -1515,7 +1435,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
     public void UnGreyAll()
     {
-        soldierOptionsUI.transform.Find("SoldierActions").Find("AllReason").GetComponent<TextMeshProUGUI>().text = "";
+        soldierOptionsUI.transform.Find("AllReason").GetComponent<TextMeshProUGUI>().text = "";
 
         foreach (Button b in actionButtons)
             UnGrey(b, "");
@@ -2505,205 +2425,22 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         flankersUI.SetActive(true);
     }
-
-
-
-
-
-
-
-
-
-
-    //melee functions - menu
-    public void OpenMeleeUINonCoroutine(string meleeCharge)
-    {
-        StartCoroutine(OpenMeleeUI(meleeCharge));
-    }
-    public IEnumerator OpenMeleeUI(string meleeCharge)
-    {
-        yield return new WaitUntil(() => MovementResolvedFlag() && detectionResolvedFlag);
-        yield return new WaitForSeconds(0.5f);
-        yield return new WaitUntil(() => detectionResolvedFlag && shotResolvedFlag);
-
-        //set attacker
-        Soldier attacker = ActiveSoldier.Instance.S;
-        meleeUI.attackerID.text = attacker.id;
-
-        meleeChargeIndicator = meleeCharge;
-
-        List<TMP_Dropdown.OptionData> defenderDetails = new();
-
-        //display best attacker weapon
-        if (attacker.BestMeleeWeapon != null)
-            meleeUI.attackerWeaponImage.sprite = attacker.BestMeleeWeapon.itemImage;
-        else
-            meleeUI.attackerWeaponImage.sprite = fist;
-
-        //generate target list
-        foreach (Soldier s in GameManager.Instance.AllSoldiers())
-        {
-            TMP_Dropdown.OptionData defender = null;
-            if (s.IsAlive() && attacker.IsOppositeTeamAs(s) && s.IsRevealed() && attacker.PhysicalObjectWithinMeleeRadius(s))
-            {
-                if (attacker.CanSeeInOwnRight(s))
-                    defender = new(s.soldierName, s.soldierPortrait, Color.white);
-                else
-                    defender = new(s.soldierName, s.LoadPortraitTeamsight(s.soldierPortraitText), Color.white);
-
-                defenderDetails.Add(defender);
-            }
-
-            if (defender != null)
-            {
-                //remove option if soldier is engaged and this soldier is not on the engagement list
-                if (attacker.IsMeleeEngaged() && !attacker.IsMeleeEngagedWith(s))
-                    defenderDetails.Remove(defender);
-            }
-        }
-
-        if (defenderDetails.Count > 0)
-        {
-            meleeUI.targetDropdown.AddOptions(defenderDetails);
-
-            Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
-
-            //show defender weapon
-            if (defender.BestMeleeWeapon != null)
-                meleeUI.defenderWeaponImage.sprite = defender.BestMeleeWeapon.itemImage;
-            else
-                meleeUI.defenderWeaponImage.sprite = fist;
-
-            GameManager.Instance.UpdateMeleeTypeOptions();
-            meleeUI.gameObject.SetActive(true);
-        }
-        else
-        {
-            ClearMeleeUI();
-            generalAlertUI.Activate("No melee targets found");
-        }
-    }
     public void ClearFlankersUI(GameObject flankersUI)
     {
         foreach (Transform child in flankersUI.transform.Find("FlankersPanel"))
             Destroy(child.gameObject);
         flankersUI.SetActive(false);
     }
+
+
+
+
+
+
+
+
+
     
-    public void ClearMeleeUI()
-    {
-        clearMeleeFlag = true;
-        meleeUI.meleeTypeDropdown.ClearOptions();
-        meleeUI.meleeTypeDropdown.value = 0;
-        meleeUI.attackerWeaponImage.sprite = null;
-        meleeUI.defenderWeaponImage.sprite = null;
-        meleeUI.targetDropdown.ClearOptions();
-        meleeUI.targetDropdown.value = 0;
-        ClearFlankersUI(meleeUI.flankersMeleeAttackerUI);
-        ClearFlankersUI(meleeUI.flankersMeleeDefenderUI);
-        clearMeleeFlag = false;
-    }
-    public void CloseMeleeUI()
-    {
-        ClearMeleeUI();
-        ClearMeleeConfirmUI();
-        meleeUI.gameObject.SetActive(false);
-        meleeConfirmUI.SetActive(false);
-    }
-    public void OpenMeleeConfirmUI()
-    {
-        if (!meleeUI.meleeTypeDropdown.captionText.text.Contains("Select"))
-        {
-            if (int.TryParse(meleeUI.apCost.text, out int ap) && ActiveSoldier.Instance.S.CheckAP(ap))
-            {
-                //find attacker and defender
-                Soldier attacker = SoldierManager.Instance.FindSoldierById(meleeUI.attackerID.text);
-                Soldier defender = SoldierManager.Instance.FindSoldierByName(meleeUI.targetDropdown.captionText.text);
-
-                int meleeDamage = GameManager.Instance.CalculateMeleeResult(attacker, defender);
-
-                meleeConfirmUI.transform.Find("OptionPanel").Find("Damage").Find("DamageDisplay").GetComponent<TextMeshProUGUI>().text = meleeDamage.ToString();
-
-                //add parameters to equation view
-                meleeConfirmUI.transform.Find("EquationPanel").Find("Parameters").GetComponent<TextMeshProUGUI>().text = DisplayMeleeParameters();
-
-                //add rounding to equation view
-                meleeConfirmUI.transform.Find("EquationPanel").Find("Rounding").GetComponent<TextMeshProUGUI>().text = $"Rounding: {GameManager.Instance.meleeParameters.Find(tuple => tuple.Item1 == "rounding").Item2}";
-
-                meleeConfirmUI.SetActive(true);
-            }
-        }
-        else
-            generalAlertUI.Activate("Select a melee type");
-    }
-    public void ClearMeleeConfirmUI()
-    {
-        //if (shotConfirmUI.activeInHierarchy)
-        {
-            clearMeleeFlag = true;
-            meleeConfirmUI.transform.Find("OptionPanel").Find("Damage").Find("DamageDisplay").GetComponent<TextMeshProUGUI>().text = "";
-            clearMeleeFlag = false;
-        }
-    }
-    public void AddMeleeAlert(Soldier attacker, Soldier defender, string damageResult, string controlResult)
-    {
-        //block duplicate detection alerts being created, stops override mode creating multiple instances during overwriting detection stats
-        foreach (Transform child in meleeResultUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
-            if ((child.GetComponent<SoldierAlertDouble>().s1 == attacker && child.GetComponent<SoldierAlertDouble>().s2 == defender) || (child.GetComponent<SoldierAlertDouble>().s1 == defender && child.GetComponent<SoldierAlertDouble>().s2 == attacker))
-                Destroy(child.gameObject);
-        
-        GameObject meleeAlert = Instantiate(meleeAlertPrefab, meleeResultUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"));
-
-        meleeAlert.GetComponent<SoldierAlertDouble>().SetSoldiers(attacker, defender);
-        meleeAlert.transform.Find("Results").Find("DamageResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = damageResult;
-        meleeAlert.transform.Find("Results").Find("ControlResult").Find("ResultDisplay").GetComponent<TextMeshProUGUI>().text = controlResult;
-        meleeAlert.transform.Find("Attacker").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(attacker);
-        meleeAlert.transform.Find("Defender").Find("SoldierPortrait").GetComponent<SoldierPortrait>().Init(defender);
-    }
-    public IEnumerator OpenMeleeResultUI()
-    {
-        yield return new WaitUntil(() => shotResolvedFlag == true);
-
-        meleeResultUI.SetActive(true);
-    }
-    public void ConfirmMeleeResult()
-    {
-        ScrollRect meleeScroller = meleeResultUI.transform.Find("OptionPanel").Find("Scroll").GetComponent<ScrollRect>();
-        Transform meleeAlertList = meleeResultUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content");
-        if (meleeScroller.verticalNormalizedPosition <= 0.05f)
-        {
-            //destroy all detection alerts after done
-            foreach (Transform child in meleeAlertList)
-                Destroy(child.gameObject);
-
-            CloseMeleeResultUI();
-        }
-        else
-            print("Haven't scrolled all the way to the bottom");
-    }
-    public void CloseMeleeResultUI()
-    {
-        SetMeleeResolvedFlagTo(true);
-        meleeResultUI.SetActive(false);
-    }
-    public void OpenMeleeBreakEngagementRequestUI()
-    {
-        meleeBreakEngagementRequestUI.SetActive(true);
-    }
-    public void DenyBreakEngagementRequest()
-    {
-        meleeUI.meleeTypeDropdown.value = 0;
-        CloseMeleeBreakEngagementRequestUI();
-    }
-    public void AcceptBreakEngagementRequest()
-    {
-        if (HelperFunctions.OverrideKeyPressed())
-            CloseMeleeBreakEngagementRequestUI();
-    }
-    public void CloseMeleeBreakEngagementRequestUI()
-    {
-        meleeBreakEngagementRequestUI.SetActive(false);
-    }
 
 
 

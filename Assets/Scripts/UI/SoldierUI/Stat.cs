@@ -63,7 +63,7 @@ public class Stat
             if (Name == "H")
                 statlineBelongsTo.soldierBelongsTo.TakeHeal(null, 1, 0, false, false);
             else if (statlineBelongsTo.soldierBelongsTo.IsMeleeEngaged() && (Name == "R" || Name == "M" || Name == "Str" || Name == "F"))
-                GameManager.Instance.StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
+                GameManager.Instance.StartCoroutine(GameManager.Instance.meleeUI.DetermineMeleeControllerMultiple(statlineBelongsTo.soldierBelongsTo));
             else if (Name == "SR" || Name == "C" || Name == "P")
                 statlineBelongsTo.soldierBelongsTo.SetLosCheck($"statChange({Name})|baseStatChange"); //losCheck
         }

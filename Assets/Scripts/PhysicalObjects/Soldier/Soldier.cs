@@ -761,7 +761,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //check if soldier becomes blind
         if (stats.SR.Val == 0)
         {
-            GameManager.Instance.BreakAllControllingMeleeEngagments(this);
+            GameManager.Instance.meleeUI.BreakAllControllingMeleeEngagments(this);
             UnsetOverwatch();
         }
     }
@@ -1038,7 +1038,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         //remove all engagements
         if (IsMeleeEngaged())
-            StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
+            StartCoroutine(GameManager.Instance.meleeUI.DetermineMeleeControllerMultiple(this));
 
         SetLosCheck("losChange|statChange(SR)(C)|playdeadActive"); //losCheck
     }
@@ -1404,7 +1404,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     }
 
                     //if not broken by health state change break remaining melee engagements
-                    GameManager.Instance.BreakAllControllingMeleeEngagments(this);
+                    GameManager.Instance.meleeUI.BreakAllControllingMeleeEngagments(this);
                 }
 
                 //apply stun affect from tranquiliser
@@ -1451,7 +1451,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 BrokenDropAllItems();
                 foreach (Soldier s in GameManager.Instance.AllSoldiers())
-                    GameManager.Instance.BreakMeleeEngagement(this, s);
+                    GameManager.Instance.meleeUI.BreakMeleeEngagement(this, s);
             }
         }
     }
@@ -2690,7 +2690,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
             //remove all engagements
             if (IsMeleeEngaged())
-                StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
+                StartCoroutine(GameManager.Instance.meleeUI.DetermineMeleeControllerMultiple(this));
 
             SetLosCheck("statChange(C)(SR)|stunActive"); //losCheck
         }
@@ -2786,7 +2786,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         //remove all engagements
         if (IsMeleeEngaged())
-            StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
+            StartCoroutine(GameManager.Instance.meleeUI.DetermineMeleeControllerMultiple(this));
 
         //set sound flags after ally made uncon
         foreach (Soldier s in GameManager.Instance.AllSoldiers())
@@ -2843,7 +2843,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 //remove all engagements
                 if (IsMeleeEngaged())
-                    StartCoroutine(GameManager.Instance.DetermineMeleeControllerMultiple(this));
+                    StartCoroutine(GameManager.Instance.meleeUI.DetermineMeleeControllerMultiple(this));
 
                 //check if critical trauma
                 int tp = 1;
