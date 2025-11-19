@@ -217,10 +217,7 @@ public class MeleeUI : MonoBehaviour
         Soldier attacker = SoldierManager.Instance.FindSoldierById(attackerID.text);
 
         if (!clearMeleeFlag)
-        {
             UpdateMeleeTypeOptions();
-            UpdateMeleeAP(attacker);
-        }
     }
     public void MeleeTypeDropdownChanged()
     {
@@ -232,6 +229,7 @@ public class MeleeUI : MonoBehaviour
             CheckMeleeType();
             if (meleeTypeDropdown.captionText.text.Contains("Attack")) //If it's an actual attack
             {
+                UpdateMeleeAP(attacker);
                 UpdateMeleeDefenderWeapon(defender);
                 UpdateMeleeFlankingAgainstAttacker(attacker, defender);
                 UpdateMeleeFlankingAgainstDefender(attacker, defender);
@@ -240,7 +238,7 @@ public class MeleeUI : MonoBehaviour
     }
     public void UpdateMeleeAP(Soldier attacker)
     {
-        if (meleeTypeDropdown.options[0].text.Contains("Charge"))
+        if (meleeTypeDropdown.captionText.text.Contains("Charge"))
             apCost.text = "0";
         else
         {
@@ -691,13 +689,13 @@ public class MeleeUI : MonoBehaviour
         s2.controlledBySoldiersList.Add(controller.id);
         s2.controllingSoldiersList.Remove(controller.id);
 
-        StartCoroutine(OpenMeleeResultUI());
+        MenuManager.Instance.StartCoroutine(OpenMeleeResultUI());
     }
     public void EstablishNoController(Soldier s1, Soldier s2)
     {
         BreakMeleeEngagement(s1, s2);
 
-        StartCoroutine(OpenMeleeResultUI());
+        MenuManager.Instance.StartCoroutine(OpenMeleeResultUI());
     }
     public string DetermineMeleeController(Soldier attacker, Soldier defender, bool counterattack, bool disengage)
     {

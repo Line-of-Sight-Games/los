@@ -183,6 +183,8 @@ public class DipElecUI : MonoBehaviour
                         dipelecResultUI.transform.Find("OptionPanel").Find("Title").GetComponentInChildren<TextMeshProUGUI>().text = $"<color=green>{resultString} successful</color>";
                         GameObject dipelecReward = Instantiate(MenuManager.Instance.dipelecRewardPrefab, dipelecResultUI.transform.Find("OptionPanel").Find("Rewards"));
                         dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text = (resultString == "Hack") ? DipelecManager.Instance.GetLevelElec(i) : DipelecManager.Instance.GetLevelDip(i);
+
+                        FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} is granted reward for {dipelecReward.GetComponentInChildren<TextMeshProUGUI>().text}"); //write to report
                     }
 
                     //add xp for successful dipelec
