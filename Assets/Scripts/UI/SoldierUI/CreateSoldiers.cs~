@@ -114,8 +114,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		"Tungsten","Casper","Boudica","Raphael","Egersund","Sgt. Chinkara","Nyctea","Eyewall","Keys","Bartholemew","Fiddlesticks","Spike","Destiny","Richtor","Slice","Tramp","Rome","Sassari",
 		"Verona","Milan","Bologna","Rumble","Conan","Lillehammer","Atlas","Florence","Smithy","Bighammer","Thorny","Wraith","Sharticus","Turnip","Jazzhands","Ivan","Kamrov","Price","Amun","Wick",
 		"Leespatz","Vanellope","Esmeralda","Merida","Rapunzel","Snow-White","Cinderella","Giselle","Tinkerbell","Mary-Poppins","Aurora","Bocconcini","Burrata","Haloumi","Saganaki","Quark","Dawon",
-		"Anansi","Yali","Lupin","Saci","Nue","Leutogi","Isonade","Roc","Oozlum","Dill","Wattle","Alkanet","Nepata","Kava","Wonka","Razor","Amber","Alexay","Zulu","Kissinger","Bismuth","Voss",
-		"Cassius"
+		"Anansi","Yali","Lupin","Saci","Nue","Leutogi","Isonade","Roc","Oozlum","Dill","Wattle","Alkanet","Nepata","Kava"
     };
 	public List<string> selectedPortraits;
 	public List<string> selectedSkills;
