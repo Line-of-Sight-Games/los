@@ -7,9 +7,9 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
     public float camOrthoSize;
 
     public GameObject setupMenuUI, createSoldierMenuUI;
-    public TMP_InputField xSize, ySize, zSize, maxRoundsInput, turnTimeInput;
+    public TMP_InputField xSize, ySize, zSize, maxRoundsInput, turnTimeInput, numberBasicZombiesInput, numberBruteZombiesInput;
     public TMP_Dropdown maxSoldierDropdown;
-    public int x, y, z, maxRounds, maxTurnTime, maxTeams, maxSoldiers;
+    public int x, y, z, maxRounds, maxTurnTime, maxTeams, maxSoldiers, numberBasicZombies, numberBruteZombies;
 
     public void LoadData(GameData data)
     {
@@ -36,6 +36,12 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
         data.maxY = y;
         data.maxZ = z;
         data.maxTeams = maxTeams;
+
+        if (DataPersistenceManager.Instance.lozMode)
+        {
+            data.numberBasicZombies = numberBasicZombies;
+            data.numberBruteZombies = numberBruteZombies;
+        }
     }
     public void SetField()
     {
@@ -58,10 +64,31 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
 
     public void Confirm()
     {
-        if (HelperFunctions.ValidateIntInput(xSize, out x) && HelperFunctions.ValidateIntInput(ySize, out y) && HelperFunctions.ValidateIntInput(zSize, out z) && HelperFunctions.ValidateIntInput(maxRoundsInput, out maxRounds) && HelperFunctions.ValidateIntInput(turnTimeInput, out maxTurnTime) && int.TryParse(maxSoldierDropdown.captionText.text, out maxSoldiers))
+        // Validate non-LOZ fields
+        bool baseValid =
+            HelperFunctions.ValidateIntInput(xSize, out x) &&
+            HelperFunctions.ValidateIntInput(ySize, out y) &&
+            HelperFunctions.ValidateIntInput(zSize, out z) &&
+            HelperFunctions.ValidateIntInput(maxRoundsInput, out maxRounds) &&
+            HelperFunctions.ValidateIntInput(turnTimeInput, out maxTurnTime) &&
+            int.TryParse(maxSoldierDropdown.captionText.text, out maxSoldiers);
+
+        // Validate extra fields ONLY in LOZ mode
+        bool zombieSetupValid = true; // default to true if not in LOZ mode
+
+        if (DataPersistenceManager.Instance.lozMode)
+        {
+            zombieSetupValid =
+                HelperFunctions.ValidateIntInput(numberBasicZombiesInput, out numberBasicZombies) &&
+                HelperFunctions.ValidateIntInput(numberBruteZombiesInput, out numberBruteZombies);
+        }
+
+        // Only continue if ALL required fields are valid
+        if (baseValid && zombieSetupValid)
         {
             maxTeams = 2;
             maxTurnTime *= 60;
+
             SetField();
             SetCam();
 

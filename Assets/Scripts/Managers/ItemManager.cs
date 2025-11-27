@@ -117,7 +117,6 @@ public class ItemManager : MonoBehaviour, IDataPersistence
 
     public void AssignItemsToOwners()
     {
-        Debug.Log("Assigning items to owners...");
         IEnumerable<Item> allItems = FindObjectsByType<Item>(default);
         IEnumerable<PhysicalObject> allPhysicalObjects = FindObjectsByType<PhysicalObject>(default);
 

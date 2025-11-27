@@ -56,16 +56,18 @@ public class OpeningMenu : MonoBehaviour
     }
     public void ZombieClicked()
     {
-        if (zombieButtonText.text.Equals("Z O M B I E"))
+        if (zombieButtonText.text.Contains("L O Z"))
         {
+            DataPersistenceManager.Instance.lozMode = true;
             titleText.color = Color.white;
-            zombieButtonText.text = "N O R M A L";
+            zombieButtonText.text = "L O S   M O D E";
             activeLogo.GetComponent<Image>().sprite = lozLogo;
         }
         else
         {
+            DataPersistenceManager.Instance.lozMode = false;
             titleText.color = Color.black;
-            zombieButtonText.text = "Z O M B I E";
+            zombieButtonText.text = "L O Z   M O D E";
             activeLogo.GetComponent<Image>().sprite = losLogo;
         }
     }
@@ -77,7 +79,11 @@ public class OpeningMenu : MonoBehaviour
     {
         coreDataHandler.Delete();
         DataPersistenceManager.Instance.NewGame(); //delete gamedata
-        SceneManager.LoadScene("Create");
+
+        if (DataPersistenceManager.Instance.lozMode)
+            SceneManager.LoadScene("CreateLOZ");
+        else
+            SceneManager.LoadScene("Create");
     }
     public void GoBack()
     {

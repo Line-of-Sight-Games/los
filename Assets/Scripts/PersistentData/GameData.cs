@@ -29,6 +29,7 @@ public class GameData
     public Dictionary<string, Dictionary<string, object>> allItemDetails;
     public List<string> allPOIIds;
     public Dictionary<string, Dictionary<string, object>> allPOIDetails;
+    public int numberBasicZombies, numberBruteZombies;
 
     public GameData()
     {

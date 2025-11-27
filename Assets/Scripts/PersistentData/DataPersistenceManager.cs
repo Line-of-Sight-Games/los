@@ -18,6 +18,7 @@ public class DataPersistenceManager : MonoBehaviour
     public GameObject loadingScreen;
     public Slider progressBar;
     public TextMeshProUGUI progressText;
+    public bool lozMode = false;
 
     private void Awake()
     {

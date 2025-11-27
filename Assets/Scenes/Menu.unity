@@ -218,6 +218,7 @@ RectTransform:
   - {fileID: 1505339086}
   - {fileID: 338332722}
   - {fileID: 591389594}
+  - {fileID: 2006308266}
   - {fileID: 885810212}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -316,9 +317,12 @@ MonoBehaviour:
     allSoldiersIds: []
     allItemIds: []
     allPOIIds: []
+    numberBasicZombies: 0
+    numberBruteZombies: 0
   loadingScreen: {fileID: 963826917}
   progressBar: {fileID: 58854456}
   progressText: {fileID: 828839324}
+  lozMode: 0
 --- !u!1 &58854454
 GameObject:
   m_ObjectHideFlags: 0
@@ -748,7 +752,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -370}
+  m_AnchoredPosition: {x: 0, y: -290}
   m_SizeDelta: {x: 400, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &329402985
@@ -877,7 +881,6 @@ RectTransform:
   - {fileID: 1550392059}
   - {fileID: 1026428432}
   - {fileID: 1009442683}
-  - {fileID: 2006308266}
   - {fileID: 329402984}
   m_Father: {fileID: 29873285}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1010,7 +1013,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Z O M B I E
+  m_text: L O Z   M O D E
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1037,10 +1040,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
+  m_fontSize: 22.4
   m_fontSizeBase: 40
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -1075,7 +1078,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 20, y: 0, z: 20, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1165,7 +1168,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f1f615344048b3b4ca4c43249158cf7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a78d034dccbe8e4498bc0a60650ffca9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1778,8 +1781,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 761.3, y: -494}
-  m_SizeDelta: {x: 190, y: 30}
+  m_AnchoredPosition: {x: 760, y: -495}
+  m_SizeDelta: {x: 200, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &885810213
 MonoBehaviour:
@@ -3770,16 +3773,16 @@ RectTransform:
   m_GameObject: {fileID: 2006308265}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.9, y: 1.9, z: 1.9}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 487580124}
-  m_Father: {fileID: 338332722}
+  m_Father: {fileID: 29873285}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -290}
-  m_SizeDelta: {x: 400, y: 60}
+  m_AnchoredPosition: {x: 760, y: -425}
+  m_SizeDelta: {x: 200, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2006308267
 MonoBehaviour:

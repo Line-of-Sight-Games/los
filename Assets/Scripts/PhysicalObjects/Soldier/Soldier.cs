@@ -72,6 +72,44 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return this;
     }
+    public Soldier InitZombie(string name, int team, Sprite portrait, string portraitText)
+    {
+        id = GenerateGuid();
+        soldierName = name;
+        soldierTeam = team;
+        soldierDisplayPriority = int.Parse(name.Where(char.IsDigit).ToArray()) + (name.Contains("Brute") ? 0 : 100);
+        soldierPortrait = portrait;
+        soldierPortraitText = portraitText;
+        stats = new Statline(this);
+        stats.L.BaseVal = 0;
+        stats.H.BaseVal = 4;
+        stats.R.BaseVal = 1;
+        stats.S.BaseVal = 10;
+        stats.E.BaseVal = 1;
+        stats.F.BaseVal = 0;
+        stats.P.BaseVal = 0;
+        stats.C.BaseVal = 0;
+        stats.SR.BaseVal = 20;
+        stats.Ri.BaseVal = 0;
+        stats.AR.BaseVal = 0;
+        stats.LMG.BaseVal = 0;
+        stats.Sn.BaseVal = 0;
+        stats.SMG.BaseVal = 0;
+        stats.Sh.BaseVal = 0;
+        stats.M.BaseVal = 4;
+        stats.Str.BaseVal = 1;
+        stats.Dip.BaseVal = 0;
+        stats.Elec.BaseVal = 0;
+        stats.Heal.BaseVal = 0;
+        inventory = new Inventory(this);
+        hp = stats.H.BaseVal;
+        GenerateAP();
+        SetState("Active");
+        MapPhysicalPosition(0, 0, 0);
+
+        return this;
+    }
+
     public void SaveData(ref GameData data)
     {
         details = new Dictionary<string, object>
@@ -196,7 +234,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierName = (string)details["soldierName"];
         soldierTeam = Convert.ToInt32(details["team"]);
         soldierTerrain = (string)details["terrain"];
-        soldierPortrait = LoadPortrait((string)details["portrait"]);
+        if (DataPersistenceManager.Instance.lozMode && IsZombie())
+            soldierPortrait = LoadPortraitZombie((string)details["portrait"]);
+        else
+            soldierPortrait = LoadPortrait((string)details["portrait"]);
         soldierPortraitText = (string)details["portrait"];
         soldierSpeciality = (string)details["speciality"];
         soldierAbilities = (details["abilities"] as JArray).Select(token => token.ToString()).ToList();
@@ -297,7 +338,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public Soldier LinkWithUI(Transform displayPanel)
     {
         soldierUI = Instantiate(soldierUIPrefab, displayPanel);
-        soldierUI.GetComponent<SoldierUI>().linkedSoldier = this;
+        soldierUI.linkedSoldier = this;
         CheckSpecialityColor(soldierSpeciality);
 
         return this;
@@ -319,6 +360,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         else
             return false;
+    }
+    public bool IsZombie()
+    {
+        if (soldierName.Contains("Zombie"))
+            return true;
+        return false;
     }
     public bool IsDead()
     {
@@ -2037,7 +2084,36 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Urban_Facepaint" => allPortraits.options[29].image,
             "Urban_Shades" => allPortraits.options[30].image,
             "Urban_WWII" => allPortraits.options[31].image,
-            _ => allPortraits.options[0].image,
+            _ => allPortraits.options[32].image,
+        };
+    }
+    public Sprite LoadPortraitZombie(string portraitName)
+    {
+        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsZombieDropdown;
+        return portraitName switch
+        {
+            "Zombie-Brute1" => allPortraits.options[0].image,
+            "Zombie1" => allPortraits.options[1].image,
+            "Zombie2" => allPortraits.options[2].image,
+            "Zombie3" => allPortraits.options[3].image,
+            "Zombie4" => allPortraits.options[4].image,
+            "Zombie5" => allPortraits.options[5].image,
+            "Zombie6" => allPortraits.options[6].image,
+            "Zombie7" => allPortraits.options[7].image,
+            "Zombie8" => allPortraits.options[8].image,
+            "Zombie9" => allPortraits.options[9].image,
+            "Zombie10" => allPortraits.options[10].image,
+            "Zombie11" => allPortraits.options[11].image,
+            "Zombie12" => allPortraits.options[12].image,
+            "Zombie13" => allPortraits.options[13].image,
+            "Zombie14" => allPortraits.options[14].image,
+            "Zombie15" => allPortraits.options[15].image,
+            "Zombie16" => allPortraits.options[16].image,
+            "Zombie17" => allPortraits.options[17].image,
+            "Zombie18" => allPortraits.options[18].image,
+            "Zombie19" => allPortraits.options[19].image,
+            "Zombie20" => allPortraits.options[20].image,
+            _ => allPortraits.options[21].image,
         };
     }
     public Sprite LoadPortraitTeamsight(string portraitName)
@@ -2077,7 +2153,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Urban_Facepaint" => allPortraits.options[29].image,
             "Urban_Shades" => allPortraits.options[30].image,
             "Urban_WWII" => allPortraits.options[31].image,
-            _ => allPortraits.options[0].image,
+            _ => allPortraits.options[32].image,
         };
     }
     public Sprite LoadPortraitJammed(string portraitName)
@@ -2117,7 +2193,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Urban_Facepaint" => allPortraits.options[29].image,
             "Urban_Shades" => allPortraits.options[30].image,
             "Urban_WWII" => allPortraits.options[31].image,
-            _ => allPortraits.options[0].image,
+            _ => allPortraits.options[32].image,
         };
     }
     public Sprite LoadInsignia(string rank)
@@ -2239,34 +2315,41 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 soldierUI.actionButton.GetComponent<Image>().color = new Color(1, 0, 0, 0.2f);
             else
             {
-                switch (speciality)
+                if (DataPersistenceManager.Instance.lozMode && IsZombie())
                 {
-                    case "Leadership":
-                    case "Health":
-                    case "Resilience":
-                    case "Speed":
-                    case "Evasion":
-                    case "Fight":
-                    case "Perceptiveness":
-                    case "Camouflage":
-                    case "Sight Radius":
-                        soldierUI.actionButton.GetComponent<Image>().color = new Color(0, 1, 0, 0.2f);
-                        break;
-                    case "Rifle":
-                    case "Assault Rifle":
-                    case "Light Machine Gun":
-                    case "Sniper Rifle":
-                    case "Sub-Machine Gun":
-                    case "Shotgun":
-                    case "Melee":
-                        soldierUI.actionButton.GetComponent<Image>().color = new Color(1, 0.92f, 0.016f, 0.2f);
-                        break;
-                    case "Strength":
-                    case "Diplomacy":
-                    case "Electronics":
-                    case "Healing":
-                        soldierUI.actionButton.GetComponent<Image>().color = new Color(0, 0, 1, 0.2f);
-                        break;
+                    soldierUI.actionButton.GetComponent<Image>().color = new Color(1, 0, 0, 0.2f);
+                }
+                else
+                {
+                    switch (speciality)
+                    {
+                        case "Leadership":
+                        case "Health":
+                        case "Resilience":
+                        case "Speed":
+                        case "Evasion":
+                        case "Fight":
+                        case "Perceptiveness":
+                        case "Camouflage":
+                        case "Sight Radius":
+                            soldierUI.actionButton.GetComponent<Image>().color = new Color(0, 1, 0, 0.2f);
+                            break;
+                        case "Rifle":
+                        case "Assault Rifle":
+                        case "Light Machine Gun":
+                        case "Sniper Rifle":
+                        case "Sub-Machine Gun":
+                        case "Shotgun":
+                        case "Melee":
+                            soldierUI.actionButton.GetComponent<Image>().color = new Color(1, 0.92f, 0.016f, 0.2f);
+                            break;
+                        case "Strength":
+                        case "Diplomacy":
+                        case "Electronics":
+                        case "Healing":
+                            soldierUI.actionButton.GetComponent<Image>().color = new Color(0, 0, 1, 0.2f);
+                            break;
+                    }
                 }
             }
         }

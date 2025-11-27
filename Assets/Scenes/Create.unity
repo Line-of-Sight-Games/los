@@ -20332,15 +20332,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseSoldier: {fileID: 4380717690802720386, guid: 30039cf98e786db478c107b292c923f2, type: 3}
   setGameParameters: {fileID: 1535280273}
+  terrainFieldObj: {fileID: 0}
+  zombieTypeFieldObj: {fileID: 0}
+  specialtyFieldObj: {fileID: 0}
+  abilityFieldObj: {fileID: 0}
+  random1FieldObj: {fileID: 0}
+  random2FieldObj: {fileID: 0}
   terrainDropdown: {fileID: 1583964727}
+  zombieTypeDropdown: {fileID: 0}
   alpineDropdownObj: {fileID: 790377341}
   desertDropdownObj: {fileID: 988632959}
   jungleDropdownObj: {fileID: 552519174}
   urbanDropdownObj: {fileID: 754021759}
+  zombieBasicDropdownObj: {fileID: 0}
+  zombieBruteDropdownObj: {fileID: 0}
   alpineDropdown: {fileID: 790377343}
   desertDropdown: {fileID: 988632961}
   jungleDropdown: {fileID: 552519176}
   urbanDropdown: {fileID: 754021761}
+  zombieBasicDropdown: {fileID: 0}
+  zombieBruteDropdown: {fileID: 0}
   activePortraitDropdown: {fileID: 0}
   commanderSpecialityDropdownObj: {fileID: 2014330079}
   primarySpecialityDropdownObj: {fileID: 691744259}
@@ -20355,7 +20366,7 @@ MonoBehaviour:
   random1Dropdown: {fileID: 866774562}
   random2Dropdown: {fileID: 546239501}
   soldierIdentifier: {fileID: 1736991551}
-  playerIdentifier: {fileID: 2103543821}
+  teamIdentifier: {fileID: 2103543821}
   soldierName: {fileID: 1929085716}
   createCompletedUI: {fileID: 307404361}
   randomAlertUI: {fileID: 1206531109}
@@ -20365,6 +20376,8 @@ MonoBehaviour:
   weapons: 0
   supports: 0
   soldierIndex: 0
+  numberBasicZombies: 0
+  numberBruteZombies: 0
   selectedPortraits: []
   selectedSkills: []
   selectedAbilities: []
@@ -20397,6 +20410,8 @@ MonoBehaviour:
   zSize: {fileID: 1433469142}
   maxRoundsInput: {fileID: 2076228203}
   turnTimeInput: {fileID: 116439664}
+  numberBasicZombiesInput: {fileID: 0}
+  numberBruteZombiesInput: {fileID: 0}
   maxSoldierDropdown: {fileID: 1365869358}
   x: 0
   y: 0
@@ -20405,6 +20420,8 @@ MonoBehaviour:
   maxTurnTime: 0
   maxTeams: 0
   maxSoldiers: 0
+  numberBasicZombies: 0
+  numberBruteZombies: 0
   isDataLoaded: 0
 --- !u!1 &1536640000
 GameObject:
@@ -24969,7 +24986,7 @@ GameObject:
   - component: {fileID: 1874555539}
   - component: {fileID: 1874555538}
   m_Layer: 5
-  m_Name: PlayerIdentifier
+  m_Name: TeamIdentifier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
