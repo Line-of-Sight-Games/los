@@ -459,6 +459,12 @@ public class GameManager : MonoBehaviour, IDataPersistence
         {
             if (s.IsOnturnAndAlive()) //run things that trigger at the start of actvive team turn
             {
+                if (DataPersistenceManager.Instance.lozMode)
+                {
+                    if (s.IsZombie() && currentRound % 4 == 0)
+                        s.LeapIncrementStats(currentRound/4);
+                }
+
                 //patriot ability
                 s.SetPatriotic();
 

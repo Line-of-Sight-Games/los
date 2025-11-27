@@ -47,6 +47,21 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public InformerAlert informerAlertPrefab;
     public SoldierUI soldierUI, soldierUIPrefab;
 
+    public int[,] zombieLeapTable = new int[,]
+    {
+        {0,4,1,10,1,0,0,0,20,0,0,0,0,0,0,4,1,0,0,0 },
+        {0,6,1,15,2,0,0,0,25,0,0,0,0,0,0,5,2,0,0,0 },
+        {0,8,2,20,3,0,0,0,30,0,0,0,0,0,0,6,3,0,0,0 },
+        {0,10,2,25,4,0,0,0,35,0,0,0,0,0,0,7,4,0,0,0 },
+        {0,12,3,30,5,0,0,0,40,0,0,0,0,0,0,8,5,0,0,0 },
+        {0,14,3,35,6,0,0,0,45,0,0,0,0,0,0,9,6,0,0,0 },
+        {0,16,4,40,7,0,0,0,50,0,0,0,0,0,0,10,7,0,0,0 },
+        {0,18,4,45,8,0,0,0,55,0,0,0,0,0,0,11,8,0,0,0 },
+        {0,20,5,50,9,0,0,0,60,0,0,0,0,0,0,12,9,0,0,0 },
+        {0,22,5,55,10,0,0,0,65,0,0,0,0,0,0,13,10,0,0,0 },
+        {0,24,6,60,11,0,0,0,70,0,0,0,0,0,0,14,11,0,0,0 },
+    };
+
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
     {
         id = GenerateGuid();
@@ -77,30 +92,56 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         id = GenerateGuid();
         soldierName = name;
         soldierTeam = team;
-        soldierDisplayPriority = int.Parse(name.Where(char.IsDigit).ToArray()) + (name.Contains("Brute") ? 0 : 100);
+        soldierDisplayPriority = int.Parse(name.Where(char.IsDigit).ToArray()) + (IsBruteZombie() ? 0 : 100);
         soldierPortrait = portrait;
         soldierPortraitText = portraitText;
         stats = new Statline(this);
-        stats.L.BaseVal = 0;
-        stats.H.BaseVal = 4;
-        stats.R.BaseVal = 1;
-        stats.S.BaseVal = 10;
-        stats.E.BaseVal = 1;
-        stats.F.BaseVal = 0;
-        stats.P.BaseVal = 0;
-        stats.C.BaseVal = 0;
-        stats.SR.BaseVal = 20;
-        stats.Ri.BaseVal = 0;
-        stats.AR.BaseVal = 0;
-        stats.LMG.BaseVal = 0;
-        stats.Sn.BaseVal = 0;
-        stats.SMG.BaseVal = 0;
-        stats.Sh.BaseVal = 0;
-        stats.M.BaseVal = 4;
-        stats.Str.BaseVal = 1;
-        stats.Dip.BaseVal = 0;
-        stats.Elec.BaseVal = 0;
-        stats.Heal.BaseVal = 0;
+        if (IsBruteZombie())
+        {
+            stats.L.BaseVal = 0;
+            stats.H.BaseVal = 8;
+            stats.R.BaseVal = 2;
+            stats.S.BaseVal = 20;
+            stats.E.BaseVal = 2;
+            stats.F.BaseVal = 0;
+            stats.P.BaseVal = 0;
+            stats.C.BaseVal = 0;
+            stats.SR.BaseVal = 40;
+            stats.Ri.BaseVal = 0;
+            stats.AR.BaseVal = 0;
+            stats.LMG.BaseVal = 0;
+            stats.Sn.BaseVal = 0;
+            stats.SMG.BaseVal = 0;
+            stats.Sh.BaseVal = 0;
+            stats.M.BaseVal = 8;
+            stats.Str.BaseVal = 2;
+            stats.Dip.BaseVal = 0;
+            stats.Elec.BaseVal = 0;
+            stats.Heal.BaseVal = 0;
+        }
+        else
+        {
+            stats.L.BaseVal = 0;
+            stats.H.BaseVal = 4;
+            stats.R.BaseVal = 1;
+            stats.S.BaseVal = 10;
+            stats.E.BaseVal = 1;
+            stats.F.BaseVal = 0;
+            stats.P.BaseVal = 0;
+            stats.C.BaseVal = 0;
+            stats.SR.BaseVal = 20;
+            stats.Ri.BaseVal = 0;
+            stats.AR.BaseVal = 0;
+            stats.LMG.BaseVal = 0;
+            stats.Sn.BaseVal = 0;
+            stats.SMG.BaseVal = 0;
+            stats.Sh.BaseVal = 0;
+            stats.M.BaseVal = 4;
+            stats.Str.BaseVal = 1;
+            stats.Dip.BaseVal = 0;
+            stats.Elec.BaseVal = 0;
+            stats.Heal.BaseVal = 0;
+        }
         inventory = new Inventory(this);
         hp = stats.H.BaseVal;
         GenerateAP();
@@ -364,6 +405,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool IsZombie()
     {
         if (soldierName.Contains("Zombie"))
+            return true;
+        return false;
+    }
+    public bool IsBruteZombie()
+    {
+        if (IsZombie() && soldierName.Contains("Brute"))
             return true;
         return false;
     }
@@ -2303,6 +2350,58 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         };
 
         return incrementDisplay;
+    }
+
+    public void LeapIncrementStats(int leapRound)
+    {
+        if (IsBruteZombie())
+        {
+            stats.L.BaseVal = zombieLeapTable[leapRound, 0] * 2;
+            stats.H.BaseVal = zombieLeapTable[leapRound, 1] * 2;
+            TakeHeal(null, 4, 0, false, false);
+            stats.R.BaseVal = zombieLeapTable[leapRound, 2] * 2;
+            stats.S.BaseVal = zombieLeapTable[leapRound, 3] * 2;
+            stats.E.BaseVal = zombieLeapTable[leapRound, 4] * 2;
+            stats.F.BaseVal = zombieLeapTable[leapRound, 5] * 2;
+            stats.P.BaseVal = zombieLeapTable[leapRound, 6] * 2;
+            stats.C.BaseVal = zombieLeapTable[leapRound, 7] * 2;
+            stats.SR.BaseVal = zombieLeapTable[leapRound, 8] * 2;
+            stats.Ri.BaseVal = zombieLeapTable[leapRound, 9] * 2;
+            stats.AR.BaseVal = zombieLeapTable[leapRound, 10] * 2;
+            stats.LMG.BaseVal = zombieLeapTable[leapRound, 11] * 2;
+            stats.Sn.BaseVal = zombieLeapTable[leapRound, 12] * 2;
+            stats.SMG.BaseVal = zombieLeapTable[leapRound, 13] * 2;
+            stats.Sh.BaseVal = zombieLeapTable[leapRound, 14] * 2;
+            stats.M.BaseVal = zombieLeapTable[leapRound, 15] * 2;
+            stats.Str.BaseVal = zombieLeapTable[leapRound, 16] * 2;
+            stats.Dip.BaseVal = zombieLeapTable[leapRound, 17] * 2;
+            stats.Elec.BaseVal = zombieLeapTable[leapRound, 18] * 2;
+            stats.Heal.BaseVal = zombieLeapTable[leapRound, 19] * 2;
+        }
+        else
+        {
+            stats.L.BaseVal = zombieLeapTable[leapRound, 0];
+            stats.H.BaseVal = zombieLeapTable[leapRound, 1];
+            TakeHeal(null, 2, 0, false, false);
+            stats.R.BaseVal = zombieLeapTable[leapRound, 2];
+            stats.S.BaseVal = zombieLeapTable[leapRound, 3];
+            stats.E.BaseVal = zombieLeapTable[leapRound, 4];
+            stats.F.BaseVal = zombieLeapTable[leapRound, 5];
+            stats.P.BaseVal = zombieLeapTable[leapRound, 6];
+            stats.C.BaseVal = zombieLeapTable[leapRound, 7];
+            stats.SR.BaseVal = zombieLeapTable[leapRound, 8];
+            stats.Ri.BaseVal = zombieLeapTable[leapRound, 9];
+            stats.AR.BaseVal = zombieLeapTable[leapRound, 10];
+            stats.LMG.BaseVal = zombieLeapTable[leapRound, 11];
+            stats.Sn.BaseVal = zombieLeapTable[leapRound, 12];
+            stats.SMG.BaseVal = zombieLeapTable[leapRound, 13];
+            stats.Sh.BaseVal = zombieLeapTable[leapRound, 14];
+            stats.M.BaseVal = zombieLeapTable[leapRound, 15];
+            stats.Str.BaseVal = zombieLeapTable[leapRound, 16];
+            stats.Dip.BaseVal = zombieLeapTable[leapRound, 17];
+            stats.Elec.BaseVal = zombieLeapTable[leapRound, 18];
+            stats.Heal.BaseVal = zombieLeapTable[leapRound, 19];
+        }
     }
     public void CheckSpecialityColor(string speciality)
     {
