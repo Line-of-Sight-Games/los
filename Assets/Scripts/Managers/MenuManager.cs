@@ -1272,6 +1272,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             GreyOutButtons(ExceptButton(AddAllButtons(buttonStates), playdeadButton), "<color=yellow>Playdead</color>");
         else if (ActiveSoldier.Instance.S.ap == 0)
             GreyOutButtons(AddAllButtons(buttonStates), "No AP");
+        else if (ActiveSoldier.Instance.S.IsZombie())
+            GreyOutButtons(ExceptButton(ExceptButton(AddAllButtons(buttonStates), moveButton), meleeButton), "<color=orange>Zombie</color>");
         else if (ActiveSoldier.Instance.S.IsUsingBinocularsInReconMode())
             GreyOutButtons(AddAllButtons(buttonStates), "<color=green>Binoculars (Recon)</color>");
         else if (ActiveSoldier.Instance.S.IsFrozen() && GameManager.Instance.frozenTurn)

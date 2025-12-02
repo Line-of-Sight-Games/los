@@ -3602,6 +3602,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int GetKd()
     {
         int kd = 0;
+        if (DataPersistenceManager.Instance.lozMode)
+            return kd;
+
         foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (this.IsOppositeTeamAs(s) && s.IsDead())
