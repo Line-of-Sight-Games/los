@@ -74,6 +74,15 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierPortraitText = portraitText;
         soldierAbilities = new() { ability };
         stats = new Statline(this);
+        if (DataPersistenceManager.Instance.lozMode) //modify stats for lozMode
+        {
+            stats.E.BaseVal = 0;
+            stats.F.BaseVal = 0;
+            stats.P.BaseVal = 0;
+            stats.C.BaseVal = 0;
+            stats.SR.BaseVal = 50;
+            stats.Sn.BaseVal = 0;
+        }
         inventory = new Inventory(this);
         IncrementSpeciality();
         IncrementStat(random1);
@@ -861,16 +870,33 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void ApplyVisMods()
     {
-        if (!IsWearingThermalGoggles())
+        if (DataPersistenceManager.Instance.lozMode)
         {
-            if (WeatherManager.Instance.IsZeroVis())
-                stats.SR.Val -= 100;
-            else if (WeatherManager.Instance.IsPoorVis())
-                stats.SR.Val -= 90;
-            else if (WeatherManager.Instance.IsModerateVis())
-                stats.SR.Val -= 70;
-            else if (WeatherManager.Instance.IsGoodVis())
-                stats.SR.Val -= 40;
+            if (!IsZombie())
+            {
+                if (WeatherManager.Instance.IsZeroVis())
+                    stats.SR.Val -= 50;
+                else if (WeatherManager.Instance.IsPoorVis())
+                    stats.SR.Val -= 40;
+                else if (WeatherManager.Instance.IsModerateVis())
+                    stats.SR.Val -= 30;
+                else if (WeatherManager.Instance.IsGoodVis())
+                    stats.SR.Val -= 10;
+            }
+        }
+        else
+        {
+            if (!IsWearingThermalGoggles())
+            {
+                if (WeatherManager.Instance.IsZeroVis())
+                    stats.SR.Val -= 100;
+                else if (WeatherManager.Instance.IsPoorVis())
+                    stats.SR.Val -= 90;
+                else if (WeatherManager.Instance.IsModerateVis())
+                    stats.SR.Val -= 70;
+                else if (WeatherManager.Instance.IsGoodVis())
+                    stats.SR.Val -= 40;
+            }
         }
     }
     public void ApplyTrenboloneMods()
@@ -3042,24 +3068,40 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
                 if (killedBy != null)
                 {
-                    //pay xp for relevant damage type kill
-                    if (damageSource.Contains("Shot"))
-                        MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
-                    else if (damageSource.Contains("Melee"))
+                    if (DataPersistenceManager.Instance.lozMode)
                     {
-                        if (damageSource.Contains("Counter"))
-                            MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
-                        else
-                            MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
-
-                        killedBy.BrawlerMeleeKillReward(damageSource);
+                        if (IsZombie())
+                        {
+                            //give 1 xp to all soldiers for zombie kill
+                            foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
+                            {
+                                MenuManager.Instance.AddXpAlert(s, 1, $"Ally ({killedBy.soldierName}) killed a zombie.", false);
+                            }
+                            //give 2 xp to killer for zombie kill
+                            MenuManager.Instance.AddXpAlert(killedBy, 2, $"Killed a zombie.", false);
+                        }
                     }
-                    else if (damageSource.Contains("Poison"))
-                        MenuManager.Instance.AddXpAlert(killedBy, 10 + this.stats.R.Val, $"Killed {soldierName} by poisoning.", false);
+                    else
+                    {
+                        //pay xp for relevant damage type kill
+                        if (damageSource.Contains("Shot"))
+                            MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateShotKillXp(killedBy, this), $"Killed {soldierName} with a shot.", false);
+                        else if (damageSource.Contains("Melee"))
+                        {
+                            if (damageSource.Contains("Counter"))
+                                MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateMeleeCounterKillXp(killedBy, this), $"Killed {soldierName} in melee (counterattack).", false);
+                            else
+                                MenuManager.Instance.AddXpAlert(killedBy, GameManager.Instance.CalculateMeleeKillXp(killedBy, this), $"Killed {soldierName} in melee.", false);
 
-                    //set haskilled flag for avenger
-                    if (this.IsOppositeTeamAs(killedBy))
-                        killedBy.hasKilled = true;
+                            killedBy.BrawlerMeleeKillReward(damageSource);
+                        }
+                        else if (damageSource.Contains("Poison"))
+                            MenuManager.Instance.AddXpAlert(killedBy, 10 + this.stats.R.Val, $"Killed {soldierName} by poisoning.", false);
+
+                        //set haskilled flag for avenger
+                        if (this.IsOppositeTeamAs(killedBy))
+                            killedBy.hasKilled = true;
+                    }
                 }
 
                 //set fight flags for allied avenger(s)

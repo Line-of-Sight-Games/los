@@ -3169,6 +3169,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
             if (soldier.IsConscious())
             {
+                //do not create xp alert for zombies, or any other xp alert that does not contain 'zombie' in description
+                if (DataPersistenceManager.Instance.lozMode)
+                {
+                    if (soldier.IsZombie() || !xpDescription.Contains("Zombie"))
+                        return;
+                }
+
                 Instantiate(xpAlertPrefab, xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(soldier, xp, xpDescription, learnerEnabled);
             }
             else
