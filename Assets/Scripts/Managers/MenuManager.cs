@@ -2282,7 +2282,16 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void AddTraumaAlert(Soldier friendly, int trauma, string description, int rolls, int xpOnResist, string range)
     {
-        Instantiate(traumaAlertPrefab, traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(friendly, trauma, description, rolls, xpOnResist, range);
+        if (DataPersistenceManager.Instance.lozMode && friendly.IsZombie())
+            return;
+        else
+        {
+            if (friendly.IsConscious())
+            {
+                Instantiate(traumaAlertPrefab, traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(friendly, trauma, description, rolls, xpOnResist, range);
+                StartCoroutine(OpenTraumaAlertUI());
+            }
+        }
     }
 
     public IEnumerator OpenTraumaAlertUI()
@@ -3172,7 +3181,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 //do not create xp alert for zombies, or any other xp alert that does not contain 'zombie' in description
                 if (DataPersistenceManager.Instance.lozMode)
                 {
-                    if (soldier.IsZombie() || !xpDescription.Contains("Zombie"))
+                    if (soldier.IsZombie() || !xpDescription.Contains("zombie."))
                         return;
                 }
 

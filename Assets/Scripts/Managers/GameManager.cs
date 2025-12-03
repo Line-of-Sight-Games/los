@@ -1433,8 +1433,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         if (deadSoldier.IsDead())
         {
-            bool showTraumaUI = false;
-
             foreach (Soldier friendly in AllSoldiers())
             {
                 //print(friendly.soldierName + " trauma check attempting to run");
@@ -1452,15 +1450,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     {
                         //guaranteed trauma from commander death and/or lastandicide
                         if (commander)
-                        {
                             MenuManager.Instance.AddTraumaAlert(friendly, 1, "Commander died, an automatic trauma point has been accrued.", 0, 0, "");
-                            showTraumaUI = true;
-                        }
                         if (lastandicide)
-                        {
                             MenuManager.Instance.AddTraumaAlert(friendly, 1, $"{deadSoldier.soldierName} committed Lastandicide, an automatic trauma point has been accrued.", 0, 0, "");
-                            showTraumaUI = true;
-                        }
 
                         if (friendly.IsAbleToSee())
                         {
@@ -1508,16 +1500,11 @@ public class GameManager : MonoBehaviour, IDataPersistence
                                     MenuManager.Instance.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is Resilient. Within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
                                 else
                                     MenuManager.Instance.AddTraumaAlert(friendly, tp, $"{friendly.soldierName} is within {range} range of {deadSoldier.soldierName}. Check for LOS?", rolls, xpOnResist, range);
-
-                                showTraumaUI = true;
                             }
                         }
                     }
                 }
             }
-
-            if (showTraumaUI)
-                StartCoroutine(MenuManager.Instance.OpenTraumaAlertUI());
         }
     }
     public void ConfirmTrauma()
