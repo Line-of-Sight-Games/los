@@ -3082,13 +3082,17 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     {
                         if (IsZombie())
                         {
+                            (string, int, int) xps = ("normal", 1, 2);
+                            if (IsBruteZombie()) //double xp for brute zombie kill
+                                xps = ("brute", xps.Item2 * 2, xps.Item3 * 2);
+
                             //give 1 xp to all soldiers for zombie kill
                             foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
                             {
-                                MenuManager.Instance.AddXpAlert(s, 1, $"Ally ({killedBy.soldierName}) killed a zombie.", false);
+                                MenuManager.Instance.AddXpAlert(s, xps.Item2, $"Ally ({killedBy.soldierName}) killed a {xps.Item1} zombie.", false);
                             }
                             //give 2 xp to killer for zombie kill
-                            MenuManager.Instance.AddXpAlert(killedBy, 2, $"Killed a zombie.", false);
+                            MenuManager.Instance.AddXpAlert(killedBy, xps.Item3, $"Killed a {xps.Item1} zombie.", false);
                         }
                     }
                     else
