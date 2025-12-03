@@ -757,6 +757,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
         //patriot ability
         movingSoldier.SetPatriotic();
 
+        //generate starting ap
+        movingSoldier.GenerateAP();
+
         //check for smoke clouds
         if (!movingSoldier.CheckSmokeClouds() && movingSoldier.IsInSmoke())
             movingSoldier.UnsetSmoked();

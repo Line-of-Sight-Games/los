@@ -88,7 +88,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         IncrementStat(random1);
         IncrementStat(random2);
         hp = stats.H.BaseVal;
-        GenerateAP();
         xp = 1;
         rank = "Recruit";
         SetState("Active");
@@ -153,7 +152,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         }
         inventory = new Inventory(this);
         hp = stats.H.BaseVal;
-        GenerateAP();
         SetState("Active");
         MapPhysicalPosition(0, 0, 0);
 
@@ -1987,8 +1985,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             apMp = apMp.Zip(APLoop(), (x, y) => x + y).ToList();
         }
 
-        ap = apMp[0];
-        mp = apMp[1];
+        if (DataPersistenceManager.Instance.lozMode && IsZombie())
+        {
+            ap = 5;
+            mp = 1;
+        }
+        else
+        {
+            ap = apMp[0];
+            mp = apMp[1];
+        }
 
         FileUtility.WriteToReport($"{soldierName} generated {ap} AP and {mp} MP ({stats.L.Val}L)"); //write to report
 
