@@ -2513,8 +2513,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void IncreaseRoundsWithoutFood()
     {
-        if (!IsWearingStimulantArmour())
-            RoundsWithoutFood++;
+        if (DataPersistenceManager.Instance.lozMode && IsZombie())
+            return;
+        else
+        {
+            if (!IsWearingStimulantArmour())
+                RoundsWithoutFood++;
+        }
     }
     public void ResetRoundsWithoutFood()
     {

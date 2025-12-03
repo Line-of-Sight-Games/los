@@ -267,7 +267,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
             {
                 MenuManager.Instance.SetTeamTurnOverFlagTo(false);
 
-                EndTeamTurn();
+                StartCoroutine(EndTeamTurn());
 
                 yield return new WaitUntil(() => MenuManager.Instance.teamTurnOverFlag == true);
 
