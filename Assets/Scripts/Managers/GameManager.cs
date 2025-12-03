@@ -572,13 +572,18 @@ public class GameManager : MonoBehaviour, IDataPersistence
     }
     public int CalculateFallDamage(Soldier soldier, int fallDistance)
     {
-        int damage = Mathf.CeilToInt(Mathf.Pow(fallDistance / 4.0f, 2) / 2.0f - soldier.stats.R.Val);
+        //no fall damage for zombies
+        if (DataPersistenceManager.Instance.lozMode && soldier.IsZombie())
+            return 0;
+        else
+        {
+            int damage = Mathf.CeilToInt(Mathf.Pow(fallDistance / 4.0f, 2) / 2.0f - soldier.stats.R.Val);
+            //play fall damage sfx
+            if (damage > 0)
+                SoundManager.Instance.PlayFallFromHeight();
 
-        //play fall damage sfx
-        if (damage > 0)
-            SoundManager.Instance.PlayFallFromHeight();
-
-        return Mathf.CeilToInt(Mathf.Pow(fallDistance / 4.0f, 2) / 2.0f - soldier.stats.R.Val);
+            return Mathf.CeilToInt(Mathf.Pow(fallDistance / 4.0f, 2) / 2.0f - soldier.stats.R.Val);
+        }
     }
     public void UpdateMoveAP()
     {
