@@ -48,7 +48,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public BinocularsUI binocularsUI;
     public RiotShieldUI riotShieldUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, overmoveUI, suppressionMoveUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, overmoveUI, suppressionMoveUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, catafalqueUI, cloudDissipationAlertPrefab;
     
     public SoldierAlert soldierAlertPrefab;
     public XpAlert xpAlertPrefab;
@@ -3127,7 +3127,34 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
 
 
+    //catafalque functions
+    public void OpenCatafalqueUI()
+    {
+        catafalqueUI.SetActive(true);
+    }
+    public void CloseCatafalqueUI()
+    {
+        catafalqueUI.SetActive(false);
+    }
+    public void ConfirmCatafalqueUI()
+    {
+        if (DataPersistenceManager.Instance.lozMode)
+        {
+            Soldier lastZomKilled = SoldierManager.Instance.FindSoldierById(ActiveSoldier.Instance.S.lastZombieKilled);
+            (string, int, int) xps = ("normal", 1, 2);
+            if (lastZomKilled.IsBruteZombie()) //double xp for brute zombie kill
+                xps = ("brute", xps.Item2 * 2, xps.Item3 * 2);
 
+            //give 1 xp to all soldiers for zombie kill
+            foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
+            {
+                AddXpAlert(s, xps.Item2, $"Ally ({ActiveSoldier.Instance.S.soldierName}) catafalqued fallen comrade ({lastZomKilled.fallenSoldierName}) a {xps.Item1} zombie.", false);
+            }
+            //give 2 xp to killer for zombie kill
+            AddXpAlert(ActiveSoldier.Instance.S, xps.Item3, $"Catafalqued fallen comrade ({lastZomKilled.fallenSoldierName}).", false);
+        }
+        CloseCatafalqueUI();
+    }
 
 
 

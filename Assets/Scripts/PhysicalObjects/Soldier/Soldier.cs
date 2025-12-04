@@ -25,7 +25,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
-    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced, lastZombieKilled, fallenSoldierName;
     public Statline stats;
     public Inventory inventory;
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
@@ -95,7 +95,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return this;
     }
-    public Soldier InitZombie(string name, int team, Sprite portrait, string portraitText)
+    public Soldier InitZombie(string name, int team, Sprite portrait, string portraitText, string fallenName)
     {
         id = GenerateGuid();
         soldierName = name;
@@ -103,6 +103,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierDisplayPriority = int.Parse(name.Where(char.IsDigit).ToArray()) + (IsBruteZombie() ? 0 : 100);
         soldierPortrait = portrait;
         soldierPortraitText = portraitText;
+        fallenSoldierName = fallenName;
         stats = new Statline(this);
         if (IsBruteZombie())
         {
@@ -241,6 +242,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "madeUnconBy", madeUnconBy },
             { "madeUnconBydamageList", madeUnconBydamageList },
 
+            //save LOZ details
+            { "lastZombieKilled", lastZombieKilled },
+            { "fallenSoldierName", fallenSoldierName },
+
             //save item details
             { "glucoState", glucoState },
             { "amphStatReduction", amphStatReduction },
@@ -353,6 +358,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         bleedoutTurns = Convert.ToInt32(details["bleedoutTurns"]);
         madeUnconBy = (string)details["madeUnconBy"];
         madeUnconBydamageList = (details["madeUnconBydamageList"] as JArray).Select(token => token.ToString()).ToList();
+
+        //load LOZ details
+        lastZombieKilled = (string)details["lastZombieKilled"];
+        fallenSoldierName = (string)details["fallenSoldierName"];
 
         //load item details
         glucoState = (string)details["glucoState"];
