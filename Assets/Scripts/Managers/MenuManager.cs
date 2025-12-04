@@ -60,7 +60,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public LOSArrow LOSArrowPrefab;
     public OverwatchSectorSphere overwatchSectorSpherePrefab;
     public List<Button> actionButtons;
-    public Button shotButton, moveButton, meleeButton, configureButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton, lastandicideButton, politicsButton;
+    public Button shotButton, moveButton, meleeButton, configureButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton, lastandicideButton, politicsButton, catafalqueButton;
     private float playTimeTotal;
     public float turnTime;
     public bool timerStop, overrideView, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
@@ -1259,6 +1259,12 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             politicsButton.gameObject.SetActive(true);
         else
             politicsButton.gameObject.SetActive(false);
+
+        //display catafalque button
+        if (ActiveSoldier.Instance.S.catafalqueReady)
+            catafalqueButton.gameObject.SetActive(true);
+        else
+            catafalqueButton.gameObject.SetActive(false);
 
         if (GameManager.Instance.gameOver)
             GreyAll("Game Over");
@@ -2895,10 +2901,19 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         coverAlertUI.SetActive(true);
     }
-
     public void CloseTakeCoverUI()
     {
         coverAlertUI.SetActive(false);
+    }
+    public void ConfirmTakeCoverUI()
+    {
+        if (ActiveSoldier.Instance.S.CheckAP(1))
+        {
+            ActiveSoldier.Instance.S.DeductAP(1);
+            ActiveSoldier.Instance.S.SetCover();
+        }
+
+        CloseTakeCoverUI();
     }
     public void OpenPlaydeadAlertUI()
     {
@@ -3130,6 +3145,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     //catafalque functions
     public void OpenCatafalqueUI()
     {
+        catafalqueUI.transform.Find("APCost/APCostDisplay").GetComponent<TextMeshProUGUI>().text = $"{ActiveSoldier.Instance.S.ap}";
         catafalqueUI.SetActive(true);
     }
     public void CloseCatafalqueUI()
@@ -3140,18 +3156,22 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         if (DataPersistenceManager.Instance.lozMode)
         {
+            ActiveSoldier.Instance.S.DrainAP();
+
             Soldier lastZomKilled = SoldierManager.Instance.FindSoldierById(ActiveSoldier.Instance.S.lastZombieKilled);
             (string, int, int) xps = ("normal", 1, 2);
             if (lastZomKilled.IsBruteZombie()) //double xp for brute zombie kill
                 xps = ("brute", xps.Item2 * 2, xps.Item3 * 2);
 
-            //give 1 xp to all soldiers for zombie kill
+            //give 1 xp to all soldiers for catafalque
             foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
             {
-                AddXpAlert(s, xps.Item2, $"Ally ({ActiveSoldier.Instance.S.soldierName}) catafalqued fallen comrade ({lastZomKilled.fallenSoldierName}) a {xps.Item1} zombie.", false);
+                AddXpAlert(s, xps.Item2, $"Ally ({ActiveSoldier.Instance.S.soldierName}) catafalqued fallen zombie. ({lastZomKilled.fallenSoldierName})", false);
             }
-            //give 2 xp to killer for zombie kill
-            AddXpAlert(ActiveSoldier.Instance.S, xps.Item3, $"Catafalqued fallen comrade ({lastZomKilled.fallenSoldierName}).", false);
+            //give 2 xp to catafalquer for zombie kill
+            AddXpAlert(ActiveSoldier.Instance.S, xps.Item3, $"Catafalqued fallen zombie. ({lastZomKilled.fallenSoldierName})", false);
+            ActiveSoldier.Instance.S.lastZombieKilled = string.Empty;
+            ActiveSoldier.Instance.S.catafalqueReady = false;
         }
         CloseCatafalqueUI();
     }

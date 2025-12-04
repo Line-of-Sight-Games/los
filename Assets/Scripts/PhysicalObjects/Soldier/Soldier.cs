@@ -19,8 +19,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed;
-    public string causeOfLosCheck;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed, catafalqueReady;
+public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
@@ -245,6 +245,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             //save LOZ details
             { "lastZombieKilled", lastZombieKilled },
             { "fallenSoldierName", fallenSoldierName },
+            { "catafalqueReady", catafalqueReady },
 
             //save item details
             { "glucoState", glucoState },
@@ -362,6 +363,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //load LOZ details
         lastZombieKilled = (string)details["lastZombieKilled"];
         fallenSoldierName = (string)details["fallenSoldierName"];
+        catafalqueReady = (bool)details["catafalqueReady"];
 
         //load item details
         glucoState = (string)details["glucoState"];
@@ -427,6 +429,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public bool IsBruteZombie()
     {
         if (IsZombie() && soldierName.Contains("Brute"))
+            return true;
+        return false;
+    }
+    public bool IsNamedZombie()
+    {
+        if (!fallenSoldierName.Equals(string.Empty))
             return true;
         return false;
     }
@@ -3091,6 +3099,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                     {
                         if (IsZombie())
                         {
+                            killedBy.lastZombieKilled = Id;
                             (string, int, int) xps = ("normal", 1, 2);
                             if (IsBruteZombie()) //double xp for brute zombie kill
                                 xps = ("brute", xps.Item2 * 2, xps.Item3 * 2);
@@ -3102,6 +3111,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                             }
                             //give 2 xp to killer for zombie kill
                             MenuManager.Instance.AddXpAlert(killedBy, xps.Item3, $"Killed a {xps.Item1} zombie.", false);
+
+                            if (IsNamedZombie()) //show alert for named zombie kills
+                                MenuManager.Instance.generalAlertUI.Activate($"This zombie was identified as a fallen comrade. ({fallenSoldierName})");
                         }
                     }
                     else
@@ -3698,7 +3710,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         return stats.Str.Val * ap;
     }
-
 
 
 

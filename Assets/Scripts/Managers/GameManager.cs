@@ -348,6 +348,21 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
                 //unset politicianUsed
                 s.politicianUsed = false;
+
+                //toggle catafalque
+                if (!s.lastZombieKilled.Equals(string.Empty))
+                {
+                    if (s.catafalqueReady) //turn off catafalque
+                    {
+                        s.lastZombieKilled = string.Empty;
+                        s.catafalqueReady = false;
+                    }
+                    else
+                    {
+                        if (SoldierManager.Instance.FindSoldierById(s.lastZombieKilled).IsNamedZombie())
+                            s.catafalqueReady = true;
+                    }
+                }
             }
             else if (s.IsOffturnAndAlive()) //run things that trigger at the end of enemy team turn
             {
@@ -517,18 +532,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         ActiveSoldier.Instance.S.DrainAP();
         ActiveSoldier.Instance.S.DrainMP();
-    }
-
-    //cover functions
-    public void ConfirmCover()
-    {
-        if (ActiveSoldier.Instance.S.CheckAP(1))
-        {
-            ActiveSoldier.Instance.S.DeductAP(1);
-            ActiveSoldier.Instance.S.SetCover();
-        }
-
-        MenuManager.Instance.CloseTakeCoverUI();
     }
 
     //playdead functions
@@ -1562,8 +1565,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
         else
             print("Haven't scrolled all the way to the bottom");
     }
-
-
 
 
 
