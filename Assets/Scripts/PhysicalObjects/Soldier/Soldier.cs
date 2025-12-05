@@ -793,7 +793,10 @@ public string causeOfLosCheck;
         rank = NextRank();
         stats[0] = IncrementSpeciality(); 
         stats[1] = IncrementStat(choiceStat);
-        stats[2] = IncrementRandom(choiceStat);
+        if (DataPersistenceManager.Instance.lozMode)
+            stats[2] = IncrementRandomLOZ(choiceStat);
+        else
+            stats[2] = IncrementRandom(choiceStat);
         lastChosenStat = choiceStat;
 
         return stats;
@@ -2340,6 +2343,18 @@ public string causeOfLosCheck;
         {
             "Leadership", "Health", "Resilience", "Speed", "Evasion", "Fight", "Perceptiveness", "Camouflage", "Sight Radius", 
             "Rifle", "Assault Rifle", "Light Machine Gun", "Sniper Rifle", "Sub-Machine Gun", "Shotgun", "Melee",
+            "Strength", "Diplomacy", "Electronics", "Healing"
+        };
+
+        stats = stats.Where(e => e != soldierSpeciality && e != choiceStat).ToArray();
+        return IncrementStat(stats[UnityEngine.Random.Range(0, stats.Length)]);
+    }
+    public string IncrementRandomLOZ(string choiceStat)
+    {
+        string[] stats =
+        {
+            "Leadership", "Health", "Resilience", "Speed", "Sight Radius",
+            "Rifle", "Assault Rifle", "Light Machine Gun", "Sub-Machine Gun", "Shotgun", "Melee",
             "Strength", "Diplomacy", "Electronics", "Healing"
         };
 
