@@ -3156,6 +3156,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         if (DataPersistenceManager.Instance.lozMode)
         {
+            SoundManager.Instance.PlayCatafalqueUsed();
             ActiveSoldier.Instance.S.DrainAP();
 
             Soldier lastZomKilled = SoldierManager.Instance.FindSoldierById(ActiveSoldier.Instance.S.lastZombieKilled);

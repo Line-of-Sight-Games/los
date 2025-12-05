@@ -3099,6 +3099,8 @@ public string causeOfLosCheck;
                     {
                         if (IsZombie())
                         {
+                            SoundManager.Instance.PlayZombieDeath(this);
+
                             killedBy.lastZombieKilled = Id;
                             (string, int, int) xps = ("normal", 1, 2);
                             if (IsBruteZombie()) //double xp for brute zombie kill
@@ -3112,8 +3114,11 @@ public string causeOfLosCheck;
                             //give 2 xp to killer for zombie kill
                             MenuManager.Instance.AddXpAlert(killedBy, xps.Item3, $"Killed a {xps.Item1} zombie.", false);
 
-                            if (IsNamedZombie()) //show alert for named zombie kills
+                            if (IsNamedZombie()) //show alert for named zombie kills {
+                            {
+                                SoundManager.Instance.PlayFallenSoldierDiscovered();
                                 MenuManager.Instance.generalAlertUI.Activate($"This zombie was identified as a fallen comrade. ({fallenSoldierName})");
+                            }
                         }
                     }
                     else

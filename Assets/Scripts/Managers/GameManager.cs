@@ -477,7 +477,10 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 if (DataPersistenceManager.Instance.lozMode)
                 {
                     if (s.IsZombie() && currentRound % 4 == 0)
-                        s.LeapIncrementStats(currentRound/4);
+                    {
+                        SoundManager.Instance.PlayLeapEvent();
+                        s.LeapIncrementStats(currentRound / 4);
+                    }
                 }
 
                 //patriot ability

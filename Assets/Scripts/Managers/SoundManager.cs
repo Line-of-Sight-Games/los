@@ -44,6 +44,12 @@ public class SoundManager : MonoBehaviour
     public AudioClip itemUseFrag, itemUseFlash, itemUseSmoke, itemUseTabun;
     public AudioClip itemUseDepBeacon, itemUseETool, itemUseFood, itemUseMedikit, itemUsePoisonSatchel, itemUseSyringe, itemUseWater, itemUsePoisonedItem;
 
+    //loz effects
+    public AudioClip catafalqueUsed;
+    public AudioClip fallenSoldierDiscovered;
+    public AudioClip leapEvent;
+    public AudioClip[] zombieDeath;
+
     //dialogue
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
     public AudioClip[] commanderConfigNearGB, spartanConfigNearGB, survivorConfigNearGB, runnerConfigNearGB, evaderConfigNearGB, reservistConfigNearGB, seekerConfigNearGB, chameleonConfigNearGB, scoutConfigNearGB, infantrymanConfigNearGB, operatorConfigNearGB, earthquakeConfigNearGB, hunterConfigNearGB, cycloneConfigNearGB, hammerConfigNearGB, wolfConfigNearGB, herculesConfigNearGB, diplomatConfigNearGB, technicianConfigNearGB, medicConfigNearGB;
@@ -360,6 +366,32 @@ public class SoundManager : MonoBehaviour
     }
 
 
+
+
+
+
+
+
+
+
+    //loz effects
+    public void PlayCatafalqueUsed()
+    {
+        PlaySound(catafalqueUsed);
+    }
+    public void PlayFallenSoldierDiscovered()
+    {
+        PlaySound(fallenSoldierDiscovered);
+    }
+    public void PlayLeapEvent()
+    {
+        PlaySound(leapEvent);
+    }
+    public void PlayZombieDeath(Soldier s)
+    {
+        PlayRandomVoice(s, zombieDeath);
+    }
+    
 
 
 
