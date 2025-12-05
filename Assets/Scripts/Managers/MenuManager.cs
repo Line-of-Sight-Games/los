@@ -3229,7 +3229,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 //do not create xp alert for zombies, or any other xp alert that does not contain 'zombie' in description
                 if (DataPersistenceManager.Instance.lozMode)
                 {
-                    if (soldier.IsZombie() || !xpDescription.Contains("zombie."))
+                    if (soldier.IsZombie() || (!xpDescription.Contains("zombie.") && !xpDescription.Contains("Override")))
                         return;
                 }
 
