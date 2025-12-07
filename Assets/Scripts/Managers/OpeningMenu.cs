@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class OpeningMenu : MonoBehaviour
 {
+    public AudioSource menuMusic;
+    public AudioClip losTheme, lozTheme;
     public GameObject startButton, overwriteWarning, activeLogo;
     public TextMeshProUGUI titleText, startButtonText, zombieButtonText;
     public Sprite losLogo, lozLogo;
@@ -58,6 +60,8 @@ public class OpeningMenu : MonoBehaviour
     {
         if (zombieButtonText.text.Contains("L O Z"))
         {
+            menuMusic.clip = lozTheme;
+            menuMusic.Play();
             DataPersistenceManager.Instance.lozMode = true;
             titleText.color = Color.white;
             zombieButtonText.text = "L O S   M O D E";
@@ -65,6 +69,8 @@ public class OpeningMenu : MonoBehaviour
         }
         else
         {
+            menuMusic.clip = losTheme;
+            menuMusic.Play();
             DataPersistenceManager.Instance.lozMode = false;
             titleText.color = Color.black;
             zombieButtonText.text = "L O Z   M O D E";

@@ -239,6 +239,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b44191e41790f5409d5086531b7c84f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menuMusic: {fileID: 1402598411}
+  losTheme: {fileID: 8300000, guid: b2ef312d6cf6a054d93e3c4a762caf48, type: 3}
+  lozTheme: {fileID: 8300000, guid: ce46aceec288f4841b277c1bd12931cf, type: 3}
   startButton: {fileID: 1026428431}
   overwriteWarning: {fileID: 591389591}
   activeLogo: {fileID: 1505339085}
