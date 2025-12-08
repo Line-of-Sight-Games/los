@@ -394,54 +394,61 @@ public class SoundManager : MonoBehaviour
     {
         PlaySound(leapEvent);
     }
+    public void PlayRandomZombieVoice(Soldier s, AudioClip[] audioClipArray)
+    {
+        if (audioClipArray.Any())
+        {
+            PlayVoice(s, audioClipArray[HelperFunctions.RandomNumber(0, audioClipArray.Length - 1)]);
+        }
+    }
     public void PlayZombieDeath(Soldier s)
     {
         if (s.IsBruteZombie())
             PlayVoice(s, bruteZombieDeath);
         else
-            PlayRandomVoice(s, zombieDeath);
+            PlayRandomZombieVoice(s, zombieDeath);
     }
     public void PlayZombieMove(Soldier s)
     {
         if (s.IsBruteZombie())
-            PlayRandomVoice(s, bruteZombieMove);
+            PlayRandomZombieVoice(s, bruteZombieMove);
         else
-            PlayRandomVoice(s, zombieMove);
+            PlayRandomZombieVoice(s, zombieMove);
     }
     public void PlayZombieAttack(Soldier s)
     {
         if (s.IsBruteZombie())
-            PlayRandomVoice(s, bruteZombieAttack);
+            PlayRandomZombieVoice(s, bruteZombieAttack);
         else
-            PlayRandomVoice(s, zombieAttack);
+            PlayRandomZombieVoice(s, zombieAttack);
     }
     public void PlayZombieKillsSoldier(Soldier s)
     {
         if (s.IsBruteZombie())
-            PlayRandomVoice(s, bruteZombieKillsSoldier);
+            PlayRandomZombieVoice(s, bruteZombieKillsSoldier);
         else
-            PlayRandomVoice(s, zombieKillsSoldier);
+            PlayRandomZombieVoice(s, zombieKillsSoldier);
     }
     public void PlayZombieTakesDamage(Soldier s)
     {
         if (s.IsBruteZombie())
-            PlayRandomVoice(s, bruteZombieTakesDamage);
+            PlayRandomZombieVoice(s, bruteZombieTakesDamage);
         else
-            PlayRandomVoice(s, zombieTakesDamage);
+            PlayRandomZombieVoice(s, zombieTakesDamage);
     }
     public void PlayZombieDetectSoldier(Soldier s)
     {
         if (s.IsBruteZombie())
-            PlayRandomVoice(s, bruteZombieDetectSoldier);
+            PlayRandomZombieVoice(s, bruteZombieDetectSoldier);
         else
-            PlayRandomVoice(s, zombieDetectSoldier);
+            PlayRandomZombieVoice(s, zombieDetectSoldier);
     }
     public void PlayZombieSelection(Soldier s)
     {
         if (s.IsBruteZombie())
-            PlayRandomVoice(s, bruteZombieSelection);
+            PlayRandomZombieVoice(s, bruteZombieSelection);
         else
-            PlayRandomVoice(s, zombieSelection);
+            PlayRandomZombieVoice(s, zombieSelection);
     }
 
 
