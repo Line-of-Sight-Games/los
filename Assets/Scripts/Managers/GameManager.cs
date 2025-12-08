@@ -671,11 +671,17 @@ public class GameManager : MonoBehaviour, IDataPersistence
                     {
                         if (ActiveSoldier.Instance.S.CheckAP(ap))
                         {
-                            //play move dialogue
-                            if (moveUI.meleeToggle.isOn)
-                                SoundManager.Instance.PlaySoldierMeleeMove(ActiveSoldier.Instance.S); //play melee move dialogue
-                            else
-                                SoundManager.Instance.PlaySoldierConfirmMove(ActiveSoldier.Instance.S); //play standard move dialogue
+                            if (DataPersistenceManager.Instance.lozMode && ActiveSoldier.Instance.S.IsZombie())
+                                SoundManager.Instance.PlayZombieMove(ActiveSoldier.Instance.S);
+                            else 
+                            {
+                                //play move dialogue
+                                if (moveUI.meleeToggle.isOn)
+                                    SoundManager.Instance.PlaySoldierMeleeMove(ActiveSoldier.Instance.S); //play melee move dialogue
+                                else
+                                    SoundManager.Instance.PlaySoldierConfirmMove(ActiveSoldier.Instance.S); //play standard move dialogue
+                            }
+                            
 
                             PerformMove(ActiveSoldier.Instance.S, ap, moveToLocation, moveUI.meleeToggle.isOn, moveUI.coverToggle.isOn, moveUI.fallInput.text, true);
 

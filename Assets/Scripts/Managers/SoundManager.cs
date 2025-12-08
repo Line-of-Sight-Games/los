@@ -50,6 +50,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip leapEvent;
     public AudioClip[] zombieDeath;
     public AudioClip bruteZombieDeath;
+    public AudioClip[] zombieMove, bruteZombieMove;
 
     //dialogue
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
@@ -395,7 +396,14 @@ public class SoundManager : MonoBehaviour
         else
             PlayRandomVoice(s, zombieDeath);
     }
-    
+    public void PlayZombieMove(Soldier s)
+    {
+        if (s.IsBruteZombie())
+            PlayRandomVoice(s, bruteZombieMove);
+        else
+            PlayRandomVoice(s, zombieMove);
+    }
+
 
 
 
