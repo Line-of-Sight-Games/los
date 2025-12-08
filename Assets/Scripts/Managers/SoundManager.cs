@@ -53,6 +53,9 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] zombieMove, bruteZombieMove;
     public AudioClip[] zombieAttack, bruteZombieAttack;
     public AudioClip[] zombieKillsSoldier, bruteZombieKillsSoldier;
+    public AudioClip[] zombieTakesDamage, bruteZombieTakesDamage;
+    public AudioClip[] zombieDetectSoldier, bruteZombieDetectSoldier;
+    public AudioClip[] zombieSelection, bruteZombieSelection;
 
     //dialogue
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
@@ -412,15 +415,34 @@ public class SoundManager : MonoBehaviour
         else
             PlayRandomVoice(s, zombieAttack);
     }
-    public void PlayZombiKillsSoldier(Soldier s)
+    public void PlayZombieKillsSoldier(Soldier s)
     {
         if (s.IsBruteZombie())
             PlayRandomVoice(s, bruteZombieKillsSoldier);
         else
             PlayRandomVoice(s, zombieKillsSoldier);
     }
-
-
+    public void PlayZombieTakesDamage(Soldier s)
+    {
+        if (s.IsBruteZombie())
+            PlayRandomVoice(s, bruteZombieTakesDamage);
+        else
+            PlayRandomVoice(s, zombieTakesDamage);
+    }
+    public void PlayZombieDetectSoldier(Soldier s)
+    {
+        if (s.IsBruteZombie())
+            PlayRandomVoice(s, bruteZombieDetectSoldier);
+        else
+            PlayRandomVoice(s, zombieDetectSoldier);
+    }
+    public void PlayZombieSelection(Soldier s)
+    {
+        if (s.IsBruteZombie())
+            PlayRandomVoice(s, bruteZombieSelection);
+        else
+            PlayRandomVoice(s, zombieSelection);
+    }
 
 
 

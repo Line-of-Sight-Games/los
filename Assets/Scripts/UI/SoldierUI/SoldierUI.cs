@@ -30,11 +30,18 @@ public class SoldierUI : MonoBehaviour
     }
     public void ActionButtonClicked()
     {
-        //play button press sfx
-        SoundManager.Instance.PlayButtonPress();
-        //play select generic dialogue
-        SoundManager.Instance.PlaySoldierSelection(linkedSoldier);
-
+        if (DataPersistenceManager.Instance.lozMode && linkedSoldier.IsZombie())
+        {
+            SoundManager.Instance.PlayZombieSelection(linkedSoldier);
+        }
+        else
+        {
+            //play button press sfx
+            SoundManager.Instance.PlayButtonPress();
+            //play select generic dialogue
+            SoundManager.Instance.PlaySoldierSelection(linkedSoldier);
+        }
+            
         OpenSoldierMenu("");
     }
     public void ConfirmFieldButtonClicked()

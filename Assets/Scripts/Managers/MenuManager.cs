@@ -1979,6 +1979,15 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                         if (detector.ActiveC > 2)
                             AddXpAlert(counter, detector.ActiveC + counter.ShadowXpBonus(detector.IsRevoker()), $"Detected soldier ({detector.soldierName}) with C > 2.", true); //xp
                     }
+
+                    //play zombie detect sound if any zombie was paid a detection
+                    if (DataPersistenceManager.Instance.lozMode)
+                    {
+                        if (counter.IsZombie() && sAlert.s1Toggle.isOn == true)
+                            SoundManager.Instance.PlayZombieDetectSoldier(counter);
+                        else if (detector.IsZombie() && sAlert.s2Toggle.isOn == true)
+                            SoundManager.Instance.PlayZombieDetectSoldier(detector);
+                    }
                 }
                 else if (child.GetComponent<ClaymoreAlertLOS>() != null)
                 {

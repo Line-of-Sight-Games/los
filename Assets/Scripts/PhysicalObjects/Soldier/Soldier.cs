@@ -1486,6 +1486,9 @@ public string causeOfLosCheck;
                             hp -= damage;
                             MenuManager.Instance.AddSoldierAlert(this, "DAMAGE SUFFERED", Color.red, $"{soldierName} suffers {damage} damage.", preHp, hp);
 
+                            if (DataPersistenceManager.Instance.lozMode && IsZombie())
+                                SoundManager.Instance.PlayZombieTakesDamage(this);
+
                             if (IsLastStand())
                             {
                                 if (ResilienceCheck())
@@ -3138,7 +3141,7 @@ public string causeOfLosCheck;
                         else
                         {
                             if (killedBy.IsZombie())
-                                SoundManager.Instance.PlayZombiKillsSoldier(killedBy);
+                                SoundManager.Instance.PlayZombieKillsSoldier(killedBy);
                         }
                     }
                     else
