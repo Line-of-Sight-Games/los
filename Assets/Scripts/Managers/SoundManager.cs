@@ -51,6 +51,8 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] zombieDeath;
     public AudioClip bruteZombieDeath;
     public AudioClip[] zombieMove, bruteZombieMove;
+    public AudioClip[] zombieAttack, bruteZombieAttack;
+    public AudioClip[] zombieKillsSoldier, bruteZombieKillsSoldier;
 
     //dialogue
     public AudioClip[] commanderConfirmMove, spartanConfirmMove, survivorConfirmMove, runnerConfirmMove, evaderConfirmMove, reservistConfirmMove, seekerConfirmMove, chameleonConfirmMove, scoutConfirmMove, infantrymanConfirmMove, operatorConfirmMove, earthquakeConfirmMove, hunterConfirmMove, cycloneConfirmMove, hammerConfirmMove, wolfConfirmMove, herculesConfirmMove, diplomatConfirmMove, technicianConfirmMove, medicConfirmMove;
@@ -403,8 +405,20 @@ public class SoundManager : MonoBehaviour
         else
             PlayRandomVoice(s, zombieMove);
     }
-
-
+    public void PlayZombieAttack(Soldier s)
+    {
+        if (s.IsBruteZombie())
+            PlayRandomVoice(s, bruteZombieAttack);
+        else
+            PlayRandomVoice(s, zombieAttack);
+    }
+    public void PlayZombiKillsSoldier(Soldier s)
+    {
+        if (s.IsBruteZombie())
+            PlayRandomVoice(s, bruteZombieKillsSoldier);
+        else
+            PlayRandomVoice(s, zombieKillsSoldier);
+    }
 
 
 

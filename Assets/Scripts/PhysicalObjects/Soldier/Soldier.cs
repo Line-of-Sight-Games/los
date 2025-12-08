@@ -3135,6 +3135,11 @@ public string causeOfLosCheck;
                                 MenuManager.Instance.generalAlertUI.Activate($"This zombie was identified as a fallen comrade. ({fallenSoldierName})");
                             }
                         }
+                        else
+                        {
+                            if (killedBy.IsZombie())
+                                SoundManager.Instance.PlayZombiKillsSoldier(killedBy);
+                        }
                     }
                     else
                     {

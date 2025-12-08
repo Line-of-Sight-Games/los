@@ -890,9 +890,14 @@ public class MeleeUI : MonoBehaviour
                     attacker.DropWeakerHandheldItem();
                     defender.DropWeakerHandheldItem();
 
+                    //play melee success sfx
+                    if (DataPersistenceManager.Instance.lozMode && attacker.IsZombie())
+                    {
+                        SoundManager.Instance.PlayZombieAttack(attacker); //play loz melee success sfx
+                    }
+
                     if (meleeDamage > 0)
                     {
-                        //play melee success sfx
                         if (damageType.Contains("Charge"))
                             SoundManager.Instance.PlayMeleeResolution("successCharge"); //play melee success charge sfx
                         else
