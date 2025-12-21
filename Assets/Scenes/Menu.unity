@@ -296,6 +296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameData:
+    lozMode: 0
     currentRound: 0
     currentTeam: 0
     currentTurn: 0
@@ -323,6 +324,9 @@ MonoBehaviour:
     numberBasicZombies: 0
     numberBruteZombies: 0
   loadingScreen: {fileID: 963826917}
+  loadingImage: {fileID: 538825342}
+  losLogo: {fileID: 21300000, guid: a78d034dccbe8e4498bc0a60650ffca9, type: 3}
+  lozLogo: {fileID: 21300000, guid: 26aef28e951416d4d97b8a2ed3642eb1, type: 3}
   progressBar: {fileID: 58854456}
   progressText: {fileID: 828839324}
   lozMode: 0

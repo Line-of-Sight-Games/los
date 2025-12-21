@@ -48,7 +48,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public BinocularsUI binocularsUI;
     public RiotShieldUI riotShieldUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, overmoveUI, suppressionMoveUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, catafalqueUI, cloudDissipationAlertPrefab;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, overmoveUI, suppressionMoveUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, catafalqueUI, cloudDissipationAlertPrefab, minimapBorder;
     
     public SoldierAlert soldierAlertPrefab;
     public XpAlert xpAlertPrefab;
@@ -168,7 +168,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         SceneManager.LoadScene("Menu");
     }
-
+    void Start()
+    {
+        if (DataPersistenceManager.Instance.lozMode)
+            minimapBorder.GetComponent<Image>().color = new Color32(100, 151, 53, 255); //green border for LOZ mode
+        else
+            minimapBorder.GetComponent<Image>().color = new Color32(250, 189, 0, 255); //yellow border for LOS mode
+    }
     void Update()
     {
         //check the game is running

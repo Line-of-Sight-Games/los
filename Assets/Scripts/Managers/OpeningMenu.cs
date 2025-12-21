@@ -21,7 +21,13 @@ public class OpeningMenu : MonoBehaviour
         {
             startButton.SetActive(true);
             if (ActiveGame())
+            {
                 startButtonText.text = "C O N T I N U E";
+                if (LOZGame())
+                    SetLOZMode();
+                else
+                    SetLOSMode();
+            }
             else
                 startButtonText.text = "S T A R T";
         }
@@ -59,23 +65,35 @@ public class OpeningMenu : MonoBehaviour
     public void ZombieClicked()
     {
         if (zombieButtonText.text.Contains("L O Z"))
-        {
-            menuMusic.clip = lozTheme;
-            menuMusic.Play();
-            DataPersistenceManager.Instance.lozMode = true;
-            titleText.color = Color.white;
-            zombieButtonText.text = "L O S   M O D E";
-            activeLogo.GetComponent<Image>().sprite = lozLogo;
-        }
+            SetLOZMode();
         else
-        {
-            menuMusic.clip = losTheme;
-            menuMusic.Play();
-            DataPersistenceManager.Instance.lozMode = false;
-            titleText.color = Color.black;
-            zombieButtonText.text = "L O Z   M O D E";
-            activeLogo.GetComponent<Image>().sprite = losLogo;
-        }
+            SetLOSMode();
+    }
+    public void SetLOSMode()
+    {
+        DataPersistenceManager.Instance.lozMode = false;
+
+        menuMusic.clip = losTheme;
+        menuMusic.Play();
+        titleText.color = Color.black;
+        zombieButtonText.text = "L O Z   M O D E";
+        activeLogo.GetComponent<Image>().sprite = losLogo;
+    }
+    public void SetLOZMode()
+    {
+        DataPersistenceManager.Instance.lozMode = true;
+
+        menuMusic.clip = lozTheme;
+        menuMusic.Play();
+        titleText.color = Color.white;
+        zombieButtonText.text = "L O S   M O D E";
+        activeLogo.GetComponent<Image>().sprite = lozLogo;
+    }
+    public bool LOZGame()
+    {
+        if (coreDataHandler.Load().lozMode)
+            return true;
+        return false;
     }
     public void QuitClicked()
     {
@@ -87,7 +105,10 @@ public class OpeningMenu : MonoBehaviour
         DataPersistenceManager.Instance.NewGame(); //delete gamedata
 
         if (DataPersistenceManager.Instance.lozMode)
+        {
+            DataPersistenceManager.Instance.gameData.lozMode = true;
             SceneManager.LoadScene("CreateLOZ");
+        }
         else
             SceneManager.LoadScene("Create");
     }

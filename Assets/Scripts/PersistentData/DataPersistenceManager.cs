@@ -16,9 +16,12 @@ public class DataPersistenceManager : MonoBehaviour
     public List<IDataPersistence> dataPersistanceObjects;
     public FileDataHandler coreDataHandler;
     public GameObject loadingScreen;
+    public Image loadingImage;
+    public Sprite losLogo, lozLogo;
     public Slider progressBar;
     public TextMeshProUGUI progressText;
-    public bool lozMode = false;
+    public bool lozMode;
+    
 
     private void Awake()
     {
@@ -27,15 +30,27 @@ public class DataPersistenceManager : MonoBehaviour
             Instance = this;
             coreDataHandler = new(Application.persistentDataPath, "LOSCore.json");
             DontDestroyOnLoad(gameObject);
+            if (gameData.lozMode)
+                lozMode = true;
         }
         else
             Destroy(gameObject);
     }
     public void LoadSceneWithData(string sceneName)
     {
-        loadingScreen.SetActive(true);
+        if (lozMode)
+        {
+            loadingImage.sprite = lozLogo;
+            progressText.color = new Color32(100, 151, 53, 255); //green for LOZ mode
+        }
+        else
+        {
+            loadingImage.sprite = losLogo;
+            progressText.color = new Color32(250, 189, 0, 255); //yellow for LOS mode
+        }
         progressBar.value = 0;
         progressText.text = "Loading...";
+        loadingScreen.SetActive(true);
 
         StartCoroutine(LoadSceneAsync(sceneName));
     }

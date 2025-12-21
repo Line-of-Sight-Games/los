@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
+    public bool lozMode;
     public int currentRound;
     public int currentTeam;
     public int currentTurn;
@@ -33,6 +34,7 @@ public class GameData
 
     public GameData()
     {
+        lozMode = false;
         currentRound = 0;
         currentTeam = 0;
         currentTurn = 0;
