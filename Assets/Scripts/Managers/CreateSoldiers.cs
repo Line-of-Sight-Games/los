@@ -79,6 +79,35 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 		data.allSoldiersIds = allSoldierIds;
     }
+    void Start()
+    {
+        random1Dropdown.ClearOptions();
+        random2Dropdown.ClearOptions();
+
+        List<string> losStatOptions = new()
+        {
+            "...", "L", "H", "R", "S", "E", "F", "P", "C", "SR",
+            "Ri", "AR", "LMG", "Sn", "SMG", "Sh", "M",
+            "Str", "Dip", "Elec", "Heal"
+        };
+        List<string> lozStatOptions = new()
+        {
+            "...", "L", "H", "R", "S", "SR",
+            "Ri", "AR", "LMG", "SMG", "Sh", "M",
+            "Str", "Dip", "Elec", "Heal"
+        };
+
+        if (DataPersistenceManager.Instance.lozMode)
+        {
+            random1Dropdown.AddOptions(lozStatOptions);
+            random2Dropdown.AddOptions(lozStatOptions);
+        }
+        else
+        {
+            random1Dropdown.AddOptions(losStatOptions);
+            random2Dropdown.AddOptions(losStatOptions);
+        }
+    }
     public void Update()
     {
         UpdateVisuals();
