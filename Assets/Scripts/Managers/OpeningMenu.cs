@@ -8,8 +8,8 @@ public class OpeningMenu : MonoBehaviour
 {
     public AudioSource menuMusic;
     public AudioClip losTheme, lozTheme;
-    public GameObject startButton, overwriteWarning, activeLogo;
-    public TextMeshProUGUI titleText, startButtonText, zombieButtonText;
+    public GameObject startButton, overwriteWarning, activeLogo, gameModePopup;
+    public TextMeshProUGUI titleText, startButtonText;
     public Sprite losLogo, lozLogo;
     private FileDataHandler coreDataHandler;
 
@@ -57,17 +57,25 @@ public class OpeningMenu : MonoBehaviour
     }
     public void NewClicked()
     {
+        gameModePopup.SetActive(true);
+    }
+    public void LOSButtonClick()
+    {
+        SetLOSMode();
         if (ActiveGame())
             overwriteWarning.SetActive(true);
         else
             PlayNewGame();
+        gameModePopup.SetActive(false);
     }
-    public void ZombieClicked()
+    public void LOZButtonClick()
     {
-        if (zombieButtonText.text.Contains("L O Z"))
-            SetLOZMode();
+        SetLOZMode();
+        if (ActiveGame())
+            overwriteWarning.SetActive(true);
         else
-            SetLOSMode();
+            PlayNewGame();
+        gameModePopup.SetActive(false);
     }
     public void SetLOSMode()
     {
@@ -76,7 +84,6 @@ public class OpeningMenu : MonoBehaviour
         menuMusic.clip = losTheme;
         menuMusic.Play();
         titleText.color = Color.black;
-        zombieButtonText.text = "L O Z   M O D E";
         activeLogo.GetComponent<Image>().sprite = losLogo;
     }
     public void SetLOZMode()
@@ -86,7 +93,6 @@ public class OpeningMenu : MonoBehaviour
         menuMusic.clip = lozTheme;
         menuMusic.Play();
         titleText.color = Color.white;
-        zombieButtonText.text = "L O S   M O D E";
         activeLogo.GetComponent<Image>().sprite = lozLogo;
     }
     public bool LOZGame()
