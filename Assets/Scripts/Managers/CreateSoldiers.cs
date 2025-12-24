@@ -328,7 +328,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 			ConfirmButtonPressed();
 			UpdateVisuals();
         }
-        ConfirmButtonPressed();
     }
     public IEnumerator RandomZombieTeam()
     {
