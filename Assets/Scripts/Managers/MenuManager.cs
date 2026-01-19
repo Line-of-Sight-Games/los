@@ -1127,23 +1127,23 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void CheckWinConditions()
     {
-        int p1DeadCount = 0, p2DeadCount = 0;
+        int t1DeadCount = 0, t2DeadCount = 0;
 
         foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
             if (s.IsDead() || s.IsUnconscious())
             {
                 if (s.soldierTeam == 1)
-                    p1DeadCount++;
+                    t1DeadCount++;
                 else
-                    p2DeadCount++;
+                    t2DeadCount++;
             }    
         }
 
-        if (p1DeadCount == GameManager.Instance.AllSoldiers().Count / 2)
+        if (t1DeadCount.Equals(GameManager.Instance.AllTeam1Soldiers()))
             GameManager.Instance.GameOver("<color=blue>Team 2</color> Victory");
 
-        if (p2DeadCount == GameManager.Instance.AllSoldiers().Count / 2)
+        if (t2DeadCount.Equals(GameManager.Instance.AllTeam2Soldiers()))
             GameManager.Instance.GameOver("<color=red>Team 1</color> Victory");
     }
     public void DisplayItems()

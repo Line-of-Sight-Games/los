@@ -72,6 +72,28 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         return SoldierManager.Instance.allSoldiers;
     }
+    public List<Soldier> AllTeam1Soldiers()
+    {
+        List<Soldier> team1Soldiers = new();
+        foreach (Soldier s in AllSoldiers())
+        {
+            if (s.soldierTeam.Equals(1))
+                team1Soldiers.Add(s);
+        }
+
+        return team1Soldiers;
+    }
+    public List<Soldier> AllTeam2Soldiers()
+    {
+        List<Soldier> team1Soldiers = new();
+        foreach (Soldier s in AllSoldiers())
+        {
+            if (s.soldierTeam.Equals(2))
+                team1Soldiers.Add(s);
+        }
+
+        return team1Soldiers;
+    }
     public List<Soldier> AllFieldedSoldiers()
     {
         return AllBattlefieldObjects().OfType<Soldier>().ToList();
