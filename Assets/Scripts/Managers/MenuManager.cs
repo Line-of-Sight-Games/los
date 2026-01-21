@@ -30,7 +30,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
 
     public TextMeshProUGUI gameTimer, turnTimer, roundIndicator, teamTurnIndicator, turnTitle;
-
+    public Canvas UICanvas;
     public DetectionUI detectionUI;
     public MoveUI moveUI;
     public ShotUI shotUI;

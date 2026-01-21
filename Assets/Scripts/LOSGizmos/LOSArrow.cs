@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(LineRenderer))]
 public class LOSArrow : LOSGizmo
 {
     public PhysicalObject to;
@@ -10,7 +11,7 @@ public class LOSArrow : LOSGizmo
         this.from = from;
         transform.position = new Vector3((from.transform.position.x + to.transform.position.x) / 2.0f, (from.transform.position.y + to.transform.position.y) / 2.0f, (from.transform.position.z + to.transform.position.z) / 2.0f);
 
-        LineRenderer lineRenderer = Instantiate(lineRendererPrefab, transform);
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
 
         lineRenderer.SetPosition(0, new Vector3(from.transform.position.x, from.transform.position.y, from.transform.position.z));
         lineRenderer.SetPosition(1, new Vector3(to.transform.position.x, to.transform.position.y, to.transform.position.z));

@@ -1,8 +1,11 @@
-using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SoldierUI : MonoBehaviour
+[RequireComponent(typeof(RectTransform))]
+public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Soldier linkedSoldier;
     public TMP_InputField xSize, ySize, zSize;
@@ -11,7 +14,10 @@ public class SoldierUI : MonoBehaviour
     public GameObject revealMessage, resolveBroken;
     public Button actionButton, fieldButton;
     public SoldierPortrait soldierPotrait;
-    public TextMeshProUGUI ap, mp, location, revealMessageText; 
+    public TextMeshProUGUI ap, mp, location, revealMessageText;
+    public GameObject LOSCount;
+    public GameObject arrowPrefab;
+    public List<GameObject> activeArrows = new();
 
     public void DisplayInFriendlyColumn()
     {
@@ -21,6 +27,62 @@ public class SoldierUI : MonoBehaviour
     {
         transform.SetParent(SoldierManager.Instance.enemyDisplayColumn.transform);
     }
+    
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (linkedSoldier.IsOnturnAndAlive())
+            ShowLineOfSightArrows();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        ClearArrows();
+    }
+    void ShowLineOfSightArrows()
+    {
+        ClearArrows();
+
+        int count = 0;
+        foreach (Soldier s in GameManager.Instance.AllFieldedEnemySoldiers())
+        {
+            if (linkedSoldier.CanSeeInOwnRight(s) && s.IsAlive())
+            {
+                GameObject arrow = Instantiate(arrowPrefab, MenuManager.Instance.UICanvas.transform);
+                SetupArrow(arrow, GetComponent<RectTransform>(), s.soldierUI.GetComponent<RectTransform>());
+                activeArrows.Add(arrow);
+                count++;
+            }
+            continue;
+        }
+        LOSCount.GetComponentInChildren<TextMeshProUGUI>().text = $"{count}";
+        LOSCount.SetActive(true);
+    }
+    void SetupArrow(GameObject arrow, RectTransform from, RectTransform to)
+    {
+        Vector2 start = new(from.position.x + (from.rect.width / 2) + 15, from.position.y + 35);
+        Vector2 end = new(to.position.x - (to.rect.width / 4), to.position.y);
+        Vector2 direction = end - start;
+        float distance = direction.magnitude;
+
+        RectTransform rt = arrow.GetComponent<RectTransform>();
+        rt.position = start;
+        rt.sizeDelta = new Vector2(distance, rt.sizeDelta.y);
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        rt.rotation = Quaternion.Euler(0f, 0f, angle);
+    }
+    void ClearArrows()
+    {
+        foreach (var arrow in activeArrows)
+            Destroy(arrow);
+        activeArrows.Clear();
+        LOSCount.SetActive(false);
+    }
+
+
+
+
+
     public void FieldButtonClicked()
     {
         //play button press sfx
@@ -62,12 +124,10 @@ public class SoldierUI : MonoBehaviour
     {
         transform.Find("PopupBox").gameObject.SetActive(true);
     }
-
     public void CancelFieldSoldier()
     {
         transform.Find("PopupBox").gameObject.SetActive(false);
     }
-
     public void ConfirmFieldSoldier()
     {
         if (int.TryParse(xSize.text, out x) && int.TryParse(ySize.text, out y) && int.TryParse(zSize.text, out z) && terrainDropdown.value != 0)
@@ -87,7 +147,6 @@ public class SoldierUI : MonoBehaviour
             }
         }
     }
-
     public void OpenSoldierMenu(string type)
     {
         ActiveSoldier.Instance.SetActiveSoldier(linkedSoldier);
