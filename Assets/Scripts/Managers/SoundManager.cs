@@ -45,6 +45,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip itemUseDepBeacon, itemUseETool, itemUseFood, itemUseMedikit, itemUsePoisonSatchel, itemUseSyringe, itemUseWater, itemUsePoisonedItem;
 
     //loz effects
+    public AudioClip operatorsWiped, zombiesWiped;
     public AudioClip catafalqueUsed;
     public AudioClip fallenSoldierDiscovered;
     public AudioClip leapEvent;
@@ -382,6 +383,14 @@ public class SoundManager : MonoBehaviour
 
 
     //loz effects
+    public void PlayOperatorsWiped()
+    {
+        PlaySound(operatorsWiped);
+    }
+    public void PlayZombiesWiped()
+    {
+        PlaySound(zombiesWiped);
+    }
     public void PlayCatafalqueUsed()
     {
         PlaySound(catafalqueUsed);

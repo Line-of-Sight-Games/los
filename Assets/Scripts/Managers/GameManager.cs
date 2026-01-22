@@ -224,7 +224,15 @@ public class GameManager : MonoBehaviour, IDataPersistence
         MenuManager.Instance.teamTurnIndicator.text = result;
 
         //play game over music
-        SoundManager.Instance.PlayGameOverMusic();
+        if (DataPersistenceManager.Instance.lozMode)
+        {
+            if (result.Contains("Team 1"))
+                SoundManager.Instance.PlayZombiesWiped();
+            else
+                SoundManager.Instance.PlayOperatorsWiped();
+        }
+        else
+            SoundManager.Instance.PlayGameOverMusic();
     }
     public void SwitchTeam(int team)
     {
