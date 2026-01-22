@@ -15,7 +15,7 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public Button actionButton, fieldButton;
     public SoldierPortrait soldierPotrait;
     public TextMeshProUGUI ap, mp, location, revealMessageText;
-    public GameObject LOSCount;
+    public GameObject LOSCountPrefab;
     public GameObject arrowPrefab;
     public List<GameObject> activeArrows = new();
 
@@ -30,11 +30,21 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (linkedSoldier == null)
+            return;
+
         if (linkedSoldier.IsOnturnAndAlive())
             ShowLineOfSightArrows();
     }
-
     public void OnPointerExit(PointerEventData eventData)
+    {
+        ClearArrows();
+    }
+    public void OnEnable()
+    {
+        ClearArrows();
+    }
+    public void OnDisable()
     {
         ClearArrows();
     }
@@ -54,8 +64,9 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             }
             continue;
         }
-        LOSCount.GetComponentInChildren<TextMeshProUGUI>().text = $"{count}";
-        LOSCount.SetActive(true);
+        GameObject counter = Instantiate(LOSCountPrefab, transform);
+        counter.GetComponentInChildren<TextMeshProUGUI>().text = $"{count}";
+        activeArrows.Add(counter);
     }
     void SetupArrow(GameObject arrow, RectTransform from, RectTransform to)
     {
@@ -76,7 +87,6 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         foreach (var arrow in activeArrows)
             Destroy(arrow);
         activeArrows.Clear();
-        LOSCount.SetActive(false);
     }
 
 
