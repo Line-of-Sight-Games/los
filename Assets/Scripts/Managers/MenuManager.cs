@@ -1285,7 +1285,29 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         else if (ActiveSoldier.Instance.S.ap == 0)
             GreyOutButtons(AddAllButtons(buttonStates), "No AP");
         else if (ActiveSoldier.Instance.S.IsZombie())
-            GreyOutButtons(ExceptButton(ExceptButton(AddAllButtons(buttonStates), moveButton), meleeButton), "<color=orange>Zombie</color>");
+        {
+            var zomButtonList = ExceptButton(ExceptButton(AddAllButtons(buttonStates), moveButton), meleeButton);
+
+            //block move button
+            if (ActiveSoldier.Instance.S.IsLastStand())
+                zomButtonList.Add(moveButton, "Last Stand");
+            else if (ActiveSoldier.Instance.S.mp == 0)
+                zomButtonList.Add(moveButton, "No MA");
+            else if (ActiveSoldier.Instance.S.IsMeleeControlling())
+                zomButtonList.Add(moveButton, "<color=green>Melee Controlling</color>");
+
+            //block melee button
+            if (!ActiveSoldier.Instance.S.FindMeleeTargets())
+                zomButtonList.Add(meleeButton, "No Target");
+            else if (ActiveSoldier.Instance.S.stats.SR.Val == 0)
+                zomButtonList.Add(meleeButton, "Blind");
+
+            //display flinch location if zom is flinched
+            if (ActiveSoldier.Instance.S.IsFlinched())
+                GreyOutButtons(zomButtonList, $"<color=orange>Zombie{ActiveSoldier.Instance.S.GetFlinchState()}</color>");
+            else
+                GreyOutButtons(zomButtonList, "<color=orange>Zombie</color>");
+        }
         else if (ActiveSoldier.Instance.S.IsUsingBinocularsInReconMode())
             GreyOutButtons(AddAllButtons(buttonStates), "<color=green>Binoculars (Recon)</color>");
         else if (ActiveSoldier.Instance.S.IsFrozen() && GameManager.Instance.frozenTurn)
@@ -1440,7 +1462,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                     GreyOut(b, bValue);
                 }
                 else
-                    UnGrey(b, "");
+                    UnGrey(b);
             }
         }
         else
@@ -1452,10 +1474,10 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         soldierOptionsUI.transform.Find("AllReason").GetComponent<TextMeshProUGUI>().text = "";
 
         foreach (Button b in actionButtons)
-            UnGrey(b, "");
+            UnGrey(b);
     }
 
-    public void UnGrey(Button button, string reason)
+    public void UnGrey(Button button)
     {
         button.interactable = true;
         button.transform.Find("Reason").gameObject.SetActive(false);

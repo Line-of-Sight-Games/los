@@ -25,7 +25,7 @@ public string causeOfLosCheck;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
-    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced, lastZombieKilled, fallenSoldierName;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced, lastZombieKilled, fallenSoldierName, flinchLocation;
     public Statline stats;
     public Inventory inventory;
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
@@ -246,6 +246,7 @@ public string causeOfLosCheck;
             { "lastZombieKilled", lastZombieKilled },
             { "fallenSoldierName", fallenSoldierName },
             { "catafalqueReady", catafalqueReady },
+            { "flinchLocation", flinchLocation },
 
             //save item details
             { "glucoState", glucoState },
@@ -364,6 +365,7 @@ public string causeOfLosCheck;
         lastZombieKilled = (string)details["lastZombieKilled"];
         fallenSoldierName = (string)details["fallenSoldierName"];
         catafalqueReady = (bool)details["catafalqueReady"];
+        flinchLocation = (string)details["flinchLocation"];
 
         //load item details
         glucoState = (string)details["glucoState"];
@@ -1462,6 +1464,13 @@ public string causeOfLosCheck;
 
             if (damage > 0) //damage is directly hitting the soldier hp
             {
+                //set flinch on zombie if it takes damage from a shot and can't see anyone
+                if (DataPersistenceManager.Instance.lozMode && IsZombie())
+                {
+                    if (damageSource.Contains("Shot") && LOSToTheseSoldiersAndRevealing.Count.Equals(0))
+                        SetFlinched(damagedBy);
+                }
+
                 //remove overwatch if damage taken
                 UnsetOverwatch();
                 //remove all spotting if damage taken
@@ -1622,6 +1631,13 @@ public string causeOfLosCheck;
                 int actualHeal = Heal(heal, overhealthEnabled);
                 int actualTraumaHeal = HealTrauma(traumaHeal);
 
+                //stabilise if in last stand
+                if (IsLastStand())
+                {
+                    MakeActive();
+                    MenuManager.Instance.AddSoldierAlert(this, "STABILISED", Color.green, $"{soldierName} was stabilised from <color=red>Last Stand</color> to Active.", -1, -1);
+                }
+
                 //xp for healing
                 if (healedBy != null)
                 {
@@ -1635,13 +1651,6 @@ public string causeOfLosCheck;
                     {
                         MenuManager.Instance.AddXpAlert(healedBy, actualHeal + actualTraumaHeal, $"Healed {soldierName} by {actualHeal} hp and removed {actualTraumaHeal} trauma points.", true);
                         MenuManager.Instance.AddSoldierAlert(this, "HEALED", Color.green, $"{soldierName} was healed by {healedBy.soldierName}. Gained {actualHeal} hp and removed {actualTraumaHeal} trauma point(s).", preHealHp, hp);
-                    }
-
-                    //stabilise if in last stand
-                    if (IsLastStand())
-                    {
-                        MakeActive();
-                        MenuManager.Instance.AddSoldierAlert(this, "STABILISED", Color.green, $"{soldierName} was stabilised from <color=red>Last Stand</color> to Active.", -1, -1);
                     }
                 }
             }
@@ -2059,6 +2068,10 @@ public string causeOfLosCheck;
             //play see enemy dialogue
             if (IsOnturn())
                 SoundManager.Instance.PlaySoldierSeeEnemy(this);
+            
+            //unset flinch if zom reveals anyone in his travels
+            if (DataPersistenceManager.Instance.lozMode && IsZombie())
+                UnsetFlinched();
         }
 
         //add reference of this soldier revealing others
@@ -2904,6 +2917,21 @@ public string causeOfLosCheck;
     public bool IsInteractable()
     {
         if (CheckState("Crushed") || IsMeleeControlled())
+            return false;
+
+        return true;
+    }
+    public void SetFlinched(Soldier shooter)
+    {
+        flinchLocation = $"({shooter.X},{shooter.Y},{shooter.Z})";
+    }
+    public void UnsetFlinched()
+    {
+        flinchLocation = string.Empty;
+    }
+    public bool IsFlinched()
+    {
+        if (flinchLocation.Equals(string.Empty))
             return false;
 
         return true;
@@ -4881,6 +4909,12 @@ public string causeOfLosCheck;
             return $", <color=green>Witnessing ({HelperFunctions.PrintList(soldierAbilities.Where(ability => witnessStoredAbilities.Contains(ability)).ToList())})</color>";
         return "";
     }
+    public string GetFlinchState()
+    {
+        if (IsFlinched())
+            return $", <color=orange>Flinching{flinchLocation}</color>";
+        return "";
+    }
     public string GetStatus()
     {
         string status = "";
@@ -4915,6 +4949,8 @@ public string causeOfLosCheck;
             status += GetBloodRageState();
             status += GetSpottingState();
             status += GetWitnessState();
+
+            status += GetFlinchState();
         }
         return status;
     }

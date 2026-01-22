@@ -643,12 +643,12 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
     }
     public string GenerateRandomFallenName(Soldier s)
     {
-        List<string> normalZomNames = new List<string>
+        List<string> normalZomNames = new()
         {
             "Cpl. Ivan", "Pt. Roach", "Lt. Zeus", "Sgt. Hermes", "Lt. Hades", "Lt. Theia", "Pt. Ares", "Lt. Achilles", "Sgt. Rasputin", "Lt. Seraph", "Rec. Mercury", "Rec. Oryx", "Sgt. Manhattan", "Cpl. Neo", "Cpl. Pete", "Sgt. Chaplin", "Sgt. Streaker", "Lt. Bricke", "Cpl. Cellophane", "Lt. Ratcliffe", "Sgt. Expendable", "Sgt. Rico", "Sgt. Storm", "Sgt. Victor", "Lt. Willow", "Sgt. Horus", "Sgt. Ra", "Sgt. Sekmet", "Cpl. Osiris", "Cpl. Hathor", "Cpl. McClane", "Lt. Rambo", "Sgt. Miyagi", "Sgt. Grief", "Sgt. Gaston", "Cpl. Pascal", "Pte. Geist", "Sgt. Cyrus", "Pte. Stavanger", "Pte. Zaiel", "Pte. Krypton", "Cpl. Lechwe", "Cpl. Heyzeus", "Sgt. Khorne", "Lt. Dwayne", "Rec. Victoire", "Pte. Churchill", "Pte. Quill", "Lt. Stark", "Sgt. Excelsior", "Cpl. Boogie-Knees", "Cpl. Tungsten", "Cpl. Casper", "Pte. Boudica", "Lt. Raphael", "Cpl. Egersund", "Sgt. Chinkara", "Lt. Nyctea", "Lt. Eyewall", "Lt. Bartholemew", "Sgt. Spike", "Cpl. Destiny", "Cpl. Richtor", "Lt. Slice", "Lt. Tramp", "Cpl. Rome", "Pvt. Sassari", "Pvt. Verona", "Cpl. Bologna", "Lt. Dawon", "Lt. Anansi", "Sgt. Yali", "Rec. Lupin", "Lt. Saci", "Pvt. Nue", "Pvt. Leutogi", "Rec. Isonade", "Lt. Roc", "Pvt. Oozlum", "Cpl. Dill", "Sgt. Wattle", "Lt. Alkanet", "Lt. Nepata", "Cpl. Vanellope", "Sgt. Esmeralda", "Lt. Merida", "Pvt. Rapunzel", "Pvt. Snow-White", "Pvt. Cinderella", "Cpl. Giselle", "Pvt. Tinkerbell", "Lt. Mary-Poppins", "Maj. Aurora", "Rec. Bocconcini", "Lt. Burrata", "Rec. Saganaki", "Rec. Quark", "Pvt. Voss", "Rec. Kissinger", "Cpl. Zulu", "Sgt. Bismuth", "Pvt. Alexay", "Lt. Cassius"
         };
 
-        List<string> bruteZomNames = new List<string>
+        List<string> bruteZomNames = new()
         {
             "Capt. Lillehammer", "Capt. Bighammer", "Capt. Thorny", "Capt. Wraith", "Capt. Sharticus", "Capt. Cyclops", "Capt. Fiddlesticks", "Capt. Leespatz", "Capt. Kava"
         };
