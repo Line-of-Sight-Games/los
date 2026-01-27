@@ -17009,7 +17009,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: ddf843047dc2e7d4ea0e2d478e24d887, type: 3}
+  m_Resource: {fileID: 8300000, guid: 192107a43ac1d4047a0c3bd224a86b4a, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -24770,7 +24770,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseSoldier: {fileID: 4380717690802720386, guid: 30039cf98e786db478c107b292c923f2, type: 3}
-  baseZombie: {fileID: -385192488950466034, guid: e6b56670f65646a4aaf6afe7bbfb71e2, type: 3}
   setGameParameters: {fileID: 1535280273}
   terrainFieldObj: {fileID: 832863642}
   zombieTypeFieldObj: {fileID: 2002975242}
