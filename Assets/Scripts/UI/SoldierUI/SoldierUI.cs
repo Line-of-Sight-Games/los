@@ -103,9 +103,7 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void ActionButtonClicked()
     {
         if (DataPersistenceManager.Instance.lozMode && linkedSoldier.IsZombie())
-        {
             SoundManager.Instance.PlayZombieSelection(linkedSoldier);
-        }
         else
         {
             //play button press sfx
@@ -154,6 +152,9 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
                 linkedSoldier.fielded = true;
                 transform.Find("PopupBox").gameObject.SetActive(false);
                 linkedSoldier.CheckSpecialityColor(linkedSoldier.soldierSpeciality);
+
+                if (DataPersistenceManager.Instance.lozMode && linkedSoldier.IsZombie())
+                    linkedSoldier.LeapIncrementStats(GameManager.Instance.currentRound / GameManager.Instance.roundsBetweenLeaps);
             }
         }
     }

@@ -41,6 +41,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public bool gameOver, modaTurn, frozenTurn;
     public int maxX, maxY, maxZ;
     public int currentRound, currentTeam, currentTurn, maxRounds, maxTeams, maxTurnTime, tempTeam;
+    public int roundsBetweenLeaps = 3;
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea;
@@ -506,7 +507,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
             {
                 if (DataPersistenceManager.Instance.lozMode)
                 {
-                    int roundsBetweenLeaps = 3;
                     if (s.IsZombie() && currentRound % roundsBetweenLeaps == 0)
                     {
                         SoundManager.Instance.PlayLeapEvent();
