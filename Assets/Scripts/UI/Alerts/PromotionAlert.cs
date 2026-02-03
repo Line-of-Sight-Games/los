@@ -56,7 +56,28 @@ public class PromotionAlert : SoldierAlert
         new string[] { "Vaulter", "Acrobat" },
         new string[] { "Witness", "Hypnotist" },
     };
+    private void Start()
+    {
+        statDropdown.ClearOptions();
 
+        List<string> losStatOptions = new()
+        {
+            "Select Option", "Leadership", "Health", "Resilience", "Speed", "Evasion", "Fight", "Perceptiveness", "Camouflage", "Sight Radius",
+            "Rifle", "Assault Rifle", "Light Machine Gun", "Sniper Rifle", "Sub-Machine Gun", "Shotgun", "Melee",
+            "Strength", "Diplomacy", "Electronics", "Healing"
+        };
+        List<string> lozStatOptions = new()
+        {
+            "Select Option", "Leadership", "Health", "Resilience", "Speed", "Sight Radius",
+            "Rifle", "Assault Rifle", "Light Machine Gun", "Sub-Machine Gun", "Shotgun", "Melee",
+            "Strength", "Diplomacy", "Electronics", "Healing"
+        };
+
+        if (DataPersistenceManager.Instance.lozMode)
+            statDropdown.AddOptions(lozStatOptions);
+        else
+            statDropdown.AddOptions(losStatOptions);
+    }
     public void PromoteSoldier()
     {
         string choiceStat = statDropdown.captionText.text;
