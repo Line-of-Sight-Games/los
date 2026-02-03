@@ -506,10 +506,11 @@ public class GameManager : MonoBehaviour, IDataPersistence
             {
                 if (DataPersistenceManager.Instance.lozMode)
                 {
-                    if (s.IsZombie() && currentRound % 4 == 0)
+                    int roundsBetweenLeaps = 3;
+                    if (s.IsZombie() && currentRound % roundsBetweenLeaps == 0)
                     {
                         SoundManager.Instance.PlayLeapEvent();
-                        s.LeapIncrementStats(currentRound / 4);
+                        s.LeapIncrementStats(currentRound / roundsBetweenLeaps);
                     }
                 }
 
