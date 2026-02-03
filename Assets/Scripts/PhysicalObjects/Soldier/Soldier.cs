@@ -2437,7 +2437,6 @@ public string causeOfLosCheck;
         {
             stats.L.BaseVal = zombieLeapTable[leapRound, 0] * 2;
             stats.H.BaseVal = zombieLeapTable[leapRound, 1] * 2;
-            TakeHeal(null, 4, 0, false, false);
             stats.R.BaseVal = zombieLeapTable[leapRound, 2] * 2;
             stats.S.BaseVal = zombieLeapTable[leapRound, 3] * 2;
             stats.E.BaseVal = zombieLeapTable[leapRound, 4] * 2;
@@ -2456,12 +2455,13 @@ public string causeOfLosCheck;
             stats.Dip.BaseVal = zombieLeapTable[leapRound, 17] * 2;
             stats.Elec.BaseVal = zombieLeapTable[leapRound, 18] * 2;
             stats.Heal.BaseVal = zombieLeapTable[leapRound, 19] * 2;
+            CalculateActiveStats();
+            TakeHeal(null, 4, 0, false, false);
         }
         else
         {
             stats.L.BaseVal = zombieLeapTable[leapRound, 0];
             stats.H.BaseVal = zombieLeapTable[leapRound, 1];
-            TakeHeal(null, 2, 0, false, false);
             stats.R.BaseVal = zombieLeapTable[leapRound, 2];
             stats.S.BaseVal = zombieLeapTable[leapRound, 3];
             stats.E.BaseVal = zombieLeapTable[leapRound, 4];
@@ -2480,6 +2480,8 @@ public string causeOfLosCheck;
             stats.Dip.BaseVal = zombieLeapTable[leapRound, 17];
             stats.Elec.BaseVal = zombieLeapTable[leapRound, 18];
             stats.Heal.BaseVal = zombieLeapTable[leapRound, 19];
+            CalculateActiveStats();
+            TakeHeal(null, 2, 0, false, false);
         }
     }
     public void CheckSpecialityColor(string speciality)
