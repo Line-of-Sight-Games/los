@@ -3201,13 +3201,12 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             if (lastZomKilled.IsBruteZombie()) //double xp for brute zombie kill
                 xps = ("brute", xps.Item2 * 2, xps.Item3 * 2);
 
+            //give 2 xp to catafalquer for zombie kill
+            AddXpAlert(ActiveSoldier.Instance.S, xps.Item3, $"Initiated catafalque of fallen soldier. ({lastZomKilled.fallenSoldierName})(zombie)", false);
             //give 1 xp to all soldiers for catafalque
             foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
-            {
-                AddXpAlert(s, xps.Item2, $"Ally ({ActiveSoldier.Instance.S.soldierName}) catafalqued fallen zombie. ({lastZomKilled.fallenSoldierName})", false);
-            }
-            //give 2 xp to catafalquer for zombie kill
-            AddXpAlert(ActiveSoldier.Instance.S, xps.Item3, $"Catafalqued fallen zombie. ({lastZomKilled.fallenSoldierName})", false);
+                AddXpAlert(s, xps.Item2, $"Catafalque of fallen soldier. ({lastZomKilled.fallenSoldierName})(zombie)", false);
+
             ActiveSoldier.Instance.S.lastZombieKilled = string.Empty;
             ActiveSoldier.Instance.S.catafalqueReady = false;
         }
@@ -3266,7 +3265,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 //do not create xp alert for zombies, or any other xp alert that does not contain 'zombie' in description
                 if (DataPersistenceManager.Instance.lozMode)
                 {
-                    if (soldier.IsZombie() || (!xpDescription.Contains("zombie.") && !xpDescription.Contains("Override")))
+                    if (soldier.IsZombie() || (!xpDescription.Contains("zombie") && !xpDescription.Contains("Override")))
                         return;
                 }
 

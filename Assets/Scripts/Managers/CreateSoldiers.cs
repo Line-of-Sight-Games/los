@@ -655,7 +655,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
         };
 
 
-        if (HelperFunctions.RandomNumber(1, 10).Equals(10))
+        if (HelperFunctions.RandomNumber(10, 10).Equals(10))
         {
             if (s.IsBruteZombie())
                 return bruteZomNames[HelperFunctions.RandomNumber(0, bruteZomNames.Count - 1)];
