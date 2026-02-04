@@ -131,7 +131,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
             if (soldierIndex <= numberBruteZombies)
             {
                 soldierIdentifier.text = $"Zombie-Brute{soldierIndex}";
-                soldierName.text = $"Zombie-Brute{soldierIndex}";
+                soldierName.text = $"Brutus{soldierIndex}";
                 soldierName.interactable = false;
                 activePortraitDropdown.value = soldierIndex - 1;
                 activePortraitDropdown.interactable = false;
@@ -139,7 +139,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
             else
             {
                 soldierIdentifier.text = $"Zombie{soldierIndex - numberBruteZombies}";
-                soldierName.text = $"Zombie{soldierIndex - numberBruteZombies}";
+                soldierName.text = $"Zom{soldierIndex - numberBruteZombies}";
                 soldierName.interactable = false;
                 activePortraitDropdown.value = soldierIndex - numberBruteZombies - 1;
                 activePortraitDropdown.interactable = false;
@@ -499,7 +499,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		{
 			if (soldierIdentifier.text.Contains("Zombie"))
 			{
-                Instantiate(baseSoldier).InitZombie(soldierName.text, currentTeam, activePortraitDropdown.captionImage.sprite, activePortraitDropdown.captionText.text, GenerateRandomFallenName(baseSoldier));
+                Instantiate(baseSoldier).InitZombie(soldierName.text, currentTeam, activePortraitDropdown.captionImage.sprite, activePortraitDropdown.captionText.text, zombieTypeDropdown.captionText.text, GenerateRandomFallenName(baseSoldier));
 
                 //refresh input fields
                 soldierName.text = "";
@@ -624,12 +624,13 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 
 	public bool CheckValidDetails()
     {
-		if (soldierName.text.Contains("Zombie"))
+		if (soldierIdentifier.text.Contains("Zombie"))
 		{
             if (soldierName.text.Length > 0 && soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color == new Color(0.196f, 0.196f, 0.196f))
                 return true;
         }
-		else {
+		else 
+        {
             if (soldierName.text.Length > 0 && soldierName.transform.Find("Text Area").Find("Text").GetComponent<TextMeshProUGUI>().color == new Color(0.196f, 0.196f, 0.196f) && terrainDropdown.value != 0 && activeSpecialityDropdown.value != 0 && abilityDropdown.value != 0 && random1Dropdown.value != 0 && random2Dropdown.value != 0 && RandomPointsUnique())
                 return true;
         }

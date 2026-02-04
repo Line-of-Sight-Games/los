@@ -19,13 +19,13 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed, catafalqueReady;
-public string causeOfLosCheck;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed, isZombie, catafalqueReady;
+    public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
-    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced, lastZombieKilled, fallenSoldierName, flinchLocation;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced, lastZombieKilled, fallenSoldierName, flinchLocation, zombieType;
     public Statline stats;
     public Inventory inventory;
     public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
@@ -95,8 +95,10 @@ public string causeOfLosCheck;
 
         return this;
     }
-    public Soldier InitZombie(string name, int team, Sprite portrait, string portraitText, string fallenName)
+    public Soldier InitZombie(string name, int team, Sprite portrait, string portraitText, string type, string fallenName)
     {
+        isZombie = true;
+        zombieType = type;
         id = GenerateGuid();
         soldierName = name;
         soldierTeam = team;
@@ -243,6 +245,8 @@ public string causeOfLosCheck;
             { "madeUnconBydamageList", madeUnconBydamageList },
 
             //save LOZ details
+            { "isZombie", isZombie },
+            { "zombieType", zombieType },
             { "lastZombieKilled", lastZombieKilled },
             { "fallenSoldierName", fallenSoldierName },
             { "catafalqueReady", catafalqueReady },
@@ -289,11 +293,11 @@ public string causeOfLosCheck;
         soldierName = (string)details["soldierName"];
         soldierTeam = Convert.ToInt32(details["team"]);
         soldierTerrain = (string)details["terrain"];
-        if (DataPersistenceManager.Instance.lozMode && IsZombie())
+        soldierPortraitText = (string)details["portrait"];
+        if (DataPersistenceManager.Instance.lozMode && soldierPortraitText.Contains("Zombie"))
             soldierPortrait = LoadPortraitZombie((string)details["portrait"]);
         else
             soldierPortrait = LoadPortrait((string)details["portrait"]);
-        soldierPortraitText = (string)details["portrait"];
         soldierSpeciality = (string)details["speciality"];
         soldierAbilities = (details["abilities"] as JArray).Select(token => token.ToString()).ToList();
         soldierDisplayPriority = Convert.ToInt32(details["displayPriority"]);
@@ -362,6 +366,8 @@ public string causeOfLosCheck;
         madeUnconBydamageList = (details["madeUnconBydamageList"] as JArray).Select(token => token.ToString()).ToList();
 
         //load LOZ details
+        isZombie = (bool)details["isZombie"];
+        zombieType = (string)details["zombieType"];
         lastZombieKilled = (string)details["lastZombieKilled"];
         fallenSoldierName = (string)details["fallenSoldierName"];
         catafalqueReady = (bool)details["catafalqueReady"];
@@ -424,13 +430,13 @@ public string causeOfLosCheck;
     }
     public bool IsZombie()
     {
-        if (soldierName.Contains("Zombie"))
+        if (isZombie)
             return true;
         return false;
     }
     public bool IsBruteZombie()
     {
-        if (IsZombie() && soldierName.Contains("Brute"))
+        if (IsZombie() && zombieType.Equals("Brute"))
             return true;
         return false;
     }
@@ -2163,6 +2169,7 @@ public string causeOfLosCheck;
 
     public Sprite LoadPortrait(string portraitName)
     {
+        Debug.Log("Loading portrait: " + portraitName);
         TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsDropdown;
         return portraitName switch
         {
@@ -2203,6 +2210,7 @@ public string causeOfLosCheck;
     }
     public Sprite LoadPortraitZombie(string portraitName)
     {
+        Debug.Log("Loading zombie portrait: " + portraitName);
         TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsZombieDropdown;
         return portraitName switch
         {
