@@ -499,7 +499,8 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
 		{
 			if (soldierIdentifier.text.Contains("Zombie"))
 			{
-                Instantiate(baseSoldier).InitZombie(soldierName.text, currentTeam, activePortraitDropdown.captionImage.sprite, activePortraitDropdown.captionText.text, zombieTypeDropdown.captionText.text, GenerateRandomFallenName(baseSoldier));
+                Soldier zom = Instantiate(baseSoldier).InitZombie(soldierName.text, currentTeam, activePortraitDropdown.captionImage.sprite, activePortraitDropdown.captionText.text, zombieTypeDropdown.captionText.text);
+                zom.fallenSoldierName = GenerateRandomFallenName(zom);
 
                 //refresh input fields
                 soldierName.text = "";
@@ -655,7 +656,7 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
         };
 
 
-        if (HelperFunctions.RandomNumber(10, 10).Equals(10))
+        if (HelperFunctions.RandomNumber(10, 10).Equals(10)) //EDIT THIS
         {
             if (s.IsBruteZombie())
                 return bruteZomNames[HelperFunctions.RandomNumber(0, bruteZomNames.Count - 1)];
@@ -665,7 +666,6 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
         else
             return string.Empty;
     }
-
 
 
     [SerializeField]

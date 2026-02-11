@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System;
@@ -19,16 +18,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed, isZombie, catafalqueReady;
+    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed, isZombie, catafalqueAvailable, catafalquedThisTurn;
     public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
     public int instantSpeed, roundsFielded, roundsFieldedConscious, roundsWithoutFood, loudActionTurnsVulnerable, lastLoudActionCounter, lastLoudRadius, stunnedTurnsVulnerable, suppressionValue, healthRemovedFromStarve, bleedoutTurns,
         plannerDonatedMove, turnsAvenging, overwatchXPoint, overwatchYPoint, overwatchConeRadius, overwatchConeArc, startX, startY, startZ, riotXPoint, riotYPoint;
-    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced, lastZombieKilled, fallenSoldierName, flinchLocation, zombieType;
+    public string revealedByTeam, lastChosenStat, poisonedBy, isSpotting, glucoState, binocularBeamId, lastSoldierBinoced, fallenSoldierName, flinchLocation, zombieType;
     public Statline stats;
     public Inventory inventory;
-    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed;
+    public List<string> state, inventoryList, controlledBySoldiersList, controllingSoldiersList, soldiersWithinAnyCollider, soldiersOutOfSRList, noLosToTheseSoldiersList, losToTheseSoldiersAndRevealingList, losToTheseSoldiersButHiddenList, soldiersRevealingThisSoldierList, witnessStoredAbilities, isSpottedBy, plannerGunsBlessed, gunnerGunsBlessed, fallenSoldierList;
     public Item itemPrefab;
     private JArray statsJArray;
     public GameObject SRColliderFullPhysical, SRColliderHalfPhysical, SRColliderMinPhysical;
@@ -95,7 +94,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
         return this;
     }
-    public Soldier InitZombie(string name, int team, Sprite portrait, string portraitText, string type, string fallenName)
+    public Soldier InitZombie(string name, int team, Sprite portrait, string portraitText, string type)
     {
         isZombie = true;
         zombieType = type;
@@ -105,7 +104,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierDisplayPriority = int.Parse(name.Where(char.IsDigit).ToArray()) + (IsBruteZombie() ? 0 : 100);
         soldierPortrait = portrait;
         soldierPortraitText = portraitText;
-        fallenSoldierName = fallenName;
         stats = new Statline(this);
         if (IsBruteZombie())
         {
@@ -247,9 +245,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             //save LOZ details
             { "isZombie", isZombie },
             { "zombieType", zombieType },
-            { "lastZombieKilled", lastZombieKilled },
             { "fallenSoldierName", fallenSoldierName },
-            { "catafalqueReady", catafalqueReady },
+            { "fallenSoldierList", fallenSoldierList },
+            { "catafalqueAvailable", catafalqueAvailable },
+            { "catafalquedThisTurn", catafalquedThisTurn },
             { "flinchLocation", flinchLocation },
 
             //save item details
@@ -368,9 +367,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         //load LOZ details
         isZombie = (bool)details["isZombie"];
         zombieType = (string)details["zombieType"];
-        lastZombieKilled = (string)details["lastZombieKilled"];
         fallenSoldierName = (string)details["fallenSoldierName"];
-        catafalqueReady = (bool)details["catafalqueReady"];
+        fallenSoldierList = (details["fallenSoldierList"] as JArray).Select(token => token.ToString()).ToList();
+        catafalqueAvailable = (bool)details["catafalqueAvailable"];
+        catafalquedThisTurn = (bool)details["catafalquedThisTurn"];
         flinchLocation = (string)details["flinchLocation"];
 
         //load item details
@@ -3157,7 +3157,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                         {
                             SoundManager.Instance.PlayZombieDeath(this);
 
-                            killedBy.lastZombieKilled = Id;
+                            killedBy.fallenSoldierList.Add(Id);
                             (string, int, int) xps = ("normal", 1, 2);
                             if (IsBruteZombie()) //double xp for brute zombie kill
                                 xps = ("brute", xps.Item2 * 2, xps.Item3 * 2);
@@ -4479,6 +4479,12 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             isSpotting = string.Empty;
         }
     }
+    public void RemoveAllCatafalque()
+    {
+        catafalqueAvailable = false;
+        catafalquedThisTurn = false;
+        fallenSoldierList.Clear();
+    }
     public bool IsTactician()
     {
         if (IsConscious())
@@ -4570,6 +4576,16 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             //break spotter ability
             RemoveAllSpotting();
 
+            //break catafalque chain
+            if (DataPersistenceManager.Instance.lozMode)
+            {
+                if (catafalqueAvailable && !catafalquedThisTurn)
+                {
+                    Debug.Log("Removed catafalque");
+                    RemoveAllCatafalque();
+                }
+            }
+
             if (this.ap < 0)
                 this.ap = 0;
         }
@@ -4587,13 +4603,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void DrainAP()
     {
-        ap = 0;
-        usedAP = true;
+        DeductAP(ap);
     }
     public void DrainMP()
     {
-        mp = 0;
-        usedMP = true;
+        DeductMP(mp);
     }
 
 

@@ -380,19 +380,13 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 //unset politicianUsed
                 s.politicianUsed = false;
 
-                //toggle catafalque
-                if (!s.lastZombieKilled.Equals(string.Empty))
+                if (DataPersistenceManager.Instance.lozMode) //turn off catafalque
                 {
-                    if (s.catafalqueReady) //turn off catafalque
-                    {
-                        s.lastZombieKilled = string.Empty;
-                        s.catafalqueReady = false;
-                    }
+                    if (s.fallenSoldierList.Any())
+                        s.catafalqueAvailable = true;
                     else
-                    {
-                        if (SoldierManager.Instance.FindSoldierById(s.lastZombieKilled).IsNamedZombie())
-                            s.catafalqueReady = true;
-                    }
+                        s.catafalqueAvailable = false;
+                    s.catafalquedThisTurn = false;
                 }
             }
             else if (s.IsOffturnAndAlive()) //run things that trigger at the end of enemy team turn

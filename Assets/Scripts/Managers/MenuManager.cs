@@ -47,8 +47,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public GeneralAlertUI generalAlertUI;
     public BinocularsUI binocularsUI;
     public RiotShieldUI riotShieldUI;
+    public CatafalqueUI catafalqueUI;
 
-    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, overmoveUI, suppressionMoveUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, catafalqueUI, cloudDissipationAlertPrefab, minimapBorder;
+    public GameObject menuUI, weatherUI, teamTurnOverUI, teamTurnStartUI, soldierOptionsUI, soldierStatsUI, flankersShotUI, overmoveUI, suppressionMoveUI, overrideUI, detectionAlertUI, lostLosUI, damageUI, traumaAlertUI, traumaUI, explosionUI, inspirerUI, xpAlertUI, xpLogUI, promotionUI, lastandicideConfirmUI, brokenFledUI, endSoldierTurnAlertUI, playdeadAlertUI, coverAlertUI, inventorySourceIconsUI, lostLosAlertPrefab, losGlimpseAlertPrefab, inspirerAlertPrefab, allyInventoryIconPrefab, groundInventoryIconPrefab, gbInventoryIconPrefab, dcInventoryIconPrefab, globalInventoryIconPrefab, soldierPortraitPrefab, possibleFlankerPrefab, dipelecRewardPrefab, explosionListPrefab, explosionAlertPrefab, explosionAlertPOIPrefab, explosionAlertItemPrefab, endTurnButton, enterOverrideButton, exitOverrideButton, overrideVersionDisplay, overrideVisibilityDropdown, overrideWindSpeedDropdown, overrideWindDirectionDropdown, overrideRainDropdown, overrideInsertObjectsButton, muteIcon, timeStopIcon, undoButton, blockingScreen, itemSlotPrefab, itemIconPrefab, useItemUI, dropThrowItemUI, etoolResultUI, grenadeUI, claymoreUI, deploymentBeaconUI, thermalCamUI, useULFUI, ULFResultUI, UHFUI, disarmUI, politicianUI, cloudDissipationAlertPrefab, minimapBorder;
     
     public SoldierAlert soldierAlertPrefab;
     public XpAlert xpAlertPrefab;
@@ -1267,7 +1268,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             politicsButton.gameObject.SetActive(false);
 
         //display catafalque button
-        if (ActiveSoldier.Instance.S.catafalqueReady)
+        if (ActiveSoldier.Instance.S.catafalqueAvailable)
             catafalqueButton.gameObject.SetActive(true);
         else
             catafalqueButton.gameObject.SetActive(false);
@@ -3182,35 +3183,29 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     //catafalque functions
     public void OpenCatafalqueUI()
     {
+        List<TMP_Dropdown.OptionData> targetOptionDataList = new();
+
+        //generate target list
+        foreach (string s in ActiveSoldier.Instance.S.fallenSoldierList)
+        {
+            Soldier fallenSoldier = SoldierManager.Instance.FindSoldierById(s);
+            TMP_Dropdown.OptionData targetOptionData = new($"{s}", fallenSoldier.soldierPortrait, Color.white);
+
+            if (targetOptionData != null)
+                targetOptionDataList.Add(targetOptionData);
+        }
+        catafalqueUI.fallenSoldierDropdown.AddOptions(targetOptionDataList);
         catafalqueUI.transform.Find("APCost/APCostDisplay").GetComponent<TextMeshProUGUI>().text = $"{ActiveSoldier.Instance.S.ap}";
-        catafalqueUI.SetActive(true);
+        catafalqueUI.gameObject.SetActive(true);
     }
     public void CloseCatafalqueUI()
     {
-        catafalqueUI.SetActive(false);
+        ClearCatafalqueUI();
+        catafalqueUI.gameObject.SetActive(false);
     }
-    public void ConfirmCatafalqueUI()
+    public void ClearCatafalqueUI()
     {
-        if (DataPersistenceManager.Instance.lozMode)
-        {
-            SoundManager.Instance.PlayCatafalqueUsed();
-            ActiveSoldier.Instance.S.DrainAP();
-
-            Soldier lastZomKilled = SoldierManager.Instance.FindSoldierById(ActiveSoldier.Instance.S.lastZombieKilled);
-            (string, int, int) xps = ("normal", 1, 2);
-            if (lastZomKilled.IsBruteZombie()) //double xp for brute zombie kill
-                xps = ("brute", xps.Item2 * 2, xps.Item3 * 2);
-
-            //give 2 xp to catafalquer for zombie kill
-            AddXpAlert(ActiveSoldier.Instance.S, xps.Item3, $"Initiated catafalque of fallen soldier. ({lastZomKilled.fallenSoldierName})(zombie)", false);
-            //give 1 xp to all soldiers for catafalque
-            foreach (Soldier s in GameManager.Instance.AllFieldedFriendlySoldiers())
-                AddXpAlert(s, xps.Item2, $"Catafalque of fallen soldier. ({lastZomKilled.fallenSoldierName})(zombie)", false);
-
-            ActiveSoldier.Instance.S.lastZombieKilled = string.Empty;
-            ActiveSoldier.Instance.S.catafalqueReady = false;
-        }
-        CloseCatafalqueUI();
+        catafalqueUI.fallenSoldierDropdown.ClearOptions();
     }
 
 
