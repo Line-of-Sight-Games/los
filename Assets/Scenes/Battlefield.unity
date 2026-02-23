@@ -141487,7 +141487,7 @@ MonoBehaviour:
   itemUsePoisonedItem: {fileID: 8300000, guid: 9d76991ee7b6a9f4d8f03202ddb3f0a1, type: 3}
   operatorsWiped: {fileID: 8300000, guid: cd5231a3a9a95f04f995b9640eea0066, type: 3}
   zombiesWiped: {fileID: 8300000, guid: 4d5eb5608e2bb9541b8b55696235d323, type: 3}
-  catafalqueUsed: {fileID: 8300000, guid: 9fbec2bb1ae5a2948a90d01b330f5a33, type: 3}
+  catafalqueUsed: {fileID: 8300000, guid: 084a2a0ea5612da40bad4b16106d61a7, type: 3}
   fallenSoldierDiscovered: {fileID: 8300000, guid: c395b5bbb13abe44a9a0601a52257e06, type: 3}
   leapEvent: {fileID: 8300000, guid: a15c5831b9e37404da3142bb59f257a6, type: 3}
   zombieDeath:
