@@ -521,22 +521,22 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (IsUnconscious())
         {
-            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (<color=blue>Uncon</color>)");
+            MenuManager.Instance.CreateGeneralAlert($"{soldierName} cannot use items (<color=blue>Uncon</color>)");
             return false;
         }
         else if (IsStunned())
         {
-            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (<color=red>Stunner</color>)");
+            MenuManager.Instance.CreateGeneralAlert($"{soldierName} cannot use items (<color=red>Stunner</color>)");
             return false;
         }
         else if (IsPlayingDead())
         {
-            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (<color=yellow>Playdead</color>)");
+            MenuManager.Instance.CreateGeneralAlert($"{soldierName} cannot use items (<color=yellow>Playdead</color>)");
             return false;
         }
         else if (IsUsingBinocularsInReconMode())
         {
-            MenuManager.Instance.generalAlertUI.Activate($"{soldierName} cannot use items (Using binoculars)");
+            MenuManager.Instance.CreateGeneralAlert($"{soldierName} cannot use items (Using binoculars)");
             return false;
         }
         
@@ -3173,7 +3173,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                             if (IsNamedZombie()) //show alert for named zombie kills {
                             {
                                 SoundManager.Instance.PlayFallenSoldierDiscovered();
-                                MenuManager.Instance.generalAlertUI.Activate($"This zombie was identified as a fallen comrade. ({fallenSoldierName})");
+                                MenuManager.Instance.CreateGeneralAlert($"This zombie was identified as a fallen comrade. ({fallenSoldierName})");
                             }
                         }
                         else
@@ -3538,7 +3538,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         if (message == "")
             return true;
         else
-            MenuManager.Instance.generalAlertUI.Activate(message);
+            MenuManager.Instance.CreateGeneralAlert(message);
 
         return false;
     }
@@ -4539,14 +4539,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             {
                 if (!MenuManager.Instance.meleeUI.isActiveAndEnabled && IsMeleeControlling() && ap > 1)
                 {
-                    MenuManager.Instance.generalAlertUI.Activate("Cannot perform actions >1AP while controlling melee");
+                    MenuManager.Instance.CreateGeneralAlert("Cannot perform actions >1AP while controlling melee");
                     return false;
                 }
                 return true;
             }
             else
             {
-                MenuManager.Instance.generalAlertUI.Activate("Not enough AP to perform action");
+                MenuManager.Instance.CreateGeneralAlert("Not enough AP to perform action");
                 return false;
             }
         }
@@ -4561,7 +4561,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 return true;
             else
             {
-                MenuManager.Instance.generalAlertUI.Activate("Not enough MA to perform move");
+                MenuManager.Instance.CreateGeneralAlert("Not enough MA to perform move");
                 return false;
             }
         }

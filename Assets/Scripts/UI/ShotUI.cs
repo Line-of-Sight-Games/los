@@ -344,10 +344,10 @@ public class ShotUI : MonoBehaviour
                         shotConfirmUI.transform.Find("OptionPanel").Find("AltGun").gameObject.SetActive(false);
                 }
                 else
-                    MenuManager.Instance.generalAlertUI.Activate("Cannot target a Jammer");
+                    MenuManager.Instance.CreateGeneralAlert("Cannot target a Jammer");
             }
             else
-                MenuManager.Instance.generalAlertUI.Activate("Not enough AP to take the shot");
+                MenuManager.Instance.CreateGeneralAlert("Not enough AP to take the shot");
         }
     }
     public void ExitShotConfirmUI()

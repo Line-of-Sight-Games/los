@@ -91,7 +91,7 @@ public class MeleeUI : MonoBehaviour
         else
         {
             ClearMeleeUI();
-            MenuManager.Instance.generalAlertUI.Activate("No melee targets found");
+            MenuManager.Instance.CreateGeneralAlert("No melee targets found");
         }
     }
 
@@ -140,7 +140,7 @@ public class MeleeUI : MonoBehaviour
             }
         }
         else
-            MenuManager.Instance.generalAlertUI.Activate("Select a melee type");
+            MenuManager.Instance.CreateGeneralAlert("Select a melee type");
     }
     public void ClearMeleeConfirmUI()
     {

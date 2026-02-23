@@ -360,7 +360,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 }
             }
             else
-                MenuManager.Instance.generalAlertUI.Activate("This item is not usable in this way.");
+                MenuManager.Instance.CreateGeneralAlert("This item is not usable in this way.");
         }
     }
     public void DropThrowItem()

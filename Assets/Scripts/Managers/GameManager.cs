@@ -719,7 +719,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                         MenuManager.Instance.OpenOvermoveUI("Warning: Landing is further than 3cm away from jump point.");
                 }
                 else
-                    MenuManager.Instance.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
+                    MenuManager.Instance.CreateGeneralAlert("Cannot move to same location, use OVERRIDE if terrain change is required");
             }
         }
         else
@@ -765,7 +765,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                         MenuManager.Instance.OpenSuppressionMoveUI();
                 }
                 else
-                    MenuManager.Instance.generalAlertUI.Activate("Cannot move to same location, use OVERRIDE if terrain change is required");
+                    MenuManager.Instance.CreateGeneralAlert("Cannot move to same location, use OVERRIDE if terrain change is required");
             }
             else
                 print("Invalid Input");

@@ -44,7 +44,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public ThrowUI throwUI;
     public InsertObjectsUI insertObjectsUI;
     public OverwatchShotUI overwatchShotUI;
-    public GeneralAlertUI generalAlertUI;
+    public GeneralAlertUI generalAlertUIprefab;
     public BinocularsUI binocularsUI;
     public RiotShieldUI riotShieldUI;
     public CatafalqueUI catafalqueUI;
@@ -885,10 +885,10 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 ActiveSoldier.Instance.S.Z = (int)newlocationInput.z;
             }
             else
-                generalAlertUI.Activate("Please enter location within battlefield bounds");
+                CreateGeneralAlert("Please enter location within battlefield bounds");
         }
         else
-            generalAlertUI.Activate("Please enter valid location");
+            CreateGeneralAlert("Please enter valid location");
 
         xPos.text = string.Empty;
         yPos.text = string.Empty;
@@ -3180,6 +3180,15 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
 
 
+
+
+
+
+
+
+
+
+
     //catafalque functions
     public void OpenCatafalqueUI()
     {
@@ -3981,6 +3990,14 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         teamTurnStartUI.SetActive(false);
     }
 
+
+
+
+    //general alert function
+    public void CreateGeneralAlert(string message)
+    {
+        Instantiate(generalAlertUIprefab).Init(message);
+    }
 
 
 

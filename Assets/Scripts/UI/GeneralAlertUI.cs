@@ -5,13 +5,14 @@ public class GeneralAlertUI : MonoBehaviour
 {
     public TextMeshProUGUI message;
 
-    public void Activate(string message)
+    public void Init(string message)
     {
         this.message.text = message;
         gameObject.SetActive(true);
+        transform.SetParent(FindFirstObjectByType<Canvas>().transform, false);
     }
     public void Deactivate()
     {
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 }
