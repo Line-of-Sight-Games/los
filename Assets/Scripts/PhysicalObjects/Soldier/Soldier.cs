@@ -869,6 +869,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
                 ApplyTabunMods();
                 ApplyLoudActionMods();
 
+                if (DataPersistenceManager.Instance.lozMode)
+                    ApplyLOZMods();
+
                 CorrectNegatives();
 
                 //get actual speed including enviro effects
@@ -1112,6 +1115,14 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (loudActionTurnsVulnerable > 0)
             stats.C.Val = 0;
+    }
+    public void ApplyLOZMods()
+    {
+        stats.C.Val = 0;
+        stats.F.Val = 0;
+        stats.P.Val = 0;
+        stats.Sn.Val = 0;
+        stats.E.Val = 0;
     }
     public void CorrectNegatives()
     {
