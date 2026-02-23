@@ -2502,6 +2502,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             CalculateActiveStats();
             TakeHeal(null, 2, 0, false, false);
         }
+
+        //update the melee controller
+        StartCoroutine(MenuManager.Instance.meleeUI.DetermineMeleeControllerMultiple(this));
     }
     public void CheckSpecialityColor(string speciality)
     {

@@ -1296,6 +1296,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 zomButtonList.Add(moveButton, "No MA");
             else if (ActiveSoldier.Instance.S.IsMeleeControlling())
                 zomButtonList.Add(moveButton, "<color=green>Melee Controlling</color>");
+            else if (ActiveSoldier.Instance.S.IsMeleeControlled())
+                buttonStates.Add(moveButton, "<color=red>Melee Controlled</color>");
 
             //block melee button
             if (!ActiveSoldier.Instance.S.FindMeleeTargets())
