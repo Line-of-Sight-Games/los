@@ -655,8 +655,8 @@ public class CreateSoldiers : MonoBehaviour, IDataPersistence
             "Capt. Lillehammer", "Capt. Bighammer", "Capt. Thorny", "Capt. Wraith", "Capt. Sharticus", "Capt. Cyclops", "Capt. Fiddlesticks", "Capt. Leespatz", "Capt. Kava"
         };
 
-
-        if (HelperFunctions.RandomNumber(10, 10).Equals(10)) //EDIT THIS
+        //10% chance of being a fallen soldier
+        if (HelperFunctions.RandomNumber(1, 10).Equals(10))
         {
             if (s.IsBruteZombie())
                 return bruteZomNames[HelperFunctions.RandomNumber(0, bruteZomNames.Count - 1)];
