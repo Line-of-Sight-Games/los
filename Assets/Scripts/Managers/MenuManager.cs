@@ -1141,10 +1141,10 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }    
         }
 
-        if (t1DeadCount.Equals(GameManager.Instance.AllTeam1Soldiers()))
+        if (t1DeadCount.Equals(GameManager.Instance.AllTeam1Soldiers().Count))
             GameManager.Instance.GameOver("<color=blue>Team 2</color> Victory");
 
-        if (t2DeadCount.Equals(GameManager.Instance.AllTeam2Soldiers()))
+        if (t2DeadCount.Equals(GameManager.Instance.AllTeam2Soldiers().Count))
             GameManager.Instance.GameOver("<color=red>Team 1</color> Victory");
     }
     public void DisplayItems()
