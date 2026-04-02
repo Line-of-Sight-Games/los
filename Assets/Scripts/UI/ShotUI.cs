@@ -106,7 +106,7 @@ public class ShotUI : MonoBehaviour
                 }
             }
 
-            aimTypeDropdown.value = 1;
+            aimTypeDropdown.SetValueWithoutNotify(1);
             aimTypeDropdown.interactable = false;
         }
         gunDropdown.AddOptions(gunOptionDataList);
@@ -136,7 +136,7 @@ public class ShotUI : MonoBehaviour
         //if soldier engaged in melee block force unaimed shot
         if (shooter.IsMeleeEngaged())
         {
-            aimTypeDropdown.value = 1;
+            aimTypeDropdown.SetValueWithoutNotify(1);
             shotTypeDropdown.interactable = false;
             aimTypeDropdown.interactable = false;
             coverLevelDropdown.interactable = false;
