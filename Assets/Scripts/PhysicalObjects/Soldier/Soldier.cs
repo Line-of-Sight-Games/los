@@ -901,7 +901,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         if (DataPersistenceManager.Instance.lozMode)
         {
-            if (!IsZombie())
+            if (!IsZombie() && !IsWearingThermalGoggles())
             {
                 if (WeatherManager.Instance.IsZeroVis())
                     stats.SR.Val -= 50;
