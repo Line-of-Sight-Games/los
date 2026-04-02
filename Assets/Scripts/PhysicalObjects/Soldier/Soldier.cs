@@ -293,10 +293,6 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         soldierTeam = Convert.ToInt32(details["team"]);
         soldierTerrain = (string)details["terrain"];
         soldierPortraitText = (string)details["portrait"];
-        if (DataPersistenceManager.Instance.lozMode && soldierPortraitText.Contains("Zombie"))
-            soldierPortrait = LoadPortraitZombie((string)details["portrait"]);
-        else
-            soldierPortrait = LoadPortrait((string)details["portrait"]);
         soldierSpeciality = (string)details["speciality"];
         soldierAbilities = (details["abilities"] as JArray).Select(token => token.ToString()).ToList();
         soldierDisplayPriority = Convert.ToInt32(details["displayPriority"]);
@@ -399,6 +395,9 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         plannerGunsBlessed = (details["plannerGunsBlessed"] as JArray).Select(token => token.ToString()).ToList();
         gunnerGunsBlessed = (details["gunnerGunsBlessed"] as JArray).Select(token => token.ToString()).ToList();
         politicianUsed = (bool)details["politicianUsed"];
+
+        //load portrait
+        soldierPortrait = LoadPortrait((string)details["portrait"]);
 
         isDataLoaded = true;
     }
@@ -2180,114 +2179,93 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
 
     public Sprite LoadPortrait(string portraitName)
     {
-        Debug.Log("Loading portrait: " + portraitName);
-        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsDropdown;
-        return portraitName switch
+        if (DataPersistenceManager.Instance.lozMode && IsZombie())
+            return LoadPortraitZombie(portraitName);
+        else
         {
-            "Alpine_Commander" => allPortraits.options[0].image,
-            "Alpine_Balaclava" => allPortraits.options[1].image,
-            "Alpine_BroadBrim" => allPortraits.options[2].image,
-            "Alpine_Cap" => allPortraits.options[3].image,
-            "Alpine_GasMask" => allPortraits.options[4].image,
-            "Alpine_Helmet" => allPortraits.options[5].image,
-            "Alpine_Visor" => allPortraits.options[6].image,
-            "Alpine_WWII" => allPortraits.options[7].image,
-            "Desert_Commander" => allPortraits.options[8].image,
-            "Desert_Balaclava" => allPortraits.options[9].image,
-            "Desert_BroadBrim" => allPortraits.options[10].image,
-            "Desert_DarkWWII" => allPortraits.options[11].image,
-            "Desert_GasMask" => allPortraits.options[12].image,
-            "Desert_Helmet" => allPortraits.options[13].image,
-            "Desert_LightWWII" => allPortraits.options[14].image,
-            "Desert_Shades" => allPortraits.options[15].image,
-            "Jungle_Commander" => allPortraits.options[16].image,
-            "Jungle_Balaclava" => allPortraits.options[17].image,
-            "Jungle_BeardWWII" => allPortraits.options[18].image,
-            "Jungle_Mewham" => allPortraits.options[19].image,
-            "Jungle_DarkWWII" => allPortraits.options[20].image,
-            "Jungle_LightWWII" => allPortraits.options[21].image,
-            "Jungle_Rang" => allPortraits.options[22].image,
-            "Jungle_Shades" => allPortraits.options[23].image,
-            "Urban_Commander" => allPortraits.options[24].image,
-            "Urban_Anubis" => allPortraits.options[25].image,
-            "Urban_Beret" => allPortraits.options[26].image,
-            "Urban_BlackBalaclava" => allPortraits.options[27].image,
-            "Urban_BrownBalaclava" => allPortraits.options[28].image,
-            "Urban_Facepaint" => allPortraits.options[29].image,
-            "Urban_Shades" => allPortraits.options[30].image,
-            "Urban_WWII" => allPortraits.options[31].image,
-            _ => allPortraits.options[32].image,
-        };
-    }
-    public Sprite LoadPortraitZombie(string portraitName)
-    {
-        Debug.Log("Loading zombie portrait: " + portraitName);
-        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsZombieDropdown;
-        return portraitName switch
-        {
-            "Zombie-Brute1" => allPortraits.options[0].image,
-            "Zombie1" => allPortraits.options[1].image,
-            "Zombie2" => allPortraits.options[2].image,
-            "Zombie3" => allPortraits.options[3].image,
-            "Zombie4" => allPortraits.options[4].image,
-            "Zombie5" => allPortraits.options[5].image,
-            "Zombie6" => allPortraits.options[6].image,
-            "Zombie7" => allPortraits.options[7].image,
-            "Zombie8" => allPortraits.options[8].image,
-            "Zombie9" => allPortraits.options[9].image,
-            "Zombie10" => allPortraits.options[10].image,
-            "Zombie11" => allPortraits.options[11].image,
-            "Zombie12" => allPortraits.options[12].image,
-            "Zombie13" => allPortraits.options[13].image,
-            "Zombie14" => allPortraits.options[14].image,
-            "Zombie15" => allPortraits.options[15].image,
-            "Zombie16" => allPortraits.options[16].image,
-            "Zombie17" => allPortraits.options[17].image,
-            "Zombie18" => allPortraits.options[18].image,
-            "Zombie19" => allPortraits.options[19].image,
-            "Zombie20" => allPortraits.options[20].image,
-            _ => allPortraits.options[21].image,
-        };
+            TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsDropdown;
+            return portraitName switch
+            {
+                "Alpine_Commander" => allPortraits.options[0].image,
+                "Alpine_Balaclava" => allPortraits.options[1].image,
+                "Alpine_BroadBrim" => allPortraits.options[2].image,
+                "Alpine_Cap" => allPortraits.options[3].image,
+                "Alpine_GasMask" => allPortraits.options[4].image,
+                "Alpine_Helmet" => allPortraits.options[5].image,
+                "Alpine_Visor" => allPortraits.options[6].image,
+                "Alpine_WWII" => allPortraits.options[7].image,
+                "Desert_Commander" => allPortraits.options[8].image,
+                "Desert_Balaclava" => allPortraits.options[9].image,
+                "Desert_BroadBrim" => allPortraits.options[10].image,
+                "Desert_DarkWWII" => allPortraits.options[11].image,
+                "Desert_GasMask" => allPortraits.options[12].image,
+                "Desert_Helmet" => allPortraits.options[13].image,
+                "Desert_LightWWII" => allPortraits.options[14].image,
+                "Desert_Shades" => allPortraits.options[15].image,
+                "Jungle_Commander" => allPortraits.options[16].image,
+                "Jungle_Balaclava" => allPortraits.options[17].image,
+                "Jungle_BeardWWII" => allPortraits.options[18].image,
+                "Jungle_Mewham" => allPortraits.options[19].image,
+                "Jungle_DarkWWII" => allPortraits.options[20].image,
+                "Jungle_LightWWII" => allPortraits.options[21].image,
+                "Jungle_Rang" => allPortraits.options[22].image,
+                "Jungle_Shades" => allPortraits.options[23].image,
+                "Urban_Commander" => allPortraits.options[24].image,
+                "Urban_Anubis" => allPortraits.options[25].image,
+                "Urban_Beret" => allPortraits.options[26].image,
+                "Urban_BlackBalaclava" => allPortraits.options[27].image,
+                "Urban_BrownBalaclava" => allPortraits.options[28].image,
+                "Urban_Facepaint" => allPortraits.options[29].image,
+                "Urban_Shades" => allPortraits.options[30].image,
+                "Urban_WWII" => allPortraits.options[31].image,
+                _ => allPortraits.options[32].image,
+            };
+        }
     }
     public Sprite LoadPortraitTeamsight(string portraitName)
     {
-        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsTeamsightDropdown;
-        return portraitName switch
+        if (DataPersistenceManager.Instance.lozMode && IsZombie())
+            return LoadPortraitZombieTeamsight(portraitName);
+        else
         {
-            "Alpine_Commander" => allPortraits.options[0].image,
-            "Alpine_Balaclava" => allPortraits.options[1].image,
-            "Alpine_BroadBrim" => allPortraits.options[2].image,
-            "Alpine_Cap" => allPortraits.options[3].image,
-            "Alpine_GasMask" => allPortraits.options[4].image,
-            "Alpine_Helmet" => allPortraits.options[5].image,
-            "Alpine_Visor" => allPortraits.options[6].image,
-            "Alpine_WWII" => allPortraits.options[7].image,
-            "Desert_Commander" => allPortraits.options[8].image,
-            "Desert_Balaclava" => allPortraits.options[9].image,
-            "Desert_BroadBrim" => allPortraits.options[10].image,
-            "Desert_DarkWWII" => allPortraits.options[11].image,
-            "Desert_GasMask" => allPortraits.options[12].image,
-            "Desert_Helmet" => allPortraits.options[13].image,
-            "Desert_LightWWII" => allPortraits.options[14].image,
-            "Desert_Shades" => allPortraits.options[15].image,
-            "Jungle_Commander" => allPortraits.options[16].image,
-            "Jungle_Balaclava" => allPortraits.options[17].image,
-            "Jungle_BeardWWII" => allPortraits.options[18].image,
-            "Jungle_Mewham" => allPortraits.options[19].image,
-            "Jungle_DarkWWII" => allPortraits.options[20].image,
-            "Jungle_LightWWII" => allPortraits.options[21].image,
-            "Jungle_Rang" => allPortraits.options[22].image,
-            "Jungle_Shades" => allPortraits.options[23].image,
-            "Urban_Commander" => allPortraits.options[24].image,
-            "Urban_Anubis" => allPortraits.options[25].image,
-            "Urban_Beret" => allPortraits.options[26].image,
-            "Urban_BlackBalaclava" => allPortraits.options[27].image,
-            "Urban_BrownBalaclava" => allPortraits.options[28].image,
-            "Urban_Facepaint" => allPortraits.options[29].image,
-            "Urban_Shades" => allPortraits.options[30].image,
-            "Urban_WWII" => allPortraits.options[31].image,
-            _ => allPortraits.options[32].image,
-        };
+            TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsTeamsightDropdown;
+            return portraitName switch
+            {
+                "Alpine_Commander" => allPortraits.options[0].image,
+                "Alpine_Balaclava" => allPortraits.options[1].image,
+                "Alpine_BroadBrim" => allPortraits.options[2].image,
+                "Alpine_Cap" => allPortraits.options[3].image,
+                "Alpine_GasMask" => allPortraits.options[4].image,
+                "Alpine_Helmet" => allPortraits.options[5].image,
+                "Alpine_Visor" => allPortraits.options[6].image,
+                "Alpine_WWII" => allPortraits.options[7].image,
+                "Desert_Commander" => allPortraits.options[8].image,
+                "Desert_Balaclava" => allPortraits.options[9].image,
+                "Desert_BroadBrim" => allPortraits.options[10].image,
+                "Desert_DarkWWII" => allPortraits.options[11].image,
+                "Desert_GasMask" => allPortraits.options[12].image,
+                "Desert_Helmet" => allPortraits.options[13].image,
+                "Desert_LightWWII" => allPortraits.options[14].image,
+                "Desert_Shades" => allPortraits.options[15].image,
+                "Jungle_Commander" => allPortraits.options[16].image,
+                "Jungle_Balaclava" => allPortraits.options[17].image,
+                "Jungle_BeardWWII" => allPortraits.options[18].image,
+                "Jungle_Mewham" => allPortraits.options[19].image,
+                "Jungle_DarkWWII" => allPortraits.options[20].image,
+                "Jungle_LightWWII" => allPortraits.options[21].image,
+                "Jungle_Rang" => allPortraits.options[22].image,
+                "Jungle_Shades" => allPortraits.options[23].image,
+                "Urban_Commander" => allPortraits.options[24].image,
+                "Urban_Anubis" => allPortraits.options[25].image,
+                "Urban_Beret" => allPortraits.options[26].image,
+                "Urban_BlackBalaclava" => allPortraits.options[27].image,
+                "Urban_BrownBalaclava" => allPortraits.options[28].image,
+                "Urban_Facepaint" => allPortraits.options[29].image,
+                "Urban_Shades" => allPortraits.options[30].image,
+                "Urban_WWII" => allPortraits.options[31].image,
+                _ => allPortraits.options[32].image,
+            };
+        }
     }
     public Sprite LoadPortraitJammed(string portraitName)
     {
@@ -2327,6 +2305,64 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             "Urban_Shades" => allPortraits.options[30].image,
             "Urban_WWII" => allPortraits.options[31].image,
             _ => allPortraits.options[32].image,
+        };
+    }
+    public Sprite LoadPortraitZombie(string portraitName)
+    {
+        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsZombieDropdown;
+        return portraitName switch
+        {
+            "Zombie-Brute1" => allPortraits.options[0].image,
+            "Zombie1" => allPortraits.options[1].image,
+            "Zombie2" => allPortraits.options[2].image,
+            "Zombie3" => allPortraits.options[3].image,
+            "Zombie4" => allPortraits.options[4].image,
+            "Zombie5" => allPortraits.options[5].image,
+            "Zombie6" => allPortraits.options[6].image,
+            "Zombie7" => allPortraits.options[7].image,
+            "Zombie8" => allPortraits.options[8].image,
+            "Zombie9" => allPortraits.options[9].image,
+            "Zombie10" => allPortraits.options[10].image,
+            "Zombie11" => allPortraits.options[11].image,
+            "Zombie12" => allPortraits.options[12].image,
+            "Zombie13" => allPortraits.options[13].image,
+            "Zombie14" => allPortraits.options[14].image,
+            "Zombie15" => allPortraits.options[15].image,
+            "Zombie16" => allPortraits.options[16].image,
+            "Zombie17" => allPortraits.options[17].image,
+            "Zombie18" => allPortraits.options[18].image,
+            "Zombie19" => allPortraits.options[19].image,
+            "Zombie20" => allPortraits.options[20].image,
+            _ => allPortraits.options[21].image,
+        };
+    }
+    public Sprite LoadPortraitZombieTeamsight(string portraitName)
+    {
+        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsZombieTeamsightDropdown;
+        return portraitName switch
+        {
+            "Zombie-Brute1" => allPortraits.options[0].image,
+            "Zombie1" => allPortraits.options[1].image,
+            "Zombie2" => allPortraits.options[2].image,
+            "Zombie3" => allPortraits.options[3].image,
+            "Zombie4" => allPortraits.options[4].image,
+            "Zombie5" => allPortraits.options[5].image,
+            "Zombie6" => allPortraits.options[6].image,
+            "Zombie7" => allPortraits.options[7].image,
+            "Zombie8" => allPortraits.options[8].image,
+            "Zombie9" => allPortraits.options[9].image,
+            "Zombie10" => allPortraits.options[10].image,
+            "Zombie11" => allPortraits.options[11].image,
+            "Zombie12" => allPortraits.options[12].image,
+            "Zombie13" => allPortraits.options[13].image,
+            "Zombie14" => allPortraits.options[14].image,
+            "Zombie15" => allPortraits.options[15].image,
+            "Zombie16" => allPortraits.options[16].image,
+            "Zombie17" => allPortraits.options[17].image,
+            "Zombie18" => allPortraits.options[18].image,
+            "Zombie19" => allPortraits.options[19].image,
+            "Zombie20" => allPortraits.options[20].image,
+            _ => allPortraits.options[21].image,
         };
     }
     public Sprite LoadInsignia(string rank)
