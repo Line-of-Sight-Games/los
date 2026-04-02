@@ -2935,8 +2935,10 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public void UnsetCover()
     {
-        FileUtility.WriteToReport($"{soldierName} stops taking cover."); //write to report
-        UnsetState("Cover");
+        if (IsInCover()) {
+            FileUtility.WriteToReport($"{soldierName} stops taking cover."); //write to report
+            UnsetState("Cover");
+        }
     }
     public bool IsInteractable()
     {
