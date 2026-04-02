@@ -439,18 +439,32 @@ public class MeleeUI : MonoBehaviour
     }
     public float FlankingAgainstAttackerMod()
     {
+        float attackerFlankingMod = 0;
         int flankersCount = 0;
         foreach (Transform child in flankersMeleeAttackerUI.transform.Find("FlankersPanel"))
             if (child.GetComponentInChildren<Toggle>().isOn)
                 flankersCount++;
 
-        float attackerFlankingMod = flankersCount switch
+        if (DataPersistenceManager.Instance.lozMode)
         {
-            0 => 0f,
-            1 => 0.16f,
-            2 => 0.46f,
-            3 or _ => 0.8f
-        };
+            attackerFlankingMod = flankersCount switch
+            {
+                0 => 0f,
+                1 => 0.08f,
+                2 => 0.23f,
+                3 or _ => 0.4f
+            };
+        }
+        else
+        {
+            attackerFlankingMod = flankersCount switch
+            {
+                0 => 0f,
+                1 => 0.16f,
+                2 => 0.46f,
+                3 or _ => 0.8f
+            };
+        }
 
         meleeParameters.Add(Tuple.Create("aFlank", $"{1 - attackerFlankingMod}"));
         return 1 - attackerFlankingMod;
@@ -575,13 +589,26 @@ public class MeleeUI : MonoBehaviour
                 if (child.GetComponentInChildren<Toggle>().isOn)
                     flankersCount++;
 
-            defenderFlankingMod = flankersCount switch
+            if (DataPersistenceManager.Instance.lozMode)
             {
-                0 => 0f,
-                1 => 0.26f,
-                2 => 0.56f,
-                3 or _ => 0.86f
-            };
+                defenderFlankingMod = flankersCount switch
+                {
+                    0 => 0f,
+                    1 => 0.13f,
+                    2 => 0.28f,
+                    3 or _ => 0.43f
+                };
+            }
+            else
+            {
+                defenderFlankingMod = flankersCount switch
+                {
+                    0 => 0f,
+                    1 => 0.26f,
+                    2 => 0.56f,
+                    3 or _ => 0.86f
+                };
+            }
         }
 
         meleeParameters.Add(Tuple.Create("dFlank", $"{1 - defenderFlankingMod}"));
