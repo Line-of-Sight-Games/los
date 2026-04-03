@@ -10,7 +10,7 @@ public class POI : PhysicalObject
 
     public Sprite LoadPortrait(string portraitType)
     {
-        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsPOIDropdown;
+        TMP_Dropdown allPortraits = FindAnyObjectByType<AllPortraits>().allPortraitsPOIDropdown;
         return portraitType switch
         {
             "barrel" => allPortraits.options[0].image,

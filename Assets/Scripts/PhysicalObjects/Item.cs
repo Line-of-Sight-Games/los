@@ -997,7 +997,7 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
             Explosion explosion3 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(8, position);
             Explosion explosion4 = Instantiate(POIManager.Instance.explosionPrefab, position, default).Init(15, position);
 
-            foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
+            foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>())
             {
                 int damage = 0, stun = 0;
                 if (obj.IsWithinSphere(explosion1.BodyCollider))

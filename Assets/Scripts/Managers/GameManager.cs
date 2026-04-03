@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public List<PhysicalObject> AllBattlefieldObjects()
     {
         List<PhysicalObject> battlefieldObjects = new();
-        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>())
         {
             if (obj.OnBattlefield())
                 battlefieldObjects.Add(obj);
@@ -880,7 +880,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     }
     public void CheckDeploymentBeacons(Soldier fieldedSoldier)
     {
-        foreach (DeploymentBeacon beacon in FindObjectsByType<DeploymentBeacon>(default))
+        foreach (DeploymentBeacon beacon in FindObjectsByType<DeploymentBeacon>())
             if (beacon.placedBy.IsSameTeamAs(fieldedSoldier) && fieldedSoldier.X == beacon.X && fieldedSoldier.Y == beacon.Y && fieldedSoldier.Z == beacon.Z)
                 MenuManager.Instance.AddXpAlert(beacon.placedBy, 1, $"Ally ({fieldedSoldier.soldierName}) deployed through beacon at ({beacon.X}, {beacon.Y}, {beacon.Z})", true);
     }
@@ -951,7 +951,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public List<Item> FindNearbyItems()
     {
         List<Item> nearbyItems = new();
-        foreach (Item i in FindObjectsByType<Item>(default))
+        foreach (Item i in FindObjectsByType<Item>())
             if (ActiveSoldier.Instance.S.PhysicalObjectWithinItemRadius(i))
                 nearbyItems.Add(i);
 
@@ -1423,9 +1423,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
     }
     public void IncreaseTurnsActiveAllClouds()
     {
-        foreach (SmokeCloud cloud in FindObjectsByType<SmokeCloud>(default))
+        foreach (SmokeCloud cloud in FindObjectsByType<SmokeCloud>())
             cloud.TurnsUntilDissipation--;
-        foreach (TabunCloud cloud in FindObjectsByType<TabunCloud>(default))
+        foreach (TabunCloud cloud in FindObjectsByType<TabunCloud>())
             cloud.TurnsUntilDissipation--;
     }
     public void DecreaseTurnsSpyingJammingAllULFs()

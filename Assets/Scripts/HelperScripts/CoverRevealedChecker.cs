@@ -10,7 +10,7 @@ public class CoverRevealedChecker : MonoBehaviour
 
     private void Start()
     {
-        coverman = FindFirstObjectByType<Coverman>();
+        coverman = FindAnyObjectByType<Coverman>();
     }
     private void Update()
     {

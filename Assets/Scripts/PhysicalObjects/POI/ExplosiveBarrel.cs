@@ -70,7 +70,7 @@ public class ExplosiveBarrel : POI, IDataPersistence, IAmShootable, IExplosive
         Explosion explosion2 = Instantiate(POIManager.Instance.explosionPrefab).Init(8, new(X, Y, Z));
         Explosion explosion3 = Instantiate(POIManager.Instance.explosionPrefab).Init(15, new(X, Y, Z));
 
-        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>())
         {
             int damage = 0;
             if (obj.IsWithinSphere(explosion1.BodyCollider))

@@ -30,7 +30,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     public GameObject friendlyDisplayColumn, enemyDisplayColumn;
     private void Update()
     {
-        foreach (SoldierUI soldierUI in FindObjectsByType<SoldierUI>(default))
+        foreach (SoldierUI soldierUI in FindObjectsByType<SoldierUI>())
         {
             if (soldierUI.linkedSoldier != null)
             {
@@ -47,7 +47,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     public void SetSiblingIndexByPriority()
     {
         // Get all sibling components
-        Soldier[] allSoldiers = FindObjectsByType<Soldier>(default);
+        Soldier[] allSoldiers = FindObjectsByType<Soldier>();
 
         // Sort siblings by soldierDisplayPriority in ascending order
         System.Array.Sort(allSoldiers, (x, y) => x.soldierDisplayPriority.CompareTo(y.soldierDisplayPriority));
@@ -62,7 +62,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         //destroy existing soldiers ready to regenerate them
-        IEnumerable<Soldier> allSoldiersInst = FindObjectsByType<Soldier>(default);
+        IEnumerable<Soldier> allSoldiersInst = FindObjectsByType<Soldier>();
         foreach (Soldier soldier in allSoldiersInst)
         {
             Destroy(soldier.soldierUI);
@@ -88,7 +88,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
 
     public void SaveData(ref GameData data)
     {
-        IEnumerable<Soldier> allSoldiers = FindObjectsByType<Soldier>(default);
+        IEnumerable<Soldier> allSoldiers = FindObjectsByType<Soldier>();
         foreach (Soldier soldier in allSoldiers)
             if (!allSoldierIds.Contains(soldier.id))
                 allSoldierIds.Add(soldier.id);
@@ -98,7 +98,7 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
 
     public void RefreshSoldierList()
     {
-        allSoldiers = FindObjectsByType<Soldier>(default).ToList();
+        allSoldiers = FindObjectsByType<Soldier>().ToList();
     }
     public Soldier FindSoldierByName(string name)
     {

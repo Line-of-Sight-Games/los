@@ -3406,7 +3406,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     {
         List<Tuple<float, Terminal>> soldierDistanceToTerminals = new();
 
-        foreach (Terminal t in FindObjectsByType<Terminal>(default))
+        foreach (Terminal t in FindObjectsByType<Terminal>())
             soldierDistanceToTerminals.Add(Tuple.Create(GameManager.Instance.CalculateRange(this, t), t));
 
         soldierDistanceToTerminals = soldierDistanceToTerminals.OrderBy(t => t.Item1).ToList();
@@ -3487,7 +3487,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool CheckSmokeClouds()
     {
-        SmokeCloud[] allSmokeClouds = FindObjectsByType<SmokeCloud>(default);
+        SmokeCloud[] allSmokeClouds = FindObjectsByType<SmokeCloud>();
         if (allSmokeClouds.Length > 0)
         {
             if (IsAlive())
@@ -3530,7 +3530,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public bool CheckTabunClouds()
     {
-        TabunCloud[] allTabunClouds = FindObjectsByType<TabunCloud>(default);
+        TabunCloud[] allTabunClouds = FindObjectsByType<TabunCloud>();
         if (allTabunClouds.Length > 0)
         {
             if (IsAlive() && !IsWearingStimulantArmour())

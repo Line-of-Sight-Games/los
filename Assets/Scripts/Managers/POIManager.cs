@@ -44,7 +44,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         //destroy existing POIs ready to regenerate them
-        IEnumerable<POI> allPOIsInst = FindObjectsByType<POI>(default);
+        IEnumerable<POI> allPOIsInst = FindObjectsByType<POI>();
         foreach (POI poi in allPOIsInst)
             Destroy(poi.gameObject);
 
@@ -126,7 +126,7 @@ public class POIManager : MonoBehaviour, IDataPersistence
         allPOIIds.Clear();
         data.allPOIIds.Clear();
 
-        IEnumerable<POI> allPOIs = FindObjectsByType<POI>(default);
+        IEnumerable<POI> allPOIs = FindObjectsByType<POI>();
         foreach (POI poi in allPOIs)
             if (!allPOIIds.Contains(poi.id))
                 allPOIIds.Add(poi.id);
@@ -140,11 +140,11 @@ public class POIManager : MonoBehaviour, IDataPersistence
     }
     public void RefreshPOIList()
     {
-        allPOIs = FindObjectsByType<POI>(default).ToList();
+        allPOIs = FindObjectsByType<POI>().ToList();
     }
     public POI FindPOIById(string id)
     {
-        foreach (POI poi in FindObjectsByType<POI>(default))
+        foreach (POI poi in FindObjectsByType<POI>())
         {
             if (poi.id == id)
                 return poi;

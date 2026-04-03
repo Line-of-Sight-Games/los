@@ -118,7 +118,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
         else
             arc = 60f;
 
-        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>(default))
+        foreach (PhysicalObject obj in FindObjectsByType<PhysicalObject>())
         {
             if (PhysicalObjectWithinClaymoreCone(obj, arc))
             {

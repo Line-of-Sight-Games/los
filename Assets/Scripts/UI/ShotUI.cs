@@ -452,7 +452,7 @@ public class ShotUI : MonoBehaviour
             aimTypeUI.SetActive(true);
 
             //add explosive barrels to target list
-            foreach (ExplosiveBarrel b in FindObjectsByType<ExplosiveBarrel>(default))
+            foreach (ExplosiveBarrel b in FindObjectsByType<ExplosiveBarrel>())
             {
                 TMP_Dropdown.OptionData targetOptionData = null;
                 if (shooter.PhysicalObjectIsRevealed(b))

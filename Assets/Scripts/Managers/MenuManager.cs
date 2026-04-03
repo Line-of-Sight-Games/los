@@ -278,14 +278,14 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void DisplayGMObjects()
     {
-        var GMObjects = FindObjectsByType<GMObject>(FindObjectsInactive.Include, default);
+        var GMObjects = FindObjectsByType<GMObject>(FindObjectsInactive.Include);
 
         foreach (GMObject obj in GMObjects)
             obj.gameObject.SetActive(true);
     }
     public void HideGMObjects()
     {
-        var GMObjects = FindObjectsByType<GMObject>(FindObjectsInactive.Include, default);
+        var GMObjects = FindObjectsByType<GMObject>(FindObjectsInactive.Include);
 
         foreach (GMObject obj in GMObjects)
             obj.gameObject.SetActive(false);
@@ -327,13 +327,13 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void DestroyLOSArrows()
     {
-        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include, default);
+        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include);
         foreach (LOSArrow arrow in LOSArrows)
             Destroy(arrow.gameObject);
     }
     public void DestroyOverwatchSectors()
     {
-        var overwatchSectors = FindObjectsByType<OverwatchSectorSphere>(FindObjectsInactive.Include, default);
+        var overwatchSectors = FindObjectsByType<OverwatchSectorSphere>(FindObjectsInactive.Include);
         foreach (OverwatchSectorSphere overwatchSector in overwatchSectors)
             Destroy(overwatchSector.gameObject);
     }
@@ -1101,7 +1101,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
             s.PaintColor();
         }
-        foreach (Claymore c in FindObjectsByType<Claymore>(default))
+        foreach (Claymore c in FindObjectsByType<Claymore>())
         {
             if (OverrideView)
                 c.renderer.enabled = true;
@@ -1113,7 +1113,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                     c.renderer.enabled = false;
             }
         }
-        foreach (ThermalCamera tc in FindObjectsByType<ThermalCamera>(default))
+        foreach (ThermalCamera tc in FindObjectsByType<ThermalCamera>())
         {
             if (OverrideView)
                 tc.beam.renderer.enabled = true;
@@ -1149,7 +1149,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void DisplayItems()
     {
-        var itemList = FindObjectsByType<Item>(default);
+        var itemList = FindObjectsByType<Item>();
         foreach (Item i in itemList)
         {
             if (OverrideView)
@@ -2385,7 +2385,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         if (explosionUI.transform.childCount == 1) //check if this is the last explosion list
         {
             //delete relevant explosions
-            foreach (Explosion explosion in FindObjectsByType<Explosion>(default))
+            foreach (Explosion explosion in FindObjectsByType<Explosion>())
                 Destroy(explosion.gameObject);
 
             SetExplosionResolvedFlagTo(true);
