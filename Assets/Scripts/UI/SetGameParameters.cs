@@ -33,8 +33,8 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
         data.maxRounds = maxRounds;
         data.maxTurnTime = maxTurnTime;
         data.maxX = x;
-        data.maxY = y;
-        data.maxZ = z;
+        data.maxY = z;
+        data.maxZ = y;
         data.maxTeams = maxTeams;
 
         if (DataPersistenceManager.Instance.lozMode)
@@ -64,6 +64,8 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
 
     public void Confirm()
     {
+        
+
         // Validate non-LOZ fields
         bool baseValid =
             HelperFunctions.ValidateIntInput(xSize, out x) &&
@@ -86,6 +88,11 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
         // Only continue if ALL required fields are valid
         if (baseValid && zombieSetupValid)
         {
+            print($"pre|x:{x}y:{y}z:{z}");
+            //swap z and y
+            (y, z) = (z, y);
+            print($"post|x:{x}y:{y}z:{z}");
+
             maxTeams = 2;
             maxTurnTime *= 60;
 
