@@ -1140,6 +1140,7 @@ public class ShotUI : MonoBehaviour
             //calculate base shot chance
             hitChance = Mathf.RoundToInt((WeaponHitChance(shooter, target, gun) + 10 * RelevantWeaponSkill(shooter, gun) - 12 * TargetEvasion(target)) * CoverMod() * VisMod(shooter) * RainMod(shooter, target) * WindMod(shooter, target) * ShooterHealthMod(shooter) * TargetHealthMod(target) * ShooterTerrainMod(shooter) * TargetTerrainMod(target) * ElevationMod(shooter, target) * KdMod(shooter) * OverwatchMod(shooter) * FlankingMod(target) * StealthMod(shooter) * ShooterSmokeMod(shooter) * ShooterTabunMod(shooter)) + ShooterFightMod(shooter);
 
+            print($"{RelevantWeaponSkill(shooter, gun)} to the power of 2, times {(hitChance / 100.0f)} minus {TargetEvasion(target)}");
             //calculate critical shot chance
             critChance = Mathf.RoundToInt((Mathf.Pow(RelevantWeaponSkill(shooter, gun), 2) * (hitChance / 100.0f)) - TargetEvasion(target));
         }

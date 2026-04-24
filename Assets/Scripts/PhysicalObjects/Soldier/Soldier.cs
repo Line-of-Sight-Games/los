@@ -1121,7 +1121,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         stats.F.Val = 0;
         stats.P.Val = 0;
         stats.Sn.Val = 0;
-        stats.E.Val = 0;
+        if (!IsZombie())
+            stats.E.Val = 0;
     }
     public void CorrectNegatives()
     {
