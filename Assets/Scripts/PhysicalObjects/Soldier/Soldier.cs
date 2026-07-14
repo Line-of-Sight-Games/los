@@ -1706,8 +1706,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             instantSpeed = Mathf.RoundToInt(((stats.S.Val - CalculateCarryWeight() + ApplyTerrainModsMove()) * ApplyVisModsMove() * ApplyRainModsMove() * ApplySustenanceModsMove() * ApplyTraumaModsMove() * ApplyKdModsMove() * ApplySmokeModsMove() * ApplyTabunModsMove()) + stats.Str.Val + ApplyFightModsMove());
 
             //halve movement for team 1 on first turn
-            if (soldierTeam == 1 && GameManager.Instance.currentRound == 1)
-                instantSpeed /= 2;
+            if (!DataPersistenceManager.Instance.lozMode)
+            {
+                if (soldierTeam == 1 && GameManager.Instance.currentRound == 1)
+                    instantSpeed /= 2;
+            }
 
             //cap lowest speed at 3cm
             if (instantSpeed < 3)
