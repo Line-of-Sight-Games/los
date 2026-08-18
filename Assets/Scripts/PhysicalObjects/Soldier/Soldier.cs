@@ -11,7 +11,7 @@ using UnityEditor;
 
 public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShootable, IAmDetectable
 {
-    public Dictionary<string, object> details;
+    [NonSerialized] public Dictionary<string, object> details;
     public string soldierName, soldierTerrain, soldierSpeciality;
     public List<string> soldierAbilities;
     public int soldierTeam;
@@ -34,7 +34,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public SphereCollider SRColliderFull, SRColliderHalf, SRColliderMin, tileCollider;
     public Renderer SRColliderFullRenderer, SRColliderHalfRenderer, SRColliderMinRenderer;
     public new Renderer renderer;
-    public Dictionary<string, string> inventorySlots = new()
+    [NonSerialized] public Dictionary<string, string> inventorySlots = new()
     {
         { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }
     };
@@ -46,7 +46,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public InformerAlert informerAlertPrefab;
     public SoldierUI soldierUI, soldierUIPrefab;
 
-    public int[,] zombieLeapTable = new int[,]
+    [NonSerialized] public int[,] zombieLeapTable = new int[,]
     {
         {0,4,1,10,1,0,0,0,20,0,0,0,0,0,0,4,1,0,0,0 },
         {0,6,1,15,2,0,0,0,25,0,0,0,0,0,0,5,2,0,0,0 },
@@ -2187,7 +2187,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return LoadPortraitZombie(portraitName);
         else
         {
-            TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsDropdown;
+            TMP_Dropdown allPortraits = FindAnyObjectByType<AllPortraits>().allPortraitsDropdown;
             return portraitName switch
             {
                 "Alpine_Commander" => allPortraits.options[0].image,
@@ -2232,7 +2232,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             return LoadPortraitZombieTeamsight(portraitName);
         else
         {
-            TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsTeamsightDropdown;
+            TMP_Dropdown allPortraits = FindAnyObjectByType<AllPortraits>().allPortraitsTeamsightDropdown;
             return portraitName switch
             {
                 "Alpine_Commander" => allPortraits.options[0].image,
@@ -2273,7 +2273,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadPortraitJammed(string portraitName)
     {
-        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsJammedDropdown;
+        TMP_Dropdown allPortraits = FindAnyObjectByType<AllPortraits>().allPortraitsJammedDropdown;
         return portraitName switch
         {
             "Alpine_Commander" => allPortraits.options[0].image,
@@ -2313,7 +2313,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadPortraitZombie(string portraitName)
     {
-        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsZombieDropdown;
+        TMP_Dropdown allPortraits = FindAnyObjectByType<AllPortraits>().allPortraitsZombieDropdown;
         return portraitName switch
         {
             "Zombie-Brute1" => allPortraits.options[0].image,
@@ -2342,7 +2342,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadPortraitZombieTeamsight(string portraitName)
     {
-        TMP_Dropdown allPortraits = FindFirstObjectByType<AllPortraits>().allPortraitsZombieTeamsightDropdown;
+        TMP_Dropdown allPortraits = FindAnyObjectByType<AllPortraits>().allPortraitsZombieTeamsightDropdown;
         return portraitName switch
         {
             "Zombie-Brute1" => allPortraits.options[0].image,
@@ -2371,7 +2371,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadInsignia(string rank)
     {
-        TMP_Dropdown allInsignia = FindFirstObjectByType<AllInsignia>().allInsigniaDropdown;
+        TMP_Dropdown allInsignia = FindAnyObjectByType<AllInsignia>().allInsigniaDropdown;
         return rank switch
         {
             "Private" => allInsignia.options[1].image,
@@ -2391,7 +2391,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadPosition(string position)
     {
-        TMP_Dropdown allPositions = FindFirstObjectByType<AllPositions>().allPositionsDropdown;
+        TMP_Dropdown allPositions = FindAnyObjectByType<AllPositions>().allPositionsDropdown;
         return position switch
         {
             "Last Stand" => allPositions.options[1].image,
@@ -2401,7 +2401,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     }
     public Sprite LoadHeadEquipment(string headEquipmentType)
     {
-        TMP_Dropdown allHeadEquipment = FindFirstObjectByType<AllHeadEquipment>().allHeadEquipmentDropdown;
+        TMP_Dropdown allHeadEquipment = FindAnyObjectByType<AllHeadEquipment>().allHeadEquipmentDropdown;
         return headEquipmentType switch
         {
             "Thermal_Goggles" => allHeadEquipment.options[1].image,

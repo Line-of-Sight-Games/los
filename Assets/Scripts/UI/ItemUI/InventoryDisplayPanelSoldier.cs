@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
+using System;
 
 public class InventoryDisplayPanelSoldier : MonoBehaviour
 {
-    public string[,] blockedSlotMatrix = new string[,]
+    [NonSerialized] public string[,] blockedSlotMatrix = new string[,]
     {
         {"SlotsBlocked", "Head","Chest","Back","LeftHand","RightHand","Lateral","Posterior","LeftLeg","LeftBrace","RightLeg","RightBrace","Armour1","Armour2","Armour3","Armour4","Backpack1","Backpack2","Backpack3"},
         {"Armour_Exo", "Back|LeftLeg|RightLeg|Lateral|Posterior", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},

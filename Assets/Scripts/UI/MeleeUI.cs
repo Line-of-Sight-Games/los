@@ -26,7 +26,7 @@ public class MeleeUI : MonoBehaviour
 
     public bool clearMeleeFlag;
 
-    public List<Tuple<string, string>> meleeParameters = new();
+    [NonSerialized] public List<Tuple<string, string>> meleeParameters = new();
     public void OpenMeleeUINonCoroutine(string meleeCharge)
     {
         MenuManager.Instance.StartCoroutine(OpenMeleeUI(meleeCharge));

@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public Camera cam;
     public Light sun;
     public GameObject battlefield, bottomPlane, outlineArea;
-    public Tuple<Vector3, string, int, int> tempMove;
+    [NonSerialized] public Tuple<Vector3, string, int, int> tempMove;
     public Soldier tempSoldier;
     public List<string> tempDamageSource;
 

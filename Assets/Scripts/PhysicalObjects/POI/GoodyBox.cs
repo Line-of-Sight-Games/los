@@ -6,7 +6,7 @@ using UnityEngine;
 public class GoodyBox : POI, IDataPersistence, IHaveInventory
 {
     public Inventory inventory;
-    public JArray itemsJArray;
+    [NonSerialized] private JArray itemsJArray;
     public List<string> inventoryList;
 
     public GoodyBox Init(Tuple<Vector3, string> location)

@@ -16,7 +16,7 @@ public class ItemIconGB : MonoBehaviour
 
     public void Start()
     {
-        itemAssets = FindFirstObjectByType<ItemAssets>();
+        itemAssets = FindAnyObjectByType<ItemAssets>();
         transform.Find("ItemImage").GetComponent<Image>().sprite = itemAssets.GetSprite(this.gameObject.name);
         transform.Find("Arrow").GetComponent<Image>().sprite = arrows[0];
         destination = null;
@@ -24,7 +24,7 @@ public class ItemIconGB : MonoBehaviour
 
     public ItemIconGB Init(string name, int amount, Item item)
     {
-        itemAssets = FindFirstObjectByType<ItemAssets>();
+        itemAssets = FindAnyObjectByType<ItemAssets>();
         gameObject.name = name;
         pickupNumber = amount;
         linkedItem = item;

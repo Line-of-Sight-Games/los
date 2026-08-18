@@ -28,8 +28,8 @@ public class SoundManager : MonoBehaviour
 
     //audio stuff
     public AudioSource audioSource;
-    private Dictionary<AudioClip, Coroutine> playingSounds = new();
-
+    private readonly Dictionary<AudioClip, Coroutine> playingSounds = new();
+    private readonly Dictionary<AudioClip, WaitForSeconds> waitForClipCache = new();
     //meta sfx
     public AudioClip banzai, overrideAlarm, detectionAlarm, buttonPress, levelUp, overmoveAlarm, gameOverMusic, failAbilityUpgrade, succeedAbilityUpgrade, newAbilityUpgrade;
 
@@ -128,8 +128,13 @@ public class SoundManager : MonoBehaviour
         // Play the sound using PlayOneShot
         audioSource.PlayOneShot(clip);
 
-        // Wait for the clip to finish
-        yield return new WaitForSeconds(clip.length);
+        // Wait for the clip to finish (reuse cached WaitForSeconds per clip)
+        if (!waitForClipCache.TryGetValue(clip, out var wait))
+        {
+            wait = new WaitForSeconds(clip.length);
+            waitForClipCache[clip] = wait;
+        }
+        yield return wait;
 
         // Remove the sound from the tracking dictionary after it finishes
         playingSounds.Remove(clip);
@@ -487,8 +492,13 @@ public class SoundManager : MonoBehaviour
         // Play the sound using PlayOneShot
         audioSource.PlayOneShot(clip);
 
-        // Wait for the clip to finish
-        yield return new WaitForSeconds(clip.length);
+        // Wait for the clip to finish (reuse cached WaitForSeconds per clip)
+        if (!waitForClipCache.TryGetValue(clip, out var wait))
+        {
+            wait = new WaitForSeconds(clip.length);
+            waitForClipCache[clip] = wait;
+        }
+        yield return wait;
 
         // Remove the sound from the tracking dictionary after it finishes
         playingSounds.Remove(clip);

@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 [System.Serializable]
 public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 {
-    public Dictionary<string, object> details;
+    [NonSerialized] public Dictionary<string, object> details;
     public ItemReader reader;
     public IHaveInventory owner;
     public string ownerId;
@@ -60,13 +60,13 @@ public class Item : PhysicalObject, IDataPersistence, IHaveInventory
 
     public Inventory inventory;
     public List<string> inventoryList;
-    public Dictionary<string, string> inventorySlots;
+    [NonSerialized] public Dictionary<string, string> inventorySlots;
 
     private Soldier linkedSoldier;
 
     private void Awake()
     {
-        reader = FindFirstObjectByType<ItemReader>();
+        reader = FindAnyObjectByType<ItemReader>();
     }
     private void Update()
     {

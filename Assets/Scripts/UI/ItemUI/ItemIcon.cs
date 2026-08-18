@@ -29,11 +29,11 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     void Start()
     {
-        dropThrowPopup = FindFirstObjectByType<DropthrowPopup>(FindObjectsInactive.Include);
-        spyJamPopup = FindFirstObjectByType<SpyJamPopup>(FindObjectsInactive.Include);
-        binocReconPopup = FindFirstObjectByType<BinocReconPopup>(FindObjectsInactive.Include);
-        binocInHandPopup = FindFirstObjectByType<BinocInHandPopup>(FindObjectsInactive.Include);
-        riotShieldPopup = FindFirstObjectByType<RiotShieldPopup>(FindObjectsInactive.Include);
+        dropThrowPopup = FindAnyObjectByType<DropthrowPopup>(FindObjectsInactive.Include);
+        spyJamPopup = FindAnyObjectByType<SpyJamPopup>(FindObjectsInactive.Include);
+        binocReconPopup = FindAnyObjectByType<BinocReconPopup>(FindObjectsInactive.Include);
+        binocInHandPopup = FindAnyObjectByType<BinocInHandPopup>(FindObjectsInactive.Include);
+        riotShieldPopup = FindAnyObjectByType<RiotShieldPopup>(FindObjectsInactive.Include);
     }
 
     public ItemIcon Init(Item item, ItemSlot originalSlot)
@@ -46,7 +46,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         this.originalSlot = originalSlot;
         currentSlot = originalSlot;
         item.markedForAction = string.Empty;
-        transform.Find("ItemImage").GetComponent<Image>().sprite = FindFirstObjectByType<ItemAssets>().GetSprite(item.itemName);
+        transform.Find("ItemImage").GetComponent<Image>().sprite = FindAnyObjectByType<ItemAssets>().GetSprite(item.itemName);
 
         //show suppressor slot
         if (item.IsSuppressibleGun())

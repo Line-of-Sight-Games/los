@@ -14,7 +14,7 @@ public class DataPersistenceManager : MonoBehaviour
     public static DataPersistenceManager Instance { get; private set; }
     public GameData gameData;
     public List<IDataPersistence> dataPersistanceObjects;
-    public FileDataHandler coreDataHandler;
+    [NonSerialized] public FileDataHandler coreDataHandler;
     public GameObject loadingScreen;
     public Image loadingImage;
     public Sprite losLogo, lozLogo;

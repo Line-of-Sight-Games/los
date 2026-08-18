@@ -9,7 +9,7 @@ public class GeneralAlertUI : MonoBehaviour
     {
         this.message.text = message;
         gameObject.SetActive(true);
-        transform.SetParent(FindFirstObjectByType<Canvas>().transform, false);
+        transform.SetParent(FindAnyObjectByType<Canvas>().transform, false);
     }
     public void Deactivate()
     {

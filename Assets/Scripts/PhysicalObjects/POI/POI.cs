@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using System;
 
 public class POI : PhysicalObject
 {
-    public Dictionary<string, object> details;
+    [NonSerialized] public Dictionary<string, object> details;
     public string poiType;
     public Sprite poiPortrait;
 

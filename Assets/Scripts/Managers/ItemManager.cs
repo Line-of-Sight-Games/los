@@ -30,7 +30,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     public ItemReader reader;
     public GameObject battlefield;
 
-    public int[,] scoreTable = new int[,]
+    [NonSerialized] public int[,] scoreTable = new int[,]
     {
         {0,1,2,3,4,5,6,7,8,9},
         {1,3,5,7,9,11,13,15,17,19},
@@ -43,7 +43,7 @@ public class ItemManager : MonoBehaviour, IDataPersistence
         {8,17,26,35,44,53,62,71,80,89},
         {9,19,29,39,49,59,69,79,89,99},
     };
-    public Tuple<int, string, int, int, int>[] strikeTable = new Tuple<int, string, int, int, int>[]
+    [NonSerialized] public Tuple<int, string, int, int, int>[] strikeTable = new Tuple<int, string, int, int, int>[]
     {
         Tuple.Create(3, "40mm Mortar", 4, 1, 4),
         Tuple.Create(5, "40mm Mortar (tuned)", 4, 2, 4),

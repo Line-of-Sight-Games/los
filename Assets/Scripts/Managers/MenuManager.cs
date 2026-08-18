@@ -313,14 +313,14 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void DestroyLOSArrowPair(Soldier s1, Soldier s2)
     {
-        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include, default);
+        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include);
         foreach (LOSArrow arrow in LOSArrows)
             if (arrow.from == s1 && arrow.to == s2)
                 Destroy(arrow.gameObject);
     }
     public void DestroyLOSArrowPair(Soldier s1, POI p1)
     {
-        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include, default);
+        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include);
         foreach (LOSArrow arrow in LOSArrows)
             if (arrow.from == s1 && arrow.to == p1)
                 Destroy(arrow.gameObject);
@@ -931,10 +931,10 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     //display functions - menu
     public void DisplayWeather()
     {
-        TMP_Dropdown allVis = FindFirstObjectByType<AllWeatherIcons>().allVisIcons;
-        TMP_Dropdown allWind = FindFirstObjectByType<AllWeatherIcons>().allWindIcons;
-        TMP_Dropdown allWindDirection = FindFirstObjectByType<AllWeatherIcons>().allWindDirectionIcons;
-        TMP_Dropdown allRain = FindFirstObjectByType<AllWeatherIcons>().allRainIcons;
+        TMP_Dropdown allVis = FindAnyObjectByType<AllWeatherIcons>().allVisIcons;
+        TMP_Dropdown allWind = FindAnyObjectByType<AllWeatherIcons>().allWindIcons;
+        TMP_Dropdown allWindDirection = FindAnyObjectByType<AllWeatherIcons>().allWindDirectionIcons;
+        TMP_Dropdown allRain = FindAnyObjectByType<AllWeatherIcons>().allRainIcons;
 
         Transform weatherIcons = weatherUI.transform.Find("WeatherIcons");
         Transform experimentalistWeatherIcons = weatherUI.transform.Find("ExperimentalistWeatherIcons");

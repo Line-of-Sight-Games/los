@@ -41,8 +41,8 @@ public class ShotUI : MonoBehaviour
 
     public bool clearShotFlag;
 
-    public Tuple<Soldier, IAmShootable> tempShooterTarget;
-    public List<Tuple<string, string>> shotParameters = new();
+    [NonSerialized] public Tuple<Soldier, IAmShootable> tempShooterTarget;
+    [NonSerialized] public List<Tuple<string, string>> shotParameters = new();
 
     //shot functions - menu
     public void OpenShotUI()
