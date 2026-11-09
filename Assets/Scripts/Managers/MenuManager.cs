@@ -1176,15 +1176,16 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void ChangeRoundIndicators()
     {
-        if (!GameManager.Instance.gameOver)
-        {
-            roundIndicator.text = $"Round {GameManager.Instance.currentRound}";
-            if (GameManager.Instance.currentTeam == 1)
-                teamTurnIndicator.text = "<color=red>";
-            else
-                teamTurnIndicator.text = "<color=blue>";
-            teamTurnIndicator.text += $"Team {GameManager.Instance.currentTeam}</color> Turn";
-        }
+        if (GameManager.Instance.gameOver)
+            return;
+
+        roundIndicator.SetText("Round {0}", (float)GameManager.Instance.currentRound);
+
+        teamTurnIndicator.SetText(
+            GameManager.Instance.currentTeam == 1
+                ? "<color=red>Team 1</color> Turn"
+                : "<color=blue>Team 2</color> Turn"
+        );
     }
     public string FormatFloatTime(float time)
     {
