@@ -1637,10 +1637,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public void CloseSoldierMenuUndo()
     {
-        ActiveSoldier.Instance.S.usedAP = false;
-        ActiveSoldier.Instance.S.selected = false;
-        soldierOptionsUI.SetActive(false);
-        menuUI.transform.Find("Options Panel").Find("GameOptions").gameObject.SetActive(true);
+        //load game to previous save
+        StartCoroutine(DataPersistenceManager.Instance.LoadGame());
     }
     public void OpenEndSoldierTurnAlertUI()
     {
