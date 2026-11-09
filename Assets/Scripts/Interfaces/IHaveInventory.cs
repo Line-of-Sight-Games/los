@@ -12,4 +12,5 @@ public interface IHaveInventory
     public int Y { get; }
     public int Z { get; }
     public string Id { get; }
+
 }
