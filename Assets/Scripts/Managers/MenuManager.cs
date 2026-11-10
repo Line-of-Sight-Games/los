@@ -1687,6 +1687,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void CloseSoldierMenuUI()
     {
         // Always close the menu and restore the display columns.
+        ActiveSoldier.Instance.UnsetActiveSoldier();
         soldierOptionsUI.SetActive(false);
         SoldierManager.Instance.enemyDisplayColumn.SetActive(true);
         SoldierManager.Instance.friendlyDisplayColumn.SetActive(true);

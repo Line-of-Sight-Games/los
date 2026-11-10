@@ -562,7 +562,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
         ActiveSoldier.Instance.S.DrainAP();
         ActiveSoldier.Instance.S.DrainMP();
         ActiveSoldier.Instance.S.turnEnded = true;
-        ActiveSoldier.Instance.UnsetActiveSoldier();
     }
 
     //playdead functions

@@ -101,6 +101,7 @@ public class MeleeUI : MonoBehaviour
         clearMeleeFlag = true;
         meleeTypeDropdown.ClearOptions();
         meleeTypeDropdown.value = 0;
+        apCost.text = "0";
         attackerWeaponImage.sprite = null;
         defenderWeaponImage.sprite = null;
         targetDropdown.ClearOptions();
@@ -227,9 +228,9 @@ public class MeleeUI : MonoBehaviour
         if (!clearMeleeFlag)
         {
             CheckMeleeType();
+            UpdateMeleeAP(attacker);
             if (meleeTypeDropdown.captionText.text.Contains("Attack")) //If it's an actual attack
             {
-                UpdateMeleeAP(attacker);
                 UpdateMeleeDefenderWeapon(defender);
                 UpdateMeleeFlankingAgainstAttacker(attacker, defender);
                 UpdateMeleeFlankingAgainstDefender(attacker, defender);
@@ -238,7 +239,7 @@ public class MeleeUI : MonoBehaviour
     }
     public void UpdateMeleeAP(Soldier attacker)
     {
-        if (meleeTypeDropdown.captionText.text.Contains("Charge"))
+        if (meleeTypeDropdown.captionText.text.Contains("Charge") || meleeTypeDropdown.captionText.text.Contains("Engagement") || meleeTypeDropdown.captionText.text.Contains("Select"))
             apCost.text = "0";
         else
         {
