@@ -43,81 +43,107 @@ public class POIManager : MonoBehaviour, IDataPersistence
 
     public void LoadData(GameData data)
     {
-        //destroy existing POIs ready to regenerate them
-        IEnumerable<POI> allPOIsInst = FindObjectsByType<POI>();
-        foreach (POI poi in allPOIsInst)
-            Destroy(poi.gameObject);
+        // Destroy existing POIs ready to regenerate them.
+        POI[] existingPOIs = FindObjectsByType<POI>();
 
+        foreach (POI poi in existingPOIs)
+        {
+            if (poi != null)
+                Destroy(poi.gameObject);
+        }
+
+        // Clear existing lists.
+        allPOIs.Clear();
+
+        // Restore saved POI IDs.
         allPOIIds = data.allPOIIds;
+
         foreach (string id in allPOIIds)
         {
-            string spawnType;
-            if (data.allPOIDetails.TryGetValue(id, out var details))
-            {
-                spawnType = (string)details["poiType"];
+            if (!data.allPOIDetails.TryGetValue(id, out var details))
+                continue;
 
-                if (spawnType == "terminal")
-                {
-                    Terminal terminal = Instantiate(terminalPrefab);
-                    terminal.id = id;
-                    terminal.LoadData(data);
-                }
-                else if (spawnType == "gb")
-                {
-                    GoodyBox gb = Instantiate(gbPrefab);
-                    gb.id = id;
-                    gb.LoadData(data);
-                }
-                else if (spawnType == "barrel")
-                {
-                    ExplosiveBarrel barrel = Instantiate(barrelPrefab);
-                    barrel.id = id;
-                    barrel.LoadData(data);
-                }
-                else if (spawnType == "claymore")
-                {
-                    Claymore claymore = Instantiate(claymorePrefab);
-                    claymore.id = id;
-                    claymore.LoadData(data);
-                }
-                else if (spawnType == "smoke")
-                {
-                    SmokeCloud smoke = Instantiate(smokeCloudPrefab);
-                    smoke.id = id;
-                    smoke.LoadData(data);
-                }
-                else if (spawnType == "tabun")
-                {
-                    TabunCloud tabun = Instantiate(tabunCloudPrefab);
-                    tabun.id = id;
-                    tabun.LoadData(data);
-                }
-                else if (spawnType == "depbeacon")
-                {
-                    DeploymentBeacon depbeacon = Instantiate(deploymentBeaconPrefab);
-                    depbeacon.id = id;
-                    depbeacon.LoadData(data);
-                }
-                else if (spawnType == "thermalcam")
-                {
-                    ThermalCamera thermalcam = Instantiate(thermalCamPrefab);
-                    thermalcam.id = id;
-                    thermalcam.LoadData(data);
-                }
-                else if (spawnType == "drugcab")
-                {
-                    DrugCabinet drugcab = Instantiate(drugCabinetPrefab);
-                    drugcab.id = id;
-                    drugcab.LoadData(data);
-                }
-                else if (spawnType == "binocularBeam")
-                {
-                    BinocularBeam binocular = Instantiate(binocularStripPrefab);
-                    binocular.id = id;
-                    binocular.LoadData(data);
-                }
+            string spawnType = (string)details["poiType"];
+
+            switch (spawnType)
+            {
+                case "terminal":
+                    {
+                        Terminal terminal = Instantiate(terminalPrefab);
+                        terminal.id = id;
+                        terminal.LoadData(data);
+                        break;
+                    }
+                case "gb":
+                    {
+                        GoodyBox gb = Instantiate(gbPrefab);
+                        gb.id = id;
+                        gb.LoadData(data);
+                        break;
+                    }
+                case "barrel":
+                    {
+                        ExplosiveBarrel barrel = Instantiate(barrelPrefab);
+                        barrel.id = id;
+                        barrel.LoadData(data);
+                        break;
+                    }
+                case "claymore":
+                    {
+                        Claymore claymore = Instantiate(claymorePrefab);
+                        claymore.id = id;
+                        claymore.LoadData(data);
+                        break;
+                    }
+                case "smoke":
+                    {
+                        SmokeCloud smoke = Instantiate(smokeCloudPrefab);
+                        smoke.id = id;
+                        smoke.LoadData(data);
+                        break;
+                    }
+                case "tabun":
+                    {
+                        TabunCloud tabun = Instantiate(tabunCloudPrefab);
+                        tabun.id = id;
+                        tabun.LoadData(data);
+                        break;
+                    }
+                case "depbeacon":
+                    {
+                        DeploymentBeacon beacon = Instantiate(deploymentBeaconPrefab);
+                        beacon.id = id;
+                        beacon.LoadData(data);
+                        break;
+                    }
+                case "thermalcam":
+                    {
+                        ThermalCamera camera = Instantiate(thermalCamPrefab);
+                        camera.id = id;
+                        camera.LoadData(data);
+                        break;
+                    }
+                case "drugcab":
+                    {
+                        DrugCabinet cabinet = Instantiate(drugCabinetPrefab);
+                        cabinet.id = id;
+                        cabinet.LoadData(data);
+                        break;
+                    }
+                case "binocularBeam":
+                    {
+                        BinocularBeam binocular = Instantiate(binocularStripPrefab);
+                        binocular.id = id;
+                        binocular.LoadData(data);
+                        break;
+                    }
+                default:
+                    Debug.LogWarning($"Unknown POI type '{spawnType}' for ID '{id}'.");
+                    break;
             }
         }
+
+        RefreshPOIList();
 
         isDataLoaded = true;
     }

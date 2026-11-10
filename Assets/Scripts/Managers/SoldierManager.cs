@@ -61,28 +61,58 @@ public class SoldierManager : MonoBehaviour, IDataPersistence
     }
     public void LoadData(GameData data)
     {
-        //destroy existing soldiers ready to regenerate them
-        IEnumerable<Soldier> allSoldiersInst = FindObjectsByType<Soldier>();
-        foreach (Soldier soldier in allSoldiersInst)
+        // Keep track of existing soldiers and their UI objects.
+        Dictionary<string, Soldier> existingSoldiers = new Dictionary<string, Soldier>();
+
+        foreach (Soldier soldier in FindObjectsByType<Soldier>())
         {
-            Destroy(soldier.soldierUI);
-            Destroy(soldier.gameObject);
+            if (soldier != null && !string.IsNullOrEmpty(soldier.id))
+            {
+                existingSoldiers[soldier.id] = soldier;
+            }
         }
 
         allSoldierIds = data.allSoldiersIds;
+
         foreach (string id in allSoldierIds)
         {
-            var newSoldier = Instantiate(soldierPrefab);
-            newSoldier.id = id;
+            Soldier newSoldier;
+
+            if (existingSoldiers.TryGetValue(id, out Soldier existingSoldier)
+                && existingSoldier != null)
+            {
+                // Reuse the existing soldier.
+                newSoldier = existingSoldier;
+            }
+            else
+            {
+                // Only create a soldier if one doesn't already exist.
+                newSoldier = Instantiate(soldierPrefab);
+                newSoldier.id = id;
+            }
+
             newSoldier.LoadData(data);
 
-            if (newSoldier.IsOnturn())
-                newSoldier.LinkWithUI(friendlyDisplayColumn.transform);
+            // Reuse its UI if it exists; otherwise LinkWithUI should create one.
+            if (newSoldier.soldierUI == null)
+            {
+                if (newSoldier.IsOnturn())
+                    newSoldier.LinkWithUI(friendlyDisplayColumn.transform);
+                else
+                    newSoldier.LinkWithUI(enemyDisplayColumn.transform);
+            }
             else
-                newSoldier.LinkWithUI(enemyDisplayColumn.transform);
-        }
-        RefreshSoldierList();
+            {
+                // Move the existing UI to the appropriate team column.
+                Transform targetColumn = newSoldier.IsOnturn()
+                    ? friendlyDisplayColumn.transform
+                    : enemyDisplayColumn.transform;
 
+                newSoldier.soldierUI.transform.SetParent(targetColumn, false);
+            }
+        }
+
+        RefreshSoldierList();
         isDataLoaded = true;
     }
 

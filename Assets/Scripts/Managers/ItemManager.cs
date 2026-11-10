@@ -85,19 +85,32 @@ public class ItemManager : MonoBehaviour, IDataPersistence
     };
     public void LoadData(GameData data)
     {
-        //destroy items ready to be regenerated
-        IEnumerable<Item> allItems = FindObjectsByType<Item>();
-        foreach (Item item in allItems)
+        // Destroy existing items.
+        Item[] existingItems = FindObjectsByType<Item>();
+
+        foreach (Item item in existingItems)
+        {
             if (item != null)
                 Destroy(item.gameObject);
+        }
 
+        // Clear the existing item list.
+        allItems.Clear();
+
+        // Restore saved item IDs.
         allItemIds = data.allItemIds;
+
+        // Recreate and load each saved item.
         foreach (string id in allItemIds)
         {
             Item newItem = Instantiate(itemPrefab);
+
             newItem.id = id;
             newItem.LoadData(data);
         }
+
+        // Refresh the item list with the newly created items.
+        RefreshItemList();
 
         isDataLoaded = true;
     }

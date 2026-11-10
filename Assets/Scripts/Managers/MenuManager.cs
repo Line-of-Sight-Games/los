@@ -181,6 +181,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         //check the game is running
         if (GameManager.Instance.GameRunning)
         {
+            if (DataPersistenceManager.Instance.IsLoadingGame)
+                return;
+
             //check if game has not run out of turns
             if (GameManager.Instance.currentRound <= GameManager.Instance.maxRounds)
             {
@@ -784,7 +787,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} ap changed from {ActiveSoldier.Instance.S.ap} to {newAp}"); //write to report
 
             ActiveSoldier.Instance.S.usedAP = false;
-            ActiveSoldier.Instance.S.ap = newAp; 
+            ActiveSoldier.Instance.S.ap = newAp;
+            ActiveSoldier.Instance.S.turnEnded = false;
         }
 
         apInput.text = "";
@@ -1031,11 +1035,16 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
         }
     }
-    
+
+
     public void DisplaySoldiers()
     {
         foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
+            // Skip destroyed soldiers or soldiers whose UI has not yet been created.
+            if (s == null || s.soldierUI == null)
+                continue;
+
             if (OverrideView)
             {
                 s.soldierUI.gameObject.SetActive(true);
@@ -1045,19 +1054,25 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
             else
             {
-                //set visibility of button
-                if (s.IsOnturn() || (s.IsOffturn() && (s.IsRevealed() || s.IsSpotted()) || s.IsDead() || s.IsPlayingDead())) 
+                // Set visibility of button
+                if (s.IsOnturn() ||
+                    (s.IsOffturn() && (s.IsRevealed() || s.IsSpotted()) ||
+                    s.IsDead() || s.IsPlayingDead()))
+                {
                     s.soldierUI.gameObject.SetActive(true);
+                }
                 else
+                {
                     s.soldierUI.gameObject.SetActive(false);
+                }
 
-                //set interactability of buttons 
+                // Set interactability of buttons
                 if (s.IsOnturn() && (s.IsBroken() || !s.HasUnresolvedBrokenAllies()))
                     s.soldierUI.actionButton.interactable = true;
                 else
                     s.soldierUI.actionButton.interactable = false;
 
-                //set message
+                // Set message
                 if (s.IsDead() || s.IsPlayingDead())
                 {
                     s.soldierUI.revealMessageText.text = "<color=red>Dead</color>";
@@ -1074,58 +1089,79 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                     s.soldierUI.revealMessageText.text = "<color=green>Spotting</color>";
                 }
                 else
+                {
                     s.soldierUI.revealMessage.SetActive(false);
+                }
 
-                //set broken message
+                // Set broken message
                 if (s.IsOnturnAndAlive() && !s.IsBroken() && s.HasUnresolvedBrokenAllies())
                     s.soldierUI.resolveBroken.SetActive(true);
                 else
                     s.soldierUI.resolveBroken.SetActive(false);
-
-                
             }
         }
     }
+
+
     public void RenderSoldierVisuals()
     {
+        // Render soldiers
         foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
+            if (s == null || s.renderer == null)
+                continue;
+
             if (OverrideView)
                 s.renderer.enabled = true;
             else
             {
-                if (s.IsOnturn() || s.IsRevealed() || s.IsDead() || s.IsPlayingDead() || s.IsSpotted())
+                if (s.IsOnturn() || s.IsRevealed() || s.IsDead() ||
+                    s.IsPlayingDead() || s.IsSpotted())
                     s.renderer.enabled = true;
                 else
                     s.renderer.enabled = false;
             }
+
             s.PaintColor();
         }
+
+        // Render claymores
         foreach (Claymore c in FindObjectsByType<Claymore>())
         {
+            if (c == null || c.renderer == null)
+                continue;
+
             if (OverrideView)
                 c.renderer.enabled = true;
             else
             {
-                if (c.revealed || (c.placedBy != null && c.placedBy.soldierTeam == GameManager.Instance.currentTeam))
+                if (c.revealed ||
+                    (c.placedBy != null && c.placedBy.soldierTeam == GameManager.Instance.currentTeam))
                     c.renderer.enabled = true;
                 else
                     c.renderer.enabled = false;
             }
         }
+
+        // Render thermal cameras
         foreach (ThermalCamera tc in FindObjectsByType<ThermalCamera>())
         {
+            if (tc == null || tc.beam == null || tc.beam.renderer == null)
+                continue;
+
             if (OverrideView)
                 tc.beam.renderer.enabled = true;
             else
             {
-                if (tc.placedBy != null && tc.placedBy.soldierTeam == GameManager.Instance.currentTeam)
+                if (tc.placedBy != null &&
+                    tc.placedBy.soldierTeam == GameManager.Instance.currentTeam)
                     tc.beam.renderer.enabled = true;
                 else
                     tc.beam.renderer.enabled = false;
             }
         }
     }
+
     public void CheckWinConditions()
     {
         int t1DeadCount = 0, t2DeadCount = 0;
@@ -1439,10 +1475,10 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         else
             configureButton.GetComponentInChildren<TextMeshProUGUI>().text = "Config";
 
-        /*if (ActiveSoldier.Instance.S.usedAP)
+        if (ActiveSoldier.Instance.S.usedAP && !ActiveSoldier.Instance.S.turnEnded)
             undoButton.SetActive(true);
         else
-            undoButton.SetActive(false);*/
+            undoButton.SetActive(false);
     }
     public void GreyAll(string reason)
     {
@@ -1616,30 +1652,50 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                 soldierStatsUI.Find("General").Find("TraumaPoints").GetComponent<TextMeshProUGUI>().color = Color.white;
         }
     }
-
-    public void CloseSoldierMenu()
+    public void CloseSoldierMenu(bool force)
     {
-        if (ActiveSoldier.Instance.S.usedAP && ActiveSoldier.Instance.S.ap > 0 && !OverrideView)
+        Soldier soldier = ActiveSoldier.Instance.S;
+
+        // Ask for confirmation if the soldier has used AP but still has AP remaining.
+        if (!force && soldier.usedAP && soldier.ap > 0 && !OverrideView)
+        {
             OpenEndSoldierTurnAlertUI();
-        else
+            return;
+        }
+
+        // Only end the turn if forced or the soldier has run out of AP after using some.
+        if (force || (soldier.usedAP && soldier.ap <= 0))
         {
             if (GameManager.Instance.modaTurn)
                 GameManager.Instance.EndModaTurn();
+
             if (GameManager.Instance.frozenTurn)
                 GameManager.Instance.EndFrozenTurn();
-            ActiveSoldier.Instance.UnsetActiveSoldier();
-            soldierOptionsUI.SetActive(false);
-            SoldierManager.Instance.enemyDisplayColumn.SetActive(true);
-            SoldierManager.Instance.friendlyDisplayColumn.SetActive(true);
-            
-            //save game
-            DataPersistenceManager.Instance.SaveGame();
+
+            GameManager.Instance.EndSoldierTurn();
         }
+
+        CloseSoldierMenuUI();
+
+        // Save game
+        DataPersistenceManager.Instance.SaveGame();
+    }
+    public void CloseSoldierMenuUI()
+    {
+        // Always close the menu and restore the display columns.
+        soldierOptionsUI.SetActive(false);
+        SoldierManager.Instance.enemyDisplayColumn.SetActive(true);
+        SoldierManager.Instance.friendlyDisplayColumn.SetActive(true);
     }
     public void CloseSoldierMenuUndo()
     {
-        //load game to previous save
-        StartCoroutine(DataPersistenceManager.Instance.LoadGame());
+        if (HelperFunctions.OverrideKeyPressed())
+        {
+            //load game to previous save
+            Debug.Log("Undoing soldier turn");
+            CloseSoldierMenuUI();
+            StartCoroutine(DataPersistenceManager.Instance.LoadGameData());
+        }
     }
     public void OpenEndSoldierTurnAlertUI()
     {

@@ -18,7 +18,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public int soldierDisplayPriority;
     public Sprite soldierPortrait;
     public string soldierPortraitText;
-    public bool fielded, selected, revealed, usedAP, usedMP, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed, isZombie, catafalqueAvailable, catafalquedThisTurn;
+    public bool fielded, selected, revealed, usedAP, usedMP, turnEnded, patriotic, bloodLettedThisTurn, illusionedThisMove, hasKilled, overwatchFirstShotUsed, guardsmanRetryUsed, amphStatReduction, modaProtect, trenXRayEffect, trenSRShrinkEffect, moveResolvedFlag, losCheck, isSpeaking, politicianUsed, isZombie, catafalqueAvailable, catafalquedThisTurn;
     public string causeOfLosCheck;
     public int hp, ap, mp, tp, xp;
     public string rank;
@@ -33,7 +33,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public GameObject SRColliderFullPhysical, SRColliderHalfPhysical, SRColliderMinPhysical;
     public SphereCollider SRColliderFull, SRColliderHalf, SRColliderMin, tileCollider;
     public Renderer SRColliderFullRenderer, SRColliderHalfRenderer, SRColliderMinRenderer;
-    public new Renderer renderer;
+    public Renderer renderer;
     [NonSerialized] public Dictionary<string, string> inventorySlots = new()
     {
         { "Head", "" }, { "Chest", "" }, { "Back", "" }, { "Posterior", "" }, { "Lateral", "" }, { "LeftLeg", "" }, { "RightLeg", "" }, { "LeftHand", "" }, { "RightHand", "" }
@@ -60,6 +60,11 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {0,22,5,55,10,0,0,0,65,0,0,0,0,0,0,13,10,0,0,0 },
         {0,24,6,60,11,0,0,0,70,0,0,0,0,0,0,14,11,0,0,0 },
     };
+
+    private void Awake()
+    {
+        renderer = GetComponentInChildren<Renderer>();
+    }
 
     public Soldier Init(string name, int team, string terrain, Sprite portrait, string portraitText, string speciality, string ability, string random1, string random2)
     {
@@ -222,6 +227,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
             { "revealed", revealed },
             { "usedAP", usedAP },
             { "usedMP", usedMP },
+            { "turnEnded", turnEnded },
             { "loudActionTurnsVulnerable", loudActionTurnsVulnerable },
             { "lastLoudActionCounter", lastLoudActionCounter },
             { "lastLoudRadius", lastLoudRadius },
@@ -340,6 +346,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         revealed = (bool)details["revealed"];
         usedAP = (bool)details["usedAP"];
         usedMP = (bool)details["usedMP"];
+        turnEnded = (bool)details["turnEnded"];
         loudActionTurnsVulnerable = Convert.ToInt32(details["loudActionTurnsVulnerable"]);
         lastLoudActionCounter = Convert.ToInt32(details["lastLoudActionCounter"]);
         lastLoudRadius = Convert.ToInt32(details["lastLoudRadius"]);

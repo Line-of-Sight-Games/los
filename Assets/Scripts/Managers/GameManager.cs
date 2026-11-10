@@ -345,6 +345,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 //reset usedap flag
                 s.usedAP = false;
                 s.usedMP = false;
+                s.turnEnded = false;
 
                 //reset bloodletter used on turn flag
                 s.bloodLettedThisTurn = false;
@@ -560,6 +561,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         ActiveSoldier.Instance.S.DrainAP();
         ActiveSoldier.Instance.S.DrainMP();
+        ActiveSoldier.Instance.S.turnEnded = true;
+        ActiveSoldier.Instance.UnsetActiveSoldier();
     }
 
     //playdead functions

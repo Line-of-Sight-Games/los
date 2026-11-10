@@ -21,7 +21,7 @@ public class DataPersistenceManager : MonoBehaviour
     public Slider progressBar;
     public TextMeshProUGUI progressText;
     public bool lozMode;
-    
+    public bool IsLoadingGame { get; private set; }
 
     private void Awake()
     {
@@ -125,41 +125,71 @@ public class DataPersistenceManager : MonoBehaviour
 
         loadingScreen.SetActive(false);
     }
+
     public IEnumerator LoadGame()
     {
-        dataPersistanceObjects = FindAllDataPersistenceObjects();
-        gameData = coreDataHandler.Load();
+        IsLoadingGame = true;
 
-        if (gameData == null)
+        try
         {
-            print("No data was found. Starting new GameManager.Instance.");
-            NewGame();
+            dataPersistanceObjects = FindAllDataPersistenceObjects();
+            gameData = coreDataHandler.Load();
+
+            if (gameData == null)
+            {
+                Debug.Log("No data was found. Starting new game.");
+                NewGame();
+            }
+
+            // Exclude individual Soldiers and Items.
+            // Their managers handle destroying, recreating and loading them.
+            List<IDataPersistence> objectsToLoad = dataPersistanceObjects
+                .Where(obj => obj != null &&
+                              obj is not Soldier &&
+                              obj is not Item &&
+                              obj is not POI)
+                .ToList();
+
+            float step = objectsToLoad.Count > 0
+                ? 0.15f / objectsToLoad.Count
+                : 0f;
+
+            float currentProgress = 0.85f;
+
+            foreach (IDataPersistence dataPersistenceObj in objectsToLoad)
+            {
+                if (dataPersistenceObj == null)
+                    continue;
+
+                dataPersistenceObj.LoadData(gameData);
+
+                currentProgress += step;
+
+                progressBar.value = currentProgress;
+                progressText.text = $"Loading Data... {currentProgress * 100:F0}%";
+
+                yield return null;
+            }
+
+            // Assign items to their owners after Soldiers and Items have loaded.
+            if (ItemManager.Instance != null && SoldierManager.Instance != null)
+            {
+                ItemManager.Instance.AssignItemsToOwners();
+                progressBar.value = 0.98f;
+            }
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.Init();
+                progressBar.value = 1f;
+            }
         }
-
-        float step = 0.15f / dataPersistanceObjects.Count; // 15% for game data
-        float currentProgress = 0.85f;
-
-        foreach (IDataPersistence dataPersistenceObj in dataPersistanceObjects)
+        finally
         {
-            dataPersistenceObj.LoadData(gameData);
-            currentProgress += step;
-            progressBar.value = currentProgress;
-            progressText.text = $"Loading Data... {currentProgress * 100:F0}%";
-            yield return null;
-        }
-
-        if (ItemManager.Instance != null && SoldierManager.Instance != null)
-        {
-            ItemManager.Instance.AssignItemsToOwners();
-            progressBar.value = 0.98f;
-        }
-
-        if (GameManager.Instance != null)
-        {
-			GameManager.Instance.Init();
-            progressBar.value = 1f;
+            IsLoadingGame = false;
         }
     }
+
     public void NewGame()
     {
         gameData = new GameData();
