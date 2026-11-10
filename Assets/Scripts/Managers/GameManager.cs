@@ -9,7 +9,31 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour, IDataPersistence
 {
     public static GameManager Instance { get; private set; }
+    
+    [Header("Map Viewer")]
+    [SerializeField] private MapCameraController mapCameraController;
 
+    [SerializeField]
+    private bool gameRunning;
+    public MoveUI moveUI;
+    public ShotUI shotUI;
+    public MeleeUI meleeUI;
+    public ConfigureUI configUI;
+    public DamageEventUI damageEventUI;
+    public OverwatchUI overwatchUI;
+    public InsertObjectsUI insertObjectsUI;
+    public bool gameOver, modaTurn, frozenTurn;
+    public int maxX, maxY, maxZ;
+    public int currentRound, currentTeam, currentTurn, maxRounds, maxTeams, maxTurnTime, tempTeam;
+    public int roundsBetweenLeaps = 3;
+    public Light sun;
+    public GameObject battlefield, bottomPlane, outlineArea;
+    [NonSerialized] public Tuple<Vector3, string, int, int> tempMove;
+    public Soldier tempSoldier;
+    public List<string> tempDamageSource;
+
+    public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI;
+    
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -27,33 +51,19 @@ public class GameManager : MonoBehaviour, IDataPersistence
             Instance = null;
     }
 
-    [SerializeField]
-    private bool gameRunning;
-
-    public MoveUI moveUI;
-    public ShotUI shotUI;
-    public MeleeUI meleeUI;
-    public ConfigureUI configUI;
-    public DamageEventUI damageEventUI;
-    public OverwatchUI overwatchUI;
-    public InsertObjectsUI insertObjectsUI;
-
-    public bool gameOver, modaTurn, frozenTurn;
-    public int maxX, maxY, maxZ;
-    public int currentRound, currentTeam, currentTurn, maxRounds, maxTeams, maxTurnTime, tempTeam;
-    public int roundsBetweenLeaps = 3;
-    public Camera cam;
-    public Light sun;
-    public GameObject battlefield, bottomPlane, outlineArea;
-    [NonSerialized] public Tuple<Vector3, string, int, int> tempMove;
-    public Soldier tempSoldier;
-    public List<string> tempDamageSource;
-
-    public Transform allItemsContentUI, inventoryItemsContentUI, groundItemsContentUI, activeItemPanel, allyButtonContentUI;
-
     public GameManager Init()
     {
         gameRunning = true;
+
+        if (mapCameraController != null)
+        {
+            mapCameraController.Init(maxX, maxY, maxZ);
+        }
+        else
+        {
+            Debug.LogError("GameManager: MapCameraController is not assigned.");
+        }
+
         return this;
     }
 
@@ -1926,8 +1936,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
         outlineArea.transform.position = data.outlineAreaPosition;
         outlineArea.transform.localScale = data.outlineAreaDimensions;
 
-        cam.transform.position = data.camPosition;
-        cam.orthographicSize = data.camOrthoSize;
         sun.transform.position = data.sunPosition;
         maxRounds = data.maxRounds;
         maxTurnTime = data.maxTurnTime;
@@ -1946,8 +1954,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
         data.mapPosition = battlefield.transform.position;
         data.mapDimensions = battlefield.transform.localScale;
-        data.camPosition = cam.transform.position;
-        data.camOrthoSize = cam.orthographicSize;
         data.sunPosition = sun.transform.position;
         data.maxRounds = maxRounds;
         data.maxTurnTime = maxTurnTime;
