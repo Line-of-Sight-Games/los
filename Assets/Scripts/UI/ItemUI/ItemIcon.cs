@@ -284,6 +284,12 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         if (MenuManager.Instance.onItemUseScreen && !MenuManager.Instance.OverrideView)
         {
+            if (item.SoldierNestedOn().IsMeleeControlled())
+            {
+                MenuManager.Instance.CreateGeneralAlert("Melee controlled");
+                return;
+            }
+
             if (item.IsUsable())
             {
                 if (item.IsBinoculars() && item.SoldierNestedOn().IsUsingBinocularsInReconMode()) //give option to relocate or stop recon
