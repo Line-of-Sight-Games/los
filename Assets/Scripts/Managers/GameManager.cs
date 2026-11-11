@@ -27,7 +27,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public int currentRound, currentTeam, currentTurn, maxRounds, maxTeams, maxTurnTime, tempTeam;
     public int roundsBetweenLeaps = 3;
     public Light sun;
-    public GameObject battlefield, bottomPlane, outlineArea;
+    public Battlefield battlefield;
+    public GameObject ground;
     [NonSerialized] public Tuple<Vector3, string, int, int> tempMove;
     public Soldier tempSoldier;
     public List<string> tempDamageSource;
@@ -56,13 +57,10 @@ public class GameManager : MonoBehaviour, IDataPersistence
         gameRunning = true;
 
         if (mapCameraController != null)
-        {
             mapCameraController.Init(maxX, maxY, maxZ);
-        }
-        else
-        {
-            Debug.LogError("GameManager: MapCameraController is not assigned.");
-        }
+
+        if (battlefield != null)
+            battlefield.Init(maxX, maxY, maxZ);
 
         return this;
     }
@@ -1930,11 +1928,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         battlefield.transform.position = data.mapPosition;
         battlefield.transform.localScale = data.mapDimensions;
 
-        bottomPlane.transform.position = data.bottomPlanePosition;
-        bottomPlane.transform.localScale = data.bottomPlaneDimensions;
-
-        outlineArea.transform.position = data.outlineAreaPosition;
-        outlineArea.transform.localScale = data.outlineAreaDimensions;
+        ground.transform.position = data.groundPosition;
 
         sun.transform.position = data.sunPosition;
         maxRounds = data.maxRounds;

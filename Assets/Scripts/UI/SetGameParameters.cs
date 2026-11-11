@@ -3,7 +3,7 @@ using TMPro;
 
 public class SetGameParameters : MonoBehaviour, IDataPersistence
 {
-    public Vector3 camPosition, sunPosition, mapPosition, mapDimensions, bottomPlanePosition, bottomPlaneDimensions, outlineAreaPosition, outlineAreaDimensions;
+    public Vector3 camPosition, sunPosition, mapPosition, mapDimensions, groundPosition;
     public float camOrthoSize;
 
     public GameObject setupMenuUI, createSoldierMenuUI;
@@ -20,12 +20,7 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
     {
         data.mapPosition = mapPosition;
         data.mapDimensions = mapDimensions;
-        data.bottomPlanePosition = bottomPlanePosition;
-        data.bottomPlaneDimensions = bottomPlaneDimensions;
-        data.outlineAreaPosition = outlineAreaPosition;
-        data.outlineAreaDimensions = outlineAreaDimensions;
-        data.camPosition = camPosition;
-        data.camOrthoSize = camOrthoSize;
+        data.groundPosition = groundPosition;
         data.sunPosition = sunPosition;
 
         data.currentRound = 1;
@@ -45,27 +40,14 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
     }
     public void SetField()
     {
-        bottomPlaneDimensions = new Vector3(x, y, z);
-        bottomPlanePosition = new Vector3(x / 2, 0, z / 2);
-
-        outlineAreaDimensions = new Vector3(x, 0.1f, z);
-        outlineAreaPosition = new Vector3(x / 2, 0, z / 2);
+        groundPosition = new Vector3(x / 2, 0, z / 2);
 
         mapDimensions = new Vector3(x, y, z);
         mapPosition = new Vector3(x / 2, y / 2, z / 2);
     }
 
-    public void SetCam()
-    {
-        camOrthoSize = Mathf.Max(x, z) / 2;
-        camPosition = new Vector3(x / 2, y * 2, z / 2);
-        sunPosition = new Vector3(0, y + 1, 0);
-    }
-
     public void Confirm()
     {
-        
-
         // Validate non-LOZ fields
         bool baseValid =
             HelperFunctions.ValidateIntInput(xSize, out x) &&
@@ -97,7 +79,6 @@ public class SetGameParameters : MonoBehaviour, IDataPersistence
             maxTurnTime *= 60;
 
             SetField();
-            SetCam();
 
             WeatherManager.Instance.GenerateWeather(maxRounds);
             DataPersistenceManager.Instance.SaveGame();

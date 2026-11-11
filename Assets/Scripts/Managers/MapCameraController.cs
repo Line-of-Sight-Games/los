@@ -21,18 +21,15 @@ public class MapCameraController : MonoBehaviour,
 
     [Header("Rotation")]
     [SerializeField] private float rotationSpeed = 1f;
-    [SerializeField] private float minPitch = 20f;
-    [SerializeField] private float maxPitch = 90f;
     [SerializeField] private float defaultPitch = 90f;
 
     [Header("Panning")]
-    [SerializeField] private float panSpeed = 0.5f;
-    [SerializeField] private float verticalPanSpeed = 0.5f;
+    [SerializeField] private float panSpeed = 10f;
     [SerializeField] private float mousePanSensitivity = 0.05f;
 
     [Header("Battlefield Bounds")]
-    [SerializeField] private float edgeOverscroll = 10f;
-    [SerializeField] private float verticalOverscroll = 2f;
+    [SerializeField] private float edgeOverscroll = 100f;
+    [SerializeField] private float verticalOverscroll = 100f;
 
     [Header("Initial View")]
     [SerializeField] private float initialViewPadding = 1.25f;
@@ -111,7 +108,6 @@ public class MapCameraController : MonoBehaviour,
             return;
 
         Mouse mouse = Mouse.current;
-        Keyboard keyboard = Keyboard.current;
 
         if (mouse == null)
             return;
@@ -119,7 +115,7 @@ public class MapCameraController : MonoBehaviour,
         HandleDoubleClick(mouse);
         HandleZoom(mouse);
         HandleRotation(mouse);
-        HandlePanning(mouse, keyboard);
+        HandlePanning(mouse);
     }
 
 
@@ -190,35 +186,41 @@ public class MapCameraController : MonoBehaviour,
     private Vector3 GetBattlefieldCentre()
     {
         return new Vector3(
-            (minX + maxX) * 0.5f,
-            (minY + maxY) * 0.5f,
-            (minZ + maxZ) * 0.5f
+            (1f + maxX) * 0.5f,
+            maxZ * 0.5f,
+            (1f + maxY) * 0.5f
         );
     }
 
 
     private float CalculateFitDistance()
     {
-        float width = maxX - minX;
-        float depth = maxZ - minZ;
-        float height = maxY - minY;
+        // Battlefield dimensions in Unity world space.
+        float battlefieldWidth = maxX - 1f;
+        float battlefieldDepth = maxY - 1f;
 
-        float horizontalDiagonal = Mathf.Sqrt(
-            width * width + depth * depth
+        // Camera's vertical field of view.
+        float verticalFov = mapCamera.fieldOfView * Mathf.Deg2Rad;
+
+        // Use the actual camera viewport aspect ratio.
+        float aspect = mapCamera.aspect;
+
+        // Calculate horizontal field of view from vertical FOV.
+        float horizontalFov = 2f * Mathf.Atan(
+            Mathf.Tan(verticalFov * 0.5f) * aspect
         );
 
-        float mapSize = Mathf.Sqrt(
-            horizontalDiagonal * horizontalDiagonal +
-            height * height
-        );
+        // Calculate the distance needed to fit each dimension.
+        float distanceForWidth =
+            (battlefieldWidth * 0.5f) /
+            Mathf.Tan(horizontalFov * 0.5f);
 
-        float halfFovRadians =
-            mapCamera.fieldOfView * 0.5f * Mathf.Deg2Rad;
+        float distanceForDepth =
+            (battlefieldDepth * 0.5f) /
+            Mathf.Tan(verticalFov * 0.5f);
 
-        float fitDistance =
-            (mapSize * 0.5f) / Mathf.Tan(halfFovRadians);
-
-        return fitDistance;
+        // Whichever dimension requires more distance determines the fit.
+        return Mathf.Max(distanceForWidth, distanceForDepth);
     }
 
 
@@ -277,10 +279,10 @@ public class MapCameraController : MonoBehaviour,
 
     private void HandleRotation(Mouse mouse)
     {
-        if (mouse.middleButton.wasPressedThisFrame)
+        if (mouse.rightButton.wasPressedThisFrame)
             isRotating = true;
 
-        if (mouse.middleButton.wasReleasedThisFrame)
+        if (mouse.rightButton.wasReleasedThisFrame)
             isRotating = false;
 
         if (!isRotating)
@@ -288,28 +290,25 @@ public class MapCameraController : MonoBehaviour,
 
         Vector2 mouseDelta = mouse.delta.ReadValue();
 
+        // Allow continuous rotation beyond 360 degrees.
         yaw += mouseDelta.x * rotationSpeed;
 
+        // Allow looking over and underneath the battlefield.
+        // Avoid exactly +/-90 degrees to prevent orientation instability.
         pitch -= mouseDelta.y * rotationSpeed;
-
-        pitch = Mathf.Clamp(
-            pitch,
-            minPitch,
-            maxPitch
-        );
+        pitch = Mathf.Clamp(pitch, -89f, 89f);
     }
 
 
     // ---------------------------------------------------------
     // PANNING - RIGHT MOUSE BUTTON
     // ---------------------------------------------------------
-
-    private void HandlePanning(Mouse mouse, Keyboard keyboard)
+    private void HandlePanning(Mouse mouse)
     {
-        if (mouse.rightButton.wasPressedThisFrame)
+        if (mouse.middleButton.wasPressedThisFrame)
             isPanning = true;
 
-        if (mouse.rightButton.wasReleasedThisFrame)
+        if (mouse.middleButton.wasReleasedThisFrame)
             isPanning = false;
 
         if (!isPanning)
@@ -317,36 +316,17 @@ public class MapCameraController : MonoBehaviour,
 
         Vector2 mouseDelta = mouse.delta.ReadValue();
 
-        bool shiftHeld = keyboard != null &&
-            (keyboard.leftShiftKey.isPressed ||
-             keyboard.rightShiftKey.isPressed);
+        // Get the camera's current screen-relative directions.
+        Vector3 cameraRight = mapCamera.transform.right;
+        Vector3 cameraUp = mapCamera.transform.up;
 
-        // Shift + right drag moves the focus vertically.
-        if (shiftHeld)
-        {
-            focusPoint.y -=
-                mouseDelta.y *
-                verticalPanSpeed *
-                currentZoomDistance *
-                mousePanSensitivity;
-        }
-        else
-        {
-            // Normal right drag pans across the battlefield.
-            Vector3 right = Quaternion.Euler(0f, yaw, 0f) *
-                            Vector3.right;
+        // Move the map in the same direction as the mouse drag.
+        Vector3 movement =
+            (cameraRight * mouseDelta.x +
+             cameraUp * mouseDelta.y)
+            * panSpeed * mousePanSensitivity;
 
-            Vector3 forward = Quaternion.Euler(0f, yaw, 0f) *
-                              Vector3.forward;
-
-            Vector3 movement =
-                (-right * mouseDelta.x - forward * mouseDelta.y) *
-                panSpeed *
-                currentZoomDistance *
-                mousePanSensitivity;
-
-            focusPoint += movement;
-        }
+        focusPoint += movement;
 
         ClampFocusPoint();
     }
@@ -379,11 +359,7 @@ public class MapCameraController : MonoBehaviour,
 
     public void ResetView()
     {
-        if (!initialised)
-            return;
-
         focusPoint = GetBattlefieldCentre();
-
         yaw = 0f;
         pitch = defaultPitch;
 
@@ -397,8 +373,6 @@ public class MapCameraController : MonoBehaviour,
 
         ClampFocusPoint();
         UpdateCameraPosition();
-
-        Debug.Log("Map viewer reset to default view.");
     }
 
 

@@ -14,12 +14,7 @@ public class GameData
     public float playTimeTotal, turnTime;
     public Vector3 mapPosition;
     public Vector3 mapDimensions;
-    public Vector3 bottomPlanePosition;
-    public Vector3 bottomPlaneDimensions;
-    public Vector3 outlineAreaPosition;
-    public Vector3 outlineAreaDimensions;
-    public Vector3 camPosition;
-    public float camOrthoSize;
+    public Vector3 groundPosition;
     public Vector3 sunPosition;
     public int maxTurnTime;
     public int maxX, maxY, maxZ;
@@ -43,12 +38,7 @@ public class GameData
         playTimeTotal = 0;
         mapPosition = Vector3.zero;
         mapDimensions = Vector3.zero;
-        bottomPlanePosition = Vector3.zero;
-        bottomPlaneDimensions = Vector3.zero;
-        outlineAreaPosition = Vector3.zero;
-        outlineAreaDimensions = Vector3.zero;
-        camPosition = Vector3.zero;
-        camOrthoSize = 0;
+        groundPosition = Vector3.zero;
         sunPosition = Vector3.zero;
         turnTime = 0;
         maxTurnTime = 0;
