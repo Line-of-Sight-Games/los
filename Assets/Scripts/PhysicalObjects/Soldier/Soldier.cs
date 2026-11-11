@@ -31,6 +31,7 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
     public Item itemPrefab;
     private JArray statsJArray;
     public GameObject SRColliderFullPhysical, SRColliderHalfPhysical, SRColliderMinPhysical;
+    public CapsuleCollider soldierBodyCollider;
     public SphereCollider SRColliderFull, SRColliderHalf, SRColliderMin, tileCollider;
     public Renderer SRColliderFullRenderer, SRColliderHalfRenderer, SRColliderMinRenderer;
     public Renderer renderer;

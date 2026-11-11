@@ -55,6 +55,10 @@ public class PhysicalObject : MonoBehaviour
             return true;
         return false;
     }
+    public bool IsBodyCollider(Collider candidate)
+    {
+        return candidate != null && candidate == bodyCollider;
+    }
     public bool PhysicalObjectWithinRadius(PhysicalObject obj, float radius)
     {
         if (OnBattlefield() && obj.OnBattlefield() && GameManager.Instance.CalculateRange(this, obj) <= radius)

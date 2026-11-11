@@ -432,18 +432,21 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
     // ---------------------------------------------------------
     // FOCUS ON OBJECT CLICK
     // ---------------------------------------------------------
+
     private void HandleObjectClick(Mouse mouse)
     {
         if (!mouse.leftButton.wasPressedThisFrame)
             return;
 
+        // Convert screen position to RawImage local coordinates.
         Vector2 mousePosition = mouse.position.ReadValue();
 
         Canvas canvas = rawImage.canvas;
 
-        Camera uiCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay
-            ? null
-            : canvas.worldCamera;
+        Camera uiCamera =
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : canvas.worldCamera;
 
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
             rawImage.rectTransform,
@@ -454,28 +457,113 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             return;
         }
 
+        // Convert local coordinates into viewport coordinates.
         Rect rect = rawImage.rectTransform.rect;
 
-        float u = Mathf.InverseLerp(rect.xMin, rect.xMax, localPoint.x);
-        float v = Mathf.InverseLerp(rect.yMin, rect.yMax, localPoint.y);
+        float u = Mathf.InverseLerp(
+            rect.xMin,
+            rect.xMax,
+            localPoint.x
+        );
 
-        // Account for the RawImage UV rectangle.
+        float v = Mathf.InverseLerp(
+            rect.yMin,
+            rect.yMax,
+            localPoint.y
+        );
+
+        // Account for RawImage UV settings.
         Rect uv = rawImage.uvRect;
 
         u = uv.x + u * uv.width;
         v = uv.y + v * uv.height;
 
+        // Generate the tactical map ray.
         Ray ray = mapCamera.ViewportPointToRay(
             new Vector3(u, v, 0f)
         );
 
-        int raycastMask = clickableLayers.value & ~(1 << LayerMask.NameToLayer("Ignore Raycast"));
-        if (Physics.Raycast(ray, out RaycastHit hit, maxRaycastDistance, raycastMask, QueryTriggerInteraction.Ignore))
+        // Exclude Ignore Raycast layer.
+        int raycastMask = clickableLayers.value;
+
+        int ignoreLayer = LayerMask.NameToLayer("Ignore Raycast");
+
+        if (ignoreLayer >= 0)
         {
-            Debug.Log($"HIT: {hit.collider.name}");
+            raycastMask &= ~(1 << ignoreLayer);
+        }
+
+        // Detect all colliders, including triggers.
+        RaycastHit[] hits = Physics.RaycastAll(
+            ray,
+            maxRaycastDistance,
+            raycastMask,
+            QueryTriggerInteraction.Collide
+        );
+
+        // Process closest hits first.
+        System.Array.Sort(
+            hits,
+            (a, b) => a.distance.CompareTo(b.distance)
+        );
+
+        bool foundObject = false;
+
+        foreach (RaycastHit hit in hits)
+        {
+            // Find the PhysicalObject belonging to this collider.
+            PhysicalObject physicalObject =
+                hit.collider.GetComponentInParent<PhysicalObject>();
+
+            if (physicalObject == null)
+                continue;
+
+            // Only accept the designated body collider.
+            if (!physicalObject.IsBodyCollider(hit.collider))
+                continue;
+
+            Debug.Log(
+                $"TACTICAL MAP HIT: {physicalObject.name} | " +
+                $"Collider: {hit.collider.name}"
+            );
+
+            // Focus camera on the selected object.
             FocusOnObject(hit.collider);
+
+            // SOLDIER
+            if (physicalObject is Soldier soldier)
+            {
+                TooltipPopup.Instance.Show(soldier);
+                foundObject = true;
+                break;
+            }
+
+            // POI
+            if (physicalObject is POI poi)
+            {
+                TooltipPopup.Instance.Show(poi);
+                foundObject = true;
+                break;
+            }
+
+            // ITEM
+            if (physicalObject is Item item)
+            {
+                TooltipPopup.Instance.Show(item);
+                foundObject = true;
+                break;
+            }
+        }
+
+        // Nothing selectable was hit.
+        if (!foundObject)
+        {
+            TooltipPopup.Instance?.Close();
+
+            Debug.Log("Tactical map click: No selectable object found.");
         }
     }
+
 
     // ---------------------------------------------------------
     // FOCUS ON OBJECT
