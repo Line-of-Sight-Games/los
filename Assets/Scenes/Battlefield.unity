@@ -78221,7 +78221,7 @@ MonoBehaviour:
   mapCamera: {fileID: 963194227}
   cameraRig: {fileID: 1827719362}
   minZoomDistance: 5
-  maxZoomDistance: 250
+  maxZoomDistance: 1000
   zoomSpeed: 10000
   scrollSensitivity: 1
   zoomSmoothness: 10
@@ -99366,7 +99366,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 2000
   field of view: 50.90089
   orthographic: 1
   orthographic size: 50

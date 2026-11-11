@@ -14,7 +14,7 @@ public class MapCameraController : MonoBehaviour,
 
     [Header("Zoom")]
     [SerializeField] private float minZoomDistance = 5f;
-    [SerializeField] private float maxZoomDistance = 250f;
+    [SerializeField] private float maxZoomDistance = 1000f;
     [SerializeField] private float zoomSpeed = 100f;
     [SerializeField] private float scrollSensitivity = 1f;
     [SerializeField] private float zoomSmoothness = 10f;
@@ -161,7 +161,7 @@ public class MapCameraController : MonoBehaviour,
         targetZoomDistance = CalculateFitDistance();
 
         targetZoomDistance = Mathf.Clamp(
-            targetZoomDistance * initialViewPadding,
+            CalculateFitDistance(),
             minZoomDistance,
             maxZoomDistance
         );
@@ -187,7 +187,7 @@ public class MapCameraController : MonoBehaviour,
     {
         return new Vector3(
             (1f + maxX) * 0.5f,
-            maxZ * 0.5f,
+            0f,
             (1f + maxY) * 0.5f
         );
     }
@@ -195,22 +195,16 @@ public class MapCameraController : MonoBehaviour,
 
     private float CalculateFitDistance()
     {
-        // Battlefield dimensions in Unity world space.
         float battlefieldWidth = maxX - 1f;
         float battlefieldDepth = maxY - 1f;
 
-        // Camera's vertical field of view.
         float verticalFov = mapCamera.fieldOfView * Mathf.Deg2Rad;
-
-        // Use the actual camera viewport aspect ratio.
         float aspect = mapCamera.aspect;
 
-        // Calculate horizontal field of view from vertical FOV.
         float horizontalFov = 2f * Mathf.Atan(
             Mathf.Tan(verticalFov * 0.5f) * aspect
         );
 
-        // Calculate the distance needed to fit each dimension.
         float distanceForWidth =
             (battlefieldWidth * 0.5f) /
             Mathf.Tan(horizontalFov * 0.5f);
@@ -219,7 +213,6 @@ public class MapCameraController : MonoBehaviour,
             (battlefieldDepth * 0.5f) /
             Mathf.Tan(verticalFov * 0.5f);
 
-        // Whichever dimension requires more distance determines the fit.
         return Mathf.Max(distanceForWidth, distanceForDepth);
     }
 
@@ -327,8 +320,6 @@ public class MapCameraController : MonoBehaviour,
             * panSpeed * mousePanSensitivity;
 
         focusPoint += movement;
-
-        ClampFocusPoint();
     }
 
 
@@ -364,7 +355,7 @@ public class MapCameraController : MonoBehaviour,
         pitch = defaultPitch;
 
         targetZoomDistance = Mathf.Clamp(
-            CalculateFitDistance() * initialViewPadding,
+            CalculateFitDistance(),
             minZoomDistance,
             maxZoomDistance
         );
@@ -390,14 +381,14 @@ public class MapCameraController : MonoBehaviour,
 
         focusPoint.y = Mathf.Clamp(
             focusPoint.y,
-            minY - verticalOverscroll,
-            maxY + verticalOverscroll
+            minZ - verticalOverscroll,
+            maxZ + verticalOverscroll
         );
 
         focusPoint.z = Mathf.Clamp(
             focusPoint.z,
-            minZ - edgeOverscroll,
-            maxZ + edgeOverscroll
+            minY - edgeOverscroll,
+            maxY + edgeOverscroll
         );
     }
 
