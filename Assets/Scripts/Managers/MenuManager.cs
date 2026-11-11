@@ -61,6 +61,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public LOSArrow LOSArrowPrefab;
     public OverwatchSectorSphere overwatchSectorSpherePrefab;
     public List<Button> actionButtons;
+    private readonly List<LOSArrow> activeLOSArrows = new();
     public Button shotButton, moveButton, meleeButton, configureButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton, lastandicideButton, politicsButton, catafalqueButton;
     private float playTimeTotal;
     public float turnTime;
@@ -293,47 +294,146 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         foreach (GMObject obj in GMObjects)
             obj.gameObject.SetActive(false);
     }
+
     public void CreateLOSArrows()
     {
         foreach (Soldier s in GameManager.Instance.AllSoldiers())
         {
+            if (s == null)
+                continue;
+
             foreach (string id in s.LOSToTheseSoldiersAndRevealing)
             {
-                LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s, SoldierManager.Instance.FindSoldierById(id));
-                arrow.transform.SetAsLastSibling();
+                Soldier target = SoldierManager.Instance.FindSoldierById(id);
+
+                if (target == null)
+                    continue;
+
+                CreateLOSArrowPair(s, target);
             }
         }
     }
+
+    public void CreateLOSArrowsForSoldier(Soldier soldier)
+    {
+        if (soldier == null)
+            return;
+
+        foreach (string id in soldier.LOSToTheseSoldiersAndRevealing)
+        {
+            Soldier target = SoldierManager.Instance.FindSoldierById(id);
+
+            if (target == null || !target.IsAlive())
+                continue;
+
+            CreateLOSArrowPair(soldier, target);
+        }
+    }
+
     public void CreateLOSArrowPair(Soldier s1, Soldier s2)
     {
+        if (s1 == null || s2 == null)
+            return;
+
         LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s1, s2);
+
         arrow.transform.SetAsLastSibling();
+
+        activeLOSArrows.Add(arrow);
     }
+
     public void CreateLOSArrowPair(Soldier s1, POI p1)
     {
+        if (s1 == null || p1 == null)
+            return;
+
         LOSArrow arrow = Instantiate(LOSArrowPrefab).Init(s1, p1);
+
         arrow.transform.SetAsLastSibling();
+
+        activeLOSArrows.Add(arrow);
     }
+
     public void DestroyLOSArrowPair(Soldier s1, Soldier s2)
     {
-        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include);
-        foreach (LOSArrow arrow in LOSArrows)
+        for (int i = activeLOSArrows.Count - 1; i >= 0; i--)
+        {
+            LOSArrow arrow = activeLOSArrows[i];
+
+            if (arrow == null)
+            {
+                activeLOSArrows.RemoveAt(i);
+                continue;
+            }
+
             if (arrow.from == s1 && arrow.to == s2)
+            {
+                arrow.gameObject.SetActive(false);
                 Destroy(arrow.gameObject);
+                activeLOSArrows.RemoveAt(i);
+            }
+        }
     }
+
     public void DestroyLOSArrowPair(Soldier s1, POI p1)
     {
-        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include);
-        foreach (LOSArrow arrow in LOSArrows)
+        for (int i = activeLOSArrows.Count - 1; i >= 0; i--)
+        {
+            LOSArrow arrow = activeLOSArrows[i];
+
+            if (arrow == null)
+            {
+                activeLOSArrows.RemoveAt(i);
+                continue;
+            }
+
             if (arrow.from == s1 && arrow.to == p1)
+            {
+                arrow.gameObject.SetActive(false);
                 Destroy(arrow.gameObject);
+                activeLOSArrows.RemoveAt(i);
+            }
+        }
     }
+
+    public void DestroyLOSArrowsForSoldier(Soldier soldier)
+    {
+        if (soldier == null)
+            return;
+
+        for (int i = activeLOSArrows.Count - 1; i >= 0; i--)
+        {
+            LOSArrow arrow = activeLOSArrows[i];
+
+            if (arrow == null)
+            {
+                activeLOSArrows.RemoveAt(i);
+                continue;
+            }
+
+            if (arrow.from == soldier)
+            {
+                arrow.gameObject.SetActive(false);
+                Destroy(arrow.gameObject);
+                activeLOSArrows.RemoveAt(i);
+            }
+        }
+    }
+
     public void DestroyLOSArrows()
     {
-        var LOSArrows = FindObjectsByType<LOSArrow>(FindObjectsInactive.Include);
-        foreach (LOSArrow arrow in LOSArrows)
-            Destroy(arrow.gameObject);
+        foreach (LOSArrow arrow in activeLOSArrows)
+        {
+            if (arrow != null)
+            {
+                arrow.gameObject.SetActive(false);
+                Destroy(arrow.gameObject);
+            }
+        }
+
+        activeLOSArrows.Clear();
     }
+
     public void DestroyOverwatchSectors()
     {
         var overwatchSectors = FindObjectsByType<OverwatchSectorSphere>(FindObjectsInactive.Include);

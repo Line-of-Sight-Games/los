@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
@@ -5,36 +6,72 @@ public class LOSArrow : LOSGizmo
 {
     public PhysicalObject to;
 
+    private LineRenderer lineRenderer;
+
+    private void Awake()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+
+        ConfigureLineRenderer();
+    }
+
+    private void ConfigureLineRenderer()
+    {
+        lineRenderer.useWorldSpace = true;
+        lineRenderer.positionCount = 2;
+        lineRenderer.enabled = true;
+
+        // Ensure the line has a visible width.
+        if (lineRenderer.startWidth <= 0f)
+            lineRenderer.startWidth = 0.1f;
+
+        if (lineRenderer.endWidth <= 0f)
+            lineRenderer.endWidth = 0.1f;
+
+        lineRenderer.sortingOrder = 1;
+    }
+
     public LOSArrow Init(Soldier from, Soldier to)
     {
-        this.to = to;
-        this.from = from;
-        transform.position = new Vector3((from.transform.position.x + to.transform.position.x) / 2.0f, (from.transform.position.y + to.transform.position.y) / 2.0f, (from.transform.position.z + to.transform.position.z) / 2.0f);
-
-        LineRenderer lineRenderer = GetComponent<LineRenderer>();
-
-        lineRenderer.SetPosition(0, new Vector3(from.transform.position.x, from.transform.position.y, from.transform.position.z));
-        lineRenderer.SetPosition(1, new Vector3(to.transform.position.x, to.transform.position.y, to.transform.position.z));
-        lineRenderer.sortingOrder = 1;
-
-        //determine colour based on mutual or team
-        if (from.CanSeeInOwnRight(to) && to.CanSeeInOwnRight(from))
-            lineRenderer.material.color = Color.green;
-        else if (!from.CanSeeInOwnRight(to) && !to.CanSeeInOwnRight(from))
-            lineRenderer.material.color = Color.grey;
-        else if (from.CanSeeInOwnRight(to))
+        if (from == null || to == null)
         {
-            if (from.soldierTeam == 1)
-                lineRenderer.material.color = Color.red;
-            else
-                lineRenderer.material.color = Color.blue;
+            Debug.LogWarning("LOSArrow: Cannot initialise because a Soldier is null.");
+            return this;
         }
-        else if (to.CanSeeInOwnRight(from))
+
+        this.from = from;
+        this.to = to;
+
+        Vector3 heightOffset = Vector3.up * 1f;
+
+        SetLinePositions(
+            from.transform.position + heightOffset,
+            to.transform.position + heightOffset
+        );
+
+        // Determine colour based on mutual visibility or team.
+        bool fromCanSee = from.CanSeeInOwnRight(to);
+        bool toCanSee = to.CanSeeInOwnRight(from);
+
+        if (fromCanSee && toCanSee)
         {
-            if (to.soldierTeam == 1)
-                lineRenderer.material.color = Color.red;
-            else
-                lineRenderer.material.color = Color.blue;
+            SetLineColour(Color.green);
+        }
+        else if (!fromCanSee && !toCanSee)
+        {
+            SetLineColour(Color.grey);
+        }
+        else if (fromCanSee)
+        {
+            SetLineColour(
+                from.soldierTeam == 1 ? Color.red : Color.blue
+            );
+        }
+        else
+        {
+            SetLineColour(
+                to.soldierTeam == 1 ? Color.red : Color.blue
+            );
         }
 
         return this;
@@ -42,22 +79,44 @@ public class LOSArrow : LOSGizmo
 
     public LOSArrow Init(Soldier from, POI to)
     {
-        this.to = to;
+        if (from == null || to == null)
+        {
+            Debug.LogWarning("LOSArrow: Cannot initialise because a Soldier or POI is null.");
+            return this;
+        }
+
         this.from = from;
-        transform.position = new Vector3((from.transform.position.x + to.transform.position.x) / 2.0f, (from.transform.position.y + to.transform.position.y) / 2.0f, (from.transform.position.z + to.transform.position.z) / 2.0f);
+        this.to = to;
 
-        LineRenderer lineRenderer = Instantiate(lineRendererPrefab, transform);
+        Vector3 heightOffset = Vector3.up * 1f;
 
-        lineRenderer.SetPosition(0, new Vector3(from.transform.position.x, from.transform.position.y, from.transform.position.z));
-        lineRenderer.SetPosition(1, new Vector3(to.transform.position.x, to.transform.position.y, to.transform.position.z));
-        lineRenderer.sortingOrder = 1;
+        SetLinePositions(
+            from.transform.position + heightOffset,
+            to.transform.position + heightOffset
+        );
 
-        //determine colour based on mutual or team
-        if (from.soldierTeam == 1)
-            lineRenderer.material.color = Color.red;
-        else
-            lineRenderer.material.color = Color.blue;
+        SetLineColour(
+            from.soldierTeam == 1 ? Color.red : Color.blue
+        );
 
         return this;
+    }
+
+    private void SetLinePositions(Vector3 start, Vector3 end)
+    {
+        if (lineRenderer == null)
+            lineRenderer = GetComponent<LineRenderer>();
+
+        ConfigureLineRenderer();
+
+        lineRenderer.SetPosition(0, start);
+        lineRenderer.SetPosition(1, end);
+    }
+
+    private void SetLineColour(Color colour)
+    {
+        // Use the instantiated material so changing this LOSArrow
+        // does not change the colour of every other LOSArrow.
+        lineRenderer.material.color = colour;
     }
 }

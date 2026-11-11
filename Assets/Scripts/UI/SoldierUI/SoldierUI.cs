@@ -48,26 +48,53 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         ClearArrows();
     }
+
     void ShowLineOfSightArrows()
     {
+        // Clear existing UI arrows and counter.
         ClearArrows();
 
+        // Remove only the 3D LOS arrows belonging to this soldier.
+        MenuManager.Instance.DestroyLOSArrowsForSoldier(linkedSoldier);
+
         int count = 0;
+
         foreach (Soldier s in GameManager.Instance.AllFieldedEnemySoldiers())
         {
-            if (linkedSoldier.CanSeeInOwnRight(s) && s.IsAlive())
-            {
-                GameObject arrow = Instantiate(arrowPrefab, MenuManager.Instance.UICanvas.transform);
-                SetupArrow(arrow, GetComponent<RectTransform>(), s.soldierUI.GetComponent<RectTransform>());
-                activeArrows.Add(arrow);
-                count++;
-            }
-            continue;
+            if (s == null || !s.IsAlive())
+                continue;
+
+            if (!linkedSoldier.CanSeeInOwnRight(s))
+                continue;
+
+            // Create the UI arrow.
+            GameObject arrow = Instantiate(
+                arrowPrefab,
+                MenuManager.Instance.UICanvas.transform
+            );
+
+            SetupArrow(
+                arrow,
+                GetComponent<RectTransform>(),
+                s.soldierUI.GetComponent<RectTransform>()
+            );
+
+            activeArrows.Add(arrow);
+
+            count++;
         }
+
+        // Recreate this soldier's 3D LOS arrows.
+        MenuManager.Instance.CreateLOSArrowsForSoldier(linkedSoldier);
+
+        // Create the UI counter.
         GameObject counter = Instantiate(LOSCountPrefab, transform);
+
         counter.GetComponentInChildren<TextMeshProUGUI>().text = $"{count}";
+
         activeArrows.Add(counter);
     }
+
     void SetupArrow(GameObject arrow, RectTransform from, RectTransform to)
     {
         Vector2 start = new(from.position.x + (from.rect.width / 2) + 15, from.position.y + 35);
@@ -87,6 +114,9 @@ public class SoldierUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         foreach (var arrow in activeArrows)
             Destroy(arrow);
         activeArrows.Clear();
+
+        // Remove only the 3D LOS arrows belonging to this soldier.
+        MenuManager.Instance.DestroyLOSArrowsForSoldier(linkedSoldier);
     }
 
 
