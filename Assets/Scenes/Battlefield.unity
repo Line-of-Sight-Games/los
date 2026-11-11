@@ -78231,9 +78231,16 @@ MonoBehaviour:
   mousePanSensitivity: 1
   edgeOverscroll: 100
   verticalOverscroll: 100
-  initialViewPadding: 1.25
+  initialViewPadding: 1.1
   defaultFieldOfView: 50
   doubleClickInterval: 0.3
+  objectFocusDistance: 15
+  focusTransitionSpeed: 5
+  focusZoomPadding: 2
+  clickableLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxRaycastDistance: 2000
 --- !u!1 &773044423
 GameObject:
   m_ObjectHideFlags: 0
@@ -86247,7 +86254,7 @@ GameObject:
   - component: {fileID: 834094319}
   - component: {fileID: 834094318}
   - component: {fileID: 834094322}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Battlefield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98645,7 +98652,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -518, y: 0}
+  m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 850, y: 1034}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &948471975
@@ -168257,8 +168264,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -527.5, y: 0}
+  m_SizeDelta: {x: -1055, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1612653571
 MonoBehaviour:
@@ -181148,7 +181155,7 @@ GameObject:
   - component: {fileID: 1758786419}
   - component: {fileID: 1758786418}
   - component: {fileID: 1758786417}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}

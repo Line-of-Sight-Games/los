@@ -19,8 +19,10 @@ public class ActiveSoldier : MonoBehaviour
     public void SetActiveSoldier(Soldier soldier)
     {
         S = soldier;
-
         S.selected = true;
+
+        // Focus the camera on the soldier's position
+        MapCameraController.Instance.FocusOnObject(soldier.transform);
     }
 
     public void UnsetActiveSoldier()

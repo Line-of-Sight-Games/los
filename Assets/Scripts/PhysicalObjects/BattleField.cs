@@ -13,15 +13,15 @@ public class Battlefield : MonoBehaviour
     {
         Vector3[] worldCorners =
         {
-            new (1,    0,    1),
-            new (maxX, 0,    1),
+            new (0,    0,    0),
+            new (maxX, 0,    0),
             new (maxX, 0,    maxY),
-            new (1,    0,    maxY),
+            new (0,    0,    maxY),
 
-            new (1,    maxZ, 1),
-            new (maxX, maxZ, 1),
+            new (0,    maxZ, 0),
+            new (maxX, maxZ, 0),
             new (maxX, maxZ, maxY),
-            new (1,    maxZ, maxY)
+            new (0,    maxZ, maxY)
         };
 
         Vector3[] localCorners = new Vector3[worldCorners.Length];

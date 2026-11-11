@@ -1,13 +1,13 @@
 
+using Unity.SmartStrings.Core.Extensions;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
-public class MapCameraController : MonoBehaviour,
-    IPointerEnterHandler,
-    IPointerExitHandler
+public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    public static MapCameraController Instance { get; private set; }
     [Header("References")]
     [SerializeField] private Camera mapCamera;
     [SerializeField] private Transform cameraRig;
@@ -32,11 +32,20 @@ public class MapCameraController : MonoBehaviour,
     [SerializeField] private float verticalOverscroll = 100f;
 
     [Header("Initial View")]
-    [SerializeField] private float initialViewPadding = 1.25f;
+    [SerializeField] private float initialViewPadding = 5f;
     [SerializeField] private float defaultFieldOfView = 50f;
 
     [Header("Double Click")]
     [SerializeField] private float doubleClickInterval = 0.3f;
+
+    [Header("Object Focus")]
+    [SerializeField] private float objectFocusDistance = 15f;
+    [SerializeField] private float focusTransitionSpeed = 5f;
+    [SerializeField] private float focusZoomPadding = 2f;
+
+    [Header("Object Clicking")]
+    [SerializeField] private LayerMask clickableLayers = ~0;
+    [SerializeField] private float maxRaycastDistance = 2000f;
 
     // Battlefield bounds
     private float minX = 1f;
@@ -63,11 +72,23 @@ public class MapCameraController : MonoBehaviour,
 
     private float lastLeftClickTime = -1f;
 
+    private Vector3 targetFocusPoint;
+    private bool isFocusing;
+    private float focusTargetZoom;
+
     private RawImage rawImage;
 
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogError("Multiple MapCameraControllers detected.");
+            enabled = false;
+            return;
+        }
+        Instance = this;
+
         rawImage = GetComponent<RawImage>();
 
         if (rawImage == null)
@@ -113,6 +134,7 @@ public class MapCameraController : MonoBehaviour,
             return;
 
         HandleDoubleClick(mouse);
+        HandleObjectClick(mouse);
         HandleZoom(mouse);
         HandleRotation(mouse);
         HandlePanning(mouse);
@@ -124,6 +146,33 @@ public class MapCameraController : MonoBehaviour,
         if (!initialised)
             return;
 
+        float smoothFactor = 1f - Mathf.Exp(
+            -focusTransitionSpeed * Time.unscaledDeltaTime
+        );
+
+        if (isFocusing)
+        {
+            focusPoint = Vector3.Lerp(
+                focusPoint,
+                targetFocusPoint,
+                smoothFactor
+            );
+
+            targetZoomDistance = Mathf.Lerp(
+                targetZoomDistance,
+                focusTargetZoom,
+                smoothFactor
+            );
+
+            if (Vector3.Distance(focusPoint, targetFocusPoint) < 0.01f &&
+                Mathf.Abs(targetZoomDistance - focusTargetZoom) < 0.01f)
+            {
+                focusPoint = targetFocusPoint;
+                targetZoomDistance = focusTargetZoom;
+                isFocusing = false;
+            }
+        }
+
         currentZoomDistance = Mathf.Lerp(
             currentZoomDistance,
             targetZoomDistance,
@@ -131,6 +180,11 @@ public class MapCameraController : MonoBehaviour,
         );
 
         UpdateCameraPosition();
+    }
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
 
@@ -186,18 +240,19 @@ public class MapCameraController : MonoBehaviour,
     private Vector3 GetBattlefieldCentre()
     {
         return new Vector3(
-            (1f + maxX) * 0.5f,
+            (maxX) * 0.5f,
             0f,
-            (1f + maxY) * 0.5f
+            (maxY) * 0.5f
         );
     }
 
-
     private float CalculateFitDistance()
     {
+        // Battlefield dimensions.
         float battlefieldWidth = maxX - 1f;
         float battlefieldDepth = maxY - 1f;
 
+        // Camera field of view.
         float verticalFov = mapCamera.fieldOfView * Mathf.Deg2Rad;
         float aspect = mapCamera.aspect;
 
@@ -205,6 +260,7 @@ public class MapCameraController : MonoBehaviour,
             Mathf.Tan(verticalFov * 0.5f) * aspect
         );
 
+        // Required distance to fit the battlefield.
         float distanceForWidth =
             (battlefieldWidth * 0.5f) /
             Mathf.Tan(horizontalFov * 0.5f);
@@ -213,7 +269,14 @@ public class MapCameraController : MonoBehaviour,
             (battlefieldDepth * 0.5f) /
             Mathf.Tan(verticalFov * 0.5f);
 
-        return Mathf.Max(distanceForWidth, distanceForDepth);
+        // Use whichever dimension requires the greater distance.
+        float fitDistance = Mathf.Max(
+            distanceForWidth,
+            distanceForDepth
+        );
+
+        // Add additional viewing margin.
+        return fitDistance * initialViewPadding;
     }
 
 
@@ -364,6 +427,128 @@ public class MapCameraController : MonoBehaviour,
 
         ClampFocusPoint();
         UpdateCameraPosition();
+    }
+
+    // ---------------------------------------------------------
+    // FOCUS ON OBJECT CLICK
+    // ---------------------------------------------------------
+    private void HandleObjectClick(Mouse mouse)
+    {
+        if (!mouse.leftButton.wasPressedThisFrame)
+            return;
+
+        Vector2 mousePosition = mouse.position.ReadValue();
+
+        Canvas canvas = rawImage.canvas;
+
+        Camera uiCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay
+            ? null
+            : canvas.worldCamera;
+
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rawImage.rectTransform,
+            mousePosition,
+            uiCamera,
+            out Vector2 localPoint))
+        {
+            return;
+        }
+
+        Rect rect = rawImage.rectTransform.rect;
+
+        float u = Mathf.InverseLerp(rect.xMin, rect.xMax, localPoint.x);
+        float v = Mathf.InverseLerp(rect.yMin, rect.yMax, localPoint.y);
+
+        // Account for the RawImage UV rectangle.
+        Rect uv = rawImage.uvRect;
+
+        u = uv.x + u * uv.width;
+        v = uv.y + v * uv.height;
+
+        Ray ray = mapCamera.ViewportPointToRay(
+            new Vector3(u, v, 0f)
+        );
+
+        int raycastMask = clickableLayers.value & ~(1 << LayerMask.NameToLayer("Ignore Raycast"));
+        if (Physics.Raycast(ray, out RaycastHit hit, maxRaycastDistance, raycastMask, QueryTriggerInteraction.Ignore))
+        {
+            Debug.Log($"HIT: {hit.collider.name}");
+            FocusOnObject(hit.collider);
+        }
+    }
+
+    // ---------------------------------------------------------
+    // FOCUS ON OBJECT
+    // ---------------------------------------------------------
+    public void FocusOnObject(Transform target)
+    {
+        if (target == null)
+            return;
+
+        // Centre the camera on the target.
+        targetFocusPoint = target.position;
+
+        // Determine whether the object has a Renderer
+        // so we can account for its actual size.
+        Renderer objectRenderer = target.GetComponentInChildren<Renderer>();
+
+        if (objectRenderer != null)
+        {
+            Bounds bounds = objectRenderer.bounds;
+
+            float objectSize = Mathf.Max(
+                bounds.size.x,
+                bounds.size.y,
+                bounds.size.z
+            );
+
+            focusTargetZoom = Mathf.Max(
+                objectFocusDistance,
+                objectSize * focusZoomPadding
+            );
+        }
+        else
+        {
+            focusTargetZoom = objectFocusDistance;
+        }
+
+        focusTargetZoom = Mathf.Clamp(
+            focusTargetZoom,
+            minZoomDistance,
+            maxZoomDistance
+        );
+
+        isFocusing = true;
+    }
+    public void FocusOnObject(Collider targetCollider)
+    {
+        if (targetCollider == null)
+            return;
+
+        Bounds bounds = targetCollider.bounds;
+
+        targetFocusPoint = bounds.center;
+
+        float objectSize = Mathf.Max(
+            bounds.size.x,
+            bounds.size.y,
+            bounds.size.z
+        );
+
+        focusTargetZoom = Mathf.Max(
+            objectFocusDistance,
+            objectSize * focusZoomPadding
+        );
+
+        focusTargetZoom = Mathf.Clamp(
+            focusTargetZoom,
+            minZoomDistance,
+            maxZoomDistance
+        );
+
+        isFocusing = true;
+
+        Debug.Log($"Focusing tactical camera on: {targetCollider.name}");
     }
 
 
