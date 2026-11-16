@@ -843,6 +843,16 @@ public class MeleeUI : MonoBehaviour
         foreach (string soldierId in engagedSoldiersList)
             BreakMeleeEngagement(s1, SoldierManager.Instance.FindSoldierById(soldierId));
     }
+    public void BreakAllControlledMeleeEngagments(Soldier s1)
+    {
+        List<string> engagedSoldiersList = new();
+
+        foreach (string soldierId in s1.controlledBySoldiersList)
+            engagedSoldiersList.Add(soldierId);
+
+        foreach (string soldierId in engagedSoldiersList)
+            BreakMeleeEngagement(s1, SoldierManager.Instance.FindSoldierById(soldierId));
+    }
     public void BreakMeleeEngagement(Soldier s1, Soldier s2)
     {
         s1.controllingSoldiersList.Remove(s2.id);

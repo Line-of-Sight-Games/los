@@ -100,7 +100,14 @@ public class DragUI : MonoBehaviour
             if (legitMove)
             {
                 dragee.beingDraggedBy = drager.Id;
-                GameManager.Instance.meleeUI.BreakAllControllingMeleeEngagments(drager); //break melee engagement when commencing drag
+
+                //break melee engagements on the drager that the drager is controlling (if controlled should not be permitted to drag)
+                GameManager.Instance.meleeUI.BreakAllControllingMeleeEngagments(drager);
+
+                //break all melee engagements on the dragee
+                GameManager.Instance.meleeUI.BreakAllControllingMeleeEngagments(dragee);
+                GameManager.Instance.meleeUI.BreakAllControlledMeleeEngagments(dragee);
+
                 if (drager.CheckAP(GetDragAPCost()))
                 {
                     drager.DeductAP(GetDragAPCost());
