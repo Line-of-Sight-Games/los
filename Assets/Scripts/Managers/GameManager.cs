@@ -1862,6 +1862,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
         battlefield.transform.localScale = data.mapDimensions;
 
         ground.transform.position = data.groundPosition;
+        Vector3 groundScale = ground.transform.localScale;
+        groundScale.y = 0.0005f;
+        ground.transform.localScale = groundScale; //keep ground flat
 
         sun.transform.position = data.sunPosition;
         maxRounds = data.maxRounds;
