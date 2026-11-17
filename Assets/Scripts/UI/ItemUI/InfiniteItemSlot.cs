@@ -12,7 +12,7 @@ public class InfiniteItemSlot : MonoBehaviour
     {
         if (linkedSlot.item == null)
         {
-            print($"itemslot is empty | {transform.name}");
+            //print($"itemslot is empty | {transform.name}");
             linkedItem = Instantiate(itemPrefab).Init(transform.name);
             linkedItem.transform.position = new(1, 1, 0);
             linkedItem.X = 1;

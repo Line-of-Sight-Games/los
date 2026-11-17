@@ -1621,74 +1621,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
 
 
-    //damage event functions - game
-    public void ConfirmDamageEvent()
-    {
-        if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting"))
-        {
-            FileUtility.WriteToReport($"{ActiveSoldier.Instance.S.soldierName} bloodlets."); //write to report
-
-            ActiveSoldier.Instance.S.TakeBloodlettingDamage();
-            MenuManager.Instance.CloseDamageEventUI();
-        }
-        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Other") && int.TryParse(damageEventUI.otherInput.text, out int otherDamage))
-        {
-            ActiveSoldier.Instance.S.TakeDamage(null, otherDamage, false, new() { damageEventUI.damageSource.text }, Vector3.zero);
-            MenuManager.Instance.CloseDamageEventUI();
-        }
-        else
-        {
-            //check input
-            if (GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation))
-            {
-                if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Fall"))
-                    ActiveSoldier.Instance.S.TakeDamage(null, CalculateFallDamage(ActiveSoldier.Instance.S, int.Parse(damageEventUI.fallInput.text)), false, new() { "Fall" }, Vector3.zero);
-                else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Collapse"))
-                {
-                    int structureHeight = int.Parse(damageEventUI.structureHeight.text);
-                    //add xp if survives, otherwise kill
-                    if (ActiveSoldier.Instance.S.StructuralCollapseCheck(structureHeight))
-                    {
-                        MenuManager.Instance.AddXpAlert(ActiveSoldier.Instance.S, ActiveSoldier.Instance.S.stats.R.Val, $"Survived a {structureHeight}cm structural collapse.", true);
-                        MenuManager.Instance.AddSoldierAlert(ActiveSoldier.Instance.S, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse.", -1, -1);
-                    }
-                    else
-                    {
-                        if (ActiveSoldier.Instance.S.IsWearingJuggernautArmour(false))
-                        {
-                            ActiveSoldier.Instance.S.MakeUnconscious(null, new() { "Structural Collapse" });
-                            MenuManager.Instance.AddSoldierAlert(ActiveSoldier.Instance.S, "EVENT SURVIVED", Color.green, $"Survives a {structureHeight}cm structural collapse with Juggernaut Armour.", -1, -1);
-                        }
-                        else
-                        {
-                            ActiveSoldier.Instance.S.InstantKill(null, new() { "Structural Collapse" });
-                            ActiveSoldier.Instance.S.SetCrushed();
-                        }
-                    }
-                }
-
-                //move actually proceeds
-                PerformMove(ActiveSoldier.Instance.S, 0, fallCollapseLocation, false, false, string.Empty, true);
-
-                MenuManager.Instance.CloseDamageEventUI();
-
-            }
-            else
-                print("Invalid Input");
-        }
-    }
-    public bool GetFallOrCollapseLocation(out Tuple<Vector3, string> fallCollapseLocation)
-    {
-        fallCollapseLocation = default;
-        if (HelperFunctions.ValidateIntInput(damageEventUI.xPos, out int x) && HelperFunctions.ValidateIntInput(damageEventUI.yPos, out int y) && HelperFunctions.ValidateIntInput(damageEventUI.zPos, out int z) && damageEventUI.terrainDropdown.value != 0)
-        {
-            fallCollapseLocation = Tuple.Create(new Vector3(x, y, z), damageEventUI.terrainDropdown.captionText.text);
-
-            return true;
-        }
-
-        return false;
-    }
+ 
 
 
 

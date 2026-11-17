@@ -25,6 +25,8 @@ public class GameData
     public Dictionary<string, Dictionary<string, object>> allItemDetails;
     public List<string> allPOIIds;
     public Dictionary<string, Dictionary<string, object>> allPOIDetails;
+    public List<string> allXpAlertIds;
+    public Dictionary<string, Dictionary<string, object>> allXpAlertDetails;
     public int numberBasicZombies, numberBruteZombies;
 
     public GameData()
@@ -55,5 +57,8 @@ public class GameData
 
         allPOIIds = new List<string>();
         allPOIDetails = new Dictionary<string, Dictionary<string, object>>();
+
+        allXpAlertIds = new List<string>();
+        allXpAlertDetails = new Dictionary<string, Dictionary<string, object>>();
     }
 }

@@ -16,7 +16,7 @@ public class ItemSlot : MonoBehaviour
     }
     public ItemSlot AssignItemIcon(ItemIcon itemIcon)
     {
-        print($"trying to assign the item icon: {itemIcon.name}|{itemIcon.item.itemName}");
+        //print($"trying to assign the item icon: {itemIcon.name}|{itemIcon.item.itemName}");
         // Set the item in the target slot
         item = itemIcon.item;
 

@@ -149,6 +149,20 @@ public static class HelperFunctions
         }
         return false;
     }
+    public static void PopulateDropdown(TMP_Dropdown dropdown, List<string> options)
+    {
+        List<TMP_Dropdown.OptionData> dropdownOptions = new List<TMP_Dropdown.OptionData>
+        {
+            new TMP_Dropdown.OptionData("Select Option...")
+        };
+
+        dropdownOptions.AddRange(options.Select(option => new TMP_Dropdown.OptionData(option)));
+
+        dropdown.ClearOptions();
+        dropdown.AddOptions(dropdownOptions);
+        dropdown.value = 0;
+        dropdown.RefreshShownValue();
+    }
     public static bool IsWithinAngle(Vector3 pointA, Vector3 pointB, Vector3 centralPoint, float angleThreshold)
     {
         Debug.Log($"Checking is within angle: {angleThreshold}");

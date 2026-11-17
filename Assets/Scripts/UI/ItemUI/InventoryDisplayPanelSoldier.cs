@@ -121,7 +121,7 @@ public class InventoryDisplayPanelSoldier : MonoBehaviour
     }
     public void RemoveItemIconInSlot(string slotName)
     {
-        print($"removing item from {slotName}");
+        //print($"removing item from {slotName}");
         transform.FindRecursively(slotName).GetComponent<ItemSlot>().ClearItemIcon();
     }
     public void ClearAllSlots()

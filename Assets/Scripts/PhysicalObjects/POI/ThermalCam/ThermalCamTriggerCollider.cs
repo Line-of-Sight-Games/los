@@ -23,7 +23,7 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
                         if (detectee.losCheck && (detectee.causeOfLosCheck.Contains("move") || detectee.causeOfLosCheck.Contains("thermalCam"))) //only trigger if a change has happened and it's a move or the placement of the cam
                         {
                             MenuManager.Instance.detectionUI.LOSAlertThermalCamSoldierStart(LinkedThermalCamera, detectee);
-                            print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatEntered)}");
+                            //print($"{soldierThatEntered.LinkedSoldier.soldierName} entered the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatEntered)}");
                         }
                     }
                 }
@@ -50,7 +50,7 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
                         if (detectee.losCheck && (detectee.causeOfLosCheck.Contains("move") || detectee.causeOfLosCheck.Contains("thermalCam"))) //only trigger if a change has happened and it's a move or the placement of the cam
                         {
                             MenuManager.Instance.detectionUI.LOSAlertThermalCamSoldierStay(LinkedThermalCamera, detectee);
-                            print($"{soldierThatStayed.LinkedSoldier.soldierName} stayed in the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatStayed)}");
+                            //print($"{soldierThatStayed.LinkedSoldier.soldierName} stayed in the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatStayed)}");
                         }
                     }
                 }
@@ -77,7 +77,7 @@ public class ThermalCamTriggerCollider : BaseTriggerCollider
                             if (detectee.losCheck && (detectee.causeOfLosCheck.Contains("move") || detectee.causeOfLosCheck.Contains("thermalCam"))) //only trigger if a change has happened and it's a move or the placement of the cam
                             {
                                 MenuManager.Instance.detectionUI.LOSAlertThermalCamSoldierEnd(LinkedThermalCamera, detectee);
-                                print($"{soldierThatExited.LinkedSoldier.soldierName} exited the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatExited)}");
+                                //print($"{soldierThatExited.LinkedSoldier.soldierName} exited the beam of {LinkedThermalCamera} ({LinkedThermalCamera.X},{LinkedThermalCamera.Y},{LinkedThermalCamera.Z}) at {CollisionPoint(colliderThatExited)}");
                             }
                         }
                     }

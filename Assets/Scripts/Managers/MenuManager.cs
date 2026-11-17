@@ -65,7 +65,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public Button shotButton, moveButton, meleeButton, configureButton, dipElecButton, overwatchButton, coverButton, playdeadButton, disarmButton, dragButton, lastandicideButton, politicsButton, catafalqueButton;
     private float playTimeTotal;
     public float turnTime;
-    public bool timerStop, overrideView, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, clearDamageEventFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
+    public bool timerStop, overrideView, clearMoveFlag, detectionResolvedFlag, meleeResolvedFlag, shotResolvedFlag, binocularsFlashResolvedFlag, explosionResolvedFlag, inspirerResolvedFlag, xpResolvedFlag, traumaResolvedFlag, teamTurnOverFlag, teamTurnStartFlag, onItemUseScreen, inventorySourceViewOnly;
     public TMP_InputField LInput, HInput, RInput, SInput, EInput, FInput, PInput, CInput, SRInput, RiInput, ARInput, LMGInput, SnInput, SMGInput, ShInput, MInput, StrInput, DipInput, ElecInput, HealInput;
     public Sprite explosiveBarrelSprite, goodyBoxSprite, terminalSprite, drugCabinetSprite, covermanSprite;
 
@@ -509,6 +509,15 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
         xpResolvedFlag = value;
     }
+    public void SetTraumaResolvedFlagTo(bool value)
+    {
+        if (value)
+            UnfreezeTimer();
+        else
+            FreezeTimer();
+
+        traumaResolvedFlag = value;
+    }
     public void SetExplosionResolvedFlagTo(bool value)
     {
         if (value)
@@ -907,24 +916,9 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
         mpInput.text = "";
     }
-    public void ChangeXP()
+    public void AddXP()
     {
-        TMP_InputField xpInput = soldierOptionsUI.transform.Find("SoldierBanner").Find("OverrideXP").GetComponent<TMP_InputField>();
-        
-        if (int.TryParse(xpInput.text, out int newXp))
-        {
-            if (newXp >= 0)
-            {
-                FileUtility.WriteToReport($"(Override) {ActiveSoldier.Instance.S.soldierName} xp changed from {ActiveSoldier.Instance.S.xp} to {newXp}"); //write to report
-
-                if (newXp > ActiveSoldier.Instance.S.xp)
-                    AddXpAlert(ActiveSoldier.Instance.S, newXp - ActiveSoldier.Instance.S.xp, "(Override) Extra xp added.", false);
-
-                ActiveSoldier.Instance.S.xp = newXp;
-            }
-        }
-
-        xpInput.text = "";
+        AddXpAlert(ActiveSoldier.Instance.S, 1, "(Override) Extra xp added.", false);
     }
     public void ChangeBaseStat(string code)
     {
@@ -1648,7 +1642,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             soldierBanner.Find("OverrideMP").gameObject.SetActive(true);
             soldierBanner.Find("OverrideMP").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = ActiveSoldier.Instance.S.mp.ToString();
             soldierBanner.Find("OverrideXP").gameObject.SetActive(true);
-            soldierBanner.Find("OverrideXP").GetComponent<TMP_InputField>().placeholder.GetComponent<TextMeshProUGUI>().text = ActiveSoldier.Instance.S.xp.ToString();
         }
         else
         {
@@ -1797,7 +1790,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         if (HelperFunctions.OverrideKeyPressed())
         {
             //load game to previous save
-            Debug.Log("Undoing soldier turn");
             CloseSoldierMenuUI();
             StartCoroutine(DataPersistenceManager.Instance.LoadGameData());
         }
@@ -2374,9 +2366,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     }
     public IEnumerator OpenDamageList()
     {
-        Debug.Log("OpenDamageList called");
         yield return new WaitUntil(() => shotResolvedFlag == true && meleeResolvedFlag == true);
-        Debug.Log("OpenDamageList passed flags");
 
         bool display = false;
         foreach (Transform child in damageUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
@@ -2476,6 +2466,8 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     {
         if (HelperFunctions.OverrideKeyPressed())
         {
+            SetTraumaResolvedFlagTo(false);
+
             foreach (Transform child in traumaUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
                 if (child.GetComponent<SoldierAlert>().soldier.IsDead())
                     Destroy(child.gameObject);
@@ -2488,6 +2480,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
     public void CloseTraumaUI()
     {
         traumaUI.SetActive(false);
+        SetTraumaResolvedFlagTo(true);
     }
     public void AddTraumaAlert(Soldier friendly, int trauma, string description, int rolls, int xpOnResist, string range)
     {
@@ -2502,7 +2495,6 @@ public class MenuManager : MonoBehaviour, IDataPersistence
             }
         }
     }
-
     public IEnumerator OpenTraumaAlertUI()
     {
         yield return new WaitUntil(() => meleeResolvedFlag == true && shotResolvedFlag == true && explosionResolvedFlag == true);
@@ -3241,81 +3233,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
 
 
 
-    //damage event functions - menu
-    public void OpenDamageEventUI()
-    {
-        FreezeTimer();
-        damageEventUI.damageEventTypeDropdown.ClearOptions();
-
-        //generate damage event type dropdown
-        List<TMP_Dropdown.OptionData> damageEventTypeDetails = new()
-        {
-        new TMP_Dropdown.OptionData("Fall Damage"),
-        new TMP_Dropdown.OptionData("Structural Collapse"),
-        new TMP_Dropdown.OptionData("Other"),
-        };
-        if (ActiveSoldier.Instance.S.IsBloodletter() && !ActiveSoldier.Instance.S.bloodLettedThisTurn)
-            damageEventTypeDetails.Add(new TMP_Dropdown.OptionData("<color=green>Bloodletting</color>"));
-        damageEventUI.damageEventTypeDropdown.AddOptions(damageEventTypeDetails);
-
-        //prefill movement position inputs with current position
-        damageEventUI.xPos.placeholder.GetComponent<TextMeshProUGUI>().text = ActiveSoldier.Instance.S.X.ToString();
-        damageEventUI.yPos.placeholder.GetComponent<TextMeshProUGUI>().text = ActiveSoldier.Instance.S.Y.ToString();
-        damageEventUI.zPos.placeholder.GetComponent<TextMeshProUGUI>().text = ActiveSoldier.Instance.S.Z.ToString();
-
-        /*//block bloodletter if already bloodletted this turn
-        if (ActiveSoldier.Instance.S.IsBloodletter() && ActiveSoldier.Instance.S.bloodLettedThisTurn)
-            damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Add("Bloodletting");
-        else
-            damageEventTypeDropdown.GetComponent<DropdownController>().optionsToGrey.Clear();*/
-
-        damageEventUI.gameObject.SetActive(true);
-    }
-    public void ClearDamageEventUI()
-    {
-        clearDamageEventFlag = true;
-        damageEventUI.damageEventTypeDropdown.value = 0;
-        damageEventUI.fallInput.text = "";
-        damageEventUI.structureHeight.text = "";
-        damageEventUI.otherInput.text = "";
-        damageEventUI.damageSource.text = "";
-        damageEventUI.xPos.text = "";
-        damageEventUI.yPos.text = "";
-        damageEventUI.zPos.text = "";
-        damageEventUI.terrainDropdown.value = 0;
-        clearDamageEventFlag = false;
-    }
-    public void CloseDamageEventUI()
-    {
-        UnfreezeTimer();
-        ClearDamageEventUI();
-        damageEventUI.gameObject.SetActive(false);
-    }
-    public void CheckDamageEventType()
-    {
-        damageEventUI.transform.Find("FallDistance").gameObject.SetActive(false);
-        damageEventUI.transform.Find("Other").gameObject.SetActive(false);
-        damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(false);
-        damageEventUI.transform.Find("DamageSource").gameObject.SetActive(false);
-        damageEventUI.transform.Find("Location").gameObject.SetActive(false);
-
-        if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Fall"))
-        {
-            damageEventUI.fallDistanceUI.SetActive(true);
-            damageEventUI.locationUI.SetActive(true);
-        }
-        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Collapse"))
-        {
-            damageEventUI.transform.Find("StructureHeight").gameObject.SetActive(true);
-            damageEventUI.transform.Find("Location").gameObject.SetActive(true);
-        }
-        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Other"))
-        {
-            damageEventUI.transform.Find("Other").gameObject.SetActive(true);
-            damageEventUI.transform.Find("DamageSource").gameObject.SetActive(true);
-        }
-        else if (damageEventUI.damageEventTypeDropdown.captionText.text.Contains("Bloodletting")) {}
-    }
+ 
 
 
 
@@ -3412,9 +3330,18 @@ public class MenuManager : MonoBehaviour, IDataPersistence
         SetXpResolvedFlagTo(true);
         promotionUI.SetActive(false);
     }
+    public void GenerateFringeDamageXp(Soldier causedBy, int damage, string description)
+    {
+        if (causedBy == null || damage <= 0)
+            return;
+
+        int xp = causedBy.IsOppositeTeamAs(ActiveSoldier.Instance.S) ? damage : -damage;
+        
+        AddXpAlert(causedBy, xp, description, true);
+    }
     public void AddXpAlert(Soldier soldier, int xp, string xpDescription, bool learnerEnabled)
     {
-        if (soldier != null && xp > 0)
+        if (soldier != null && xp != 0)
         {
             //block duplicate xp alerts being created, made to obey the rule that xp for avoidance or detection can only be one per soldier per turn
             foreach (Transform child in xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content"))
@@ -3438,7 +3365,7 @@ public class MenuManager : MonoBehaviour, IDataPersistence
                         return;
                 }
 
-                Instantiate(xpAlertPrefab, xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).Init(soldier, xp, xpDescription, learnerEnabled);
+                Instantiate(xpAlertPrefab, xpLogUI.transform.Find("OptionPanel").Find("Scroll").Find("View").Find("Content")).GetComponent<XpAlert>().Init(soldier, xp, xpDescription, learnerEnabled);
             }
             else
                 print($"{soldier.soldierName} cannot receive xp unconscious.");

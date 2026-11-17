@@ -1,25 +1,30 @@
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
-using UnityEngine.SceneManagement;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using System;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DataPersistenceManager : MonoBehaviour
 {
     public static DataPersistenceManager Instance { get; private set; }
+
     public GameData gameData;
     public List<IDataPersistence> dataPersistanceObjects;
+
     [NonSerialized] public FileDataHandler coreDataHandler;
+
     public GameObject loadingScreen;
     public Image loadingImage;
     public Sprite losLogo, lozLogo;
     public Slider progressBar;
     public TextMeshProUGUI progressText;
+
     public bool lozMode;
     public bool IsLoadingGame { get; private set; }
 
@@ -28,40 +33,56 @@ public class DataPersistenceManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            coreDataHandler = new(Application.persistentDataPath, "LOSCore.json");
+
+            coreDataHandler = new FileDataHandler(
+                Application.persistentDataPath,
+                "LOSCore.json"
+            );
+
             DontDestroyOnLoad(gameObject);
-            if (gameData.lozMode)
+
+            if (gameData != null && gameData.lozMode)
                 lozMode = true;
         }
         else
+        {
             Destroy(gameObject);
+        }
     }
+
+    // --------------------------------------------------
+    // SCENE LOADING
+    // --------------------------------------------------
+
     public void LoadSceneWithData(string sceneName)
     {
         if (lozMode)
         {
             loadingImage.sprite = lozLogo;
-            progressText.color = new Color32(100, 151, 53, 255); //green for LOZ mode
+            progressText.color = new Color32(100, 151, 53, 255);
         }
         else
         {
             loadingImage.sprite = losLogo;
-            progressText.color = new Color32(250, 189, 0, 255); //yellow for LOS mode
+            progressText.color = new Color32(250, 189, 0, 255);
         }
+
         progressBar.value = 0;
         progressText.text = "Loading...";
         loadingScreen.SetActive(true);
 
         StartCoroutine(LoadSceneAsync(sceneName));
     }
+
     private IEnumerator LoadSceneAsync(string sceneName)
     {
         Debug.Log($"Loading scene: {sceneName}");
 
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+
         if (operation == null)
         {
-            Debug.LogError($"Scene '{sceneName}' failed to load. Check build settings.");
+            Debug.LogError($"Scene '{sceneName}' failed to load.");
             yield break;
         }
 
@@ -69,7 +90,7 @@ public class DataPersistenceManager : MonoBehaviour
 
         float displayedProgress = 0f;
         float timer = 0f;
-        float timeout = 30f; // seconds
+        const float timeout = 30f;
 
         while (!operation.isDone)
         {
@@ -77,15 +98,21 @@ public class DataPersistenceManager : MonoBehaviour
 
             float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
 
-            // Timeout safety
             if (timer >= timeout)
             {
-                Debug.LogError($"Scene load stalled at {operation.progress:P0}. Timeout hit.");
+                Debug.LogError(
+                    $"Scene loading stalled at {operation.progress:P0}."
+                );
+
                 yield break;
             }
 
-            // Visual progress bar
-            displayedProgress = Mathf.MoveTowards(displayedProgress, targetProgress * 0.8f, Time.deltaTime * 0.5f);
+            displayedProgress = Mathf.MoveTowards(
+                displayedProgress,
+                targetProgress * 0.8f,
+                Time.deltaTime * 0.5f
+            );
+
             progressBar.value = displayedProgress;
             progressText.text = $"Loading... {displayedProgress * 100:F0}%";
 
@@ -98,32 +125,21 @@ public class DataPersistenceManager : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log("Scene load complete. Proceeding to data load.");
-        StartCoroutine(LoadGameData());
+        Debug.Log("Scene loaded. Starting data loading.");
+
+        yield return StartCoroutine(LoadGameData());
     }
+
+    // --------------------------------------------------
+    // DATA LOADING
+    // --------------------------------------------------
 
     public IEnumerator LoadGameData()
     {
-        string path = Path.Combine(Application.persistentDataPath, "LOSCore.json");
-
-        if (!File.Exists(path))
-        {
-            Debug.LogError("JSON file not found!");
-            progressBar.value = 1f;
-            progressText.text = "Load Failed!";
-            yield break;
-        }
-
-        progressBar.value = 0.8f; // Scene loaded, start data loading
-
-        string jsonText = File.ReadAllText(path);
-        gameData = JsonUtility.FromJson<GameData>(jsonText);
-        progressBar.value = 0.85f;
-        progressText.text = "Loading Data...";
-
         yield return StartCoroutine(LoadGame());
 
-        loadingScreen.SetActive(false);
+        if (loadingScreen != null)
+            loadingScreen.SetActive(false);
     }
 
     public IEnumerator LoadGame()
@@ -132,57 +148,73 @@ public class DataPersistenceManager : MonoBehaviour
 
         try
         {
-            dataPersistanceObjects = FindAllDataPersistenceObjects();
+            progressBar.value = 0.8f;
+            progressText.text = "Loading Data...";
+
             gameData = coreDataHandler.Load();
 
             if (gameData == null)
             {
-                Debug.Log("No data was found. Starting new game.");
+                Debug.Log("No save data found. Starting a new game.");
                 NewGame();
             }
 
-            // Exclude individual Soldiers and Items.
-            // Their managers handle destroying, recreating and loading them.
-            List<IDataPersistence> objectsToLoad = dataPersistanceObjects
-                .Where(obj => obj != null &&
-                              obj is not Soldier &&
-                              obj is not Item &&
-                              obj is not POI)
-                .ToList();
+            // Ensure collections exist, including collections introduced
+            // by newer versions of the save system.
+            EnsureGameDataCollections();
 
-            float step = objectsToLoad.Count > 0
-                ? 0.15f / objectsToLoad.Count
+            // Find persistence objects in the newly loaded scene.
+            dataPersistanceObjects = FindAllDataPersistenceObjects();
+
+            // Load in a deliberate order.
+            List<IDataPersistence> orderedObjects =
+                GetOrderedPersistenceObjects(dataPersistanceObjects);
+
+            float step = orderedObjects.Count > 0
+                ? 0.15f / orderedObjects.Count
                 : 0f;
 
-            float currentProgress = 0.85f;
+            float currentProgress = 0.8f;
 
-            foreach (IDataPersistence dataPersistenceObj in objectsToLoad)
+            foreach (IDataPersistence persistenceObject in orderedObjects)
             {
-                if (dataPersistenceObj == null)
+                if (persistenceObject == null)
                     continue;
 
-                dataPersistenceObj.LoadData(gameData);
+                Debug.Log(
+                    $"Loading persistence object: {persistenceObject.GetType().Name}"
+                );
+
+                persistenceObject.LoadData(gameData);
 
                 currentProgress += step;
-
                 progressBar.value = currentProgress;
-                progressText.text = $"Loading Data... {currentProgress * 100:F0}%";
 
+                progressText.text =
+                    $"Loading Data... {currentProgress * 100:F0}%";
+
+                // Allow Unity to finish instantiating and initializing
+                // objects before the next manager loads.
                 yield return null;
             }
 
-            // Assign items to their owners after Soldiers and Items have loaded.
-            if (ItemManager.Instance != null && SoldierManager.Instance != null)
+            // Assign items only after both Soldiers and Items exist.
+            if (ItemManager.Instance != null &&
+                SoldierManager.Instance != null)
             {
                 ItemManager.Instance.AssignItemsToOwners();
-                progressBar.value = 0.98f;
             }
 
+            progressBar.value = 0.98f;
+
+            // Initialize gameplay only after persistence has completed.
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.Init();
-                progressBar.value = 1f;
             }
+
+            progressBar.value = 1f;
+            progressText.text = "Loading Complete!";
         }
         finally
         {
@@ -190,59 +222,171 @@ public class DataPersistenceManager : MonoBehaviour
         }
     }
 
+    // --------------------------------------------------
+    // ORDERED PERSISTENCE
+    // --------------------------------------------------
+
+    private List<IDataPersistence> GetOrderedPersistenceObjects(
+        List<IDataPersistence> objects)
+    {
+        List<IDataPersistence> ordered = new();
+
+        // 1. Soldiers must exist before alerts reference them.
+        AddPersistenceObjects<SoldierManager>(objects, ordered);
+
+        // 2. Items can now load and resolve their references.
+        AddPersistenceObjects<ItemManager>(objects, ordered);
+
+        // 3. Load all remaining persistence objects.
+        // XpAlertManager is included here, after SoldierManager.
+        foreach (IDataPersistence obj in objects)
+        {
+            if (obj == null ||
+                IsManagedPersistenceObject(obj) ||
+                ordered.Contains(obj))
+                continue;
+
+            ordered.Add(obj);
+        }
+
+        return ordered;
+    }
+
+    private void AddPersistenceObjects<T>(
+        List<IDataPersistence> source,
+        List<IDataPersistence> destination)
+    {
+        foreach (IDataPersistence obj in source)
+        {
+            if (obj != null && obj is T && !destination.Contains(obj))
+            {
+                destination.Add(obj);
+            }
+        }
+    }
+
+    // --------------------------------------------------
+    // GAME DATA INITIALIZATION
+    // --------------------------------------------------
+
+    private void EnsureGameDataCollections()
+    {
+        if (gameData.allSoldiersIds == null)
+            gameData.allSoldiersIds = new List<string>();
+
+        if (gameData.allSoldiersDetails == null)
+            gameData.allSoldiersDetails =
+                new Dictionary<string, Dictionary<string, object>>();
+
+        if (gameData.allXpAlertIds == null)
+            gameData.allXpAlertIds = new List<string>();
+
+        if (gameData.allXpAlertDetails == null)
+            gameData.allXpAlertDetails =
+                new Dictionary<string, Dictionary<string, object>>();
+
+        // Add other save collections here if they can be null
+        // when loading older save files.
+    }
+
     public void NewGame()
     {
         gameData = new GameData();
+        EnsureGameDataCollections();
     }
 
-    public async Task WaitForDynamicObjects(IProgress<float> progress = null)
+    // --------------------------------------------------
+    // SAVE
+    // --------------------------------------------------
+
+    public void SaveGame()
     {
-        float startProgress = 0.9f;
-        float endProgress = 1.0f;
-        float currentProgress = startProgress;
+        if (gameData == null)
+        {
+            Debug.LogError("Cannot save: GameData is null.");
+            return;
+        }
+
+        dataPersistanceObjects = FindAllDataPersistenceObjects();
+
+        foreach (IDataPersistence persistenceObject in dataPersistanceObjects)
+        {
+            if (persistenceObject == null ||
+                IsManagedPersistenceObject(persistenceObject))
+                continue;
+
+            persistenceObject.SaveData(ref gameData);
+        }
+
+        coreDataHandler.Save(gameData);
+
+        Debug.Log("Game saved successfully.");
+        Debug.Log($"Saved XP Alerts: {gameData.allXpAlertIds?.Count ?? 0}");
+        Debug.Log($"XP Alert Details: {gameData.allXpAlertDetails?.Count ?? 0}");
+    }
+
+    // --------------------------------------------------
+    // FIND PERSISTENCE OBJECTS
+    // --------------------------------------------------
+
+    private List<IDataPersistence> FindAllDataPersistenceObjects()
+    {
+        IEnumerable<IDataPersistence> dataPersistenceObjects = FindObjectsByType<MonoBehaviour>().OfType<IDataPersistence>();
+
+        return new List<IDataPersistence>(dataPersistenceObjects);
+    }
+    private bool IsManagedPersistenceObject(IDataPersistence obj)
+    {
+        return obj is Soldier ||
+               obj is Item ||
+               obj is POI ||
+               obj is XpAlert;
+    }
+    // --------------------------------------------------
+    // DYNAMIC OBJECT LOADING
+    // --------------------------------------------------
+
+    public async Task WaitForDynamicObjects(
+        IProgress<float> progress = null)
+    {
+        float currentProgress = 0.9f;
 
         while (!AllObjectsLoaded())
         {
-            currentProgress = Mathf.Lerp(currentProgress, endProgress, Time.deltaTime * 2);
+            currentProgress = Mathf.Lerp(
+                currentProgress,
+                1f,
+                Time.deltaTime * 2f
+            );
+
             progress?.Report(currentProgress);
+
             await Task.Yield();
         }
 
-        // Ensure it reaches 100%
         await Task.Delay(500);
         progress?.Report(1f);
     }
 
     public bool AllObjectsLoaded()
     {
-        dataPersistanceObjects = FindAllDataPersistenceObjects(); // Refresh list
-        foreach (var obj in dataPersistanceObjects)
+        dataPersistanceObjects = FindAllDataPersistenceObjects();
+
+        foreach (IDataPersistence obj in dataPersistanceObjects)
         {
-            if (!obj.IsDataLoaded) // Implement this property in IDataPersistence
+            if (obj == null)
+                continue;
+
+            if (!obj.IsDataLoaded)
             {
-                print($"DataPersistence object {obj.GetType().Name} is not loaded yet.");
+                Debug.Log(
+                    $"DataPersistence object {obj.GetType().Name} is not loaded yet."
+                );
+
                 return false;
             }
         }
+
         return true;
-    }
-    public void SaveGame()
-    {
-        //print("Saving game");
-        dataPersistanceObjects = FindAllDataPersistenceObjects();
-        //pass data to other scripts to update it
-        foreach (IDataPersistence dataPersistenceObj in dataPersistanceObjects)
-        {
-            dataPersistenceObj.SaveData(ref gameData);
-        }
-        //save that data to a file using the data handler
-
-        coreDataHandler.Save(gameData);
-    }
-    private List<IDataPersistence> FindAllDataPersistenceObjects()
-    {
-        IEnumerable<IDataPersistence> dataPersistenceObjects = FindObjectsByType<MonoBehaviour>().OfType<IDataPersistence>();
-
-        return new List<IDataPersistence>(dataPersistenceObjects);
     }
 }

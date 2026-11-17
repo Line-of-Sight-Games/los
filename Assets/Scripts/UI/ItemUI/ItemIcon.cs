@@ -38,7 +38,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public ItemIcon Init(Item item, ItemSlot originalSlot)
     {
-        print($"trying to initialise prefab of {item.itemName}({item.Id})");
+        //print($"trying to initialise prefab of {item.itemName}({item.Id})");
         this.item = item;
         gameObject.name = item.itemName;
         rectTransform = GetComponent<RectTransform>();
@@ -57,7 +57,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         //show medikit slots
         if (item.IsBackpack() || item.IsBrace() || item.IsBag())
         {
-            print($"{item.Id} is a brace/bag/backpack");
+            //print($"{item.Id} is a brace/bag/backpack");
             ShowMedikit1();
             if (item.IsBackpack())
                 ShowMedikit2();
@@ -117,15 +117,15 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void AddItemIconInSlot(Item item, ItemSlot slot)
     {
-        print($"trying to add item icon to slot for item: {item.Id}");
+        //print($"trying to add item icon to slot for item: {item.Id}");
         if (item != null && slot != null)
         {
-            print($"item and slot are not null");
+            //print($"item and slot are not null");
             if (slot.item == null)
             {
-                print("targetslot is empty");
+                //print("targetslot is empty");
                 ItemIcon newItemIcon = Instantiate(MenuManager.Instance.itemIconPrefab, slot.transform).GetComponent<ItemIcon>().Init(item, slot);
-                print($"{newItemIcon.name} @ {newItemIcon.transform}");
+                //print($"{newItemIcon.name} @ {newItemIcon.transform}");
                 slot.AssignItemIcon(newItemIcon);
             }
         }
@@ -139,7 +139,7 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void ShowMedikit1()
     {
-        print($"trying to show medikits in item {item.Id}");
+        //print($"trying to show medikits in item {item.Id}");
         if (item.Inventory.GetItemInSlot("Medikit1") != null)
             AddItemIconInSlot(item.Inventory.GetItemInSlot("Medikit1"), medikit1);
 
@@ -147,10 +147,10 @@ public class ItemIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     }
     public void ShowMedikit2()
     {
-        print($"searching inventory of item: {item.Id} trying to show medikit2");
+        //print($"searching inventory of item: {item.Id} trying to show medikit2");
         if (item.Inventory.GetItemInSlot("Medikit2") != null)
         {
-            print($"found medikit2 item in inventory of item: {item.Id}");
+            //print($"found medikit2 item in inventory of item: {item.Id}");
             AddItemIconInSlot(item.Inventory.GetItemInSlot("Medikit2"), medikit2);
         }
         
