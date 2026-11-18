@@ -4089,7 +4089,8 @@ public class Soldier : PhysicalObject, IDataPersistence, IHaveInventory, IAmShoo
         {
             MenuManager.Instance.binocularsFlashResolvedFlag = false;
 
-            yield return new WaitForSeconds(0.5f);
+            WaitForSeconds waitForSeconds = new(0.5f);
+            yield return waitForSeconds;
 
             MenuManager.Instance.binocularsFlashResolvedFlag = true;
 

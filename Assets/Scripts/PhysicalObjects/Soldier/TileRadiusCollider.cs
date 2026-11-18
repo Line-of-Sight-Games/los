@@ -2,17 +2,6 @@ using UnityEngine;
 
 public class TileRadiusCollider : SoldierTriggerCollider
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void OnTriggerEnter(Collider colliderThatEntered)
     {
         if (IsValidBodyCollision(colliderThatEntered, out BaseBodyCollider bodyThatEntered))

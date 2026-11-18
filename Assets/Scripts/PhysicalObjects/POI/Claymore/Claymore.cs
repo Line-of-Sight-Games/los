@@ -13,7 +13,7 @@ public class Claymore : POI, IDataPersistence, IExplosive, IAmDetectable, IAmDis
     public int c, facingX, facingY;
     public string placedById;
     public Soldier placedBy;
-    public new Renderer renderer;
+    public Renderer renderer;
 
     private void Update()
     {

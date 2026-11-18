@@ -650,12 +650,12 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 ap++;
         }
 
-        moveUI.apCost.text = ap.ToString();
+        moveUI.apCost.SetText("{0}", ap);
     }
     public void UpdateMoveDonated()
     {
         if (moveUI.moveTypeDropdown.captionText.text.Contains("Planner"))
-            moveUI.moveDonated.text = ActiveSoldier.Instance.S.HalfMove.ToString();
+            moveUI.moveDonated.SetText("{0}", ActiveSoldier.Instance.S.HalfMove);
     }
     public void UpdateMoveUI()
     {
@@ -955,7 +955,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         if (ActiveSoldier.Instance.S.roundsFielded == 0 && !ActiveSoldier.Instance.S.usedAP)
             ap = 0;
 
-        configUI.apCost.text = ap.ToString();
+        configUI.apCost.SetText("{0}", ap);
         return ap;
     }
     public List<Item> FindNearbyItems()
@@ -1511,7 +1511,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
                         if (friendly.IsAbleToSee())
                         {
-                            int rolls = 0, xpOnResist = 0;
+                            int rolls, xpOnResist;
                             if (friendly.PhysicalObjectWithinMaxRadius(deadSoldier))
                             {
                                 string range = CalculateRangeBracket(CalculateRange(deadSoldier, friendly));

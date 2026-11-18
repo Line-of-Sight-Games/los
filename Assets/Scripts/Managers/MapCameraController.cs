@@ -1,5 +1,4 @@
 
-using Unity.SmartStrings.Core.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -8,49 +7,49 @@ using UnityEngine.UI;
 public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public static MapCameraController Instance { get; private set; }
+
     [Header("References")]
-    [SerializeField] private Camera mapCamera;
-    [SerializeField] private Transform cameraRig;
+    public Camera mapCamera;
+    public Transform cameraRig;
 
     [Header("Zoom")]
-    [SerializeField] private float minZoomDistance = 5f;
-    [SerializeField] private float maxZoomDistance = 1000f;
-    [SerializeField] private float zoomSpeed = 100f;
-    [SerializeField] private float scrollSensitivity = 1f;
-    [SerializeField] private float zoomSmoothness = 10f;
+    private float minZoomDistance = 5f;
+    private float maxZoomDistance = 1000f;
+    private float zoomSpeed = 100f;
+    private float scrollSensitivity = 100f;
+    private float zoomSmoothness = 10f;
 
     [Header("Rotation")]
-    [SerializeField] private float rotationSpeed = 1f;
-    [SerializeField] private float defaultPitch = 90f;
+    private float rotationSpeed = 2f;
+    private float defaultPitch = 90f;
 
     [Header("Panning")]
-    [SerializeField] private float panSpeed = 10f;
-    [SerializeField] private float mousePanSensitivity = 0.05f;
+    private float panDragThreshold = 5f;
 
     [Header("Battlefield Bounds")]
-    [SerializeField] private float edgeOverscroll = 100f;
-    [SerializeField] private float verticalOverscroll = 100f;
+    private float edgeOverscroll = 100f;
+    private float verticalOverscroll = 100f;
 
     [Header("Initial View")]
-    [SerializeField] private float initialViewPadding = 5f;
-    [SerializeField] private float defaultFieldOfView = 50f;
+    private float initialViewPadding = 1.1f;
+    private float defaultFieldOfView = 50f;
 
     [Header("Double Click")]
-    [SerializeField] private float doubleClickInterval = 0.3f;
+    private float doubleClickInterval = 0.3f;
 
     [Header("Object Focus")]
-    [SerializeField] private float objectFocusDistance = 15f;
-    [SerializeField] private float focusTransitionSpeed = 5f;
-    [SerializeField] private float focusZoomPadding = 2f;
+    private float objectFocusDistance = 15f;
+    private float focusTransitionSpeed = 5f;
+    private float focusZoomPadding = 2f;
 
     [Header("Object Clicking")]
-    [SerializeField] private LayerMask clickableLayers = ~0;
-    [SerializeField] private float maxRaycastDistance = 2000f;
+    private LayerMask clickableLayers = ~0;
+    private float maxRaycastDistance = 2000f;
 
     // Battlefield bounds
-    private float minX = 1f;
-    private float minY = 1f;
-    private float minZ = 0f;
+    private readonly float minX = 1f;
+    private readonly float minY = 1f;
+    private readonly float minZ = 0f;
 
     private float maxX;
     private float maxY;
@@ -68,16 +67,41 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
     private bool initialised;
     private bool pointerInside;
     private bool isRotating;
+
+    // Grab-and-drag state
     private bool isPanning;
+    private bool hasDragged;
+    private bool leftClickWasDrag;
+
+    private Vector2 panStartPosition;
+    private Vector2 previousMousePosition;
 
     private float lastLeftClickTime = -1f;
 
+    // Object focus state
     private Vector3 targetFocusPoint;
     private bool isFocusing;
     private float focusTargetZoom;
 
     private RawImage rawImage;
 
+    private RaycastHit[] raycastHits = new RaycastHit[32];
+
+    private static readonly System.Collections.Generic.IComparer<RaycastHit>
+        raycastHitComparer =
+            System.Collections.Generic.Comparer<RaycastHit>.Create(
+                CompareRaycastHits
+            );
+
+    private static int CompareRaycastHits(RaycastHit a, RaycastHit b)
+    {
+        return a.distance.CompareTo(b.distance);
+    }
+
+
+    // ---------------------------------------------------------
+    // UNITY LIFECYCLE
+    // ---------------------------------------------------------
 
     private void Awake()
     {
@@ -87,6 +111,7 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             enabled = false;
             return;
         }
+
         Instance = this;
 
         rawImage = GetComponent<RawImage>();
@@ -133,11 +158,29 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
         if (mouse == null)
             return;
 
-        HandleDoubleClick(mouse);
-        HandleObjectClick(mouse);
         HandleZoom(mouse);
         HandleRotation(mouse);
         HandlePanning(mouse);
+
+        // Process left-click actions on release so we can distinguish
+        // an actual click from a drag.
+        if (mouse.leftButton.wasReleasedThisFrame)
+        {
+            if (leftClickWasDrag)
+            {
+                // A drag should not count as a double-click.
+                lastLeftClickTime = -1f;
+            }
+            else
+            {
+                if (!HandleDoubleClick())
+                {
+                    HandleObjectClick(mouse);
+                }
+            }
+
+            leftClickWasDrag = false;
+        }
     }
 
 
@@ -181,6 +224,8 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
 
         UpdateCameraPosition();
     }
+
+
     private void OnDestroy()
     {
         if (Instance == this)
@@ -192,7 +237,10 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
     // INITIALIZATION
     // ---------------------------------------------------------
 
-    public void Init(float battlefieldMaxX, float battlefieldMaxY, float battlefieldMaxZ)
+    public void Init(
+        float battlefieldMaxX,
+        float battlefieldMaxY,
+        float battlefieldMaxZ)
     {
         maxX = battlefieldMaxX;
         maxY = battlefieldMaxY;
@@ -211,8 +259,6 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
 
         yaw = 0f;
         pitch = defaultPitch;
-
-        targetZoomDistance = CalculateFitDistance();
 
         targetZoomDistance = Mathf.Clamp(
             CalculateFitDistance(),
@@ -240,19 +286,18 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
     private Vector3 GetBattlefieldCentre()
     {
         return new Vector3(
-            (maxX) * 0.5f,
+            maxX * 0.5f,
             0f,
-            (maxY) * 0.5f
+            maxY * 0.5f
         );
     }
 
+
     private float CalculateFitDistance()
     {
-        // Battlefield dimensions.
         float battlefieldWidth = maxX - 1f;
         float battlefieldDepth = maxY - 1f;
 
-        // Camera field of view.
         float verticalFov = mapCamera.fieldOfView * Mathf.Deg2Rad;
         float aspect = mapCamera.aspect;
 
@@ -260,7 +305,6 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             Mathf.Tan(verticalFov * 0.5f) * aspect
         );
 
-        // Required distance to fit the battlefield.
         float distanceForWidth =
             (battlefieldWidth * 0.5f) /
             Mathf.Tan(horizontalFov * 0.5f);
@@ -269,13 +313,11 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             (battlefieldDepth * 0.5f) /
             Mathf.Tan(verticalFov * 0.5f);
 
-        // Use whichever dimension requires the greater distance.
         float fitDistance = Mathf.Max(
             distanceForWidth,
             distanceForDepth
         );
 
-        // Add additional viewing margin.
         return fitDistance * initialViewPadding;
     }
 
@@ -315,7 +357,6 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
         if (Mathf.Abs(scroll) < 0.01f)
             return;
 
-        // Normalise mouse wheel input. A typical wheel notch is 120.
         float zoomAmount =
             scroll * scrollSensitivity * zoomSpeed * 0.001f;
 
@@ -330,7 +371,7 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
 
 
     // ---------------------------------------------------------
-    // ROTATION - MIDDLE MOUSE BUTTON
+    // ROTATION - RIGHT MOUSE BUTTON
     // ---------------------------------------------------------
 
     private void HandleRotation(Mouse mouse)
@@ -346,43 +387,159 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
 
         Vector2 mouseDelta = mouse.delta.ReadValue();
 
-        // Allow continuous rotation beyond 360 degrees.
         yaw += mouseDelta.x * rotationSpeed;
 
-        // Allow looking over and underneath the battlefield.
-        // Avoid exactly +/-90 degrees to prevent orientation instability.
         pitch -= mouseDelta.y * rotationSpeed;
+
         pitch = Mathf.Clamp(pitch, -89f, 89f);
     }
 
 
     // ---------------------------------------------------------
-    // PANNING - RIGHT MOUSE BUTTON
+    // GRAB AND DRAG PANNING - LEFT MOUSE BUTTON
     // ---------------------------------------------------------
+
     private void HandlePanning(Mouse mouse)
     {
-        if (mouse.middleButton.wasPressedThisFrame)
+        if (mouse.leftButton.wasPressedThisFrame)
+        {
             isPanning = true;
+            hasDragged = false;
 
-        if (mouse.middleButton.wasReleasedThisFrame)
+            panStartPosition = mouse.position.ReadValue();
+            previousMousePosition = panStartPosition;
+        }
+
+        if (isPanning && mouse.leftButton.isPressed)
+        {
+            Vector2 currentMousePosition = mouse.position.ReadValue();
+
+            if (!hasDragged)
+            {
+                float dragDistance = Vector2.Distance(
+                    panStartPosition,
+                    currentMousePosition
+                );
+
+                if (dragDistance >= panDragThreshold)
+                {
+                    hasDragged = true;
+
+                    // Start from the original click position so the
+                    // entire initial drag distance is accounted for.
+                    previousMousePosition = panStartPosition;
+                }
+            }
+
+            if (hasDragged)
+            {
+                PanCamera(
+                    previousMousePosition,
+                    currentMousePosition
+                );
+
+                previousMousePosition = currentMousePosition;
+            }
+        }
+
+        if (mouse.leftButton.wasReleasedThisFrame)
+        {
+            leftClickWasDrag = hasDragged;
+
             isPanning = false;
+            hasDragged = false;
+        }
+    }
 
-        if (!isPanning)
+
+    private void PanCamera(
+        Vector2 previousScreenPosition,
+        Vector2 currentScreenPosition)
+    {
+        // The battlefield is assumed to lie on the XZ plane at Y = 0.
+        Plane battlefieldPlane = new Plane(
+            Vector3.up,
+            Vector3.zero
+        );
+
+        if (!TryGetBattlefieldPoint(
+            previousScreenPosition,
+            battlefieldPlane,
+            out Vector3 previousWorldPoint))
+        {
             return;
+        }
 
-        Vector2 mouseDelta = mouse.delta.ReadValue();
+        if (!TryGetBattlefieldPoint(
+            currentScreenPosition,
+            battlefieldPlane,
+            out Vector3 currentWorldPoint))
+        {
+            return;
+        }
 
-        // Get the camera's current screen-relative directions.
-        Vector3 cameraRight = mapCamera.transform.right;
-        Vector3 cameraUp = mapCamera.transform.up;
-
-        // Move the map in the same direction as the mouse drag.
-        Vector3 movement =
-            (cameraRight * mouseDelta.x +
-             cameraUp * mouseDelta.y)
-            * panSpeed * mousePanSensitivity;
+        // Move the camera in the opposite direction to the mouse.
+        // This keeps the grabbed world point underneath the cursor.
+        Vector3 movement = previousWorldPoint - currentWorldPoint;
 
         focusPoint += movement;
+    }
+
+
+    private bool TryGetBattlefieldPoint(
+        Vector2 screenPosition,
+        Plane battlefieldPlane,
+        out Vector3 worldPoint)
+    {
+        worldPoint = Vector3.zero;
+
+        Canvas canvas = rawImage.canvas;
+
+        Camera uiCamera =
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : canvas.worldCamera;
+
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rawImage.rectTransform,
+            screenPosition,
+            uiCamera,
+            out Vector2 localPoint))
+        {
+            return false;
+        }
+
+        Rect rect = rawImage.rectTransform.rect;
+
+        float u = Mathf.InverseLerp(
+            rect.xMin,
+            rect.xMax,
+            localPoint.x
+        );
+
+        float v = Mathf.InverseLerp(
+            rect.yMin,
+            rect.yMax,
+            localPoint.y
+        );
+
+        // Account for the RawImage UV rectangle.
+        Rect uv = rawImage.uvRect;
+
+        u = uv.x + u * uv.width;
+        v = uv.y + v * uv.height;
+
+        Ray ray = mapCamera.ViewportPointToRay(
+            new Vector3(u, v, 0f)
+        );
+
+        if (battlefieldPlane.Raycast(ray, out float distance))
+        {
+            worldPoint = ray.GetPoint(distance);
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -390,11 +547,8 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
     // DOUBLE CLICK - RESET VIEW
     // ---------------------------------------------------------
 
-    private void HandleDoubleClick(Mouse mouse)
+    private bool HandleDoubleClick()
     {
-        if (!mouse.leftButton.wasPressedThisFrame)
-            return;
-
         float currentClickTime = Time.unscaledTime;
 
         if (lastLeftClickTime >= 0f &&
@@ -403,17 +557,20 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             ResetView();
 
             lastLeftClickTime = -1f;
+
+            return true;
         }
-        else
-        {
-            lastLeftClickTime = currentClickTime;
-        }
+
+        lastLeftClickTime = currentClickTime;
+
+        return false;
     }
 
 
     public void ResetView()
     {
         focusPoint = GetBattlefieldCentre();
+
         yaw = 0f;
         pitch = defaultPitch;
 
@@ -425,20 +582,19 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
 
         currentZoomDistance = targetZoomDistance;
 
+        isFocusing = false;
+
         ClampFocusPoint();
         UpdateCameraPosition();
     }
 
+
     // ---------------------------------------------------------
-    // FOCUS ON OBJECT CLICK
+    // OBJECT CLICKING
     // ---------------------------------------------------------
 
     private void HandleObjectClick(Mouse mouse)
     {
-        if (!mouse.leftButton.wasPressedThisFrame)
-            return;
-
-        // Convert screen position to RawImage local coordinates.
         Vector2 mousePosition = mouse.position.ReadValue();
 
         Canvas canvas = rawImage.canvas;
@@ -457,7 +613,6 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             return;
         }
 
-        // Convert local coordinates into viewport coordinates.
         Rect rect = rawImage.rectTransform.rect;
 
         float u = Mathf.InverseLerp(
@@ -472,18 +627,15 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             localPoint.y
         );
 
-        // Account for RawImage UV settings.
         Rect uv = rawImage.uvRect;
 
         u = uv.x + u * uv.width;
         v = uv.y + v * uv.height;
 
-        // Generate the tactical map ray.
         Ray ray = mapCamera.ViewportPointToRay(
             new Vector3(u, v, 0f)
         );
 
-        // Exclude Ignore Raycast layer.
         int raycastMask = clickableLayers.value;
 
         int ignoreLayer = LayerMask.NameToLayer("Ignore Raycast");
@@ -493,32 +645,46 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             raycastMask &= ~(1 << ignoreLayer);
         }
 
-        // Detect all colliders, including triggers.
-        RaycastHit[] hits = Physics.RaycastAll(
-            ray,
-            maxRaycastDistance,
-            raycastMask,
-            QueryTriggerInteraction.Collide
-        );
+        int hitCount;
 
-        // Process closest hits first.
+        while (true)
+        {
+            hitCount = Physics.RaycastNonAlloc(
+                ray,
+                raycastHits,
+                maxRaycastDistance,
+                raycastMask,
+                QueryTriggerInteraction.Collide
+            );
+
+            if (hitCount < raycastHits.Length)
+                break;
+
+            System.Array.Resize(
+                ref raycastHits,
+                raycastHits.Length * 2
+            );
+        }
+
         System.Array.Sort(
-            hits,
-            (a, b) => a.distance.CompareTo(b.distance)
+            raycastHits,
+            0,
+            hitCount,
+            raycastHitComparer
         );
 
         bool foundObject = false;
 
-        foreach (RaycastHit hit in hits)
+        for (int i = 0; i < hitCount; i++)
         {
-            // Find the PhysicalObject belonging to this collider.
+            RaycastHit hit = raycastHits[i];
+
             PhysicalObject physicalObject =
                 hit.collider.GetComponentInParent<PhysicalObject>();
 
             if (physicalObject == null)
                 continue;
 
-            // Only accept the designated body collider.
             if (!physicalObject.IsBodyCollider(hit.collider))
                 continue;
 
@@ -527,7 +693,6 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
                 $"Collider: {hit.collider.name}"
             );
 
-            // Focus camera on the selected object.
             FocusOnObject(hit.collider);
 
             // SOLDIER
@@ -555,7 +720,6 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
             }
         }
 
-        // Nothing selectable was hit.
         if (!foundObject)
         {
             TooltipPopup.Instance?.Close();
@@ -568,17 +732,16 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
     // ---------------------------------------------------------
     // FOCUS ON OBJECT
     // ---------------------------------------------------------
+
     public void FocusOnObject(Transform target)
     {
         if (target == null)
             return;
 
-        // Centre the camera on the target.
         targetFocusPoint = target.position;
 
-        // Determine whether the object has a Renderer
-        // so we can account for its actual size.
-        Renderer objectRenderer = target.GetComponentInChildren<Renderer>();
+        Renderer objectRenderer =
+            target.GetComponentInChildren<Renderer>();
 
         if (objectRenderer != null)
         {
@@ -608,6 +771,8 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
 
         isFocusing = true;
     }
+
+
     public void FocusOnObject(Collider targetCollider)
     {
         if (targetCollider == null)
@@ -682,7 +847,9 @@ public class MapCameraController : MonoBehaviour, IPointerEnterHandler, IPointer
 
         isRotating = false;
         isPanning = false;
+        hasDragged = false;
 
+        leftClickWasDrag = false;
         lastLeftClickTime = -1f;
     }
 }

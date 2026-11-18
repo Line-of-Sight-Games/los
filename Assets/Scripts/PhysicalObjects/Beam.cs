@@ -5,7 +5,7 @@ public class Beam : MonoBehaviour
     public Vector3 startingPosition, targetPosition;
     public float beamHeight, beamWidth;
 
-    public new Renderer renderer;
+    public Renderer renderer;
 
     void Update()
     {

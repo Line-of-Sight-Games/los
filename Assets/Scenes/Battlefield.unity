@@ -79277,7 +79277,8 @@ MonoBehaviour:
   rotationSpeed: 2
   defaultPitch: 90
   panSpeed: 8
-  mousePanSensitivity: 1
+  mousePanSensitivity: 0.5
+  panDragThreshold: 5
   edgeOverscroll: 100
   verticalOverscroll: 100
   initialViewPadding: 1.1
@@ -87415,8 +87416,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90ac500e9bc5560419d4850ddef3662e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineMaterial: {fileID: 0}
-  lineColor: {r: 0, g: 1, b: 1, a: 1}
+  lineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  lineColor: {r: 0, g: 0, b: 0, a: 0}
   lineWidth: 0.15
 --- !u!1 &835551709
 GameObject:

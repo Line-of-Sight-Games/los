@@ -10,12 +10,6 @@ public class SoldierTriggerCollider : BaseTriggerCollider
         linkedObject = linkedSoldier;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public Soldier LinkedSoldier 
     { 
         get { return linkedSoldier; } 

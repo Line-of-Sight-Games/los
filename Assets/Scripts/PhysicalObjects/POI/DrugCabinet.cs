@@ -6,7 +6,7 @@ using UnityEngine;
 public class DrugCabinet : POI, IDataPersistence, IHaveInventory
 {
     public Inventory inventory;
-    public JArray itemsJArray;
+    [NonSerialized] public JArray itemsJArray;
     public List<string> inventoryList;
 
     public DrugCabinet Init(Tuple<Vector3, string> location)

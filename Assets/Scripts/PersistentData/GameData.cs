@@ -20,13 +20,13 @@ public class GameData
     public int maxX, maxY, maxZ;
     public List<string> savedWeather;
     public List<string> allSoldiersIds;
-    public Dictionary<string, Dictionary<string, object>> allSoldiersDetails;
+    [SerializeField] public Dictionary<string, Dictionary<string, object>> allSoldiersDetails;
     public List<string> allItemIds;
-    public Dictionary<string, Dictionary<string, object>> allItemDetails;
+    [SerializeField] public Dictionary<string, Dictionary<string, object>> allItemDetails;
     public List<string> allPOIIds;
-    public Dictionary<string, Dictionary<string, object>> allPOIDetails;
+    [SerializeField] public Dictionary<string, Dictionary<string, object>> allPOIDetails;
     public List<string> allXpAlertIds;
-    public Dictionary<string, Dictionary<string, object>> allXpAlertDetails;
+    [SerializeField] public Dictionary<string, Dictionary<string, object>> allXpAlertDetails;
     public int numberBasicZombies, numberBruteZombies;
 
     public GameData()
